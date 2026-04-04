@@ -669,7 +669,7 @@ function Dashboard({ user, onLogout }) {
   ];
 
   return (
-    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", height:"100vh", width:"100vw", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", height:"100dvh", width:"100vw", display:"flex", flexDirection:"column", overflow:"hidden", position:"fixed", inset:0 }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* TOAST */}
@@ -734,7 +734,7 @@ function Dashboard({ user, onLogout }) {
 
       {page === null ? (
         /* ═══════ CHATBOT (FULL CENTER) ═══════ */
-        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%" }}>
+        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%", minHeight:0, overflow:"hidden" }}>
           {/* Chat Header */}
           <div style={{ padding:"12px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12" }}>
             <div style={{ display:"flex", alignItems:"center", gap:12 }}>
@@ -757,7 +757,7 @@ function Dashboard({ user, onLogout }) {
           </div>
 
           {/* Messages */}
-          <div style={{ flex:1, overflowY:"auto", padding:"16px", display:"flex", flexDirection:"column", gap:12, maxWidth:800, width:"100%", margin:"0 auto" }}>
+          <div style={{ flex:1, overflowY:"auto", padding:"16px", display:"flex", flexDirection:"column", gap:12, maxWidth:800, width:"100%", margin:"0 auto", minHeight:0, WebkitOverflowScrolling:"touch" }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display:"flex", justifyContent: m.role==="user" ? "flex-end" : "flex-start" }}>
                 <div style={{
@@ -921,8 +921,8 @@ function Dashboard({ user, onLogout }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         *{box-sizing:border-box;margin:0;padding:0}
-        html,body,#root{width:100%;height:100%;margin:0;padding:0;background:#09090d;}
-        ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
+        html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
+        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
         input::placeholder{color:#4a4a5a}
       `}</style>
     </div>
