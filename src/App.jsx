@@ -328,7 +328,7 @@ function getSmartResponse(text) {
 
 /* ───────── STYLES (object) ───────── */
 const S = {
-  app: { fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", minHeight:"100vh", display:"flex", flexDirection:"column" },
+  app: { fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", minHeight:"100vh", display:"flex", flexDirection:"column", width:"100%", maxWidth:"100vw", overflow:"hidden" },
   header: { padding:"16px 28px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12" },
   logo: { width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14, color:"#000" },
   layout: { flex:1, display:"flex", overflow:"hidden", height:"calc(100vh - 65px)" },
@@ -485,7 +485,7 @@ function Dashboard({ user, onLogout }) {
       )}
 
       {/* HEADER */}
-      <header style={S.header}>
+      <header className="header-inner" style={{ padding:"16px 28px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12", width:"100%" }}>
         <div style={{ display:"flex", alignItems:"center", gap:14 }}>
           <div style={S.logo}>TH</div>
           <div>
@@ -494,20 +494,34 @@ function Dashboard({ user, onLogout }) {
           </div>
         </div>
         <div style={{ display:"flex", gap:4, alignItems:"center" }}>
-          {["dashboard","contacts","chat"].map(t => (
-            <button key={t} onClick={() => setTab(t)} style={{
-              background: tab===t ? "#1a1a28" : "transparent",
-              border: tab===t ? "1px solid #2a2a3a" : "1px solid transparent",
-              borderRadius:8, padding:"7px 16px", color: tab===t ? "#f0f0f5" : "#6b6b80",
-              fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize", transition:"all .2s"
-            }}>{t}</button>
-          ))}
+          {/* Desktop Tabs */}
+          <div className="desktop-tabs" style={{ display:"flex", gap:4 }}>
+            {["dashboard","contacts","chat"].map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                background: tab===t ? "#1a1a28" : "transparent",
+                border: tab===t ? "1px solid #2a2a3a" : "1px solid transparent",
+                borderRadius:8, padding:"7px 16px", color: tab===t ? "#f0f0f5" : "#6b6b80",
+                fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize", transition:"all .2s"
+              }}>{t}</button>
+            ))}
+          </div>
+          {/* Mobile Menu Button */}
+          <div className="mobile-menu-btn" style={{ display:"none", gap:4 }}>
+            {["dashboard","contacts","chat"].map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                background: tab===t ? "#1a1a28" : "transparent",
+                border: tab===t ? "1px solid #2a2a3a" : "1px solid transparent",
+                borderRadius:8, padding:"6px 10px", color: tab===t ? "#f0f0f5" : "#6b6b80",
+                fontSize:11, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize",
+              }}>{t === "dashboard" ? "📊" : t === "contacts" ? "👤" : "💬"}</button>
+            ))}
+          </div>
           <div style={{ width:1, height:24, background:"#2a2a3a", margin:"0 8px" }} />
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:"#000" }}>
               {user?.avatar || user?.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <span style={{ fontSize:12, color:"#8888a0", maxWidth:100, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.username}</span>
+            <span className="user-name-text" style={{ fontSize:12, color:"#8888a0", maxWidth:100, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.username}</span>
             <button onClick={onLogout} title="Logout" style={{
               background:"none", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 8px",
               color:"#6b6b80", cursor:"pointer", display:"flex", alignItems:"center", transition:"all .2s",
@@ -521,15 +535,15 @@ function Dashboard({ user, onLogout }) {
         </div>
       </header>
 
-      <div style={S.layout}>
+      <div className="main-layout" style={S.layout}>
         {/* ───── CONTENT AREA ───── */}
         {tab !== "chat" && (
-          <div style={S.content}>
+          <div className="content-area" style={S.content}>
 
             {/* DASHBOARD */}
             {tab === "dashboard" && <>
               {/* Stats */}
-              <div style={{ display:"flex", gap:14, marginBottom:28, flexWrap:"wrap" }}>
+              <div className="stat-grid" style={{ display:"flex", gap:14, marginBottom:28, flexWrap:"wrap" }}>
                 <StatCard icon={<I.Users/>} label="Total Contacts" value={STATS.totalContacts} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} />
                 <StatCard icon={<I.Mail/>}  label="Emails Sent"    value={STATS.emailsSent}    accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} />
                 <StatCard icon={<I.Activity/>} label="Categories"  value={STATS.categories}    accent="#f97316" />
@@ -539,7 +553,7 @@ function Dashboard({ user, onLogout }) {
               {/* Quick Actions */}
               <div style={{ marginBottom:28 }}>
                 <div style={S.sectionLabel}>Quick Actions</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:10 }}>
+                <div className="quick-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:10 }}>
                   {[
                     { icon:<I.Mail/>,     label:"Send All Emails",  cmd:"Send outreach emails to all categories" },
                     { icon:<I.Activity/>,  label:"Campaign Status",  cmd:"Show me the campaign status" },
@@ -560,7 +574,7 @@ function Dashboard({ user, onLogout }) {
               {/* Category Buttons */}
               <div style={{ marginBottom:28 }}>
                 <div style={S.sectionLabel}>Send by Category</div>
-                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:10 }}>
+                <div className="cat-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:10 }}>
                   {Object.entries(CAT).map(([name, c]) => (
                     <button key={name} onClick={() => handleSend(`Send outreach emails to all ${name} companies`)} style={{
                       background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:12, padding:16,
@@ -581,7 +595,7 @@ function Dashboard({ user, onLogout }) {
             {tab === "contacts" && (
               <div>
                 <div style={S.sectionLabel}>Contact Database</div>
-                <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, overflow:"hidden" }}>
+                <div className="table-wrapper" style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, overflow:"hidden" }}>
                   <table style={{ width:"100%", borderCollapse:"collapse" }}>
                     <thead>
                       <tr style={{ borderBottom:"1px solid #1e1e28" }}>
@@ -614,10 +628,11 @@ function Dashboard({ user, onLogout }) {
         )}
 
         {/* ───── CHAT PANEL ───── */}
-        <div style={{
+        <div className="chat-panel" style={{
           width: tab==="chat" ? "100%" : 380,
           borderLeft: tab==="chat" ? "none" : "1px solid #1a1a24",
-          display:"flex", flexDirection:"column", background:"#0c0c12",
+          display: tab!=="chat" && tab!=="dashboard" && tab!=="contacts" ? "none" : "flex",
+          flexDirection:"column", background:"#0c0c12",
         }}>
           {/* Chat Header */}
           <div style={{ padding:"16px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", gap:10 }}>
@@ -695,8 +710,28 @@ function Dashboard({ user, onLogout }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         *{box-sizing:border-box;margin:0;padding:0}
+        html,body,#root{width:100%;height:100%;margin:0;padding:0;background:#09090d;}
         ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
         input::placeholder{color:#4a4a5a}
+
+        /* Mobile menu button */
+        .mobile-menu-btn{display:none}
+
+        @media(max-width:768px){
+          .desktop-tabs{display:none !important}
+          .mobile-menu-btn{display:flex !important}
+          .main-layout{flex-direction:column !important;height:auto !important;min-height:calc(100vh - 60px)}
+          .content-area{padding:16px !important;width:100% !important}
+          .chat-panel{width:100% !important;border-left:none !important;height:calc(100vh - 60px) !important}
+          .stat-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px !important}
+          .quick-grid{grid-template-columns:1fr !important}
+          .cat-grid{grid-template-columns:1fr 1fr !important}
+          .header-inner{padding:12px 16px !important}
+          .user-name-text{display:none !important}
+          .table-wrapper{overflow-x:auto}
+          table{min-width:600px}
+          .mobile-bottom-nav{display:flex !important}
+        }
       `}</style>
     </div>
   );
