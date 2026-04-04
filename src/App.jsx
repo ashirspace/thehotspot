@@ -3,6 +3,12 @@ import { useState, useEffect, useRef } from "react";
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
 
+// Login credentials — change these!
+const LOGIN_USERS = [
+  { username: "admin", password: "thehotspot2026" },
+  { username: "ashir", password: "ibra@123" },
+];
+
 // Gmail OAuth Config — Replace with your Google Cloud Console credentials
 // 1. Go to https://console.cloud.google.com
 // 2. Create a project → Enable Gmail API
@@ -11,6 +17,7 @@ const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
 // 5. Paste your Client ID below
 const GMAIL_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
 const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
+const GOOGLE_LOGIN_CLIENT_ID = GMAIL_CLIENT_ID; // Same client ID for Google Sign-In
 
 /* ───────── ICONS (inline SVG) ───────── */
 const I = {
@@ -25,7 +32,184 @@ const I = {
   Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
   Clock: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
   Right: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+  Eye: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+  EyeOff: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
+  Logout: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
 };
+
+/* ───────── LOGIN PAGE ───────── */
+function LoginPage({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPass, setShowPass] = useState(false);
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleLogin = (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+    
+    setTimeout(() => {
+      const user = LOGIN_USERS.find(u => u.username === username && u.password === password);
+      if (user) {
+        localStorage.setItem("thehotspot_user", JSON.stringify({ username: user.username, method: "password" }));
+        onLogin({ username: user.username, method: "password" });
+      } else {
+        setError("Invalid username or password");
+        setLoading(false);
+      }
+    }, 800);
+  };
+
+  const handleGoogleLogin = () => {
+    if (GOOGLE_LOGIN_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
+      // Demo mode
+      const popup = window.open("", "Google Login", "width=450,height=550,left=300,top=100");
+      popup.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head><title>Google Sign-In</title></head>
+        <body style="font-family:-apple-system,sans-serif;background:#1a1a2e;color:#e0e0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
+          <div style="background:#111118;border-radius:16px;padding:40px;text-align:center;max-width:340px;border:1px solid #2a2a3a;">
+            <svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            <h2 style="margin:20px 0 8px;font-size:18px;">Sign in with Google</h2>
+            <p style="color:#6b6b80;font-size:13px;margin-bottom:20px;">Use your Google account to access thehotspot</p>
+            <input id="em" type="email" placeholder="Enter your email" style="width:100%;padding:10px 14px;border-radius:8px;border:1px solid #2a2a3a;background:#0c0c12;color:#e0e0e8;font-size:13px;margin-bottom:12px;outline:none;box-sizing:border-box;" />
+            <button onclick="var e=document.getElementById('em').value;if(e){window.opener.postMessage({type:'google-login',email:e},'*');window.close();}else{document.getElementById('em').style.borderColor='#f87171';}" style="background:#4285F4;color:#fff;border:none;padding:11px 28px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;font-family:sans-serif;">
+              Continue
+            </button>
+          </div>
+        </body>
+        </html>
+      `);
+    } else {
+      const redirectUri = window.location.origin;
+      const authUrl = "https://accounts.google.com/o/oauth2/v2/auth?client_id=" + GOOGLE_LOGIN_CLIENT_ID + "&redirect_uri=" + encodeURIComponent(redirectUri) + "&response_type=token&scope=email%20profile&prompt=select_account";
+      window.open(authUrl, "Google Login", "width=450,height=550,left=300,top=100");
+    }
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.data?.type === "google-login" && e.data?.email) {
+        const userData = { username: e.data.email, method: "google", avatar: e.data.email[0].toUpperCase() };
+        localStorage.setItem("thehotspot_user", JSON.stringify(userData));
+        onLogin(userData);
+      }
+    };
+    window.addEventListener("message", handler);
+    return () => window.removeEventListener("message", handler);
+  }, [onLogin]);
+
+  return (
+    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", overflow:"hidden" }}>
+      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      
+      {/* Background glow effects */}
+      <div style={{ position:"absolute", width:"400px", height:"400px", borderRadius:"50%", background:"radial-gradient(circle,#10b98115,transparent 70%)", top:"-100px", left:"-100px" }} />
+      <div style={{ position:"absolute", width:"300px", height:"300px", borderRadius:"50%", background:"radial-gradient(circle,#0ea5e915,transparent 70%)", bottom:"-50px", right:"-50px" }} />
+
+      <div style={{ width:"100%", maxWidth:420, padding:"0 20px", zIndex:1 }}>
+        {/* Logo + Brand */}
+        <div style={{ textAlign:"center", marginBottom:36 }}>
+          <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:20, color:"#000", marginBottom:16 }}>TH</div>
+          <div style={{ fontSize:28, fontWeight:700, color:"#f0f0f5", letterSpacing:-0.5 }}>thehotspot</div>
+          <div style={{ fontSize:13, color:"#6b6b80", marginTop:4 }}>Grow Connections Easily</div>
+        </div>
+
+        {/* Login Card */}
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:20, padding:"32px 28px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
+          <div style={{ fontSize:18, fontWeight:600, color:"#f0f0f5", marginBottom:4 }}>Welcome back</div>
+          <div style={{ fontSize:13, color:"#6b6b80", marginBottom:24 }}>Sign in to access your dashboard</div>
+
+          {/* Google Sign-In Button */}
+          <button onClick={handleGoogleLogin} style={{
+            width:"100%", padding:"12px", borderRadius:12, border:"1px solid #2a2a3a",
+            background:"#0c0c12", color:"#e0e0e8", fontSize:14, fontWeight:500,
+            cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+            gap:10, fontFamily:"'DM Sans',sans-serif", transition:"all .2s", marginBottom:20,
+          }}
+          onMouseEnter={e => { e.target.style.borderColor="#4285F4"; e.target.style.background="#4285F411"; }}
+          onMouseLeave={e => { e.target.style.borderColor="#2a2a3a"; e.target.style.background="#0c0c12"; }}
+          >
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+            Continue with Google
+          </button>
+
+          {/* Divider */}
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+            <div style={{ flex:1, height:1, background:"#1e1e28" }} />
+            <span style={{ fontSize:11, color:"#4a4a5a", fontWeight:500, textTransform:"uppercase", letterSpacing:1 }}>or</span>
+            <div style={{ flex:1, height:1, background:"#1e1e28" }} />
+          </div>
+
+          {/* Username/Password Form */}
+          <form onSubmit={handleLogin}>
+            <div style={{ marginBottom:14 }}>
+              <label style={{ fontSize:12, color:"#6b6b80", fontWeight:500, display:"block", marginBottom:6 }}>Username</label>
+              <input
+                type="text" value={username} onChange={e => setUsername(e.target.value)}
+                placeholder="Enter username"
+                style={{ width:"100%", padding:"11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", transition:"border-color .2s", boxSizing:"border-box" }}
+                onFocus={e => e.target.style.borderColor="#10b981"}
+                onBlur={e => e.target.style.borderColor="#2a2a3a"}
+              />
+            </div>
+            <div style={{ marginBottom:20 }}>
+              <label style={{ fontSize:12, color:"#6b6b80", fontWeight:500, display:"block", marginBottom:6 }}>Password</label>
+              <div style={{ position:"relative" }}>
+                <input
+                  type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)}
+                  placeholder="Enter password"
+                  style={{ width:"100%", padding:"11px 42px 11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", transition:"border-color .2s", boxSizing:"border-box" }}
+                  onFocus={e => e.target.style.borderColor="#10b981"}
+                  onBlur={e => e.target.style.borderColor="#2a2a3a"}
+                />
+                <button type="button" onClick={() => setShowPass(!showPass)} style={{
+                  position:"absolute", right:10, top:"50%", transform:"translateY(-50%)",
+                  background:"none", border:"none", color:"#6b6b80", cursor:"pointer", padding:4,
+                }}>
+                  {showPass ? <I.EyeOff /> : <I.Eye />}
+                </button>
+              </div>
+            </div>
+
+            {error && (
+              <div style={{ background:"#2a0a0a", border:"1px solid #f8717133", color:"#f87171", padding:"10px 14px", borderRadius:10, fontSize:12, fontWeight:500, marginBottom:16, textAlign:"center" }}>
+                {error}
+              </div>
+            )}
+
+            <button type="submit" disabled={loading || !username || !password} style={{
+              width:"100%", padding:"12px", borderRadius:12, border:"none",
+              background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
+              color: (username && password) ? "#000" : "#6b6b80",
+              fontSize:14, fontWeight:600, cursor: (username && password) ? "pointer" : "default",
+              fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+              display:"flex", alignItems:"center", justifyContent:"center", gap:8,
+            }}>
+              {loading ? (
+                <>{[0,1,2].map(d => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#000", animation:`pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
+              ) : "Sign In"}
+            </button>
+          </form>
+        </div>
+
+        {/* Footer */}
+        <div style={{ textAlign:"center", marginTop:24, fontSize:11, color:"#4a4a5a" }}>
+          Protected by thehotspot security
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
+        *{box-sizing:border-box;margin:0;padding:0}
+        input::placeholder{color:#4a4a5a}
+      `}</style>
+    </div>
+  );
+}
 
 /* ───────── CATEGORY COLORS ───────── */
 const CAT = {
@@ -178,6 +362,17 @@ function StatCard({ icon, label, value, accent, locked, onConnect }) {
 
 /* ───────── MAIN APP ───────── */
 export default function App() {
+  const [user, setUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
+  });
+
+  if (!user) return <LoginPage onLogin={setUser} />;
+
+  return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
+}
+
+/* ───────── DASHBOARD ───────── */
+function Dashboard({ user, onLogout }) {
   const [tab, setTab] = useState("dashboard");
   const [gmailConnected, setGmailConnected] = useState(false);
   const [messages, setMessages] = useState([
@@ -298,7 +493,7 @@ export default function App() {
             <div style={{ fontSize:11, color:"#6b6b80", letterSpacing:.5 }}>Grow Connections Easily</div>
           </div>
         </div>
-        <div style={{ display:"flex", gap:4 }}>
+        <div style={{ display:"flex", gap:4, alignItems:"center" }}>
           {["dashboard","contacts","chat"].map(t => (
             <button key={t} onClick={() => setTab(t)} style={{
               background: tab===t ? "#1a1a28" : "transparent",
@@ -307,6 +502,22 @@ export default function App() {
               fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize", transition:"all .2s"
             }}>{t}</button>
           ))}
+          <div style={{ width:1, height:24, background:"#2a2a3a", margin:"0 8px" }} />
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:"#000" }}>
+              {user?.avatar || user?.username?.[0]?.toUpperCase() || "U"}
+            </div>
+            <span style={{ fontSize:12, color:"#8888a0", maxWidth:100, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.username}</span>
+            <button onClick={onLogout} title="Logout" style={{
+              background:"none", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 8px",
+              color:"#6b6b80", cursor:"pointer", display:"flex", alignItems:"center", transition:"all .2s",
+            }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor="#f87171"; e.currentTarget.style.color="#f87171"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor="#2a2a3a"; e.currentTarget.style.color="#6b6b80"; }}
+            >
+              <I.Logout />
+            </button>
+          </div>
         </div>
       </header>
 
