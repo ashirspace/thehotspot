@@ -594,6 +594,68 @@ export default function App() {
   return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
 }
 
+/* ───────── PROFILE PAGE ───────── */
+function ProfilePage({ user, onBack, onLogout }) {
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", marginBottom:32 }}>
+        <div style={{ width:80, height:80, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:800, color:"#000", marginBottom:16 }}>
+          {user?.username?.[0]?.toUpperCase() || "U"}
+        </div>
+        <div style={{ fontSize:22, fontWeight:700, color:"#f0f0f5" }}>{user?.username}</div>
+        <div style={{ fontSize:12, color:"#6b6b80", marginTop:4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
+      </div>
+
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"18px 20px" }}>
+          <div style={{ fontSize:11, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600, marginBottom:8 }}>Account Info</div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Username</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontWeight:600 }}>{user?.username}</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Login Method</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontWeight:600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Role</span>
+            <span style={{ fontSize:13, color:"#10b981", fontWeight:600 }}>Admin</span>
+          </div>
+        </div>
+
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"18px 20px" }}>
+          <div style={{ fontSize:11, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600, marginBottom:8 }}>Platform Stats</div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Total Contacts</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>531</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Emails Sent</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>412</span>
+          </div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Success Rate</span>
+            <span style={{ fontSize:13, color:"#10b981", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>94%</span>
+          </div>
+        </div>
+
+        <button onClick={onLogout} style={{
+          width:"100%", padding:"14px", borderRadius:12, border:"1px solid #f8717133",
+          background:"#2a0a0a", color:"#f87171", fontSize:14, fontWeight:600,
+          cursor:"pointer", fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:8,
+        }}
+        onMouseEnter={e => { e.currentTarget.style.background="#3a0a0a"; e.currentTarget.style.borderColor="#f87171"; }}
+        onMouseLeave={e => { e.currentTarget.style.background="#2a0a0a"; e.currentTarget.style.borderColor="#f8717133"; }}
+        >
+          <I.Logout /> Sign Out
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
   const [page, setPage] = useState(null); // null = chatbot, "dashboard","contacts","totalContacts","emailsSent","categories","successRate"
@@ -666,6 +728,7 @@ function Dashboard({ user, onLogout }) {
     { id:"categories", label:"Categories", icon:"📁" },
     { id:"successRate", label:"Success Rate", icon:"✅" },
     { id:"contacts", label:"Contacts DB", icon:"📋" },
+    { id:"profile", label:"Profile", icon:"⚙️" },
   ];
 
   return (
@@ -754,6 +817,17 @@ function Dashboard({ user, onLogout }) {
                 </div>
               </div>
             </div>
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <button onClick={() => setPage("profile")} style={{ display:"flex", alignItems:"center", gap:6, background:"none", border:"1px solid #2a2a3a", borderRadius:20, padding:"5px 12px 5px 5px", cursor:"pointer", transition:"all .2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor="#10b981"}
+                onMouseLeave={e => e.currentTarget.style.borderColor="#2a2a3a"}
+              >
+                <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"#000" }}>
+                  {user?.username?.[0]?.toUpperCase() || "U"}
+                </div>
+                <span style={{ fontSize:12, color:"#8888a0" }}>{user?.username}</span>
+              </button>
+            </div>
           </div>
 
           {/* Messages */}
@@ -835,8 +909,8 @@ function Dashboard({ user, onLogout }) {
             {page === "dashboard" && (
               <>
                 <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:14, marginBottom:28 }}>
-                  <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("totalContacts")} />
-                  <StatCard icon={<I.Mail/>} label="Emails Sent" value={gmailConnected ? STATS.emailsSent : 0} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Users/>} label="Total Contacts" value={STATS.totalContacts} accent="#10b981" onClick={() => setPage("totalContacts")} />
+                  <StatCard icon={<I.Mail/>} label="Emails Sent" value={STATS.emailsSent} accent="#6366f1" onClick={() => setPage("emailsSent")} />
                   <StatCard icon={<I.Activity/>} label="Categories" value={STATS.categories} accent="#f97316" onClick={() => setPage("categories")} />
                   <StatCard icon={<I.Check/>} label="Success Rate" value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
@@ -913,6 +987,7 @@ function Dashboard({ user, onLogout }) {
             {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
             {page === "categories" && <CategoriesPage onBack={() => setPage("dashboard")} />}
             {page === "successRate" && <SuccessRatePage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+            {page === "profile" && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
           </div>
         </div>
       )}
