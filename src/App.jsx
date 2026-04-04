@@ -596,7 +596,8 @@ export default function App() {
 
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
-  const [tab, setTab] = useState("dashboard");
+  const [page, setPage] = useState(null); // null = chatbot, "dashboard","contacts","totalContacts","emailsSent","categories","successRate"
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [gmailConnected, setGmailConnected] = useState(false);
   const [messages, setMessages] = useState([
     { role:"assistant", content:"Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
@@ -605,12 +606,10 @@ function Dashboard({ user, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const [toast, setToast] = useState(null);
-  const [showSidebar, setShowSidebar] = useState(true);
   const chatEnd = useRef(null);
   const recog = useRef(null);
 
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
-
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SR) {
@@ -625,80 +624,52 @@ function Dashboard({ user, onLogout }) {
   }, []);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
-
-  const connectGmail = () => {
-    if (GMAIL_CLIENT_ID === "YOUR_GOOGLE_CLIENT_ID_HERE") {
-      // Demo mode — show a mock Gmail login popup
-      const popup = window.open("", "Gmail Connect", "width=500,height=600,left=200,top=100");
-      popup.document.write(`
-        <!DOCTYPE html>
-        <html>
-        <head><title>Connect Gmail</title></head>
-        <body style="font-family:sans-serif;background:#1a1a2e;color:#e0e0e8;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;margin:0;">
-          <div style="background:#111118;border-radius:16px;padding:40px;text-align:center;max-width:360px;border:1px solid #2a2a3a;">
-            <svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
-            <h2 style="margin:20px 0 8px;font-size:20px;">Sign in with Google</h2>
-            <p style="color:#6b6b80;font-size:13px;margin-bottom:24px;">Connect your Gmail to enable contact tracking and email stats</p>
-            <button onclick="window.opener.postMessage('gmail-connected','*');window.close();" style="background:#4285F4;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:sans-serif;transition:background .2s;" onmouseover="this.style.background='#3367D6'" onmouseout="this.style.background='#4285F4'">
-              Connect Gmail Account
-            </button>
-            <p style="color:#4a4a5a;font-size:11px;margin-top:16px;">This will allow thehotspot to read contact info and send emails on your behalf.</p>
-          </div>
-        </body>
-        </html>
-      `);
-    } else {
-      // Real OAuth flow
-      const redirectUri = window.location.origin;
-      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GMAIL_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(GMAIL_SCOPES)}&prompt=consent`;
-      window.open(authUrl, "Gmail Connect", "width=500,height=600,left=200,top=100");
-    }
-  };
-
-  // Listen for Gmail connect message from popup
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.data === "gmail-connected") {
-        setGmailConnected(true);
-        showToast("Gmail connected successfully! 🎉");
-      }
-    };
-    window.addEventListener("message", handler);
-    return () => window.removeEventListener("message", handler);
-  }, []);
-
   const toggleVoice = () => {
     if (!recog.current) return showToast("Voice not supported");
     if (listening) { recog.current.stop(); setListening(false); }
     else { recog.current.start(); setListening(true); }
   };
-
   const executeAction = (action) => {
     if (!action) return;
     const labels = { send_emails:`Triggering emails for ${action.category||"all"}...`, pause_workflow:"Workflow paused", resume_workflow:"Workflow resumed", show_stats:"Stats loaded" };
     showToast(labels[action.type] || "Action executed");
-    // Production: fetch(N8N_WEBHOOK_URL, { method:"POST", body:JSON.stringify(action) })
   };
-
   const handleSend = async (text) => {
     const msg = (text || input).trim();
     if (!msg || loading) return;
-    const userMsg = { role:"user", content:msg };
-    setMessages(prev => [...prev, userMsg]);
+    setMessages(prev => [...prev, { role:"user", content:msg }]);
     setInput("");
     setLoading(true);
-
-    // Small delay to feel natural
     await new Promise(r => setTimeout(r, 600 + Math.random() * 800));
-
     const response = getSmartResponse(msg);
     setMessages(prev => [...prev, { role:"assistant", content:response.text }]);
     if (response.action) executeAction(response.action);
     setLoading(false);
   };
+  const connectGmail = () => {
+    const popup = window.open("", "Gmail Connect", "width=500,height=600,left=200,top=100");
+    popup.document.write(`<!DOCTYPE html><html><head><title>Connect Gmail</title></head><body style="font-family:sans-serif;background:#1a1a2e;color:#e0e0e8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#111118;border-radius:16px;padding:40px;text-align:center;max-width:360px;border:1px solid #2a2a3a;"><svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><h2 style="margin:20px 0 8px;font-size:20px;">Connect Gmail</h2><p style="color:#6b6b80;font-size:13px;margin-bottom:24px;">Connect your Gmail to enable email stats</p><button onclick="window.opener.postMessage('gmail-connected','*');window.close();" style="background:#4285F4;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Connect Gmail Account</button></div></body></html>`);
+  };
+  useEffect(() => {
+    const h = (e) => { if (e.data === "gmail-connected") { setGmailConnected(true); showToast("Gmail connected! 🎉"); } };
+    window.addEventListener("message", h);
+    return () => window.removeEventListener("message", h);
+  }, []);
+
+  const navTo = (p) => { setPage(p); setSidebarOpen(false); };
+
+  // Sidebar nav items
+  const navItems = [
+    { id:"dashboard", label:"Dashboard", icon:"📊" },
+    { id:"totalContacts", label:"Total Contacts", icon:"👥" },
+    { id:"emailsSent", label:"Emails Sent", icon:"📧" },
+    { id:"categories", label:"Categories", icon:"📁" },
+    { id:"successRate", label:"Success Rate", icon:"✅" },
+    { id:"contacts", label:"Contacts DB", icon:"📋" },
+  ];
 
   return (
-    <div style={S.app}>
+    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", height:"100vh", width:"100vw", display:"flex", flexDirection:"column", overflow:"hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* TOAST */}
@@ -708,65 +679,71 @@ function Dashboard({ user, onLogout }) {
         </div>
       )}
 
-      {/* HEADER */}
-      <header className="header-inner" style={{ padding:"16px 28px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12", width:"100%" }}>
-        <div style={{ display:"flex", alignItems:"center", gap:14 }}>
-          <div style={S.logo}>TH</div>
-          <div>
-            <div style={{ fontWeight:700, fontSize:15, letterSpacing:-.3, color:"#f0f0f5" }}>thehotspot</div>
-            <div style={{ fontSize:11, color:"#6b6b80", letterSpacing:.5 }}>Grow Connections Easily</div>
+      {/* OVERLAY for mobile sidebar */}
+      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:90 }} />}
+
+      {/* LEFT SIDEBAR */}
+      <div style={{
+        position:"fixed", left: sidebarOpen ? 0 : "-280px", top:0, width:280, height:"100vh",
+        background:"#0c0c12", borderRight:"1px solid #1a1a24", zIndex:100,
+        transition:"left .3s ease", display:"flex", flexDirection:"column", overflow:"hidden",
+      }}>
+        {/* Sidebar Header */}
+        <div style={{ padding:"20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:12, color:"#000" }}>TH</div>
+            <div>
+              <div style={{ fontSize:14, fontWeight:700, color:"#f0f0f5" }}>thehotspot</div>
+              <div style={{ fontSize:10, color:"#6b6b80" }}>Grow Connections Easily</div>
+            </div>
           </div>
+          <button onClick={() => setSidebarOpen(false)} style={{ background:"none", border:"none", color:"#6b6b80", cursor:"pointer", fontSize:18 }}>✕</button>
         </div>
-        <div style={{ display:"flex", gap:4, alignItems:"center" }}>
-          {/* Desktop Tabs */}
-          <div className="desktop-tabs" style={{ display:"flex", gap:4 }}>
-            {["dashboard","contacts","chat"].map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{
-                background: tab===t ? "#1a1a28" : "transparent",
-                border: tab===t ? "1px solid #2a2a3a" : "1px solid transparent",
-                borderRadius:8, padding:"7px 16px", color: tab===t ? "#f0f0f5" : "#6b6b80",
-                fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize", transition:"all .2s"
-              }}>{t}</button>
-            ))}
-          </div>
-          {/* Mobile Menu Button */}
-          <div className="mobile-menu-btn" style={{ display:"none", gap:4 }}>
-            {["dashboard","contacts","chat"].map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{
-                background: tab===t ? "#1a1a28" : "transparent",
-                border: tab===t ? "1px solid #2a2a3a" : "1px solid transparent",
-                borderRadius:8, padding:"6px 10px", color: tab===t ? "#f0f0f5" : "#6b6b80",
-                fontSize:11, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize",
-              }}>{t === "dashboard" ? "📊" : t === "contacts" ? "👤" : "💬"}</button>
-            ))}
-          </div>
-          <div style={{ width:1, height:24, background:"#2a2a3a", margin:"0 8px" }} />
+
+        {/* Nav Items */}
+        <div style={{ flex:1, padding:"12px", overflowY:"auto" }}>
+          {navItems.map(item => (
+            <button key={item.id} onClick={() => navTo(item.id)} style={{
+              width:"100%", padding:"12px 14px", borderRadius:10, border:"none", marginBottom:4,
+              background: page === item.id ? "#1a1a28" : "transparent",
+              color: page === item.id ? "#f0f0f5" : "#8888a0",
+              fontSize:13, fontWeight:500, cursor:"pointer", display:"flex", alignItems:"center", gap:10,
+              fontFamily:"'DM Sans',sans-serif", transition:"all .15s", textAlign:"left",
+            }}>
+              <span style={{ fontSize:16 }}>{item.icon}</span> {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* User + Logout */}
+        <div style={{ padding:"16px", borderTop:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
           <div style={{ display:"flex", alignItems:"center", gap:8 }}>
             <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:"#000" }}>
-              {user?.avatar || user?.username?.[0]?.toUpperCase() || "U"}
+              {user?.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <span className="user-name-text" style={{ fontSize:12, color:"#8888a0", maxWidth:100, overflow:"hidden", textOverflow:"ellipsis", whiteSpace:"nowrap" }}>{user?.username}</span>
-            <button onClick={onLogout} title="Logout" style={{
-              background:"none", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 8px",
-              color:"#6b6b80", cursor:"pointer", display:"flex", alignItems:"center", transition:"all .2s",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor="#f87171"; e.currentTarget.style.color="#f87171"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor="#2a2a3a"; e.currentTarget.style.color="#6b6b80"; }}
-            >
-              <I.Logout />
-            </button>
+            <span style={{ fontSize:12, color:"#8888a0" }}>{user?.username}</span>
           </div>
+          <button onClick={onLogout} style={{ background:"none", border:"1px solid #2a2a3a", borderRadius:6, padding:"5px 8px", color:"#6b6b80", cursor:"pointer", display:"flex", alignItems:"center" }}>
+            <I.Logout />
+          </button>
         </div>
-      </header>
+      </div>
 
-      <div className="main-layout" style={S.layout}>
-        {/* ───── CHATBOT (PRIMARY) ───── */}
-        <div className="chat-main" style={{
-          flex:1, display:"flex", flexDirection:"column", background:"#0c0c12", minWidth:0,
-        }}>
+      {/* ═══════ MAIN AREA ═══════ */}
+      {/* If page is null → show chatbot fullscreen. If page is set → show that page */}
+
+      {page === null ? (
+        /* ═══════ CHATBOT (FULL CENTER) ═══════ */
+        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%" }}>
           {/* Chat Header */}
-          <div style={{ padding:"16px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
-            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+          <div style={{ padding:"12px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <button onClick={() => setSidebarOpen(true)} style={{
+                background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"8px",
+                color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center",
+              }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+              </button>
               <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                 <I.Bot />
               </div>
@@ -777,22 +754,14 @@ function Dashboard({ user, onLogout }) {
                 </div>
               </div>
             </div>
-            {/* Toggle sidebar button for mobile */}
-            <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} style={{
-              background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 10px",
-              color:"#6b6b80", cursor:"pointer", display:"none", alignItems:"center", gap:6, fontSize:12, fontFamily:"'DM Sans',sans-serif",
-            }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
-              {showSidebar ? "Hide" : "Menu"}
-            </button>
           </div>
 
           {/* Messages */}
-          <div style={{ flex:1, overflowY:"auto", padding:16, display:"flex", flexDirection:"column", gap:12 }}>
+          <div style={{ flex:1, overflowY:"auto", padding:"16px", display:"flex", flexDirection:"column", gap:12, maxWidth:800, width:"100%", margin:"0 auto" }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display:"flex", justifyContent: m.role==="user" ? "flex-end" : "flex-start" }}>
                 <div style={{
-                  maxWidth:"85%", padding:"12px 16px", fontSize:13, lineHeight:1.6, whiteSpace:"pre-wrap",
+                  maxWidth:"80%", padding:"12px 16px", fontSize:14, lineHeight:1.6, whiteSpace:"pre-wrap",
                   borderRadius: m.role==="user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
                   background: m.role==="user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
                   color: m.role==="user" ? "#000" : "#d0d0e0",
@@ -811,152 +780,142 @@ function Dashboard({ user, onLogout }) {
             <div ref={chatEnd} />
           </div>
 
-          {/* Input */}
-          <div style={{ padding:"14px 16px", borderTop:"1px solid #1a1a24", display:"flex", gap:8, alignItems:"center" }}>
-            <button onClick={toggleVoice} style={{
-              width:40, height:40, borderRadius:"50%", flexShrink:0, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center", transition:"all .2s",
-              background: listening ? "#10b98133" : "#18182a",
-              border: listening ? "2px solid #10b981" : "1px solid #2a2a3a",
-              color: listening ? "#10b981" : "#6b6b80",
-              animation: listening ? "pulse 1.5s ease-in-out infinite" : "none",
-            }}>
-              {listening ? <I.MicOff /> : <I.Mic />}
-            </button>
-            <input
-              type="text" value={input} onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key==="Enter" && handleSend()}
-              placeholder={listening ? "Listening..." : "Type a command or ask anything..."}
-              style={{
-                flex:1, background:"#111118", border:"1px solid #2a2a3a", borderRadius:12,
-                padding:"11px 16px", color:"#e0e0e8", fontSize:13, outline:"none",
-                fontFamily:"'DM Sans',sans-serif", transition:"border-color .2s",
-              }}
-              onFocus={e => e.target.style.borderColor="#10b981"}
-              onBlur={e => e.target.style.borderColor="#2a2a3a"}
-            />
-            <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-              width:40, height:40, borderRadius:"50%", border:"none", cursor: input.trim() ? "pointer" : "default",
-              background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
-              color: input.trim() ? "#000" : "#6b6b80",
-              display:"flex", alignItems:"center", justifyContent:"center", flexShrink:0, transition:"all .2s",
-            }}>
-              <I.Send />
-            </button>
+          {/* Chat Input */}
+          <div style={{ padding:"14px 16px", borderTop:"1px solid #1a1a24", background:"#0c0c12" }}>
+            <div style={{ maxWidth:800, margin:"0 auto", display:"flex", gap:8, alignItems:"center" }}>
+              <button onClick={toggleVoice} style={{
+                width:40, height:40, borderRadius:"50%", flexShrink:0, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+                background: listening ? "#10b98133" : "#18182a", border: listening ? "2px solid #10b981" : "1px solid #2a2a3a",
+                color: listening ? "#10b981" : "#6b6b80", animation: listening ? "pulse 1.5s ease-in-out infinite" : "none",
+              }}>
+                {listening ? <I.MicOff /> : <I.Mic />}
+              </button>
+              <input type="text" value={input} onChange={e => setInput(e.target.value)}
+                onKeyDown={e => e.key==="Enter" && handleSend()}
+                placeholder={listening ? "Listening..." : "Type a command or ask anything..."}
+                style={{ flex:1, background:"#111118", border:"1px solid #2a2a3a", borderRadius:12, padding:"11px 16px", color:"#e0e0e8", fontSize:14, outline:"none", fontFamily:"'DM Sans',sans-serif" }}
+                onFocus={e => e.target.style.borderColor="#10b981"}
+                onBlur={e => e.target.style.borderColor="#2a2a3a"}
+              />
+              <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
+                width:40, height:40, borderRadius:"50%", border:"none", flexShrink:0, cursor: input.trim() ? "pointer" : "default",
+                background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
+                color: input.trim() ? "#000" : "#6b6b80", display:"flex", alignItems:"center", justifyContent:"center",
+              }}>
+                <I.Send />
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* ───── SIDEBAR (DASHBOARD/DETAILS) ───── */}
-        <div className={`sidebar-panel ${showSidebar ? "open" : ""}`} style={{
-          width: 400, borderLeft:"1px solid #1a1a24", overflowY:"auto", background:"#09090d",
-          padding:"20px",
-        }}>
-          {/* Sidebar Tab Switcher */}
-          <div style={{ display:"flex", gap:4, marginBottom:20 }}>
-            {["dashboard","contacts"].map(t => (
-              <button key={t} onClick={() => setTab(t)} style={{
-                background: tab===t || (tab !== "contacts" && t === "dashboard") ? "#1a1a28" : "transparent",
-                border: tab===t || (tab !== "contacts" && t === "dashboard") ? "1px solid #2a2a3a" : "1px solid transparent",
-                borderRadius:8, padding:"6px 14px", color: tab===t || (tab !== "contacts" && t === "dashboard") ? "#f0f0f5" : "#6b6b80",
-                fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize",
-              }}>{t}</button>
-            ))}
+      ) : (
+        /* ═══════ PAGE VIEW ═══════ */
+        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%", overflow:"hidden" }}>
+          {/* Page Header */}
+          <div style={{ padding:"12px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", gap:12, background:"#0c0c12" }}>
+            <button onClick={() => setSidebarOpen(true)} style={{
+              background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"8px",
+              color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center",
+            }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            </button>
+            <span style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>
+              {navItems.find(n => n.id === page)?.icon} {navItems.find(n => n.id === page)?.label || "Page"}
+            </span>
+            <button onClick={() => setPage(null)} style={{
+              marginLeft:"auto", background:"none", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 12px",
+              color:"#6b6b80", cursor:"pointer", fontSize:12, fontFamily:"'DM Sans',sans-serif", display:"flex", alignItems:"center", gap:6,
+            }}>
+              💬 Back to Chat
+            </button>
           </div>
 
-          {/* DASHBOARD VIEW */}
-          {tab !== "contacts" && tab !== "totalContacts" && tab !== "emailsSent" && tab !== "categories" && tab !== "successRate" && (
-            <>
-              {/* Stats */}
-              <div className="stat-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:20 }}>
-                <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("totalContacts")} />
-                <StatCard icon={<I.Mail/>} label="Emails Sent" value={gmailConnected ? STATS.emailsSent : 0} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("emailsSent")} />
-                <StatCard icon={<I.Activity/>} label="Categories" value={STATS.categories} accent="#f97316" onClick={() => setTab("categories")} />
-                <StatCard icon={<I.Check/>} label="Success Rate" value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setTab("successRate")} />
-              </div>
-
-              {/* Quick Actions */}
-              <div style={{ marginBottom:20 }}>
-                <div style={S.sectionLabel}>Quick Actions</div>
-                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+          {/* Page Content */}
+          <div style={{ flex:1, overflowY:"auto", padding:"24px", maxWidth:900, width:"100%", margin:"0 auto" }}>
+            {/* DASHBOARD */}
+            {page === "dashboard" && (
+              <>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:14, marginBottom:28 }}>
+                  <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("totalContacts")} />
+                  <StatCard icon={<I.Mail/>} label="Emails Sent" value={gmailConnected ? STATS.emailsSent : 0} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Activity/>} label="Categories" value={STATS.categories} accent="#f97316" onClick={() => setPage("categories")} />
+                  <StatCard icon={<I.Check/>} label="Success Rate" value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                </div>
+                <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Quick Actions</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:10, marginBottom:28 }}>
                   {[
                     { icon:<I.Mail/>, label:"Send All Emails", cmd:"Send outreach emails to all categories" },
                     { icon:<I.Activity/>, label:"Campaign Status", cmd:"Show me the campaign status" },
                     { icon:<I.Clock/>, label:"Pause Workflow", cmd:"Pause the outreach workflow" },
                     { icon:<I.Zap/>, label:"Resume Workflow", cmd:"Resume the outreach workflow" },
                   ].map((a,i) => (
-                    <button key={i} onClick={() => handleSend(a.cmd)} style={{
-                      background:"#111116", border:"1px solid #1e1e28", borderRadius:10, padding:"12px 14px",
-                      color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center", gap:8,
-                      fontSize:12, fontWeight:500, fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+                    <button key={i} onClick={() => { handleSend(a.cmd); setPage(null); }} style={{
+                      background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"14px 18px",
+                      color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center", gap:10,
+                      fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif",
                     }}>
                       {a.icon} {a.label} <span style={{ marginLeft:"auto", opacity:.4 }}><I.Right/></span>
                     </button>
                   ))}
                 </div>
-              </div>
-
-              {/* Category Buttons */}
-              <div style={{ marginBottom:20 }}>
-                <div style={S.sectionLabel}>Send by Category</div>
-                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Send by Category</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))", gap:10 }}>
                   {Object.entries(CAT).map(([name, c]) => (
-                    <button key={name} onClick={() => handleSend(`Send outreach emails to all ${name} companies`)} style={{
-                      background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:10, padding:12,
-                      color:c.text, cursor:"pointer", textAlign:"left", fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+                    <button key={name} onClick={() => { handleSend(`Send outreach emails to all ${name} companies`); setPage(null); }} style={{
+                      background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:12, padding:14,
+                      color:c.text, cursor:"pointer", textAlign:"left", fontFamily:"'DM Sans',sans-serif",
                     }}>
                       <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
-                        <span style={{ width:6, height:6, borderRadius:"50%", background:c.dot, display:"inline-block" }} />
-                        <span style={{ fontSize:13, fontWeight:600 }}>{name}</span>
+                        <span style={{ width:8, height:8, borderRadius:"50%", background:c.dot }} />
+                        <span style={{ fontSize:14, fontWeight:600 }}>{name}</span>
                       </div>
-                      <div style={{ fontSize:10, opacity:.6 }}>Tap to send</div>
+                      <div style={{ fontSize:11, opacity:.6 }}>Tap to send</div>
                     </button>
                   ))}
                 </div>
-              </div>
-            </>
-          )}
+              </>
+            )}
 
-          {/* CONTACTS VIEW */}
-          {tab === "contacts" && (
-            <div>
-              <div style={S.sectionLabel}>Contact Database</div>
+            {/* CONTACTS */}
+            {page === "contacts" && (
               <div style={{ overflowX:"auto" }}>
-                <div className="table-wrapper" style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, overflow:"hidden" }}>
-                  <table style={{ width:"100%", borderCollapse:"collapse", minWidth:500 }}>
+                <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, overflow:"hidden" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", minWidth:600 }}>
                     <thead>
                       <tr style={{ borderBottom:"1px solid #1e1e28" }}>
-                        {["Company","Email","Category","Status"].map(h => (
-                          <th key={h} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, fontWeight:600, color:"#6b6b80", letterSpacing:.5, textTransform:"uppercase" }}>{h}</th>
+                        {["Company","Email","Category","Status","Last Sent"].map(h => (
+                          <th key={h} style={{ padding:"14px 18px", textAlign:"left", fontSize:11, fontWeight:600, color:"#6b6b80", letterSpacing:.5, textTransform:"uppercase" }}>{h}</th>
                         ))}
                       </tr>
                     </thead>
                     <tbody>
                       {CONTACTS.map((c,i) => (
                         <tr key={c.id} style={{ borderBottom: i<CONTACTS.length-1 ? "1px solid #1a1a24" : "none" }}>
-                          <td style={{ padding:"10px 12px", fontSize:12, fontWeight:600, color:"#f0f0f5" }}>{c.company}</td>
-                          <td style={{ padding:"10px 12px", fontSize:11, color:"#8888a0", fontFamily:"'JetBrains Mono',monospace" }}>{c.email}</td>
-                          <td style={{ padding:"10px 12px" }}>
-                            <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:CAT[c.category]?.bg, color:CAT[c.category]?.text, padding:"3px 8px", borderRadius:12, fontSize:10, fontWeight:600 }}>
-                              <span style={{ width:5, height:5, borderRadius:"50%", background:CAT[c.category]?.dot }} />
+                          <td style={{ padding:"14px 18px", fontSize:13, fontWeight:600, color:"#f0f0f5" }}>{c.company}</td>
+                          <td style={{ padding:"14px 18px", fontSize:12, color:"#8888a0", fontFamily:"'JetBrains Mono',monospace" }}>{c.email}</td>
+                          <td style={{ padding:"14px 18px" }}>
+                            <span style={{ display:"inline-flex", alignItems:"center", gap:6, background:CAT[c.category]?.bg, color:CAT[c.category]?.text, padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:600 }}>
+                              <span style={{ width:6, height:6, borderRadius:"50%", background:CAT[c.category]?.dot }} />
                               {c.category}
                             </span>
                           </td>
-                          <td style={{ padding:"10px 12px" }}><Badge status={c.status} /></td>
+                          <td style={{ padding:"14px 18px" }}><Badge status={c.status} /></td>
+                          <td style={{ padding:"14px 18px", fontSize:12, color:"#6b6b80" }}>{c.lastSent || "—"}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {/* DETAIL PAGES */}
-          {tab === "totalContacts" && <TotalContactsPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
-          {tab === "emailsSent" && <EmailsSentPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
-          {tab === "categories" && <CategoriesPage onBack={() => setTab("dashboard")} />}
-          {tab === "successRate" && <SuccessRatePage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+            {/* DETAIL PAGES */}
+            {page === "totalContacts" && <TotalContactsPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+            {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+            {page === "categories" && <CategoriesPage onBack={() => setPage("dashboard")} />}
+            {page === "successRate" && <SuccessRatePage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+          </div>
         </div>
-      </div>
+      )}
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
@@ -965,36 +924,6 @@ function Dashboard({ user, onLogout }) {
         html,body,#root{width:100%;height:100%;margin:0;padding:0;background:#09090d;}
         ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
         input::placeholder{color:#4a4a5a}
-
-        .sidebar-toggle{display:none !important}
-
-        @media(max-width:768px){
-          .desktop-tabs{display:none !important}
-          .mobile-menu-btn{display:flex !important}
-          .sidebar-toggle{display:flex !important}
-          .sidebar-panel{
-            position:fixed !important;
-            top:60px !important;
-            right:0 !important;
-            width:85vw !important;
-            max-width:360px !important;
-            height:calc(100vh - 60px) !important;
-            z-index:100 !important;
-            box-shadow:-8px 0 32px rgba(0,0,0,0.6) !important;
-            transform:translateX(100%) !important;
-            transition:transform .3s ease !important;
-          }
-          .sidebar-panel.open{
-            transform:translateX(0) !important;
-          }
-          .chat-main{width:100% !important}
-          .stat-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px !important}
-          .quick-grid{grid-template-columns:1fr !important}
-          .cat-grid{grid-template-columns:1fr 1fr !important}
-          .user-name-text{display:none !important}
-          .table-wrapper{overflow-x:auto}
-          table{min-width:600px}
-        }
       `}</style>
     </div>
   );
