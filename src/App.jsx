@@ -605,6 +605,7 @@ function Dashboard({ user, onLogout }) {
   const [loading, setLoading] = useState(false);
   const [listening, setListening] = useState(false);
   const [toast, setToast] = useState(null);
+  const [showSidebar, setShowSidebar] = useState(true);
   const chatEnd = useRef(null);
   const recog = useRef(null);
 
@@ -759,121 +760,31 @@ function Dashboard({ user, onLogout }) {
       </header>
 
       <div className="main-layout" style={S.layout}>
-        {/* ───── CONTENT AREA ───── */}
-        {tab !== "chat" && (
-          <div className="content-area" style={S.content}>
-
-            {/* DASHBOARD */}
-            {tab === "dashboard" && <>
-              {/* Stats */}
-              <div className="stat-grid" style={{ display:"flex", gap:14, marginBottom:28, flexWrap:"wrap" }}>
-                <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("totalContacts")} />
-                <StatCard icon={<I.Mail/>}  label="Emails Sent"    value={gmailConnected ? STATS.emailsSent : 0}    accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("emailsSent")} />
-                <StatCard icon={<I.Activity/>} label="Categories"  value={STATS.categories}    accent="#f97316" onClick={() => setTab("categories")} />
-                <StatCard icon={<I.Check/>} label="Success Rate"   value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setTab("successRate")} />
-              </div>
-
-              {/* Quick Actions */}
-              <div style={{ marginBottom:28 }}>
-                <div style={S.sectionLabel}>Quick Actions</div>
-                <div className="quick-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(220px,1fr))", gap:10 }}>
-                  {[
-                    { icon:<I.Mail/>,     label:"Send All Emails",  cmd:"Send outreach emails to all categories" },
-                    { icon:<I.Activity/>,  label:"Campaign Status",  cmd:"Show me the campaign status" },
-                    { icon:<I.Clock/>,     label:"Pause Workflow",   cmd:"Pause the outreach workflow" },
-                    { icon:<I.Zap/>,       label:"Resume Workflow",  cmd:"Resume the outreach workflow" },
-                  ].map((a,i) => (
-                    <button key={i} onClick={() => handleSend(a.cmd)} style={{
-                      background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"14px 18px",
-                      color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center", gap:10,
-                      fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif", transition:"all .2s", whiteSpace:"nowrap"
-                    }}>
-                      {a.icon} {a.label} <span style={{ marginLeft:"auto", opacity:.4 }}><I.Right/></span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Category Buttons */}
-              <div style={{ marginBottom:28 }}>
-                <div style={S.sectionLabel}>Send by Category</div>
-                <div className="cat-grid" style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(160px,1fr))", gap:10 }}>
-                  {Object.entries(CAT).map(([name, c]) => (
-                    <button key={name} onClick={() => handleSend(`Send outreach emails to all ${name} companies`)} style={{
-                      background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:12, padding:16,
-                      color:c.text, cursor:"pointer", textAlign:"left", fontFamily:"'DM Sans',sans-serif", transition:"all .2s"
-                    }}>
-                      <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:8 }}>
-                        <span style={{ width:8, height:8, borderRadius:"50%", background:c.dot, display:"inline-block" }} />
-                        <span style={{ fontSize:14, fontWeight:600 }}>{name}</span>
-                      </div>
-                      <div style={{ fontSize:11, opacity:.6 }}>Tap to send</div>
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </>}
-
-            {/* CONTACTS */}
-            {tab === "contacts" && (
-              <div>
-                <div style={S.sectionLabel}>Contact Database</div>
-                <div className="table-wrapper" style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, overflow:"hidden" }}>
-                  <table style={{ width:"100%", borderCollapse:"collapse" }}>
-                    <thead>
-                      <tr style={{ borderBottom:"1px solid #1e1e28" }}>
-                        {["Company","Email","Category","Status","Last Sent"].map(h => (
-                          <th key={h} style={{ padding:"14px 18px", textAlign:"left", fontSize:11, fontWeight:600, color:"#6b6b80", letterSpacing:.5, textTransform:"uppercase" }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {CONTACTS.map((c,i) => (
-                        <tr key={c.id} style={{ borderBottom: i<CONTACTS.length-1 ? "1px solid #1a1a24" : "none" }}>
-                          <td style={{ padding:"14px 18px", fontSize:13, fontWeight:600, color:"#f0f0f5" }}>{c.company}</td>
-                          <td style={{ padding:"14px 18px", fontSize:12, color:"#8888a0", fontFamily:"'JetBrains Mono',monospace" }}>{c.email}</td>
-                          <td style={{ padding:"14px 18px" }}>
-                            <span style={{ display:"inline-flex", alignItems:"center", gap:6, background:CAT[c.category]?.bg, color:CAT[c.category]?.text, padding:"4px 12px", borderRadius:20, fontSize:11, fontWeight:600 }}>
-                              <span style={{ width:6, height:6, borderRadius:"50%", background:CAT[c.category]?.dot }} />
-                              {c.category}
-                            </span>
-                          </td>
-                          <td style={{ padding:"14px 18px" }}><Badge status={c.status} /></td>
-                          <td style={{ padding:"14px 18px", fontSize:12, color:"#6b6b80" }}>{c.lastSent || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            )}
-
-            {/* DETAIL PAGES */}
-            {tab === "totalContacts" && <TotalContactsPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
-            {tab === "emailsSent" && <EmailsSentPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
-            {tab === "categories" && <CategoriesPage onBack={() => setTab("dashboard")} />}
-            {tab === "successRate" && <SuccessRatePage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
-          </div>
-        )}
-
-        {/* ───── CHAT PANEL ───── */}
-        <div className="chat-panel" style={{
-          width: tab==="chat" ? "100%" : 380,
-          borderLeft: tab==="chat" ? "none" : "1px solid #1a1a24",
-          display: tab==="chat" || tab==="dashboard" || tab==="contacts" ? "flex" : "none",
-          flexDirection:"column", background:"#0c0c12",
+        {/* ───── CHATBOT (PRIMARY) ───── */}
+        <div className="chat-main" style={{
+          flex:1, display:"flex", flexDirection:"column", background:"#0c0c12", minWidth:0,
         }}>
           {/* Chat Header */}
-          <div style={{ padding:"16px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", gap:10 }}>
-            <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center" }}>
-              <I.Bot />
-            </div>
-            <div>
-              <div style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>Outreach Assistant</div>
-              <div style={{ fontSize:11, color:"#10b981", display:"flex", alignItems:"center", gap:4 }}>
-                <span style={{ width:6, height:6, borderRadius:"50%", background:"#10b981", display:"inline-block" }} /> Online
+          <div style={{ padding:"16px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <I.Bot />
+              </div>
+              <div>
+                <div style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>Outreach Assistant</div>
+                <div style={{ fontSize:11, color:"#10b981", display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#10b981", display:"inline-block" }} /> Online
+                </div>
               </div>
             </div>
+            {/* Toggle sidebar button for mobile */}
+            <button className="sidebar-toggle" onClick={() => setShowSidebar(!showSidebar)} style={{
+              background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 10px",
+              color:"#6b6b80", cursor:"pointer", display:"none", alignItems:"center", gap:6, fontSize:12, fontFamily:"'DM Sans',sans-serif",
+            }}>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+              {showSidebar ? "Hide" : "Menu"}
+            </button>
           </div>
 
           {/* Messages */}
@@ -933,6 +844,118 @@ function Dashboard({ user, onLogout }) {
             </button>
           </div>
         </div>
+
+        {/* ───── SIDEBAR (DASHBOARD/DETAILS) ───── */}
+        <div className={`sidebar-panel ${showSidebar ? "open" : ""}`} style={{
+          width: 400, borderLeft:"1px solid #1a1a24", overflowY:"auto", background:"#09090d",
+          padding:"20px",
+        }}>
+          {/* Sidebar Tab Switcher */}
+          <div style={{ display:"flex", gap:4, marginBottom:20 }}>
+            {["dashboard","contacts"].map(t => (
+              <button key={t} onClick={() => setTab(t)} style={{
+                background: tab===t || (tab !== "contacts" && t === "dashboard") ? "#1a1a28" : "transparent",
+                border: tab===t || (tab !== "contacts" && t === "dashboard") ? "1px solid #2a2a3a" : "1px solid transparent",
+                borderRadius:8, padding:"6px 14px", color: tab===t || (tab !== "contacts" && t === "dashboard") ? "#f0f0f5" : "#6b6b80",
+                fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", textTransform:"capitalize",
+              }}>{t}</button>
+            ))}
+          </div>
+
+          {/* DASHBOARD VIEW */}
+          {tab !== "contacts" && tab !== "totalContacts" && tab !== "emailsSent" && tab !== "categories" && tab !== "successRate" && (
+            <>
+              {/* Stats */}
+              <div className="stat-grid" style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:10, marginBottom:20 }}>
+                <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("totalContacts")} />
+                <StatCard icon={<I.Mail/>} label="Emails Sent" value={gmailConnected ? STATS.emailsSent : 0} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("emailsSent")} />
+                <StatCard icon={<I.Activity/>} label="Categories" value={STATS.categories} accent="#f97316" onClick={() => setTab("categories")} />
+                <StatCard icon={<I.Check/>} label="Success Rate" value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setTab("successRate")} />
+              </div>
+
+              {/* Quick Actions */}
+              <div style={{ marginBottom:20 }}>
+                <div style={S.sectionLabel}>Quick Actions</div>
+                <div style={{ display:"flex", flexDirection:"column", gap:8 }}>
+                  {[
+                    { icon:<I.Mail/>, label:"Send All Emails", cmd:"Send outreach emails to all categories" },
+                    { icon:<I.Activity/>, label:"Campaign Status", cmd:"Show me the campaign status" },
+                    { icon:<I.Clock/>, label:"Pause Workflow", cmd:"Pause the outreach workflow" },
+                    { icon:<I.Zap/>, label:"Resume Workflow", cmd:"Resume the outreach workflow" },
+                  ].map((a,i) => (
+                    <button key={i} onClick={() => handleSend(a.cmd)} style={{
+                      background:"#111116", border:"1px solid #1e1e28", borderRadius:10, padding:"12px 14px",
+                      color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center", gap:8,
+                      fontSize:12, fontWeight:500, fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+                    }}>
+                      {a.icon} {a.label} <span style={{ marginLeft:"auto", opacity:.4 }}><I.Right/></span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Category Buttons */}
+              <div style={{ marginBottom:20 }}>
+                <div style={S.sectionLabel}>Send by Category</div>
+                <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:8 }}>
+                  {Object.entries(CAT).map(([name, c]) => (
+                    <button key={name} onClick={() => handleSend(`Send outreach emails to all ${name} companies`)} style={{
+                      background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:10, padding:12,
+                      color:c.text, cursor:"pointer", textAlign:"left", fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+                    }}>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                        <span style={{ width:6, height:6, borderRadius:"50%", background:c.dot, display:"inline-block" }} />
+                        <span style={{ fontSize:13, fontWeight:600 }}>{name}</span>
+                      </div>
+                      <div style={{ fontSize:10, opacity:.6 }}>Tap to send</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* CONTACTS VIEW */}
+          {tab === "contacts" && (
+            <div>
+              <div style={S.sectionLabel}>Contact Database</div>
+              <div style={{ overflowX:"auto" }}>
+                <div className="table-wrapper" style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, overflow:"hidden" }}>
+                  <table style={{ width:"100%", borderCollapse:"collapse", minWidth:500 }}>
+                    <thead>
+                      <tr style={{ borderBottom:"1px solid #1e1e28" }}>
+                        {["Company","Email","Category","Status"].map(h => (
+                          <th key={h} style={{ padding:"10px 12px", textAlign:"left", fontSize:10, fontWeight:600, color:"#6b6b80", letterSpacing:.5, textTransform:"uppercase" }}>{h}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {CONTACTS.map((c,i) => (
+                        <tr key={c.id} style={{ borderBottom: i<CONTACTS.length-1 ? "1px solid #1a1a24" : "none" }}>
+                          <td style={{ padding:"10px 12px", fontSize:12, fontWeight:600, color:"#f0f0f5" }}>{c.company}</td>
+                          <td style={{ padding:"10px 12px", fontSize:11, color:"#8888a0", fontFamily:"'JetBrains Mono',monospace" }}>{c.email}</td>
+                          <td style={{ padding:"10px 12px" }}>
+                            <span style={{ display:"inline-flex", alignItems:"center", gap:4, background:CAT[c.category]?.bg, color:CAT[c.category]?.text, padding:"3px 8px", borderRadius:12, fontSize:10, fontWeight:600 }}>
+                              <span style={{ width:5, height:5, borderRadius:"50%", background:CAT[c.category]?.dot }} />
+                              {c.category}
+                            </span>
+                          </td>
+                          <td style={{ padding:"10px 12px" }}><Badge status={c.status} /></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* DETAIL PAGES */}
+          {tab === "totalContacts" && <TotalContactsPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+          {tab === "emailsSent" && <EmailsSentPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+          {tab === "categories" && <CategoriesPage onBack={() => setTab("dashboard")} />}
+          {tab === "successRate" && <SuccessRatePage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+        </div>
       </div>
 
       <style>{`
@@ -943,23 +966,34 @@ function Dashboard({ user, onLogout }) {
         ::-webkit-scrollbar{width:6px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
         input::placeholder{color:#4a4a5a}
 
-        /* Mobile menu button */
-        .mobile-menu-btn{display:none}
+        .sidebar-toggle{display:none !important}
 
         @media(max-width:768px){
           .desktop-tabs{display:none !important}
           .mobile-menu-btn{display:flex !important}
-          .main-layout{flex-direction:column !important;height:auto !important;min-height:calc(100vh - 60px)}
-          .content-area{padding:16px !important;width:100% !important}
-          .chat-panel{width:100% !important;border-left:none !important;height:calc(100vh - 60px) !important}
+          .sidebar-toggle{display:flex !important}
+          .sidebar-panel{
+            position:fixed !important;
+            top:60px !important;
+            right:0 !important;
+            width:85vw !important;
+            max-width:360px !important;
+            height:calc(100vh - 60px) !important;
+            z-index:100 !important;
+            box-shadow:-8px 0 32px rgba(0,0,0,0.6) !important;
+            transform:translateX(100%) !important;
+            transition:transform .3s ease !important;
+          }
+          .sidebar-panel.open{
+            transform:translateX(0) !important;
+          }
+          .chat-main{width:100% !important}
           .stat-grid{display:grid !important;grid-template-columns:1fr 1fr !important;gap:10px !important}
           .quick-grid{grid-template-columns:1fr !important}
           .cat-grid{grid-template-columns:1fr 1fr !important}
-          .header-inner{padding:12px 16px !important}
           .user-name-text{display:none !important}
           .table-wrapper{overflow-x:auto}
           table{min-width:600px}
-          .mobile-bottom-nav{display:flex !important}
         }
       `}</style>
     </div>
