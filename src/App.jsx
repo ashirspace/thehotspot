@@ -343,9 +343,14 @@ function Badge({ status }) {
   return <span style={{ background:s.bg, color:s.c, padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:600, letterSpacing:.5, textTransform:"uppercase", border:`1px solid ${s.c}22` }}>{s.l}</span>;
 }
 
-function StatCard({ icon, label, value, accent, locked, onConnect }) {
+function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
+  const [hover, setHover] = useState(false);
   return (
-    <div style={{ background:"#111116", border:`1px solid ${locked ? "#1e1e28" : "#1e1e28"}`, borderRadius:16, padding:"20px 22px", flex:1, minWidth:140, position:"relative", overflow:"hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition:"all .3s ease" }}>
+    <div
+      onClick={locked ? onConnect : onClick}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+      style={{ background:"#111116", border:`1px solid ${hover && !locked ? accent+"44" : "#1e1e28"}`, borderRadius:16, padding:"20px 22px", flex:1, minWidth:140, position:"relative", overflow:"hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition:"all .3s ease", cursor:"pointer", transform: hover && !locked ? "translateY(-2px)" : "none" }}>
       <div style={{ position:"absolute", top:0, right:0, width:80, height:80, background:`radial-gradient(circle at top right,${accent}15,transparent 70%)` }} />
       {locked && (
         <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"rgba(9,9,13,0.75)", zIndex:2, borderRadius:16, cursor:"pointer", backdropFilter:"blur(4px)" }} onClick={onConnect}>
@@ -353,9 +358,227 @@ function StatCard({ icon, label, value, accent, locked, onConnect }) {
           <div style={{ fontSize:10, color:"#6b6b80", marginTop:6, fontWeight:600, letterSpacing:.5, textTransform:"uppercase" }}>Connect Gmail</div>
         </div>
       )}
-      <div style={{ color:accent, marginBottom:10, opacity:.9 }}>{icon}</div>
-      <div style={{ fontSize:28, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", letterSpacing:-1 }}>{locked ? "—" : value}</div>
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+        <div style={{ color:accent, marginBottom:10, opacity:.9 }}>{icon}</div>
+        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#4a4a5a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"all .2s" }}><polyline points="9 18 15 12 9 6"/></svg>}
+      </div>
+      <div style={{ fontSize:28, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", letterSpacing:-1 }}>{locked ? "0" : value}</div>
       <div style={{ fontSize:12, color:"#6b6b80", marginTop:4, fontWeight:500, letterSpacing:.5, textTransform:"uppercase" }}>{label}</div>
+    </div>
+  );
+}
+
+/* ───────── DETAIL PAGES ───────── */
+function BackButton({ onClick, label }) {
+  return (
+    <button onClick={onClick} style={{ display:"flex", alignItems:"center", gap:8, background:"none", border:"none", color:"#6b6b80", cursor:"pointer", fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif", marginBottom:20, padding:0, transition:"color .2s" }}
+      onMouseEnter={e => e.currentTarget.style.color="#f0f0f5"}
+      onMouseLeave={e => e.currentTarget.style.color="#6b6b80"}
+    >
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Dashboard
+    </button>
+  );
+}
+
+function TotalContactsPage({ onBack, gmailConnected }) {
+  const contactsByCategory = [
+    { cat: "Network", count: gmailConnected ? 142 : 0, color: CAT.Network },
+    { cat: "CPS", count: gmailConnected ? 98 : 0, color: CAT.CPS },
+    { cat: "CPL", count: gmailConnected ? 87 : 0, color: CAT.CPL },
+    { cat: "CPA", count: gmailConnected ? 121 : 0, color: CAT.CPA },
+    { cat: "Mobile", count: gmailConnected ? 83 : 0, color: CAT.Mobile },
+  ];
+  const total = contactsByCategory.reduce((s, c) => s + c.count, 0);
+  const maxCount = Math.max(...contactsByCategory.map(c => c.count), 1);
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#10b98118", display:"flex", alignItems:"center", justifyContent:"center", color:"#10b981" }}><I.Users /></div>
+        <div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Total Contacts</div>
+        </div>
+      </div>
+      {!gmailConnected && (
+        <div style={{ background:"#2a1a0e", border:"1px solid #f9731633", borderRadius:12, padding:"14px 18px", marginBottom:20, marginTop:16, fontSize:13, color:"#fb923c" }}>
+          Connect your Gmail to see contact data. Currently showing 0 contacts.
+        </div>
+      )}
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12, marginTop:24 }}>Contacts by Category</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
+        {contactsByCategory.map(c => (
+          <div key={c.cat} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px 18px" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ width:8, height:8, borderRadius:"50%", background:c.color.dot, display:"inline-block" }} />
+                <span style={{ fontSize:14, fontWeight:600, color:c.color.text }}>{c.cat}</span>
+              </div>
+              <span style={{ fontSize:18, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{c.count}</span>
+            </div>
+            <div style={{ width:"100%", height:6, background:"#1a1a28", borderRadius:3, overflow:"hidden" }}>
+              <div style={{ width:`${(c.count/maxCount)*100}%`, height:"100%", background:c.color.dot, borderRadius:3, transition:"width .5s ease" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px 18px", marginTop:16 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span style={{ fontSize:13, color:"#6b6b80", fontWeight:500 }}>Recently Added</span>
+          <span style={{ fontSize:11, color:"#4a4a5a" }}>Last 7 days</span>
+        </div>
+        <div style={{ fontSize:32, fontWeight:700, color:"#10b981", fontFamily:"'JetBrains Mono',monospace", marginTop:8 }}>{gmailConnected ? "+24" : "0"}</div>
+      </div>
+    </div>
+  );
+}
+
+function EmailsSentPage({ onBack, gmailConnected }) {
+  const emailsByDay = [
+    { day:"Mon", sent: gmailConnected ? 67 : 0 },
+    { day:"Tue", sent: gmailConnected ? 82 : 0 },
+    { day:"Wed", sent: gmailConnected ? 45 : 0 },
+    { day:"Thu", sent: gmailConnected ? 93 : 0 },
+    { day:"Fri", sent: gmailConnected ? 58 : 0 },
+    { day:"Sat", sent: gmailConnected ? 34 : 0 },
+    { day:"Sun", sent: gmailConnected ? 33 : 0 },
+  ];
+  const total = emailsByDay.reduce((s, d) => s + d.sent, 0);
+  const maxSent = Math.max(...emailsByDay.map(d => d.sent), 1);
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#6366f118", display:"flex", alignItems:"center", justifyContent:"center", color:"#6366f1" }}><I.Mail /></div>
+        <div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Emails Sent This Week</div>
+        </div>
+      </div>
+      {!gmailConnected && (
+        <div style={{ background:"#2a1a0e", border:"1px solid #f9731633", borderRadius:12, padding:"14px 18px", marginBottom:20, marginTop:16, fontSize:13, color:"#fb923c" }}>
+          Connect your Gmail to see email stats. Currently showing 0 emails.
+        </div>
+      )}
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12, marginTop:24 }}>Daily Breakdown</div>
+      <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, padding:"20px" }}>
+        <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:160 }}>
+          {emailsByDay.map(d => (
+            <div key={d.day} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+              <span style={{ fontSize:11, color:"#6366f1", fontWeight:600, fontFamily:"'JetBrains Mono',monospace" }}>{d.sent}</span>
+              <div style={{ width:"100%", maxWidth:40, height:`${(d.sent/maxSent)*120}px`, background:"linear-gradient(180deg,#6366f1,#6366f144)", borderRadius:"6px 6px 2px 2px", transition:"height .5s ease", minHeight:4 }} />
+              <span style={{ fontSize:11, color:"#6b6b80", fontWeight:500 }}>{d.day}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:16 }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px" }}>
+          <div style={{ fontSize:12, color:"#6b6b80", marginBottom:6 }}>Delivered</div>
+          <div style={{ fontSize:22, fontWeight:700, color:"#4ade80", fontFamily:"'JetBrains Mono',monospace" }}>{gmailConnected ? "387" : "0"}</div>
+        </div>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px" }}>
+          <div style={{ fontSize:12, color:"#6b6b80", marginBottom:6 }}>Failed</div>
+          <div style={{ fontSize:22, fontWeight:700, color:"#f87171", fontFamily:"'JetBrains Mono',monospace" }}>{gmailConnected ? "25" : "0"}</div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CategoriesPage({ onBack }) {
+  const categories = [
+    { name:"Network", desc:"Affiliate network partners managing multiple programs", count:142, color:CAT.Network },
+    { name:"CPS", desc:"Cost Per Sale — commission per successful sale", count:98, color:CAT.CPS },
+    { name:"CPL", desc:"Cost Per Lead — payment per qualified lead", count:87, color:CAT.CPL },
+    { name:"CPA", desc:"Cost Per Action — payment per specific user action", count:121, color:CAT.CPA },
+    { name:"Mobile", desc:"Mobile marketing and app-based advertising", count:83, color:CAT.Mobile },
+  ];
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#f9731618", display:"flex", alignItems:"center", justifyContent:"center", color:"#f97316" }}><I.Activity /></div>
+        <div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>5</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Active Categories</div>
+        </div>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        {categories.map(c => (
+          <div key={c.name} style={{ background:c.color.bg, border:`1px solid ${c.color.dot}33`, borderRadius:14, padding:"20px 22px", transition:"transform .2s", cursor:"pointer" }}
+            onMouseEnter={e => e.currentTarget.style.transform="translateX(4px)"}
+            onMouseLeave={e => e.currentTarget.style.transform="translateX(0)"}
+          >
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+              <div>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <span style={{ width:10, height:10, borderRadius:"50%", background:c.color.dot, display:"inline-block" }} />
+                  <span style={{ fontSize:16, fontWeight:700, color:c.color.text }}>{c.name}</span>
+                </div>
+                <div style={{ fontSize:12, color:"#6b6b80", marginLeft:18 }}>{c.desc}</div>
+              </div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontSize:24, fontWeight:700, color:c.color.text, fontFamily:"'JetBrains Mono',monospace" }}>{c.count}</div>
+                <div style={{ fontSize:10, color:"#6b6b80", textTransform:"uppercase" }}>contacts</div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SuccessRatePage({ onBack, gmailConnected }) {
+  const rate = gmailConnected ? 94 : 0;
+  const stats = [
+    { label:"Total Sent", value: gmailConnected ? "412" : "0", color:"#818cf8" },
+    { label:"Delivered", value: gmailConnected ? "387" : "0", color:"#4ade80" },
+    { label:"Opened", value: gmailConnected ? "231" : "0", color:"#38bdf8" },
+    { label:"Replied", value: gmailConnected ? "67" : "0", color:"#facc15" },
+    { label:"Bounced", value: gmailConnected ? "18" : "0", color:"#f87171" },
+    { label:"Failed", value: gmailConnected ? "7" : "0", color:"#f87171" },
+  ];
+  const circumference = 2 * Math.PI * 54;
+  const offset = circumference - (rate / 100) * circumference;
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#0ea5e918", display:"flex", alignItems:"center", justifyContent:"center", color:"#0ea5e9" }}><I.Check /></div>
+        <div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Success Rate</div>
+        </div>
+      </div>
+      {/* Circular Progress */}
+      <div style={{ display:"flex", justifyContent:"center", marginBottom:32 }}>
+        <div style={{ position:"relative", width:140, height:140 }}>
+          <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform:"rotate(-90deg)" }}>
+            <circle cx="60" cy="60" r="54" stroke="#1e1e28" strokeWidth="8" fill="none" />
+            <circle cx="60" cy="60" r="54" stroke={rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : "#f87171"} strokeWidth="8" fill="none"
+              strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
+              style={{ transition:"stroke-dashoffset 1s ease" }} />
+          </svg>
+          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+            <div style={{ fontSize:36, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{rate}%</div>
+          </div>
+        </div>
+      </div>
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Breakdown</div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
+        {stats.map(s => (
+          <div key={s.label} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px", textAlign:"center" }}>
+            <div style={{ fontSize:20, fontWeight:700, color:s.color, fontFamily:"'JetBrains Mono',monospace" }}>{s.value}</div>
+            <div style={{ fontSize:11, color:"#6b6b80", marginTop:4, fontWeight:500 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
@@ -544,10 +767,10 @@ function Dashboard({ user, onLogout }) {
             {tab === "dashboard" && <>
               {/* Stats */}
               <div className="stat-grid" style={{ display:"flex", gap:14, marginBottom:28, flexWrap:"wrap" }}>
-                <StatCard icon={<I.Users/>} label="Total Contacts" value={STATS.totalContacts} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} />
-                <StatCard icon={<I.Mail/>}  label="Emails Sent"    value={STATS.emailsSent}    accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} />
-                <StatCard icon={<I.Activity/>} label="Categories"  value={STATS.categories}    accent="#f97316" />
-                <StatCard icon={<I.Check/>} label="Success Rate"   value={`${STATS.successRate}%`} accent="#0ea5e9" />
+                <StatCard icon={<I.Users/>} label="Total Contacts" value={gmailConnected ? STATS.totalContacts : 0} accent="#10b981" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("totalContacts")} />
+                <StatCard icon={<I.Mail/>}  label="Emails Sent"    value={gmailConnected ? STATS.emailsSent : 0}    accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setTab("emailsSent")} />
+                <StatCard icon={<I.Activity/>} label="Categories"  value={STATS.categories}    accent="#f97316" onClick={() => setTab("categories")} />
+                <StatCard icon={<I.Check/>} label="Success Rate"   value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setTab("successRate")} />
               </div>
 
               {/* Quick Actions */}
@@ -624,6 +847,12 @@ function Dashboard({ user, onLogout }) {
                 </div>
               </div>
             )}
+
+            {/* DETAIL PAGES */}
+            {tab === "totalContacts" && <TotalContactsPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+            {tab === "emailsSent" && <EmailsSentPage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
+            {tab === "categories" && <CategoriesPage onBack={() => setTab("dashboard")} />}
+            {tab === "successRate" && <SuccessRatePage onBack={() => setTab("dashboard")} gmailConnected={gmailConnected} />}
           </div>
         )}
 
@@ -631,7 +860,7 @@ function Dashboard({ user, onLogout }) {
         <div className="chat-panel" style={{
           width: tab==="chat" ? "100%" : 380,
           borderLeft: tab==="chat" ? "none" : "1px solid #1a1a24",
-          display: tab!=="chat" && tab!=="dashboard" && tab!=="contacts" ? "none" : "flex",
+          display: tab==="chat" || tab==="dashboard" || tab==="contacts" ? "flex" : "none",
           flexDirection:"column", background:"#0c0c12",
         }}>
           {/* Chat Header */}
