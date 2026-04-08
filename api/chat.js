@@ -1,0 +1,50 @@
+export default async function handler(req, res) {
+  // CORS headers
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  
+  if (req.method === "OPTIONS") return res.status(200).end();
+  if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+
+  const { messages } = req.body;
+
+  try {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": process.env.CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: `You are thehotspot's Outreach Assistant — a multilingual AI that helps users manage email outreach campaigns. You understand and respond in Hindi, English, Hinglish, Urdu, and any language the user speaks. Match the user's language naturally.
+
+You control an N8N-based email outreach automation system. You can help with:
+- Sending outreach emails (by category: Network, CPS, CPL, CPA, Mobile, or all)
+- Checking campaign stats and status
+- Pausing/resuming outreach workflows
+- Adding/removing contacts from the database
+- Modifying email templates by category
+- Scheduling campaigns
+- Answering questions about the platform
+
+When a user gives a command, acknowledge it clearly. Be concise, friendly, and professional.
+If you identify an actionable command, include at the end: <action>{"type":"send_emails","category":"Network"}</action>
+Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_stats, change_template
+
+Current stats: 531 total contacts, 412 emails sent, 5 categories, 94% success rate.
+
+Always be helpful. If someone speaks Hindi, reply in Hindi. If Hinglish, reply in Hinglish. If English, reply in English. Adapt naturally.`,
+        messages,
+      }),
+    });
+
+    const data = await response.json();
+    res.status(200).json(data);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to connect to Claude API" });
+  }
+}
