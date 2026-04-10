@@ -2,7 +2,7 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
-  
+
   if (req.method === "OPTIONS") return res.status(200).end();
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
@@ -54,13 +54,22 @@ Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_st
     );
 
     const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "Sorry, couldn't process that.";
 
-    // Return in same format so frontend works without changes
+    // Debug: if Gemini returns an error
+    if (data.error) {
+      return res.status(200).json({
+        content: [{ type: "text", text: "API Error: " + (data.error.message || JSON.stringify(data.error)) }],
+      });
+    }
+
+    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI. Debug: " + JSON.stringify(data).slice(0, 200);
+
     res.status(200).json({
       content: [{ type: "text", text }],
     });
   } catch (error) {
-    res.status(500).json({ error: "Failed to connect to Gemini API" });
+    res.status(200).json({
+      content: [{ type: "text", text: "Server Error: " + error.message + " | Key exists: " + !!process.env.GEMINI_API_KEY }],
+    });
   }
 }
