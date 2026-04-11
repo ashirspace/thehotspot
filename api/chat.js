@@ -7,11 +7,11 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { messages } = req.body;
-  const API_KEY = process.env.CLAUDE_API_KEY;
+  const API_KEY = process.env.OPENAI_API_KEY;
 
   if (!API_KEY) {
     return res.status(200).json({
-      content: [{ type: "text", text: "API key not configured. Please add CLAUDE_API_KEY in Vercel environment variables." }],
+      content: [{ type: "text", text: "API key not configured. Please add OPENAI_API_KEY in Vercel environment variables." }],
     });
   }
 
@@ -26,17 +26,7 @@ export default async function handler(req, res) {
       });
     }
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": API_KEY,
-        "anthropic-version": "2023-06-01",
-      },
-      body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
-        system: `You are thehotspot's Outreach Assistant — a multilingual AI that helps users manage email outreach campaigns for affiliate marketing. You understand and respond in Hindi, English, Hinglish, Urdu, Punjabi, and any language the user speaks. Always match the user's language naturally.
+    const systemPrompt = `You are thehotspot's Outreach Assistant — a multilingual AI that helps users manage email outreach campaigns for affiliate marketing. You understand and respond in Hindi, English, Hinglish, Urdu, Punjabi, and any language the user speaks. Always match the user's language naturally.
 
 You help with:
 - Sending outreach emails by category (Network, CPS, CPL, CPA, Mobile)
@@ -50,8 +40,21 @@ You help with:
 Be concise, friendly, and professional. Keep responses short (2-4 sentences max).
 If someone says hi/hello, greet them warmly and ask how you can help.
 If you identify an actionable command, include at the end: <action>{"type":"send_emails","category":"Network"}</action>
-Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_stats, change_template`,
-        messages: validMessages,
+Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_stats, change_template`;
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        max_tokens: 1024,
+        messages: [
+          { role: "system", content: systemPrompt },
+          ...validMessages,
+        ],
       }),
     });
 
@@ -63,7 +66,11 @@ Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_st
       });
     }
 
-    res.status(200).json(data);
+    // Convert OpenAI format to Claude-compatible format (so frontend works without changes)
+    const text = data.choices?.[0]?.message?.content || "Sorry, couldn't process that.";
+    res.status(200).json({
+      content: [{ type: "text", text }],
+    });
   } catch (error) {
     res.status(200).json({
       content: [{ type: "text", text: "Connection error: " + error.message }],
