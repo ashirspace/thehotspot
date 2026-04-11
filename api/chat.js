@@ -7,69 +7,66 @@ export default async function handler(req, res) {
   if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
 
   const { messages } = req.body;
-  const GEMINI_KEY = process.env.GEMINI_API_KEY;
+  const API_KEY = process.env.CLAUDE_API_KEY;
 
-  if (!GEMINI_KEY) return res.status(500).json({ error: "API key not configured" });
+  if (!API_KEY) {
+    return res.status(200).json({
+      content: [{ type: "text", text: "API key not configured. Please add CLAUDE_API_KEY in Vercel environment variables." }],
+    });
+  }
 
   try {
-    const systemPrompt = `You are thehotspot's Outreach Assistant — a multilingual AI that helps users manage email outreach campaigns. You understand and respond in Hindi, English, Hinglish, Urdu, and any language the user speaks. Match the user's language naturally.
+    const cleanMessages = (messages || []).filter(m => m.role === "user" || m.role === "assistant");
+    const firstUserIdx = cleanMessages.findIndex(m => m.role === "user");
+    const validMessages = firstUserIdx >= 0 ? cleanMessages.slice(firstUserIdx) : cleanMessages;
 
-You control an N8N-based email outreach automation system. You can help with:
-- Sending outreach emails (by category: Network, CPS, CPL, CPA, Mobile, or all)
+    if (validMessages.length === 0) {
+      return res.status(200).json({
+        content: [{ type: "text", text: "Hey! How can I help you today?" }],
+      });
+    }
+
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": API_KEY,
+        "anthropic-version": "2023-06-01",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: `You are thehotspot's Outreach Assistant — a multilingual AI that helps users manage email outreach campaigns for affiliate marketing. You understand and respond in Hindi, English, Hinglish, Urdu, Punjabi, and any language the user speaks. Always match the user's language naturally.
+
+You help with:
+- Sending outreach emails by category (Network, CPS, CPL, CPA, Mobile)
 - Checking campaign stats and status
 - Pausing/resuming outreach workflows
-- Adding/removing contacts from the database
-- Modifying email templates by category
+- Adding/removing contacts
+- Modifying email templates
 - Scheduling campaigns
-- Answering questions about the platform
+- Answering questions about thehotspot platform
 
-Be concise, friendly, and professional. Keep responses short and helpful.
+Be concise, friendly, and professional. Keep responses short (2-4 sentences max).
+If someone says hi/hello, greet them warmly and ask how you can help.
 If you identify an actionable command, include at the end: <action>{"type":"send_emails","category":"Network"}</action>
-Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_stats, change_template`;
-
-    // Build conversation for Gemini
-    const validMsgs = (messages || []).filter(m => m.role === "user" || m.role === "assistant");
-    const firstUserIdx = validMsgs.findIndex(m => m.role === "user");
-    const cleanMsgs = firstUserIdx >= 0 ? validMsgs.slice(firstUserIdx) : validMsgs;
-
-    const geminiMessages = cleanMsgs.map(m => ({
-      role: m.role === "user" ? "user" : "model",
-      parts: [{ text: m.content }],
-    }));
-
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          system_instruction: { parts: [{ text: systemPrompt }] },
-          contents: geminiMessages,
-          generationConfig: {
-            maxOutputTokens: 1024,
-            temperature: 0.7,
-          },
-        }),
-      }
-    );
+Action types: send_emails, add_contact, pause_workflow, resume_workflow, show_stats, change_template`,
+        messages: validMessages,
+      }),
+    });
 
     const data = await response.json();
 
-    // Debug: if Gemini returns an error
     if (data.error) {
       return res.status(200).json({
         content: [{ type: "text", text: "API Error: " + (data.error.message || JSON.stringify(data.error)) }],
       });
     }
 
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from AI. Debug: " + JSON.stringify(data).slice(0, 200);
-
-    res.status(200).json({
-      content: [{ type: "text", text }],
-    });
+    res.status(200).json(data);
   } catch (error) {
     res.status(200).json({
-      content: [{ type: "text", text: "Server Error: " + error.message + " | Key exists: " + !!process.env.GEMINI_API_KEY }],
+      content: [{ type: "text", text: "Connection error: " + error.message }],
     });
   }
 }
