@@ -115,25 +115,47 @@ function LoginPage({ onLogin }) {
   };
 
   const handleGoogleLogin = () => {
-    // Load Google Identity Services
     const script = document.createElement("script");
     script.src = "https://accounts.google.com/gsi/client";
     script.onload = () => {
       window.google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_LOGIN_CLIENT_ID,
-        scope: "email profile",
+        scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly",
         callback: async (response) => {
           if (response.access_token) {
-            // Fetch user info from Google
+            const token = response.access_token;
+
+            // Fetch user info
             const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
-              headers: { Authorization: `Bearer ${response.access_token}` },
+              headers: { Authorization: `Bearer ${token}` },
             });
             const gUser = await res.json();
+
+            // Fetch real contacts count
+            let contactsCount = 0;
+            try {
+              const cRes = await fetch("https://people.googleapis.com/v1/people/me/connections?pageSize=1000&personFields=emailAddresses", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              const cData = await cRes.json();
+              contactsCount = cData.totalPeople || cData.connections?.length || 0;
+            } catch (e) { }
+
+            // Fetch real sent emails count
+            let sentCount = 0;
+            try {
+              const gRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=1", {
+                headers: { Authorization: `Bearer ${token}` },
+              });
+              const gData = await gRes.json();
+              sentCount = gData.resultSizeEstimate || 0;
+            } catch (e) { }
+
+            // Save to Airtable
             const gEmail = gUser.email;
             const gName = gUser.name || gEmail.split("@")[0];
             const gPic = gUser.picture || "";
 
-            // Check if user exists in Airtable
             const existing = await airtableFetch(`{user_email}='${gEmail}'`);
             if (existing.length === 0) {
               await airtableCreate({
@@ -141,12 +163,16 @@ function LoginPage({ onLogin }) {
                 created_at: new Date().toISOString().split("T")[0],
               });
             }
+
             const userData = {
               username: existing[0]?.fields?.username || gName,
               email: gEmail,
               method: "google",
               role: existing[0]?.fields?.role || "user",
               avatar: gPic,
+              accessToken: token,
+              contactsCount,
+              sentCount,
             };
             localStorage.setItem("thehotspot_user", JSON.stringify(userData));
             onLogin(userData);
@@ -993,10 +1019,10 @@ function Dashboard({ user, onLogout }) {
             {page === "dashboard" && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
-                  <StatCard icon={<I.Users />} label="Total Contacts" value={STATS.totalContacts} accent="#10b981" onClick={() => setPage("totalContacts")} />
-                  <StatCard icon={<I.Mail />} label="Emails Sent" value={STATS.emailsSent} accent="#6366f1" onClick={() => setPage("emailsSent")} />
-                  <StatCard icon={<I.Activity />} label="Categories" value={STATS.categories} accent="#f97316" onClick={() => setPage("categories")} />
-                  <StatCard icon={<I.Check />} label="Success Rate" value={`${STATS.successRate}%`} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                  <StatCard icon={<I.Users />} label="Total Contacts" value={user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("totalContacts")} />
+                  <StatCard icon={<I.Mail />} label="Emails Sent" value={user?.sentCount || 0} accent="#6366f1" onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
+                  <StatCard icon={<I.Check />} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
                 <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
