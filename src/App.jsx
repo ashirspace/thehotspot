@@ -308,21 +308,12 @@ const CAT = {
 };
 
 /* ───────── SAMPLE DATA ───────── */
-const CONTACTS = [
-  { id: 1, company: "AdCombo", email: "biz@adcombo.com", category: "Network", status: "sent", lastSent: "2 hrs ago" },
-  { id: 2, company: "ShareASale", email: "partners@shareasale.com", category: "CPS", status: "sent", lastSent: "2 hrs ago" },
-  { id: 3, company: "MaxBounty", email: "hello@maxbounty.com", category: "CPA", status: "queued", lastSent: null },
-  { id: 4, company: "Leadpages", email: "team@leadpages.com", category: "CPL", status: "sent", lastSent: "1 hr ago" },
-  { id: 5, company: "AppFlyer", email: "connect@appflyer.com", category: "Mobile", status: "failed", lastSent: null },
-  { id: 6, company: "ClickDealer", email: "ops@clickdealer.com", category: "CPA", status: "queued", lastSent: null },
-  { id: 7, company: "Perform[cb]", email: "hi@performcb.com", category: "Network", status: "sent", lastSent: "3 hrs ago" },
-  { id: 8, company: "InMobi", email: "biz@inmobi.com", category: "Mobile", status: "sent", lastSent: "1 hr ago" },
-];
+const CONTACTS = [];
 
-const STATS = { totalContacts: 531, emailsSent: 412, categories: 5, successRate: 94 };
+const STATS = { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 };
 
 /* ───────── SMART CHATBOT (works without API) ───────── */
-const STATS_DATA = { totalContacts: 531, emailsSent: 412, categories: 5, successRate: 94 };
+const STATS_DATA = { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 };
 
 function getSmartResponse(text) {
   const lower = text.toLowerCase();
@@ -468,15 +459,15 @@ function BackButton({ onClick, label }) {
   );
 }
 
-function TotalContactsPage({ onBack, gmailConnected }) {
+function TotalContactsPage({ onBack, user }) {
   const contactsByCategory = [
-    { cat: "Network", count: gmailConnected ? 142 : 0, color: CAT.Network },
-    { cat: "CPS", count: gmailConnected ? 98 : 0, color: CAT.CPS },
-    { cat: "CPL", count: gmailConnected ? 87 : 0, color: CAT.CPL },
-    { cat: "CPA", count: gmailConnected ? 121 : 0, color: CAT.CPA },
-    { cat: "Mobile", count: gmailConnected ? 83 : 0, color: CAT.Mobile },
+    { cat: "Network", count: 0, color: CAT.Network },
+    { cat: "CPS", count: 0, color: CAT.CPS },
+    { cat: "CPL", count: 0, color: CAT.CPL },
+    { cat: "CPA", count: 0, color: CAT.CPA },
+    { cat: "Mobile", count: 0, color: CAT.Mobile },
   ];
-  const total = contactsByCategory.reduce((s, c) => s + c.count, 0);
+  const total = user?.contactsCount || 0;
   const maxCount = Math.max(...contactsByCategory.map(c => c.count), 1);
 
   return (
@@ -486,15 +477,15 @@ function TotalContactsPage({ onBack, gmailConnected }) {
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Total Contacts</div>
+          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Gmail Contacts</div>
         </div>
       </div>
-      {!gmailConnected && (
+      {user?.method !== "google" && (
         <div style={{ background: "#2a1a0e", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#fb923c" }}>
-          Connect your Gmail to see contact data. Currently showing 0 contacts.
+          Sign in with Google to see your real contacts count.
         </div>
       )}
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Contacts by Category</div>
+      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Emails sent by category (via thehotspot)</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {contactsByCategory.map(c => (
           <div key={c.cat} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 18px" }}>
@@ -516,24 +507,24 @@ function TotalContactsPage({ onBack, gmailConnected }) {
           <span style={{ fontSize: 13, color: "#6b6b80", fontWeight: 500 }}>Recently Added</span>
           <span style={{ fontSize: 11, color: "#4a4a5a" }}>Last 7 days</span>
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>{gmailConnected ? "+24" : "0"}</div>
+        <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>0</div>
       </div>
     </div>
   );
 }
 
-function EmailsSentPage({ onBack, gmailConnected }) {
+function EmailsSentPage({ onBack }) {
   const emailsByDay = [
-    { day: "Mon", sent: gmailConnected ? 67 : 0 },
-    { day: "Tue", sent: gmailConnected ? 82 : 0 },
-    { day: "Wed", sent: gmailConnected ? 45 : 0 },
-    { day: "Thu", sent: gmailConnected ? 93 : 0 },
-    { day: "Fri", sent: gmailConnected ? 58 : 0 },
-    { day: "Sat", sent: gmailConnected ? 34 : 0 },
-    { day: "Sun", sent: gmailConnected ? 33 : 0 },
+    { day: "Mon", sent: 0 },
+    { day: "Tue", sent: 0 },
+    { day: "Wed", sent: 0 },
+    { day: "Thu", sent: 0 },
+    { day: "Fri", sent: 0 },
+    { day: "Sat", sent: 0 },
+    { day: "Sun", sent: 0 },
   ];
-  const total = emailsByDay.reduce((s, d) => s + d.sent, 0);
-  const maxSent = Math.max(...emailsByDay.map(d => d.sent), 1);
+  const total = 0;
+  const maxSent = 1;
 
   return (
     <div>
@@ -542,21 +533,19 @@ function EmailsSentPage({ onBack, gmailConnected }) {
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
         <div>
           <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent This Week</div>
+          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent via thehotspot</div>
         </div>
       </div>
-      {!gmailConnected && (
-        <div style={{ background: "#2a1a0e", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#fb923c" }}>
-          Connect your Gmail to see email stats. Currently showing 0 emails.
-        </div>
-      )}
+      <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#38bdf8" }}>
+        No emails sent yet. Use thehotspot to start sending outreach emails.
+      </div>
       <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Daily Breakdown</div>
       <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "20px" }}>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160 }}>
           {emailsByDay.map(d => (
             <div key={d.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent}</span>
-              <div style={{ width: "100%", maxWidth: 40, height: `${(d.sent / maxSent) * 120}px`, background: "linear-gradient(180deg,#6366f1,#6366f144)", borderRadius: "6px 6px 2px 2px", transition: "height .5s ease", minHeight: 4 }} />
+              <div style={{ width: "100%", maxWidth: 40, height: 4, background: "#6366f144", borderRadius: "6px 6px 2px 2px", minHeight: 4 }} />
               <span style={{ fontSize: 11, color: "#6b6b80", fontWeight: 500 }}>{d.day}</span>
             </div>
           ))}
@@ -565,11 +554,11 @@ function EmailsSentPage({ onBack, gmailConnected }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
         <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
           <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Delivered</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>{gmailConnected ? "387" : "0"}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
         </div>
         <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
           <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Failed</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>{gmailConnected ? "25" : "0"}</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
         </div>
       </div>
     </div>
@@ -578,11 +567,11 @@ function EmailsSentPage({ onBack, gmailConnected }) {
 
 function CategoriesPage({ onBack }) {
   const categories = [
-    { name: "Network", desc: "Affiliate network partners managing multiple programs", count: 142, color: CAT.Network },
-    { name: "CPS", desc: "Cost Per Sale — commission per successful sale", count: 98, color: CAT.CPS },
-    { name: "CPL", desc: "Cost Per Lead — payment per qualified lead", count: 87, color: CAT.CPL },
-    { name: "CPA", desc: "Cost Per Action — payment per specific user action", count: 121, color: CAT.CPA },
-    { name: "Mobile", desc: "Mobile marketing and app-based advertising", count: 83, color: CAT.Mobile },
+    { name: "Network", desc: "Affiliate network partners managing multiple programs", count: 0, color: CAT.Network },
+    { name: "CPS", desc: "Cost Per Sale — commission per successful sale", count: 0, color: CAT.CPS },
+    { name: "CPL", desc: "Cost Per Lead — payment per qualified lead", count: 0, color: CAT.CPL },
+    { name: "CPA", desc: "Cost Per Action — payment per specific user action", count: 0, color: CAT.CPA },
+    { name: "Mobile", desc: "Mobile marketing and app-based advertising", count: 0, color: CAT.Mobile },
   ];
 
   return (
@@ -621,15 +610,15 @@ function CategoriesPage({ onBack }) {
   );
 }
 
-function SuccessRatePage({ onBack, gmailConnected }) {
-  const rate = gmailConnected ? 94 : 0;
+function SuccessRatePage({ onBack }) {
+  const rate = 0;
   const stats = [
-    { label: "Total Sent", value: gmailConnected ? "412" : "0", color: "#818cf8" },
-    { label: "Delivered", value: gmailConnected ? "387" : "0", color: "#4ade80" },
-    { label: "Opened", value: gmailConnected ? "231" : "0", color: "#38bdf8" },
-    { label: "Replied", value: gmailConnected ? "67" : "0", color: "#facc15" },
-    { label: "Bounced", value: gmailConnected ? "18" : "0", color: "#f87171" },
-    { label: "Failed", value: gmailConnected ? "7" : "0", color: "#f87171" },
+    { label: "Total Sent", value: "0", color: "#818cf8" },
+    { label: "Delivered", value: "0", color: "#4ade80" },
+    { label: "Opened", value: "0", color: "#38bdf8" },
+    { label: "Replied", value: "0", color: "#facc15" },
+    { label: "Bounced", value: "0", color: "#f87171" },
+    { label: "Failed", value: "0", color: "#f87171" },
   ];
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (rate / 100) * circumference;
@@ -715,15 +704,15 @@ function ProfilePage({ user, onBack, onLogout }) {
           <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Platform Stats</div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
             <span style={{ fontSize: 13, color: "#8888a0" }}>Total Contacts</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>531</span>
+            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
             <span style={{ fontSize: 13, color: "#8888a0" }}>Emails Sent</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>412</span>
+            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
             <span style={{ fontSize: 13, color: "#8888a0" }}>Success Rate</span>
-            <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>94%</span>
+            <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0%</span>
           </div>
         </div>
 
@@ -780,8 +769,15 @@ function Dashboard({ user, onLogout }) {
   };
   const executeAction = (action) => {
     if (!action) return;
-    const labels = { send_emails: `Triggering emails for ${action.category || "all"}...`, pause_workflow: "Workflow paused", resume_workflow: "Workflow resumed", show_stats: "Stats loaded" };
-    showToast(labels[action.type] || "Action executed");
+    const labels = {
+      send_emails: "Email sender coming soon — feature under development",
+      pause_workflow: "Workflow control coming soon",
+      resume_workflow: "Workflow control coming soon",
+      show_stats: "Opening dashboard...",
+      add_contact: "Contact import coming soon",
+    };
+    showToast(labels[action.type] || "Feature coming soon");
+    if (action.type === "show_stats") setPage("dashboard");
   };
   const handleSend = async (text) => {
     const msg = (text || input).trim();
@@ -1041,10 +1037,10 @@ function Dashboard({ user, onLogout }) {
                     </button>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Send by Category</div>
+                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Categories</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
                   {Object.entries(CAT).map(([name, c]) => (
-                    <button key={name} onClick={() => { handleSend(`Send outreach emails to all ${name} companies`); setPage(null); }} style={{
+                    <button key={name} onClick={() => setPage("categories")} style={{
                       background: c.bg, border: `1px solid ${c.dot}33`, borderRadius: 12, padding: 14,
                       color: c.text, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
                     }}>
@@ -1052,7 +1048,7 @@ function Dashboard({ user, onLogout }) {
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot }} />
                         <span style={{ fontSize: 14, fontWeight: 600 }}>{name}</span>
                       </div>
-                      <div style={{ fontSize: 11, opacity: .6 }}>Tap to send</div>
+                      <div style={{ fontSize: 11, opacity: .6 }}>0 sent</div>
                     </button>
                   ))}
                 </div>
@@ -1061,42 +1057,60 @@ function Dashboard({ user, onLogout }) {
 
             {/* CONTACTS */}
             {page === "contacts" && (
-              <div style={{ overflowX: "auto" }}>
-                <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
-                  <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
-                    <thead>
-                      <tr style={{ borderBottom: "1px solid #1e1e28" }}>
-                        {["Company", "Email", "Category", "Status", "Last Sent"].map(h => (
-                          <th key={h} style={{ padding: "14px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
-                        ))}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {CONTACTS.map((c, i) => (
-                        <tr key={c.id} style={{ borderBottom: i < CONTACTS.length - 1 ? "1px solid #1a1a24" : "none" }}>
-                          <td style={{ padding: "14px 18px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company}</td>
-                          <td style={{ padding: "14px 18px", fontSize: 12, color: "#8888a0", fontFamily: "'JetBrains Mono',monospace" }}>{c.email}</td>
-                          <td style={{ padding: "14px 18px" }}>
-                            <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: CAT[c.category]?.bg, color: CAT[c.category]?.text, padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                              <span style={{ width: 6, height: 6, borderRadius: "50%", background: CAT[c.category]?.dot }} />
-                              {c.category}
-                            </span>
-                          </td>
-                          <td style={{ padding: "14px 18px" }}><Badge status={c.status} /></td>
-                          <td style={{ padding: "14px 18px", fontSize: 12, color: "#6b6b80" }}>{c.lastSent || "—"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
+              <div>
+                <BackButton onClick={() => setPage("dashboard")} />
+                {CONTACTS.length === 0 ? (
+                  <div style={{ textAlign: "center", padding: "60px 20px" }}>
+                    <div style={{ width: 64, height: 64, borderRadius: 20, background: "#10b98110", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 20 }}><I.Users /></div>
+                    <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 8 }}>No contacts yet</div>
+                    <div style={{ fontSize: 13, color: "#6b6b80", maxWidth: 320, margin: "0 auto", lineHeight: 1.6 }}>
+                      Import contacts from Google Sheets or add them manually to start your outreach campaigns.
+                    </div>
+                    <button onClick={() => setPage(null)} style={{
+                      marginTop: 24, padding: "10px 24px", borderRadius: 10, border: "none",
+                      background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#000",
+                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                    }}>Import Contacts</button>
+                  </div>
+                ) : (
+                  <div style={{ overflowX: "auto" }}>
+                    <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
+                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
+                        <thead>
+                          <tr style={{ borderBottom: "1px solid #1e1e28" }}>
+                            {["Company", "Email", "Category", "Status", "Last Sent"].map(h => (
+                              <th key={h} style={{ padding: "14px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {CONTACTS.map((c, i) => (
+                            <tr key={c.id} style={{ borderBottom: i < CONTACTS.length - 1 ? "1px solid #1a1a24" : "none" }}>
+                              <td style={{ padding: "14px 18px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company}</td>
+                              <td style={{ padding: "14px 18px", fontSize: 12, color: "#8888a0", fontFamily: "'JetBrains Mono',monospace" }}>{c.email}</td>
+                              <td style={{ padding: "14px 18px" }}>
+                                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: CAT[c.category]?.bg, color: CAT[c.category]?.text, padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
+                                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: CAT[c.category]?.dot }} />
+                                  {c.category}
+                                </span>
+                              </td>
+                              <td style={{ padding: "14px 18px" }}><Badge status={c.status} /></td>
+                              <td style={{ padding: "14px 18px", fontSize: 12, color: "#6b6b80" }}>{c.lastSent || "—"}</td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
             {/* DETAIL PAGES */}
-            {page === "totalContacts" && <TotalContactsPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
-            {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+            {page === "totalContacts" && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
+            {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} />}
             {page === "categories" && <CategoriesPage onBack={() => setPage("dashboard")} />}
-            {page === "successRate" && <SuccessRatePage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} />}
+            {page === "successRate" && <SuccessRatePage onBack={() => setPage("dashboard")} />}
             {page === "profile" && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
           </div>
         </div>
