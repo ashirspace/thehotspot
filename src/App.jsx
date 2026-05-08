@@ -7,7 +7,9 @@ const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
 const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || "";
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || "";
 const AIRTABLE_TABLE = import.meta.env.VITE_AIRTABLE_TABLE_NAME || "Users";
+const AIRTABLE_CONTACTS_TABLE = import.meta.env.VITE_AIRTABLE_CONTACTS_TABLE || "Contacts";
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE}`;
+const AIRTABLE_CONTACTS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_CONTACTS_TABLE)}`;
 
 // Airtable helper functions
 async function airtableFetch(filterFormula) {
@@ -25,6 +27,20 @@ async function airtableCreate(fields) {
     body: JSON.stringify({ records: [{ fields }] }),
   });
   return await res.json();
+}
+
+// Fetch all contacts from Airtable (with pagination)
+async function fetchAllContacts() {
+  let allRecords = [];
+  let offset = null;
+  do {
+    const url = offset ? `${AIRTABLE_CONTACTS_URL}?offset=${offset}` : AIRTABLE_CONTACTS_URL;
+    const res = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
+    const data = await res.json();
+    allRecords = [...allRecords, ...(data.records || [])];
+    offset = data.offset || null;
+  } while (offset);
+  return allRecords;
 }
 
 // Gmail OAuth Config — Replace with your Google Cloud Console credentials
@@ -120,7 +136,7 @@ function LoginPage({ onLogin }) {
     script.onload = () => {
       window.google.accounts.oauth2.initTokenClient({
         client_id: GOOGLE_LOGIN_CLIENT_ID,
-        scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly",
+        scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets.readonly",
         callback: async (response) => {
           if (response.access_token) {
             const token = response.access_token;
@@ -670,6 +686,321 @@ export default function App() {
   return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
 }
 
+/* ───────── CONTACTS PAGE (Google Sheets Connected) ───────── */
+function ContactsPage({ onBack, showToast, user }) {
+  const [contacts, setContacts] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [sheetUrl, setSheetUrl] = useState(localStorage.getItem("thehotspot_sheet_url") || "");
+  const [connected, setConnected] = useState(false);
+  const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState("All");
+  const [emailStats, setEmailStats] = useState({ total: 0, withEmail: 0, withoutEmail: 0 });
+
+  // Extract Sheet ID from URL
+  const getSheetId = (url) => {
+    const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
+    return match ? match[1] : null;
+  };
+
+  // Fetch data from Google Sheets
+  const connectSheet = async () => {
+    const sheetId = getSheetId(sheetUrl);
+    if (!sheetId) { showToast("Invalid Google Sheet URL"); return; }
+    if (!user?.accessToken) { showToast("Please sign in with Google first"); return; }
+
+    setLoading(true);
+    try {
+      const res = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=&alt=json`,
+        { headers: { Authorization: `Bearer ${user.accessToken}` } }
+      );
+      const data = await res.json();
+
+      if (data.error) {
+        showToast("Error: " + (data.error.message || "Cannot access sheet. Make sure it's shared."));
+        setLoading(false);
+        return;
+      }
+
+      const rows = data.values || [];
+      if (rows.length < 2) { showToast("Sheet is empty"); setLoading(false); return; }
+
+      const headers = rows[0].map(h => h.trim());
+      const parsed = rows.slice(1).map((row, idx) => {
+        const obj = {};
+        headers.forEach((h, i) => { obj[h] = row[i] || ""; });
+        return {
+          id: idx,
+          company_name: obj.Affiliate || obj["Company Name"] || obj.Company || "",
+          website: obj.Website || obj.URL || "",
+          email: obj["Mail ID"] || obj.Email || obj["Mail Id"] || "",
+          category: obj.Category || "",
+          country: obj.CountryName || obj.Country || "",
+          approach: obj.Aproach || obj.Approach || "",
+          status: obj["Mail ID"] || obj.Email ? "ready" : "no_email",
+        };
+      }).filter(r => r.company_name);
+
+      setContacts(parsed);
+      setConnected(true);
+      localStorage.setItem("thehotspot_sheet_url", sheetUrl);
+      localStorage.setItem("thehotspot_contacts", JSON.stringify(parsed));
+
+      const withEmail = parsed.filter(c => c.email).length;
+      setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
+      showToast(`Loaded ${parsed.length} contacts from Google Sheet!`);
+    } catch (err) {
+      showToast("Failed to connect: " + err.message);
+    }
+    setLoading(false);
+  };
+
+  // Load cached contacts on mount
+  useEffect(() => {
+    const cached = localStorage.getItem("thehotspot_contacts");
+    if (cached) {
+      try {
+        const parsed = JSON.parse(cached);
+        setContacts(parsed);
+        setConnected(true);
+        const withEmail = parsed.filter(c => c.email).length;
+        setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
+      } catch (e) { }
+    }
+  }, []);
+
+  const categories = ["All", ...new Set(contacts.map(c => c.category).filter(Boolean))];
+
+  const filtered = contacts.filter(c => {
+    const matchSearch = !search ||
+      (c.company_name || "").toLowerCase().includes(search.toLowerCase()) ||
+      (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
+      (c.country || "").toLowerCase().includes(search.toLowerCase());
+    const matchCat = filterCat === "All" || c.category === filterCat;
+    return matchSearch && matchCat;
+  });
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Contacts</div>
+          <div style={{ fontSize: 12, color: "#6b6b80" }}>{connected ? `${contacts.length} companies loaded` : "Connect your Google Sheet"}</div>
+        </div>
+      </div>
+
+      {/* Sheet Connection */}
+      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#f0f0f5", marginBottom: 10 }}>
+          {connected ? "✅ Google Sheet Connected" : "📊 Connect Google Sheet"}
+        </div>
+        <div style={{ display: "flex", gap: 10 }}>
+          <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
+            placeholder="Paste your Google Sheet URL here..."
+            style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+            onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+          />
+          <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
+            padding: "10px 20px", borderRadius: 10, border: "none", cursor: loading ? "default" : "pointer",
+            background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
+            color: sheetUrl ? "#000" : "#6b6b80", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+            whiteSpace: "nowrap",
+          }}>
+            {loading ? "Loading..." : connected ? "Refresh" : "Connect"}
+          </button>
+        </div>
+        {!connected && (
+          <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 8, lineHeight: 1.6 }}>
+            Make sure the sheet has columns: Affiliate, Website, Mail ID, Category, CountryName. The sheet must be accessible with your Google account.
+          </div>
+        )}
+      </div>
+
+      {/* Stats Cards */}
+      {connected && (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
+          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.total}</div>
+            <div style={{ fontSize: 11, color: "#6b6b80" }}>Total Companies</div>
+          </div>
+          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.withEmail}</div>
+            <div style={{ fontSize: 11, color: "#6b6b80" }}>With Email</div>
+          </div>
+          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.withoutEmail}</div>
+            <div style={{ fontSize: 11, color: "#6b6b80" }}>Missing Email</div>
+          </div>
+        </div>
+      )}
+
+      {/* Search + Filter */}
+      {connected && contacts.length > 0 && (
+        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
+            style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+          />
+          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{
+            padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif",
+          }}>
+            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
+        </div>
+      )}
+
+      {/* Contacts Table */}
+      {connected && contacts.length > 0 && (
+        <>
+          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length} contacts</div>
+          <div style={{ overflowX: "auto" }}>
+            <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
+                <thead>
+                  <tr style={{ borderBottom: "1px solid #1e1e28" }}>
+                    {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
+                      <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filtered.slice(0, 100).map((c, i) => (
+                    <tr key={c.id} style={{ borderBottom: "1px solid #1a1a24" }}>
+                      <td style={{ padding: "10px 14px", fontSize: 11, color: "#4a4a5a" }}>{i + 1}</td>
+                      <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company_name}</td>
+                      <td style={{ padding: "10px 14px" }}>
+                        {c.website ? <a href={c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#38bdf8", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#4a4a5a" }}>—</span>}
+                      </td>
+                      <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>
+                        {c.email || "⚠ Missing"}
+                      </td>
+                      <td style={{ padding: "10px 14px" }}>
+                        {c.category ? (
+                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#1a1a28", color: CAT[c.category]?.text || "#8888a0", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}>
+                            <span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#6b6b80" }} />
+                            {c.category}
+                          </span>
+                        ) : <span style={{ fontSize: 11, color: "#6b6b80" }}>—</span>}
+                      </td>
+                      <td style={{ padding: "10px 14px", fontSize: 12, color: "#6b6b80" }}>{c.country || "—"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              {filtered.length > 100 && (
+                <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#6b6b80", borderTop: "1px solid #1e1e28" }}>
+                  Showing first 100 of {filtered.length} contacts
+                </div>
+              )}
+            </div>
+          </div>
+        </>
+      )}
+
+      {/* Empty State */}
+      {connected && contacts.length === 0 && !loading && (
+        <div style={{ textAlign: "center", padding: "40px 20px", color: "#6b6b80", fontSize: 13 }}>
+          No contacts found in the sheet. Make sure it has data rows below the header.
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ───────── CAMPAIGN STATUS PAGE ───────── */
+function CampaignStatusPage({ onBack }) {
+  const campaigns = [
+    { category: "Network", color: CAT.Network, total: 0, sent: 0, delivered: 0, opened: 0, replied: 0, failed: 0 },
+    { category: "CPS", color: CAT.CPS, total: 0, sent: 0, delivered: 0, opened: 0, replied: 0, failed: 0 },
+    { category: "CPL", color: CAT.CPL, total: 0, sent: 0, delivered: 0, opened: 0, replied: 0, failed: 0 },
+    { category: "CPA", color: CAT.CPA, total: 0, sent: 0, delivered: 0, opened: 0, replied: 0, failed: 0 },
+    { category: "Mobile", color: CAT.Mobile, total: 0, sent: 0, delivered: 0, opened: 0, replied: 0, failed: 0 },
+  ];
+  const totalSent = campaigns.reduce((s, c) => s + c.sent, 0);
+  const totalDelivered = campaigns.reduce((s, c) => s + c.delivered, 0);
+  const totalFailed = campaigns.reduce((s, c) => s + c.failed, 0);
+  const totalReplied = campaigns.reduce((s, c) => s + c.replied, 0);
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Activity /></div>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Campaign Status</div>
+          <div style={{ fontSize: 12, color: "#6b6b80" }}>Real-time overview of all outreach campaigns</div>
+        </div>
+      </div>
+
+      {/* Summary Cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+        {[
+          { label: "Total Sent", value: totalSent, color: "#818cf8" },
+          { label: "Delivered", value: totalDelivered, color: "#4ade80" },
+          { label: "Replied", value: totalReplied, color: "#facc15" },
+          { label: "Failed", value: totalFailed, color: "#f87171" },
+        ].map(s => (
+          <div key={s.label} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px", textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
+            <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Overall Status */}
+      {totalSent === 0 ? (
+        <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "20px", marginBottom: 24, textAlign: "center" }}>
+          <div style={{ fontSize: 14, color: "#38bdf8", fontWeight: 600, marginBottom: 6 }}>No campaigns running</div>
+          <div style={{ fontSize: 13, color: "#6b6b80" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
+        </div>
+      ) : (
+        <div style={{ background: "#0a1a0e", border: "1px solid #10b98133", borderRadius: 12, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: "#4ade80" }}>
+          Campaign active — {totalSent} emails sent across {campaigns.filter(c => c.sent > 0).length} categories
+        </div>
+      )}
+
+      {/* Per Category Breakdown */}
+      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Category breakdown</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        {campaigns.map(c => (
+          <div key={c.category} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot }} />
+                <span style={{ fontSize: 15, fontWeight: 700, color: c.color.text }}>{c.category}</span>
+              </div>
+              <span style={{ fontSize: 12, color: "#6b6b80", background: "#1a1a28", padding: "4px 10px", borderRadius: 8 }}>
+                {c.sent === 0 ? "Not started" : c.sent === c.total ? "Complete" : "In progress"}
+              </span>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+              {[
+                { label: "Total", val: c.total, col: "#a0a0b0" },
+                { label: "Sent", val: c.sent, col: "#818cf8" },
+                { label: "Delivered", val: c.delivered, col: "#4ade80" },
+                { label: "Replied", val: c.replied, col: "#facc15" },
+                { label: "Failed", val: c.failed, col: "#f87171" },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
+                  <div style={{ fontSize: 10, color: "#6b6b80" }}>{s.label}</div>
+                </div>
+              ))}
+            </div>
+            {/* Progress bar */}
+            <div style={{ width: "100%", height: 4, background: "#1a1a28", borderRadius: 2, marginTop: 12, overflow: "hidden" }}>
+              <div style={{ width: c.total > 0 ? `${(c.sent / c.total) * 100}%` : "0%", height: "100%", background: c.color.dot, borderRadius: 2, transition: "width .5s ease" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 /* ───────── PROFILE PAGE ───────── */
 function ProfilePage({ user, onBack, onLogout }) {
   return (
@@ -734,9 +1065,10 @@ function ProfilePage({ user, onBack, onLogout }) {
 
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
-  const [page, setPage] = useState(null); // null = chatbot, "dashboard","contacts","totalContacts","emailsSent","categories","successRate"
+  const [page, setPage] = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [gmailConnected, setGmailConnected] = useState(false);
+  const [contactCount, setContactCount] = useState(0);
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
   ]);
@@ -746,6 +1078,16 @@ function Dashboard({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const chatEnd = useRef(null);
   const recog = useRef(null);
+
+  // Fetch contact count from cached sheet data or Airtable
+  useEffect(() => {
+    const cached = localStorage.getItem("thehotspot_contacts");
+    if (cached) {
+      try { setContactCount(JSON.parse(cached).length); } catch (e) { }
+    } else {
+      fetchAllContacts().then(records => setContactCount(records.length)).catch(() => { });
+    }
+  }, [page]);
 
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
   useEffect(() => {
@@ -829,6 +1171,7 @@ function Dashboard({ user, onLogout }) {
   // Sidebar nav items
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "campaignStatus", label: "Campaign Status", icon: "📡" },
     { id: "totalContacts", label: "Total Contacts", icon: "👥" },
     { id: "emailsSent", label: "Emails Sent", icon: "📧" },
     { id: "categories", label: "Categories", icon: "📁" },
@@ -1015,7 +1358,7 @@ function Dashboard({ user, onLogout }) {
             {page === "dashboard" && (
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
-                  <StatCard icon={<I.Users />} label="Total Contacts" value={user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("totalContacts")} />
+                  <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
                   <StatCard icon={<I.Mail />} label="Emails Sent" value={user?.sentCount || 0} accent="#6366f1" onClick={() => setPage("emailsSent")} />
                   <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
                   <StatCard icon={<I.Check />} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
@@ -1023,12 +1366,12 @@ function Dashboard({ user, onLogout }) {
                 <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
                   {[
-                    { icon: <I.Mail />, label: "Send All Emails", cmd: "Send outreach emails to all categories" },
-                    { icon: <I.Activity />, label: "Campaign Status", cmd: "Show me the campaign status" },
-                    { icon: <I.Clock />, label: "Pause Workflow", cmd: "Pause the outreach workflow" },
-                    { icon: <I.Zap />, label: "Resume Workflow", cmd: "Resume the outreach workflow" },
+                    { icon: <I.Mail />, label: "Send All Emails", action: () => showToast("Email sender coming soon") },
+                    { icon: <I.Activity />, label: "Campaign Status", action: () => setPage("campaignStatus") },
+                    { icon: <I.Clock />, label: "Pause Workflow", action: () => showToast("Workflow control coming soon") },
+                    { icon: <I.Zap />, label: "Resume Workflow", action: () => showToast("Workflow control coming soon") },
                   ].map((a, i) => (
-                    <button key={i} onClick={() => { handleSend(a.cmd); setPage(null); }} style={{
+                    <button key={i} onClick={a.action} style={{
                       background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px 18px",
                       color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
                       fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif",
@@ -1056,57 +1399,10 @@ function Dashboard({ user, onLogout }) {
             )}
 
             {/* CONTACTS */}
-            {page === "contacts" && (
-              <div>
-                <BackButton onClick={() => setPage("dashboard")} />
-                {CONTACTS.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "60px 20px" }}>
-                    <div style={{ width: 64, height: 64, borderRadius: 20, background: "#10b98110", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 20 }}><I.Users /></div>
-                    <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 8 }}>No contacts yet</div>
-                    <div style={{ fontSize: 13, color: "#6b6b80", maxWidth: 320, margin: "0 auto", lineHeight: 1.6 }}>
-                      Import contacts from Google Sheets or add them manually to start your outreach campaigns.
-                    </div>
-                    <button onClick={() => setPage(null)} style={{
-                      marginTop: 24, padding: "10px 24px", borderRadius: 10, border: "none",
-                      background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#000",
-                      fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-                    }}>Import Contacts</button>
-                  </div>
-                ) : (
-                  <div style={{ overflowX: "auto" }}>
-                    <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
-                      <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 600 }}>
-                        <thead>
-                          <tr style={{ borderBottom: "1px solid #1e1e28" }}>
-                            {["Company", "Email", "Category", "Status", "Last Sent"].map(h => (
-                              <th key={h} style={{ padding: "14px 18px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {CONTACTS.map((c, i) => (
-                            <tr key={c.id} style={{ borderBottom: i < CONTACTS.length - 1 ? "1px solid #1a1a24" : "none" }}>
-                              <td style={{ padding: "14px 18px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company}</td>
-                              <td style={{ padding: "14px 18px", fontSize: 12, color: "#8888a0", fontFamily: "'JetBrains Mono',monospace" }}>{c.email}</td>
-                              <td style={{ padding: "14px 18px" }}>
-                                <span style={{ display: "inline-flex", alignItems: "center", gap: 6, background: CAT[c.category]?.bg, color: CAT[c.category]?.text, padding: "4px 12px", borderRadius: 20, fontSize: 11, fontWeight: 600 }}>
-                                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: CAT[c.category]?.dot }} />
-                                  {c.category}
-                                </span>
-                              </td>
-                              <td style={{ padding: "14px 18px" }}><Badge status={c.status} /></td>
-                              <td style={{ padding: "14px 18px", fontSize: 12, color: "#6b6b80" }}>{c.lastSent || "—"}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                )}
-              </div>
-            )}
+            {page === "contacts" && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
 
             {/* DETAIL PAGES */}
+            {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} />}
             {page === "totalContacts" && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
             {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} />}
             {page === "categories" && <CategoriesPage onBack={() => setPage("dashboard")} />}
