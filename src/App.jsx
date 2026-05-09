@@ -810,73 +810,63 @@ function CreateDatabasePage({ onBack, showToast }) {
                 <tr style={{ background: L.hd, borderBottom: `1px solid ${L.bd}` }}>
                   <th style={{ padding: "10px 14px", width: 40, textAlign: "center", fontSize: 11, color: L.tx3, fontWeight: 600 }}>#</th>
                   {activeDb.columns.map(col => (
-                    <th key={col.id} style={{ padding: 0, textAlign: "left", fontSize: 11, fontWeight: 600, color: L.tx2, minWidth: col.w || 140, position: "relative" }}>
-                      <div onClick={() => setEditingCol(editingCol === col.id ? null : col.id)}
-                        style={{ padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: editingCol === col.id ? `2px solid ${L.ac}` : "2px solid transparent", transition: "all .15s" }}
+                    <th key={col.id} style={{ padding: 0, textAlign: "left", fontSize: 11, fontWeight: 600, color: L.tx2, minWidth: col.w || 140, position: "relative", verticalAlign: "top" }}>
+                      <div onClick={() => { if (editingCol === col.id) { setEditingCol(null); } else { setEditingCol(col.id); setEditColName(col.name); } }}
+                        style={{ padding: "10px 14px", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "space-between", background: editingCol === col.id ? L.hv : "transparent", borderBottom: editingCol === col.id ? `2px solid ${L.ac}` : "2px solid transparent" }}
                         onMouseEnter={e => { if (editingCol !== col.id) e.currentTarget.style.background = L.hv; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "transparent"; }}>
+                        onMouseLeave={e => { if (editingCol !== col.id) e.currentTarget.style.background = "transparent"; }}>
                         <div>
-                          <div style={{ textTransform: "uppercase", letterSpacing: .3 }}>{col.name}</div>
-                          <div style={{ fontSize: 10, fontWeight: 400, color: L.tx3, textTransform: "capitalize", marginTop: 2 }}>{col.type}</div>
+                          <div style={{ textTransform: "uppercase", letterSpacing: .3, fontSize: 11 }}>{col.name}</div>
+                          <div style={{ fontSize: 10, fontWeight: 400, color: L.tx3, textTransform: "capitalize", marginTop: 1 }}>{col.type}</div>
                         </div>
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={L.tx3} strokeWidth="2" style={{ opacity: .5 }}><polyline points="6 9 12 15 18 9" /></svg>
+                        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={L.tx3} strokeWidth="2.5" style={{ opacity: .4, flexShrink: 0, marginLeft: 6 }}><polyline points="6 9 12 15 18 9" /></svg>
                       </div>
-                      {/* Column Edit Dropdown */}
                       {editingCol === col.id && (
-                        <div style={{ position: "absolute", top: "100%", left: 0, width: 240, background: L.card, border: `1px solid ${L.bd}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, padding: "8px 0", animation: "fadeIn .15s ease" }}
-                          onClick={e => e.stopPropagation()}>
-                          {/* Rename */}
-                          <div style={{ padding: "8px 14px" }}>
-                            <label style={{ fontSize: 10, fontWeight: 600, color: L.tx3, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Column Name</label>
-                            <input autoFocus defaultValue={col.name}
-                              onBlur={e => { if (e.target.value.trim()) renameColumn(col.id, e.target.value.trim()); }}
-                              onKeyDown={e => { if (e.key === "Enter" && e.target.value.trim()) { renameColumn(col.id, e.target.value.trim()); setEditingCol(null); } }}
-                              style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }}
-                              onFocus={e => e.target.style.borderColor = L.ac}
-                            />
-                          </div>
-                          {/* Type */}
-                          <div style={{ padding: "4px 14px 8px" }}>
-                            <label style={{ fontSize: 10, fontWeight: 600, color: L.tx3, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Field Type</label>
-                            <select value={col.type} onChange={e => { updateActiveDb({ columns: activeDb.columns.map(c => c.id === col.id ? { ...c, type: e.target.value } : c) }); }}
-                              style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box" }}>
-                              {[["text", "Text"], ["email", "Email"], ["url", "URL"], ["number", "Number"], ["select", "Select"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}
-                            </select>
-                          </div>
-                          {/* Select Options (only for select type) */}
-                          {col.type === "select" && (
-                            <div style={{ padding: "4px 14px 8px" }}>
-                              <label style={{ fontSize: 10, fontWeight: 600, color: L.tx3, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Options (comma separated)</label>
-                              <input defaultValue={(col.options || []).join(", ")}
-                                onBlur={e => { const opts = e.target.value.split(",").map(o => o.trim()).filter(Boolean); updateActiveDb({ columns: activeDb.columns.map(c => c.id === col.id ? { ...c, options: opts } : c) }); }}
-                                placeholder="Option 1, Option 2, Option 3"
-                                style={{ width: "100%", padding: "7px 10px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 12, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }}
+                        <>
+                          <div style={{ position: "fixed", inset: 0, zIndex: 99 }} onClick={() => setEditingCol(null)} />
+                          <div style={{ position: "absolute", top: "100%", left: 0, width: 220, background: L.card, border: `1px solid ${L.bd}`, borderRadius: 10, boxShadow: "0 8px 24px rgba(0,0,0,0.12)", zIndex: 100, padding: 0 }}
+                            onClick={e => e.stopPropagation()}>
+                            <div style={{ padding: "12px 12px 8px" }}>
+                              <div style={{ fontSize: 10, fontWeight: 600, color: L.tx3, marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Name</div>
+                              <input value={editColName} onChange={e => setEditColName(e.target.value)}
+                                onKeyDown={e => { if (e.key === "Enter") { if (editColName.trim()) renameColumn(col.id, editColName.trim()); setEditingCol(null); } if (e.key === "Escape") setEditingCol(null); }}
+                                onBlur={() => { if (editColName.trim() && editColName !== col.name) renameColumn(col.id, editColName.trim()); }}
+                                style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }}
+                                onFocus={e => e.target.style.borderColor = L.ac}
                               />
                             </div>
-                          )}
-                          <div style={{ height: 1, background: L.bd, margin: "4px 0" }} />
-                          {/* Actions */}
-                          <button onClick={() => { const id = "c" + Date.now(); const newCol = { ...col, id, name: col.name + " (Copy)" }; updateActiveDb({ columns: [...activeDb.columns, newCol], rows: activeDb.rows.map(r => ({ ...r, [id]: r[col.id] || "" })) }); setEditingCol(null); }}
-                            style={{ width: "100%", padding: "8px 14px", background: "none", border: "none", color: L.tx2, fontSize: 13, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 8 }}
-                            onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
-                            Duplicate column
-                          </button>
-                          {activeDb.columns.length > 1 && (
-                            <button onClick={() => { deleteColumn(col.id); setEditingCol(null); }}
-                              style={{ width: "100%", padding: "8px 14px", background: "none", border: "none", color: L.rd, fontSize: 13, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 8 }}
-                              onMouseEnter={e => e.currentTarget.style.background = L.rdBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                              Delete column
+                            <div style={{ padding: "4px 12px 8px" }}>
+                              <div style={{ fontSize: 10, fontWeight: 600, color: L.tx3, marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Type</div>
+                              <select value={col.type} onChange={e => updateActiveDb({ columns: activeDb.columns.map(c => c.id === col.id ? { ...c, type: e.target.value } : c) })}
+                                style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box" }}>
+                                {[["text", "Text"], ["email", "Email"], ["url", "URL"], ["number", "Number"], ["select", "Select"]].map(([v, l]) => <option key={v} value={v}>{l}</option>)}
+                              </select>
+                            </div>
+                            {col.type === "select" && (
+                              <div style={{ padding: "4px 12px 8px" }}>
+                                <div style={{ fontSize: 10, fontWeight: 600, color: L.tx3, marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Options</div>
+                                <input defaultValue={(col.options || []).join(", ")}
+                                  onBlur={e => { const opts = e.target.value.split(",").map(o => o.trim()).filter(Boolean); updateActiveDb({ columns: activeDb.columns.map(c => c.id === col.id ? { ...c, options: opts } : c) }); }}
+                                  placeholder="Opt1, Opt2, Opt3"
+                                  style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `1px solid ${L.bd}`, fontSize: 12, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }}
+                                />
+                              </div>
+                            )}
+                            <div style={{ height: 1, background: L.bdL, margin: "4px 0" }} />
+                            <button onClick={() => { const id = "c" + Date.now(); updateActiveDb({ columns: [...activeDb.columns, { ...col, id, name: col.name + " (copy)" }], rows: activeDb.rows.map(r => ({ ...r, [id]: r[col.id] || "" })) }); setEditingCol(null); }}
+                              style={{ width: "100%", padding: "7px 12px", background: "none", border: "none", color: L.tx2, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif" }}
+                              onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                              ⧉ Duplicate
                             </button>
-                          )}
-                          <div style={{ height: 1, background: L.bd, margin: "4px 0" }} />
-                          <button onClick={() => setEditingCol(null)}
-                            style={{ width: "100%", padding: "8px 14px", background: "none", border: "none", color: L.tx3, fontSize: 12, cursor: "pointer", textAlign: "center", fontFamily: "'DM Sans',sans-serif" }}
-                            onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "none"}>
-                            Close
-                          </button>
-                        </div>
+                            {activeDb.columns.length > 1 && (
+                              <button onClick={() => { deleteColumn(col.id); setEditingCol(null); }}
+                                style={{ width: "100%", padding: "7px 12px", background: "none", border: "none", color: L.rd, fontSize: 12, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif" }}
+                                onMouseEnter={e => e.currentTarget.style.background = L.rdBg} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                                🗑 Delete
+                              </button>
+                            )}
+                          </div>
+                        </>
                       )}
                     </th>
                   ))}
