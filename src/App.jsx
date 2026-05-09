@@ -754,6 +754,7 @@ function CreateDatabasePage({ onBack, showToast }) {
   const updateCell = (ri, cid, v) => { const u = [...activeDb.rows]; u[ri] = { ...u[ri], [cid]: v }; updateActiveDb({ rows: u }); };
   const addColumn = () => { if (!newColName.trim()) return; const id = "c" + Date.now(); updateActiveDb({ columns: [...activeDb.columns, { id, name: newColName.trim(), type: newColType, w: 150 }], rows: activeDb.rows.map(r => ({ ...r, [id]: "" })) }); setNewColName(""); setNewColType("text"); setShowAddCol(false); };
   const deleteColumn = (cid) => { if (activeDb.columns.length <= 1) return; updateActiveDb({ columns: activeDb.columns.filter(c => c.id !== cid), rows: activeDb.rows.map(r => { const nr = { ...r }; delete nr[cid]; return nr; }) }); };
+  const renameColumn = (cid, newName) => { if (!newName.trim()) return; updateActiveDb({ columns: activeDb.columns.map(c => c.id === cid ? { ...c, name: newName.trim() } : c) }); };
 
   const L = { bg: "#FAFBFC", card: "#FFF", bd: "#E8ECF0", bdL: "#F0F2F5", tx: "#1A1D21", tx2: "#5F6B7A", tx3: "#8E99A4", ac: "#4F46E5", acBg: "#EEF2FF", gn: "#059669", gnBg: "#ECFDF5", rd: "#DC2626", rdBg: "#FEF2F2", bl: "#2563EB", hd: "#F8F9FB", hv: "#F5F7FA", sh: "0 1px 3px rgba(0,0,0,0.04)", shM: "0 4px 12px rgba(0,0,0,0.06)" };
 
@@ -808,8 +809,13 @@ function CreateDatabasePage({ onBack, showToast }) {
                   <th style={{ padding: "10px 14px", width: 40, textAlign: "center", fontSize: 11, color: L.tx3, fontWeight: 600 }}>#</th>
                   {activeDb.columns.map(col => (
                     <th key={col.id} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: L.tx2, letterSpacing: .3, textTransform: "uppercase", minWidth: col.w || 140 }}>
-                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><span>{col.name}</span>
-                        <button onClick={() => deleteColumn(col.id)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 2, opacity: .3, fontSize: 14 }} onMouseEnter={e => e.target.style.opacity = "1"} onMouseLeave={e => e.target.style.opacity = ".3"}>×</button>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                        <input value={col.name} onChange={e => renameColumn(col.id, e.target.value)}
+                          style={{ fontSize: 11, fontWeight: 600, color: L.tx2, letterSpacing: .3, textTransform: "uppercase", border: "none", background: "transparent", outline: "none", fontFamily: "'DM Sans',sans-serif", padding: "2px 0", width: "100%", cursor: "text" }}
+                          onFocus={e => { e.target.style.background = L.card; e.target.style.borderBottom = `2px solid ${L.ac}`; e.target.style.textTransform = "none"; }}
+                          onBlur={e => { e.target.style.background = "transparent"; e.target.style.borderBottom = "none"; e.target.style.textTransform = "uppercase"; }}
+                        />
+                        <button onClick={() => deleteColumn(col.id)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 2, opacity: .3, fontSize: 14, flexShrink: 0 }} onMouseEnter={e => e.target.style.opacity = "1"} onMouseLeave={e => e.target.style.opacity = ".3"}>×</button>
                       </div>
                       <div style={{ fontSize: 10, fontWeight: 400, color: L.tx3, textTransform: "capitalize", marginTop: 2 }}>{col.type}</div>
                     </th>
