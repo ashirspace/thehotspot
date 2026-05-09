@@ -686,44 +686,44 @@ export default function App() {
   return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
 }
 
-/* ───────── CONTACTS PAGE (Google Sheets Connected) ───────── */
+/* ───────── CONTACTS PAGE (Database Hub) ───────── */
 function ContactsPage({ onBack, showToast, user }) {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [view, setView] = useState("hub");
   const [sheetUrl, setSheetUrl] = useState(localStorage.getItem("thehotspot_sheet_url") || "");
   const [connected, setConnected] = useState(false);
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
   const [emailStats, setEmailStats] = useState({ total: 0, withEmail: 0, withoutEmail: 0 });
+  const [sheetName, setSheetName] = useState(localStorage.getItem("thehotspot_sheet_name") || "");
 
-  // Extract Sheet ID from URL
   const getSheetId = (url) => {
     const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
     return match ? match[1] : null;
   };
 
-  // Fetch data from Google Sheets
   const connectSheet = async () => {
     const sheetId = getSheetId(sheetUrl);
     if (!sheetId) { showToast("Invalid Google Sheet URL"); return; }
     if (!user?.accessToken) { showToast("Please sign in with Google first"); return; }
-
     setLoading(true);
     try {
-      const res = await fetch(
-        `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/Sheet1?key=&alt=json`,
-        { headers: { Authorization: `Bearer ${user.accessToken}` } }
-      );
-      const data = await res.json();
+      const metaRes = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}?fields=properties.title,sheets.properties.title`, {
+        headers: { Authorization: `Bearer ${user.accessToken}` },
+      });
+      const metaData = await metaRes.json();
+      const title = metaData.properties?.title || "Untitled Sheet";
+      const firstSheet = metaData.sheets?.[0]?.properties?.title || "Sheet1";
 
-      if (data.error) {
-        showToast("Error: " + (data.error.message || "Cannot access sheet. Make sure it's shared."));
-        setLoading(false);
-        return;
-      }
+      const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(firstSheet)}`, {
+        headers: { Authorization: `Bearer ${user.accessToken}` },
+      });
+      const data = await res.json();
+      if (data.error) { showToast("Error: " + (data.error.message || "Cannot access sheet")); setLoading(false); return; }
 
       const rows = data.values || [];
-      if (rows.length < 2) { showToast("Sheet is empty"); setLoading(false); return; }
+      if (rows.length < 2) { showToast("Sheet has no data rows"); setLoading(false); return; }
 
       const headers = rows[0].map(h => h.trim());
       const parsed = rows.slice(1).map((row, idx) => {
@@ -731,38 +731,47 @@ function ContactsPage({ onBack, showToast, user }) {
         headers.forEach((h, i) => { obj[h] = row[i] || ""; });
         return {
           id: idx,
-          company_name: obj.Affiliate || obj["Company Name"] || obj.Company || "",
-          website: obj.Website || obj.URL || "",
-          email: obj["Mail ID"] || obj.Email || obj["Mail Id"] || "",
-          category: obj.Category || "",
-          country: obj.CountryName || obj.Country || "",
+          company_name: obj.Affiliate || obj["Company Name"] || obj.Company || obj.Name || "",
+          website: obj.Website || obj.URL || obj.website || "",
+          email: obj["Mail ID"] || obj.Email || obj["Mail Id"] || obj.email || "",
+          category: obj.Category || obj.category || "",
+          country: obj.CountryName || obj.Country || obj.country || "",
           approach: obj.Aproach || obj.Approach || "",
-          status: obj["Mail ID"] || obj.Email ? "ready" : "no_email",
+          status: (obj["Mail ID"] || obj.Email) ? "ready" : "no_email",
         };
       }).filter(r => r.company_name);
 
       setContacts(parsed);
       setConnected(true);
+      setSheetName(title);
+      setView("table");
       localStorage.setItem("thehotspot_sheet_url", sheetUrl);
+      localStorage.setItem("thehotspot_sheet_name", title);
       localStorage.setItem("thehotspot_contacts", JSON.stringify(parsed));
 
       const withEmail = parsed.filter(c => c.email).length;
       setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
-      showToast(`Loaded ${parsed.length} contacts from Google Sheet!`);
+      showToast(`Loaded ${parsed.length} contacts from "${title}"`);
     } catch (err) {
-      showToast("Failed to connect: " + err.message);
+      showToast("Connection failed: " + err.message);
     }
     setLoading(false);
   };
 
-  // Load cached contacts on mount
+  const disconnectSheet = () => {
+    setContacts([]); setConnected(false); setSheetUrl(""); setSheetName(""); setView("hub");
+    localStorage.removeItem("thehotspot_sheet_url");
+    localStorage.removeItem("thehotspot_sheet_name");
+    localStorage.removeItem("thehotspot_contacts");
+    showToast("Sheet disconnected");
+  };
+
   useEffect(() => {
     const cached = localStorage.getItem("thehotspot_contacts");
     if (cached) {
       try {
         const parsed = JSON.parse(cached);
-        setContacts(parsed);
-        setConnected(true);
+        setContacts(parsed); setConnected(true); setView("table");
         const withEmail = parsed.filter(c => c.email).length;
         setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
       } catch (e) { }
@@ -770,142 +779,189 @@ function ContactsPage({ onBack, showToast, user }) {
   }, []);
 
   const categories = ["All", ...new Set(contacts.map(c => c.category).filter(Boolean))];
-
   const filtered = contacts.filter(c => {
-    const matchSearch = !search ||
-      (c.company_name || "").toLowerCase().includes(search.toLowerCase()) ||
-      (c.email || "").toLowerCase().includes(search.toLowerCase()) ||
-      (c.country || "").toLowerCase().includes(search.toLowerCase());
-    const matchCat = filterCat === "All" || c.category === filterCat;
-    return matchSearch && matchCat;
+    const matchSearch = !search || [c.company_name, c.email, c.country].some(v => (v || "").toLowerCase().includes(search.toLowerCase()));
+    return matchSearch && (filterCat === "All" || c.category === filterCat);
   });
 
-  return (
+  // ─── HUB VIEW ───
+  if (view === "hub") return (
     <div>
       <BackButton onClick={onBack} />
-
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Contacts</div>
-          <div style={{ fontSize: 12, color: "#6b6b80" }}>{connected ? `${contacts.length} companies loaded` : "Connect your Google Sheet"}</div>
+      <div style={{ textAlign: "center", marginBottom: 32 }}>
+        <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#f0f0f5", marginBottom: 6 }}>Contacts Database</div>
+        <div style={{ fontSize: 14, color: "#6b6b80", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
+          onClick={() => setView("connect_sheets")}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.background = "#0a1a0e"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
+          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98108,transparent 70%)" }} />
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Connect Data Source</div>
+          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+            {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
+              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#10b98110", color: "#10b981", fontWeight: 500 }}>{s}</span>
+            ))}
+          </div>
+        </div>
+        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
+          onClick={() => showToast("Create database — coming soon!")}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.background = "#0e0e1a"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
+          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f108,transparent 70%)" }} />
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          </div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Create New Database</div>
+          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
+          <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#6366f110", color: "#6366f1", fontWeight: 500 }}>Coming Soon</span>
         </div>
       </div>
-
-      {/* Sheet Connection */}
-      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px", marginBottom: 20 }}>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#f0f0f5", marginBottom: 10 }}>
-          {connected ? "✅ Google Sheet Connected" : "📊 Connect Google Sheet"}
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-          <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
-            placeholder="Paste your Google Sheet URL here..."
-            style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-            onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
-          />
-          <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
-            padding: "10px 20px", borderRadius: 10, border: "none", cursor: loading ? "default" : "pointer",
-            background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
-            color: sheetUrl ? "#000" : "#6b6b80", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
-            whiteSpace: "nowrap",
-          }}>
-            {loading ? "Loading..." : connected ? "Refresh" : "Connect"}
-          </button>
-        </div>
-        {!connected && (
-          <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 8, lineHeight: 1.6 }}>
-            Make sure the sheet has columns: Affiliate, Website, Mail ID, Category, CountryName. The sheet must be accessible with your Google account.
-          </div>
-        )}
-      </div>
-
-      {/* Stats Cards */}
-      {connected && (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
-          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.total}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80" }}>Total Companies</div>
-          </div>
-          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.withEmail}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80" }}>With Email</div>
-          </div>
-          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>{emailStats.withoutEmail}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80" }}>Missing Email</div>
+      {sheetName && (
+        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "16px 20px" }}>
+          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 10 }}>Recently Connected</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => setView("table")}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>{sheetName}</div>
+              <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts</div>
+            </div>
+            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 500 }}>Open →</span>
           </div>
         </div>
       )}
+    </div>
+  );
 
-      {/* Search + Filter */}
-      {connected && contacts.length > 0 && (
-        <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
-          <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
-            style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-          />
-          <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{
-            padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif",
-          }}>
-            {categories.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
+  // ─── CONNECT SOURCES VIEW ───
+  if (view === "connect_sheets") return (
+    <div>
+      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>← Back to Data Sources</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
         </div>
-      )}
-
-      {/* Contacts Table */}
-      {connected && contacts.length > 0 && (
-        <>
-          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length} contacts</div>
-          <div style={{ overflowX: "auto" }}>
-            <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
-                <thead>
-                  <tr style={{ borderBottom: "1px solid #1e1e28" }}>
-                    {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
-                      <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filtered.slice(0, 100).map((c, i) => (
-                    <tr key={c.id} style={{ borderBottom: "1px solid #1a1a24" }}>
-                      <td style={{ padding: "10px 14px", fontSize: 11, color: "#4a4a5a" }}>{i + 1}</td>
-                      <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company_name}</td>
-                      <td style={{ padding: "10px 14px" }}>
-                        {c.website ? <a href={c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#38bdf8", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#4a4a5a" }}>—</span>}
-                      </td>
-                      <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>
-                        {c.email || "⚠ Missing"}
-                      </td>
-                      <td style={{ padding: "10px 14px" }}>
-                        {c.category ? (
-                          <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#1a1a28", color: CAT[c.category]?.text || "#8888a0", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}>
-                            <span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#6b6b80" }} />
-                            {c.category}
-                          </span>
-                        ) : <span style={{ fontSize: 11, color: "#6b6b80" }}>—</span>}
-                      </td>
-                      <td style={{ padding: "10px 14px", fontSize: 12, color: "#6b6b80" }}>{c.country || "—"}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-              {filtered.length > 100 && (
-                <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#6b6b80", borderTop: "1px solid #1e1e28" }}>
-                  Showing first 100 of {filtered.length} contacts
-                </div>
-              )}
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Connect Data Source</div>
+          <div style={{ fontSize: 13, color: "#6b6b80" }}>Choose where your contact data lives</div>
+        </div>
+      </div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ background: "#111116", border: "1px solid #10b98133", borderRadius: 14, padding: "20px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+            </div>
+            <div style={{ flex: 1 }}>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>Google Sheets</div>
+              <div style={{ fontSize: 12, color: "#6b6b80" }}>Paste your sheet URL to import all rows</div>
+            </div>
+            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#10b98118", color: "#10b981", fontWeight: 500 }}>Available</span>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
+              placeholder="https://docs.google.com/spreadsheets/d/..."
+              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"} />
+            <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
+              padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
+              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
+              color: sheetUrl ? "#000" : "#6b6b80", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
+            }}>{loading ? "Connecting..." : "Connect"}</button>
+          </div>
+          <div style={{ fontSize: 11, color: "#4a4a5a", marginTop: 10, lineHeight: 1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
+        </div>
+        {[
+          { name: "Airtable", desc: "Connect an Airtable base to sync contacts", color: "#2563eb", icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/>' },
+          { name: "CSV / XLSX Upload", desc: "Upload a spreadsheet file directly", color: "#8b5cf6", icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' },
+          { name: "Slack", desc: "Import contacts from Slack workspace", color: "#e01155", icon: '<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>' },
+        ].map(src => (
+          <div key={src.name} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "20px", opacity: .5 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${src.color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: src.icon }} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>{src.name}</div>
+                <div style={{ fontSize: 12, color: "#6b6b80" }}>{src.desc}</div>
+              </div>
+              <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#f59e0b18", color: "#f59e0b", fontWeight: 500 }}>Coming Soon</span>
             </div>
           </div>
-        </>
-      )}
+        ))}
+      </div>
+    </div>
+  );
 
-      {/* Empty State */}
-      {connected && contacts.length === 0 && !loading && (
-        <div style={{ textAlign: "center", padding: "40px 20px", color: "#6b6b80", fontSize: 13 }}>
-          No contacts found in the sheet. Make sure it has data rows below the header.
+  // ─── TABLE VIEW ───
+  return (
+    <div>
+      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>← Back to Data Sources</div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+          </div>
+          <div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#f0f0f5" }}>{sheetName || "Google Sheet"}</div>
+            <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts · <span style={{ color: "#10b981" }}>Connected</span></div>
+          </div>
         </div>
-      )}
+        <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #2a2a3a", background: "#111116", color: "#a0a0b0", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+            {loading ? "Syncing..." : "↻ Sync"}
+          </button>
+          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #f8717133", background: "#2a0a0a", color: "#f87171", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
+        </div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
+        {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
+          <div key={s.l} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+            <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
+            <div style={{ fontSize: 11, color: "#6b6b80" }}>{s.l}</div>
+          </div>
+        ))}
+      </div>
+      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+        <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
+          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
+          {categories.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+      <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length}</div>
+      <div style={{ overflowX: "auto" }}>
+        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
+            <thead><tr style={{ borderBottom: "1px solid #1e1e28" }}>
+              {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
+                <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
+              ))}
+            </tr></thead>
+            <tbody>
+              {filtered.slice(0, 100).map((c, i) => (
+                <tr key={c.id} style={{ borderBottom: "1px solid #1a1a24" }}>
+                  <td style={{ padding: "10px 14px", fontSize: 11, color: "#4a4a5a" }}>{i + 1}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company_name}</td>
+                  <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#38bdf8", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#4a4a5a" }}>—</span>}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>{c.email || "⚠ Missing"}</td>
+                  <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#1a1a28", color: CAT[c.category]?.text || "#8888a0", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#6b6b80" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#6b6b80" }}>—</span>}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 12, color: "#6b6b80" }}>{c.country || "—"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#6b6b80", borderTop: "1px solid #1e1e28" }}>Showing first 100 of {filtered.length}</div>}
+        </div>
+      </div>
     </div>
   );
 }
