@@ -1416,7 +1416,8 @@ function ProfilePage({ user, onBack, onLogout }) {
 
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
-  const [page, setPage] = useState(null);
+  const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
+  const setPage = (p) => { setPageRaw(p); if (p) localStorage.setItem("thehotspot_page", p); else localStorage.removeItem("thehotspot_page"); };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [gmailConnected, setGmailConnected] = useState(false);
   const [contactCount, setContactCount] = useState(0);
