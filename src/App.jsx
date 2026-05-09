@@ -49,26 +49,26 @@ async function fetchAllContacts() {
 // 3. Create OAuth 2.0 credentials (Web Application)
 // 4. Set redirect URI to: http://localhost:5173 (for dev) or your production URL
 // 5. Paste your Client ID below
-const GMAIL_CLIENT_ID = "1033289222732-c7c1kudmf0tuh1ustp2jme38ii8kqbm5.apps.googleusercontent.com";
+const GMAIL_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
 const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
 const GOOGLE_LOGIN_CLIENT_ID = GMAIL_CLIENT_ID; // Same client ID for Google Sign-In
 
 /* ───────── ICONS (inline SVG) ───────── */
 const I = {
-  Send: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13" /><polygon points="22 2 15 22 11 13 2 9 22 2" /></svg>,
-  Bot: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2" /><circle cx="12" cy="5" r="2" /><path d="M12 7v4" /><line x1="8" y1="16" x2="8" y2="16" /><line x1="16" y1="16" x2="16" y2="16" /></svg>,
-  Mail: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" /></svg>,
-  Users: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" /><circle cx="9" cy="7" r="4" /><path d="M22 21v-2a4 4 0 0 0-3-3.87" /><path d="M16 3.13a4 4 0 0 1 0 7.75" /></svg>,
-  Activity: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>,
-  Mic: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z" /><path d="M19 10v2a7 7 0 0 1-14 0v-2" /><line x1="12" y1="19" x2="12" y2="22" /></svg>,
-  MicOff: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="2" y1="2" x2="22" y2="22" /><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2" /><path d="M5 10v2a7 7 0 0 0 12 5" /><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33" /><path d="M9 9v3a3 3 0 0 0 5.12 2.12" /><line x1="12" y1="19" x2="12" y2="22" /></svg>,
-  Zap: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" /></svg>,
-  Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>,
-  Clock: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><polyline points="12 6 12 12 16 14" /></svg>,
-  Right: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6" /></svg>,
-  Eye: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
-  EyeOff: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" /><line x1="1" y1="1" x2="23" y2="23" /></svg>,
-  Logout: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>,
+  Send: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>,
+  Bot: () => <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8" y2="16"/><line x1="16" y1="16" x2="16" y2="16"/></svg>,
+  Mail: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>,
+  Users: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>,
+  Activity: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>,
+  Mic: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="22"/></svg>,
+  MicOff: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="2" y1="2" x2="22" y2="22"/><path d="M18.89 13.23A7.12 7.12 0 0 0 19 12v-2"/><path d="M5 10v2a7 7 0 0 0 12 5"/><path d="M15 9.34V5a3 3 0 0 0-5.68-1.33"/><path d="M9 9v3a3 3 0 0 0 5.12 2.12"/><line x1="12" y1="19" x2="12" y2="22"/></svg>,
+  Zap: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>,
+  Check: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>,
+  Clock: () => <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>,
+  Right: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>,
+  Eye: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>,
+  EyeOff: () => <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>,
+  Logout: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>,
 };
 
 /* ───────── LOGIN PAGE ───────── */
@@ -85,7 +85,7 @@ function LoginPage({ onLogin }) {
     e.preventDefault();
     setError("");
     setLoading(true);
-
+    
     try {
       const records = await airtableFetch(`AND({username}='${username}',{password}='${password}')`);
       if (records.length > 0) {
@@ -155,7 +155,7 @@ function LoginPage({ onLogin }) {
               });
               const cData = await cRes.json();
               contactsCount = cData.totalPeople || cData.connections?.length || 0;
-            } catch (e) { }
+            } catch(e) {}
 
             // Fetch real sent emails count
             let sentCount = 0;
@@ -165,7 +165,7 @@ function LoginPage({ onLogin }) {
               });
               const gData = await gRes.json();
               sentCount = gData.resultSizeEstimate || 0;
-            } catch (e) { }
+            } catch(e) {}
 
             // Save to Airtable
             const gEmail = gUser.email;
@@ -200,107 +200,107 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", position:"relative", overflow:"hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+      
+      <div style={{ position:"absolute", width:"400px", height:"400px", borderRadius:"50%", background:"radial-gradient(circle,#10b98115,transparent 70%)", top:"-100px", left:"-100px" }} />
+      <div style={{ position:"absolute", width:"300px", height:"300px", borderRadius:"50%", background:"radial-gradient(circle,#0ea5e915,transparent 70%)", bottom:"-50px", right:"-50px" }} />
 
-      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#10b98115,transparent 70%)", top: "-100px", left: "-100px" }} />
-      <div style={{ position: "absolute", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e915,transparent 70%)", bottom: "-50px", right: "-50px" }} />
-
-      <div style={{ width: "100%", maxWidth: 420, padding: "0 20px", zIndex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 20, color: "#000", marginBottom: 16 }}>TH</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "#f0f0f5", letterSpacing: -0.5 }}>thehotspot</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", marginTop: 4 }}>Grow Connections Easily</div>
+      <div style={{ width:"100%", maxWidth:420, padding:"0 20px", zIndex:1 }}>
+        <div style={{ textAlign:"center", marginBottom:36 }}>
+          <div style={{ width:56, height:56, borderRadius:14, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:20, color:"#000", marginBottom:16 }}>TH</div>
+          <div style={{ fontSize:28, fontWeight:700, color:"#f0f0f5", letterSpacing:-0.5 }}>thehotspot</div>
+          <div style={{ fontSize:13, color:"#6b6b80", marginTop:4 }}>Grow Connections Easily</div>
         </div>
 
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 20, padding: "32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:20, padding:"32px 28px", boxShadow:"0 20px 60px rgba(0,0,0,0.4)" }}>
+          <div style={{ fontSize:18, fontWeight:600, color:"#f0f0f5", marginBottom:4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
+          <div style={{ fontSize:13, color:"#6b6b80", marginBottom:24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
 
           {/* Google Button */}
           <button onClick={handleGoogleLogin} style={{
-            width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #2a2a3a",
-            background: "#0c0c12", color: "#e0e0e8", fontSize: 14, fontWeight: 500,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-            gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
+            width:"100%", padding:"12px", borderRadius:12, border:"1px solid #2a2a3a",
+            background:"#0c0c12", color:"#e0e0e8", fontSize:14, fontWeight:500,
+            cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
+            gap:10, fontFamily:"'DM Sans',sans-serif", transition:"all .2s", marginBottom:20,
           }}
-            onMouseEnter={e => { e.target.style.borderColor = "#4285F4"; e.target.style.background = "#4285F411"; }}
-            onMouseLeave={e => { e.target.style.borderColor = "#2a2a3a"; e.target.style.background = "#0c0c12"; }}
+          onMouseEnter={e => { e.target.style.borderColor="#4285F4"; e.target.style.background="#4285F411"; }}
+          onMouseLeave={e => { e.target.style.borderColor="#2a2a3a"; e.target.style.background="#0c0c12"; }}
           >
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
             Continue with Google
           </button>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
-            <span style={{ fontSize: 11, color: "#4a4a5a", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-            <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:20 }}>
+            <div style={{ flex:1, height:1, background:"#1e1e28" }} />
+            <span style={{ fontSize:11, color:"#4a4a5a", fontWeight:500, textTransform:"uppercase", letterSpacing:1 }}>or</span>
+            <div style={{ flex:1, height:1, background:"#1e1e28" }} />
           </div>
 
           <form onSubmit={isSignup ? handleSignup : handleLogin}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
+            <div style={{ marginBottom:14 }}>
+              <label style={{ fontSize:12, color:"#6b6b80", fontWeight:500, display:"block", marginBottom:6 }}>Username</label>
               <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                style={{ width:"100%", padding:"11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", boxSizing:"border-box" }}
+                onFocus={e => e.target.style.borderColor="#10b981"} onBlur={e => e.target.style.borderColor="#2a2a3a"}
               />
             </div>
 
             {isSignup && (
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
+              <div style={{ marginBottom:14 }}>
+                <label style={{ fontSize:12, color:"#6b6b80", fontWeight:500, display:"block", marginBottom:6 }}>Email</label>
                 <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                  style={{ width:"100%", padding:"11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", boxSizing:"border-box" }}
+                  onFocus={e => e.target.style.borderColor="#10b981"} onBlur={e => e.target.style.borderColor="#2a2a3a"}
                 />
               </div>
             )}
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
-              <div style={{ position: "relative" }}>
+            <div style={{ marginBottom:20 }}>
+              <label style={{ fontSize:12, color:"#6b6b80", fontWeight:500, display:"block", marginBottom:6 }}>Password</label>
+              <div style={{ position:"relative" }}>
                 <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                  style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                  style={{ width:"100%", padding:"11px 42px 11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", boxSizing:"border-box" }}
+                  onFocus={e => e.target.style.borderColor="#10b981"} onBlur={e => e.target.style.borderColor="#2a2a3a"}
                 />
-                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6b80", cursor: "pointer", padding: 4 }}>
+                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position:"absolute", right:10, top:"50%", transform:"translateY(-50%)", background:"none", border:"none", color:"#6b6b80", cursor:"pointer", padding:4 }}>
                   {showPass ? <I.EyeOff /> : <I.Eye />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <div style={{ background: "#2a0a0a", border: "1px solid #f8717133", color: "#f87171", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
+              <div style={{ background:"#2a0a0a", border:"1px solid #f8717133", color:"#f87171", padding:"10px 14px", borderRadius:10, fontSize:12, fontWeight:500, marginBottom:16, textAlign:"center" }}>
                 {error}
               </div>
             )}
 
             <button type="submit" disabled={loading || !username || !password} style={{
-              width: "100%", padding: "12px", borderRadius: 12, border: "none",
+              width:"100%", padding:"12px", borderRadius:12, border:"none",
               background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
               color: (username && password) ? "#000" : "#6b6b80",
-              fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-              fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              fontSize:14, fontWeight:600, cursor: (username && password) ? "pointer" : "default",
+              fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+              display:"flex", alignItems:"center", justifyContent:"center", gap:8,
             }}>
               {loading ? (
-                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#000", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+                <>{[0,1,2].map(d => <div key={d} style={{ width:6, height:6, borderRadius:"50%", background:"#000", animation:`pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
               ) : isSignup ? "Create Account" : "Sign In"}
             </button>
           </form>
 
           {/* Toggle Login/Signup */}
-          <div style={{ textAlign: "center", marginTop: 18 }}>
-            <span style={{ fontSize: 13, color: "#6b6b80" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
+          <div style={{ textAlign:"center", marginTop:18 }}>
+            <span style={{ fontSize:13, color:"#6b6b80" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
             <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{
-              background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+              background:"none", border:"none", color:"#10b981", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif",
             }}>
               {isSignup ? "Sign In" : "Sign Up"}
             </button>
           </div>
         </div>
 
-        <div style={{ textAlign: "center", marginTop: 24, fontSize: 11, color: "#4a4a5a" }}>
+        <div style={{ textAlign:"center", marginTop:24, fontSize:11, color:"#4a4a5a" }}>
           Protected by thehotspot security
         </div>
       </div>
@@ -317,10 +317,10 @@ function LoginPage({ onLogin }) {
 /* ───────── CATEGORY COLORS ───────── */
 const CAT = {
   Network: { bg: "#0f2922", text: "#34d399", dot: "#10b981" },
-  CPS: { bg: "#1a1a2e", text: "#818cf8", dot: "#6366f1" },
-  CPL: { bg: "#2a1a0e", text: "#fb923c", dot: "#f97316" },
-  CPA: { bg: "#2a0e2a", text: "#e879f9", dot: "#d946ef" },
-  Mobile: { bg: "#0e1a2a", text: "#38bdf8", dot: "#0ea5e9" },
+  CPS:     { bg: "#1a1a2e", text: "#818cf8", dot: "#6366f1" },
+  CPL:     { bg: "#2a1a0e", text: "#fb923c", dot: "#f97316" },
+  CPA:     { bg: "#2a0e2a", text: "#e879f9", dot: "#d946ef" },
+  Mobile:  { bg: "#0e1a2a", text: "#38bdf8", dot: "#0ea5e9" },
 };
 
 /* ───────── SAMPLE DATA ───────── */
@@ -333,7 +333,7 @@ const STATS_DATA = { totalContacts: 0, emailsSent: 0, categories: 5, successRate
 
 function getSmartResponse(text) {
   const lower = text.toLowerCase();
-  const categories = ["network", "cps", "cpl", "cpa", "mobile"];
+  const categories = ["network","cps","cpl","cpa","mobile"];
   const matchedCat = categories.find(c => lower.includes(c.toLowerCase()));
 
   // Greetings
@@ -422,19 +422,19 @@ function getSmartResponse(text) {
 
 /* ───────── STYLES (object) ───────── */
 const S = {
-  app: { fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#e0e0e8", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%", maxWidth: "100vw", overflow: "hidden" },
-  header: { padding: "16px 28px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0c0c12" },
-  logo: { width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#000" },
-  layout: { flex: 1, display: "flex", overflow: "hidden", height: "calc(100vh - 65px)" },
-  content: { flex: 1, padding: "24px 28px", overflowY: "auto" },
-  sectionLabel: { fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 },
+  app: { fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", minHeight:"100vh", display:"flex", flexDirection:"column", width:"100%", maxWidth:"100vw", overflow:"hidden" },
+  header: { padding:"16px 28px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12" },
+  logo: { width:36, height:36, borderRadius:10, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:14, color:"#000" },
+  layout: { flex:1, display:"flex", overflow:"hidden", height:"calc(100vh - 65px)" },
+  content: { flex:1, padding:"24px 28px", overflowY:"auto" },
+  sectionLabel: { fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 },
 };
 
 /* ───────── COMPONENTS ───────── */
 function Badge({ status }) {
-  const m = { sent: { bg: "#052e16", c: "#4ade80", l: "Sent" }, queued: { bg: "#1a1a2e", c: "#a78bfa", l: "Queued" }, failed: { bg: "#2a0a0a", c: "#f87171", l: "Failed" } };
+  const m = { sent:{ bg:"#052e16",c:"#4ade80",l:"Sent" }, queued:{ bg:"#1a1a2e",c:"#a78bfa",l:"Queued" }, failed:{ bg:"#2a0a0a",c:"#f87171",l:"Failed" } };
   const s = m[status] || m.queued;
-  return <span style={{ background: s.bg, color: s.c, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase", border: `1px solid ${s.c}22` }}>{s.l}</span>;
+  return <span style={{ background:s.bg, color:s.c, padding:"3px 10px", borderRadius:20, fontSize:11, fontWeight:600, letterSpacing:.5, textTransform:"uppercase", border:`1px solid ${s.c}22` }}>{s.l}</span>;
 }
 
 function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
@@ -444,20 +444,20 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
       onClick={locked ? onConnect : onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: "#111116", border: `1px solid ${hover && !locked ? accent + "44" : "#1e1e28"}`, borderRadius: 16, padding: "20px 22px", flex: 1, minWidth: 140, position: "relative", overflow: "hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition: "all .3s ease", cursor: "pointer", transform: hover && !locked ? "translateY(-2px)" : "none" }}>
-      <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right,${accent}15,transparent 70%)` }} />
+      style={{ background:"#111116", border:`1px solid ${hover && !locked ? accent+"44" : "#1e1e28"}`, borderRadius:16, padding:"20px 22px", flex:1, minWidth:140, position:"relative", overflow:"hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition:"all .3s ease", cursor:"pointer", transform: hover && !locked ? "translateY(-2px)" : "none" }}>
+      <div style={{ position:"absolute", top:0, right:0, width:80, height:80, background:`radial-gradient(circle at top right,${accent}15,transparent 70%)` }} />
       {locked && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(9,9,13,0.75)", zIndex: 2, borderRadius: 16, cursor: "pointer", backdropFilter: "blur(4px)" }} onClick={onConnect}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-          <div style={{ fontSize: 10, color: "#6b6b80", marginTop: 6, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase" }}>Connect Gmail</div>
+        <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", background:"rgba(9,9,13,0.75)", zIndex:2, borderRadius:16, cursor:"pointer", backdropFilter:"blur(4px)" }} onClick={onConnect}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <div style={{ fontSize:10, color:"#6b6b80", marginTop:6, fontWeight:600, letterSpacing:.5, textTransform:"uppercase" }}>Connect Gmail</div>
         </div>
       )}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div style={{ color: accent, marginBottom: 10, opacity: .9 }}>{icon}</div>
-        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#4a4a5a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start" }}>
+        <div style={{ color:accent, marginBottom:10, opacity:.9 }}>{icon}</div>
+        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#4a4a5a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition:"all .2s" }}><polyline points="9 18 15 12 9 6"/></svg>}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
-      <div style={{ fontSize: 12, color: "#6b6b80", marginTop: 4, fontWeight: 500, letterSpacing: .5, textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize:28, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", letterSpacing:-1 }}>{locked ? "0" : value}</div>
+      <div style={{ fontSize:12, color:"#6b6b80", marginTop:4, fontWeight:500, letterSpacing:.5, textTransform:"uppercase" }}>{label}</div>
     </div>
   );
 }
@@ -465,11 +465,11 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
 /* ───────── DETAIL PAGES ───────── */
 function BackButton({ onClick, label }) {
   return (
-    <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, transition: "color .2s" }}
-      onMouseEnter={e => e.currentTarget.style.color = "#f0f0f5"}
-      onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}
+    <button onClick={onClick} style={{ display:"flex", alignItems:"center", gap:8, background:"none", border:"none", color:"#6b6b80", cursor:"pointer", fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif", marginBottom:20, padding:0, transition:"color .2s" }}
+      onMouseEnter={e => e.currentTarget.style.color="#f0f0f5"}
+      onMouseLeave={e => e.currentTarget.style.color="#6b6b80"}
     >
-      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       Back to Dashboard
     </button>
   );
@@ -489,41 +489,41 @@ function TotalContactsPage({ onBack, user }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#10b98118", display:"flex", alignItems:"center", justifyContent:"center", color:"#10b981" }}><I.Users /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Gmail Contacts</div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Gmail Contacts</div>
         </div>
       </div>
       {user?.method !== "google" && (
-        <div style={{ background: "#2a1a0e", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#fb923c" }}>
+        <div style={{ background:"#2a1a0e", border:"1px solid #f9731633", borderRadius:12, padding:"14px 18px", marginBottom:20, marginTop:16, fontSize:13, color:"#fb923c" }}>
           Sign in with Google to see your real contacts count.
         </div>
       )}
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Emails sent by category (via thehotspot)</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12, marginTop:24 }}>Emails sent by category (via thehotspot)</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
         {contactsByCategory.map(c => (
-          <div key={c.cat} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 18px" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: c.color.text }}>{c.cat}</span>
+          <div key={c.cat} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px 18px" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:10 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ width:8, height:8, borderRadius:"50%", background:c.color.dot, display:"inline-block" }} />
+                <span style={{ fontSize:14, fontWeight:600, color:c.color.text }}>{c.cat}</span>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</span>
+              <span style={{ fontSize:18, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{c.count}</span>
             </div>
-            <div style={{ width: "100%", height: 6, background: "#1a1a28", borderRadius: 3, overflow: "hidden" }}>
-              <div style={{ width: `${(c.count / maxCount) * 100}%`, height: "100%", background: c.color.dot, borderRadius: 3, transition: "width .5s ease" }} />
+            <div style={{ width:"100%", height:6, background:"#1a1a28", borderRadius:3, overflow:"hidden" }}>
+              <div style={{ width:`${(c.count/maxCount)*100}%`, height:"100%", background:c.color.dot, borderRadius:3, transition:"width .5s ease" }} />
             </div>
           </div>
         ))}
       </div>
-      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 18px", marginTop: 16 }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, color: "#6b6b80", fontWeight: 500 }}>Recently Added</span>
-          <span style={{ fontSize: 11, color: "#4a4a5a" }}>Last 7 days</span>
+      <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px 18px", marginTop:16 }}>
+        <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
+          <span style={{ fontSize:13, color:"#6b6b80", fontWeight:500 }}>Recently Added</span>
+          <span style={{ fontSize:11, color:"#4a4a5a" }}>Last 7 days</span>
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>0</div>
+        <div style={{ fontSize:32, fontWeight:700, color:"#10b981", fontFamily:"'JetBrains Mono',monospace", marginTop:8 }}>0</div>
       </div>
     </div>
   );
@@ -531,13 +531,13 @@ function TotalContactsPage({ onBack, user }) {
 
 function EmailsSentPage({ onBack }) {
   const emailsByDay = [
-    { day: "Mon", sent: 0 },
-    { day: "Tue", sent: 0 },
-    { day: "Wed", sent: 0 },
-    { day: "Thu", sent: 0 },
-    { day: "Fri", sent: 0 },
-    { day: "Sat", sent: 0 },
-    { day: "Sun", sent: 0 },
+    { day:"Mon", sent: 0 },
+    { day:"Tue", sent: 0 },
+    { day:"Wed", sent: 0 },
+    { day:"Thu", sent: 0 },
+    { day:"Fri", sent: 0 },
+    { day:"Sat", sent: 0 },
+    { day:"Sun", sent: 0 },
   ];
   const total = 0;
   const maxSent = 1;
@@ -545,36 +545,36 @@ function EmailsSentPage({ onBack }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:8 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#6366f118", display:"flex", alignItems:"center", justifyContent:"center", color:"#6366f1" }}><I.Mail /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent via thehotspot</div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Emails Sent via thehotspot</div>
         </div>
       </div>
-      <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#38bdf8" }}>
+      <div style={{ background:"#0e1a2a", border:"1px solid #0ea5e933", borderRadius:12, padding:"14px 18px", marginBottom:20, marginTop:16, fontSize:13, color:"#38bdf8" }}>
         No emails sent yet. Use thehotspot to start sending outreach emails.
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Daily Breakdown</div>
-      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "20px" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160 }}>
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12, marginTop:24 }}>Daily Breakdown</div>
+      <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, padding:"20px" }}>
+        <div style={{ display:"flex", alignItems:"flex-end", gap:8, height:160 }}>
           {emailsByDay.map(d => (
-            <div key={d.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent}</span>
-              <div style={{ width: "100%", maxWidth: 40, height: 4, background: "#6366f144", borderRadius: "6px 6px 2px 2px", minHeight: 4 }} />
-              <span style={{ fontSize: 11, color: "#6b6b80", fontWeight: 500 }}>{d.day}</span>
+            <div key={d.day} style={{ flex:1, display:"flex", flexDirection:"column", alignItems:"center", gap:6 }}>
+              <span style={{ fontSize:11, color:"#6366f1", fontWeight:600, fontFamily:"'JetBrains Mono',monospace" }}>{d.sent}</span>
+              <div style={{ width:"100%", maxWidth:40, height:4, background:"#6366f144", borderRadius:"6px 6px 2px 2px", minHeight:4 }} />
+              <span style={{ fontSize:11, color:"#6b6b80", fontWeight:500 }}>{d.day}</span>
             </div>
           ))}
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
-          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Delivered</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:12, marginTop:16 }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px" }}>
+          <div style={{ fontSize:12, color:"#6b6b80", marginBottom:6 }}>Delivered</div>
+          <div style={{ fontSize:22, fontWeight:700, color:"#4ade80", fontFamily:"'JetBrains Mono',monospace" }}>0</div>
         </div>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
-          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Failed</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px" }}>
+          <div style={{ fontSize:12, color:"#6b6b80", marginBottom:6 }}>Failed</div>
+          <div style={{ fontSize:22, fontWeight:700, color:"#f87171", fontFamily:"'JetBrains Mono',monospace" }}>0</div>
         </div>
       </div>
     </div>
@@ -583,40 +583,40 @@ function EmailsSentPage({ onBack }) {
 
 function CategoriesPage({ onBack }) {
   const categories = [
-    { name: "Network", desc: "Affiliate network partners managing multiple programs", count: 0, color: CAT.Network },
-    { name: "CPS", desc: "Cost Per Sale — commission per successful sale", count: 0, color: CAT.CPS },
-    { name: "CPL", desc: "Cost Per Lead — payment per qualified lead", count: 0, color: CAT.CPL },
-    { name: "CPA", desc: "Cost Per Action — payment per specific user action", count: 0, color: CAT.CPA },
-    { name: "Mobile", desc: "Mobile marketing and app-based advertising", count: 0, color: CAT.Mobile },
+    { name:"Network", desc:"Affiliate network partners managing multiple programs", count:0, color:CAT.Network },
+    { name:"CPS", desc:"Cost Per Sale — commission per successful sale", count:0, color:CAT.CPS },
+    { name:"CPL", desc:"Cost Per Lead — payment per qualified lead", count:0, color:CAT.CPL },
+    { name:"CPA", desc:"Cost Per Action — payment per specific user action", count:0, color:CAT.CPA },
+    { name:"Mobile", desc:"Mobile marketing and app-based advertising", count:0, color:CAT.Mobile },
   ];
 
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#f9731618", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><I.Activity /></div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#f9731618", display:"flex", alignItems:"center", justifyContent:"center", color:"#f97316" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>5</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Active Categories</div>
+          <div style={{ fontSize:24, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>5</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Active Categories</div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
         {categories.map(c => (
-          <div key={c.name} style={{ background: c.color.bg, border: `1px solid ${c.color.dot}33`, borderRadius: 14, padding: "20px 22px", transition: "transform .2s", cursor: "pointer" }}
-            onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}
+          <div key={c.name} style={{ background:c.color.bg, border:`1px solid ${c.color.dot}33`, borderRadius:14, padding:"20px 22px", transition:"transform .2s", cursor:"pointer" }}
+            onMouseEnter={e => e.currentTarget.style.transform="translateX(4px)"}
+            onMouseLeave={e => e.currentTarget.style.transform="translateX(0)"}
           >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center" }}>
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
-                  <span style={{ fontSize: 16, fontWeight: 700, color: c.color.text }}>{c.name}</span>
+                <div style={{ display:"flex", alignItems:"center", gap:8, marginBottom:6 }}>
+                  <span style={{ width:10, height:10, borderRadius:"50%", background:c.color.dot, display:"inline-block" }} />
+                  <span style={{ fontSize:16, fontWeight:700, color:c.color.text }}>{c.name}</span>
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", marginLeft: 18 }}>{c.desc}</div>
+                <div style={{ fontSize:12, color:"#6b6b80", marginLeft:18 }}>{c.desc}</div>
               </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: c.color.text, fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</div>
-                <div style={{ fontSize: 10, color: "#6b6b80", textTransform: "uppercase" }}>contacts</div>
+              <div style={{ textAlign:"right" }}>
+                <div style={{ fontSize:24, fontWeight:700, color:c.color.text, fontFamily:"'JetBrains Mono',monospace" }}>{c.count}</div>
+                <div style={{ fontSize:10, color:"#6b6b80", textTransform:"uppercase" }}>contacts</div>
               </div>
             </div>
           </div>
@@ -629,12 +629,12 @@ function CategoriesPage({ onBack }) {
 function SuccessRatePage({ onBack }) {
   const rate = 0;
   const stats = [
-    { label: "Total Sent", value: "0", color: "#818cf8" },
-    { label: "Delivered", value: "0", color: "#4ade80" },
-    { label: "Opened", value: "0", color: "#38bdf8" },
-    { label: "Replied", value: "0", color: "#facc15" },
-    { label: "Bounced", value: "0", color: "#f87171" },
-    { label: "Failed", value: "0", color: "#f87171" },
+    { label:"Total Sent", value: "0", color:"#818cf8" },
+    { label:"Delivered", value: "0", color:"#4ade80" },
+    { label:"Opened", value: "0", color:"#38bdf8" },
+    { label:"Replied", value: "0", color:"#facc15" },
+    { label:"Bounced", value: "0", color:"#f87171" },
+    { label:"Failed", value: "0", color:"#f87171" },
   ];
   const circumference = 2 * Math.PI * 54;
   const offset = circumference - (rate / 100) * circumference;
@@ -642,32 +642,32 @@ function SuccessRatePage({ onBack }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Check /></div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#0ea5e918", display:"flex", alignItems:"center", justifyContent:"center", color:"#0ea5e9" }}><I.Check /></div>
         <div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Success Rate</div>
+          <div style={{ fontSize:12, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600 }}>Success Rate</div>
         </div>
       </div>
       {/* Circular Progress */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
-        <div style={{ position: "relative", width: 140, height: 140 }}>
-          <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
+      <div style={{ display:"flex", justifyContent:"center", marginBottom:32 }}>
+        <div style={{ position:"relative", width:140, height:140 }}>
+          <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform:"rotate(-90deg)" }}>
             <circle cx="60" cy="60" r="54" stroke="#1e1e28" strokeWidth="8" fill="none" />
             <circle cx="60" cy="60" r="54" stroke={rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : "#f87171"} strokeWidth="8" fill="none"
               strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 1s ease" }} />
+              style={{ transition:"stroke-dashoffset 1s ease" }} />
           </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 36, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</div>
+          <div style={{ position:"absolute", inset:0, display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center" }}>
+            <div style={{ fontSize:36, fontWeight:700, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace" }}>{rate}%</div>
           </div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Breakdown</div>
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr 1fr", gap:10 }}>
         {stats.map(s => (
-          <div key={s.label} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px", textAlign: "center" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          <div key={s.label} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px", textAlign:"center" }}>
+            <div style={{ fontSize:20, fontWeight:700, color:s.color, fontFamily:"'JetBrains Mono',monospace" }}>{s.value}</div>
+            <div style={{ fontSize:11, color:"#6b6b80", marginTop:4, fontWeight:500 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -774,13 +774,13 @@ function ContactsPage({ onBack, showToast, user }) {
         setContacts(parsed); setConnected(true); setView("table");
         const withEmail = parsed.filter(c => c.email).length;
         setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
-      } catch (e) { }
+      } catch(e) {}
     }
   }, []);
 
   const categories = ["All", ...new Set(contacts.map(c => c.category).filter(Boolean))];
   const filtered = contacts.filter(c => {
-    const matchSearch = !search || [c.company_name, c.email, c.country].some(v => (v || "").toLowerCase().includes(search.toLowerCase()));
+    const matchSearch = !search || [c.company_name, c.email, c.country].some(v => (v||"").toLowerCase().includes(search.toLowerCase()));
     return matchSearch && (filterCat === "All" || c.category === filterCat);
   });
 
@@ -788,112 +788,386 @@ function ContactsPage({ onBack, showToast, user }) {
   if (view === "hub") return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#f0f0f5", marginBottom: 6 }}>Contacts Database</div>
-        <div style={{ fontSize: 14, color: "#6b6b80", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
+      <div style={{ textAlign:"center", marginBottom:32 }}>
+        <div style={{ width:56, height:56, borderRadius:16, background:"linear-gradient(135deg,#10b98118,#0ea5e918)", display:"inline-flex", alignItems:"center", justifyContent:"center", color:"#10b981", marginBottom:16 }}><I.Users /></div>
+        <div style={{ fontSize:22, fontWeight:700, color:"#f0f0f5", marginBottom:6 }}>Contacts Database</div>
+        <div style={{ fontSize:14, color:"#6b6b80", maxWidth:400, margin:"0 auto", lineHeight:1.6 }}>Connect an existing data source or build your database from scratch.</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
+      <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, padding:"28px 24px", cursor:"pointer", transition:"all .2s", position:"relative", overflow:"hidden" }}
           onClick={() => setView("connect_sheets")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.background = "#0a1a0e"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98108,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+          onMouseEnter={e => { e.currentTarget.style.borderColor="#10b981"; e.currentTarget.style.background="#0a1a0e"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor="#1e1e28"; e.currentTarget.style.background="#111116"; }}>
+          <div style={{ position:"absolute", top:0, right:0, width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle,#10b98108,transparent 70%)" }} />
+          <div style={{ width:40, height:40, borderRadius:12, background:"#10b98115", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Connect Data Source</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#10b98110", color: "#10b981", fontWeight: 500 }}>{s}</span>
+          <div style={{ fontSize:16, fontWeight:600, color:"#f0f0f5", marginBottom:6 }}>Connect Data Source</div>
+          <div style={{ fontSize:13, color:"#6b6b80", lineHeight:1.6, marginBottom:16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {["Google Sheets","Airtable","CSV Upload"].map(s => (
+              <span key={s} style={{ fontSize:11, padding:"4px 10px", borderRadius:8, background:"#10b98110", color:"#10b981", fontWeight:500 }}>{s}</span>
             ))}
           </div>
         </div>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
-          onClick={() => showToast("Create database — coming soon!")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.background = "#0e0e1a"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f108,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, padding:"28px 24px", cursor:"pointer", transition:"all .2s", position:"relative", overflow:"hidden" }}
+          onClick={() => setView("create_db")}
+          onMouseEnter={e => { e.currentTarget.style.borderColor="#6366f1"; e.currentTarget.style.background="#0e0e1a"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor="#1e1e28"; e.currentTarget.style.background="#111116"; }}>
+          <div style={{ position:"absolute", top:0, right:0, width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle,#6366f108,transparent 70%)" }} />
+          <div style={{ width:40, height:40, borderRadius:12, background:"#6366f115", display:"flex", alignItems:"center", justifyContent:"center", marginBottom:16 }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Create New Database</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
-          <span style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#6366f110", color: "#6366f1", fontWeight: 500 }}>Coming Soon</span>
+          <div style={{ fontSize:16, fontWeight:600, color:"#f0f0f5", marginBottom:6 }}>Create New Database</div>
+          <div style={{ fontSize:13, color:"#6b6b80", lineHeight:1.6, marginBottom:16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
+          <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
+            {["Custom Fields","Manual Entry","Full Control"].map(s => (
+              <span key={s} style={{ fontSize:11, padding:"4px 10px", borderRadius:8, background:"#6366f110", color:"#6366f1", fontWeight:500 }}>{s}</span>
+            ))}
+          </div>
         </div>
       </div>
       {sheetName && (
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "16px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 10 }}>Recently Connected</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => setView("table")}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"16px 20px" }}>
+          <div style={{ fontSize:11, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600, marginBottom:10 }}>Recently Connected</div>
+          <div style={{ display:"flex", alignItems:"center", gap:12, cursor:"pointer" }} onClick={() => setView("table")}>
+            <div style={{ width:36, height:36, borderRadius:10, background:"#0d6b3e18", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z"/></svg>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>{sheetName}</div>
-              <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts</div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>{sheetName}</div>
+              <div style={{ fontSize:12, color:"#6b6b80" }}>Google Sheets · {contacts.length} contacts</div>
             </div>
-            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 500 }}>Open →</span>
+            <span style={{ fontSize:12, color:"#10b981", fontWeight:500 }}>Open →</span>
           </div>
         </div>
       )}
     </div>
   );
 
+  // ─── CREATE DATABASE VIEW ───
+  if (view === "create_db") {
+    const [dbName, setDbName] = useState(localStorage.getItem("thehotspot_db_name") || "My Outreach Database");
+    const [columns, setColumns] = useState(() => {
+      const saved = localStorage.getItem("thehotspot_db_columns");
+      return saved ? JSON.parse(saved) : [
+        { id:"c1", name:"Company Name", type:"text", width:180 },
+        { id:"c2", name:"Website", type:"url", width:160 },
+        { id:"c3", name:"Email", type:"email", width:180 },
+        { id:"c4", name:"Category", type:"select", width:120, options:["Network","CPS","CPL","CPA","Mobile"] },
+        { id:"c5", name:"Country", type:"text", width:120 },
+        { id:"c6", name:"Status", type:"select", width:100, options:["Pending","Sent","Replied","Failed"] },
+        { id:"c7", name:"Notes", type:"text", width:200 },
+      ];
+    });
+    const [rows, setRows] = useState(() => {
+      const saved = localStorage.getItem("thehotspot_db_rows");
+      return saved ? JSON.parse(saved) : [];
+    });
+    const [editCell, setEditCell] = useState(null);
+    const [editValue, setEditValue] = useState("");
+    const [showAddCol, setShowAddCol] = useState(false);
+    const [newColName, setNewColName] = useState("");
+    const [newColType, setNewColType] = useState("text");
+    const [dbSearch, setDbSearch] = useState("");
+    const editRef = useRef(null);
+
+    // Save to localStorage whenever data changes
+    useEffect(() => {
+      localStorage.setItem("thehotspot_db_name", dbName);
+      localStorage.setItem("thehotspot_db_columns", JSON.stringify(columns));
+      localStorage.setItem("thehotspot_db_rows", JSON.stringify(rows));
+      // Also update contacts cache for dashboard
+      const mapped = rows.map((r, i) => ({
+        id: i, company_name: r.c1||"", website: r.c2||"", email: r.c3||"",
+        category: r.c4||"", country: r.c5||"", status: (r.c6||"pending").toLowerCase(),
+      }));
+      localStorage.setItem("thehotspot_contacts", JSON.stringify(mapped));
+    }, [dbName, columns, rows]);
+
+    useEffect(() => {
+      if (editRef.current) editRef.current.focus();
+    }, [editCell]);
+
+    const addRow = () => {
+      const newRow = { _id: Date.now().toString() };
+      columns.forEach(c => { newRow[c.id] = ""; });
+      setRows([...rows, newRow]);
+    };
+
+    const deleteRow = (idx) => {
+      setRows(rows.filter((_, i) => i !== idx));
+    };
+
+    const updateCell = (rowIdx, colId, value) => {
+      const updated = [...rows];
+      updated[rowIdx] = { ...updated[rowIdx], [colId]: value };
+      setRows(updated);
+    };
+
+    const addColumn = () => {
+      if (!newColName.trim()) return;
+      const id = "c" + Date.now();
+      setColumns([...columns, { id, name: newColName.trim(), type: newColType, width: 150 }]);
+      setRows(rows.map(r => ({ ...r, [id]: "" })));
+      setNewColName("");
+      setNewColType("text");
+      setShowAddCol(false);
+    };
+
+    const deleteColumn = (colId) => {
+      if (columns.length <= 1) return;
+      setColumns(columns.filter(c => c.id !== colId));
+      setRows(rows.map(r => { const nr = {...r}; delete nr[colId]; return nr; }));
+    };
+
+    const filteredRows = rows.filter(r => {
+      if (!dbSearch) return true;
+      return columns.some(c => (r[c.id] || "").toLowerCase().includes(dbSearch.toLowerCase()));
+    });
+
+    const LT = {
+      bg: "#FAFBFC", card: "#FFFFFF", border: "#E8ECF0", borderLight: "#F0F2F5",
+      text: "#1A1D21", textSec: "#5F6B7A", textTer: "#8E99A4",
+      accent: "#4F46E5", accentBg: "#EEF2FF", accentLight: "#C7D2FE",
+      green: "#059669", greenBg: "#ECFDF5",
+      red: "#DC2626", redBg: "#FEF2F2",
+      blue: "#2563EB", blueBg: "#EFF6FF",
+      headerBg: "#F8F9FB", rowHover: "#F5F7FA",
+      shadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06)",
+      shadowMd: "0 4px 6px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.06)",
+    };
+
+    return (
+      <div style={{ background:LT.bg, minHeight:"100vh", margin:"-20px", padding:"20px", borderRadius:0 }}>
+        {/* Back */}
+        <div onClick={() => setView("hub")} style={{ display:"flex", alignItems:"center", gap:6, color:LT.textSec, cursor:"pointer", fontSize:13, fontWeight:500, marginBottom:20 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6"/></svg>
+          Back to Data Sources
+        </div>
+
+        {/* Header */}
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+            <div style={{ width:40, height:40, borderRadius:10, background:LT.accentBg, display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={LT.accent} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/></svg>
+            </div>
+            <div>
+              <input value={dbName} onChange={e => setDbName(e.target.value)}
+                style={{ fontSize:18, fontWeight:700, color:LT.text, border:"none", background:"transparent", outline:"none", fontFamily:"'DM Sans',sans-serif", padding:0, width:300 }}
+              />
+              <div style={{ fontSize:12, color:LT.textSec }}>{rows.length} records · {columns.length} fields</div>
+            </div>
+          </div>
+          <div style={{ display:"flex", gap:8 }}>
+            <button onClick={addRow} style={{
+              padding:"8px 16px", borderRadius:8, border:"none", background:LT.accent, color:"#fff",
+              fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif",
+              display:"flex", alignItems:"center", gap:6, boxShadow:LT.shadow,
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Row
+            </button>
+            <button onClick={() => setShowAddCol(!showAddCol)} style={{
+              padding:"8px 16px", borderRadius:8, border:`1px solid ${LT.border}`, background:LT.card, color:LT.text,
+              fontSize:13, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif", boxShadow:LT.shadow,
+            }}>+ Add Field</button>
+          </div>
+        </div>
+
+        {/* Add Column Modal */}
+        {showAddCol && (
+          <div style={{ background:LT.card, border:`1px solid ${LT.border}`, borderRadius:12, padding:"16px 20px", marginBottom:16, boxShadow:LT.shadowMd, display:"flex", gap:10, alignItems:"flex-end" }}>
+            <div style={{ flex:1 }}>
+              <label style={{ fontSize:11, fontWeight:600, color:LT.textSec, display:"block", marginBottom:4, textTransform:"uppercase", letterSpacing:.5 }}>Field Name</label>
+              <input value={newColName} onChange={e => setNewColName(e.target.value)} placeholder="e.g. Phone Number"
+                style={{ width:"100%", padding:"8px 12px", borderRadius:8, border:`1px solid ${LT.border}`, fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", color:LT.text, boxSizing:"border-box" }}
+                onFocus={e => e.target.style.borderColor=LT.accent} onBlur={e => e.target.style.borderColor=LT.border}
+              />
+            </div>
+            <div>
+              <label style={{ fontSize:11, fontWeight:600, color:LT.textSec, display:"block", marginBottom:4, textTransform:"uppercase", letterSpacing:.5 }}>Type</label>
+              <select value={newColType} onChange={e => setNewColType(e.target.value)}
+                style={{ padding:"8px 12px", borderRadius:8, border:`1px solid ${LT.border}`, fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", color:LT.text, background:LT.card }}>
+                <option value="text">Text</option>
+                <option value="email">Email</option>
+                <option value="url">URL</option>
+                <option value="number">Number</option>
+                <option value="select">Select</option>
+              </select>
+            </div>
+            <button onClick={addColumn} style={{ padding:"8px 20px", borderRadius:8, border:"none", background:LT.accent, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>Add</button>
+            <button onClick={() => setShowAddCol(false)} style={{ padding:"8px 14px", borderRadius:8, border:`1px solid ${LT.border}`, background:LT.card, color:LT.textSec, fontSize:13, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>Cancel</button>
+          </div>
+        )}
+
+        {/* Search */}
+        <div style={{ marginBottom:16 }}>
+          <input value={dbSearch} onChange={e => setDbSearch(e.target.value)} placeholder="Search records..."
+            style={{ width:"100%", maxWidth:320, padding:"9px 14px 9px 36px", borderRadius:8, border:`1px solid ${LT.border}`, fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", color:LT.text, background:`${LT.card} url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%238E99A4' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cline x1='21' y1='21' x2='16.65' y2='16.65'/%3E%3C/svg%3E") no-repeat 12px center`, boxSizing:"border-box" }}
+            onFocus={e => e.target.style.borderColor=LT.accent} onBlur={e => e.target.style.borderColor=LT.border}
+          />
+        </div>
+
+        {/* Table */}
+        <div style={{ background:LT.card, border:`1px solid ${LT.border}`, borderRadius:12, overflow:"hidden", boxShadow:LT.shadow }}>
+          <div style={{ overflowX:"auto" }}>
+            <table style={{ width:"100%", borderCollapse:"collapse", minWidth: columns.length * 140 }}>
+              <thead>
+                <tr style={{ background:LT.headerBg, borderBottom:`1px solid ${LT.border}` }}>
+                  <th style={{ padding:"10px 14px", width:40, textAlign:"center", fontSize:11, color:LT.textTer, fontWeight:600 }}>#</th>
+                  {columns.map(col => (
+                    <th key={col.id} style={{ padding:"10px 14px", textAlign:"left", fontSize:11, fontWeight:600, color:LT.textSec, letterSpacing:.3, textTransform:"uppercase", position:"relative", minWidth:col.width||140 }}>
+                      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+                        <span>{col.name}</span>
+                        <button onClick={() => deleteColumn(col.id)} style={{ background:"none", border:"none", color:LT.textTer, cursor:"pointer", padding:2, opacity:.4, fontSize:14 }}
+                          onMouseEnter={e => e.target.style.opacity="1"} onMouseLeave={e => e.target.style.opacity=".4"}>×</button>
+                      </div>
+                      <div style={{ fontSize:10, fontWeight:400, color:LT.textTer, textTransform:"capitalize", marginTop:2 }}>{col.type}</div>
+                    </th>
+                  ))}
+                  <th style={{ padding:"10px 14px", width:60, textAlign:"center", fontSize:11, color:LT.textTer, fontWeight:600 }}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredRows.length === 0 ? (
+                  <tr>
+                    <td colSpan={columns.length + 2} style={{ padding:"48px 20px", textAlign:"center" }}>
+                      <div style={{ fontSize:15, fontWeight:600, color:LT.textSec, marginBottom:6 }}>{rows.length === 0 ? "No records yet" : "No matching records"}</div>
+                      <div style={{ fontSize:13, color:LT.textTer, marginBottom:16 }}>{rows.length === 0 ? "Click \"Add Row\" to create your first contact." : "Try a different search term."}</div>
+                      {rows.length === 0 && (
+                        <button onClick={addRow} style={{ padding:"8px 20px", borderRadius:8, border:"none", background:LT.accent, color:"#fff", fontSize:13, fontWeight:600, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
+                          + Add First Row
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ) : filteredRows.map((row, rowIdx) => {
+                  const realIdx = rows.findIndex(r => r._id === row._id);
+                  return (
+                    <tr key={row._id} style={{ borderBottom:`1px solid ${LT.borderLight}` }}
+                      onMouseEnter={e => e.currentTarget.style.background=LT.rowHover}
+                      onMouseLeave={e => e.currentTarget.style.background="transparent"}>
+                      <td style={{ padding:"8px 14px", fontSize:11, color:LT.textTer, textAlign:"center" }}>{realIdx + 1}</td>
+                      {columns.map(col => {
+                        const isEditing = editCell === `${row._id}-${col.id}`;
+                        const val = row[col.id] || "";
+                        return (
+                          <td key={col.id} style={{ padding:"4px 6px", fontSize:13, color:LT.text }}
+                            onClick={() => { if (!isEditing) { setEditCell(`${row._id}-${col.id}`); setEditValue(val); } }}>
+                            {isEditing ? (
+                              col.type === "select" ? (
+                                <select ref={editRef} value={editValue} onChange={e => { updateCell(realIdx, col.id, e.target.value); setEditCell(null); }}
+                                  onBlur={() => setEditCell(null)}
+                                  style={{ width:"100%", padding:"6px 8px", borderRadius:6, border:`2px solid ${LT.accent}`, fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", color:LT.text, background:LT.card, boxSizing:"border-box" }}>
+                                  <option value="">—</option>
+                                  {(col.options||[]).map(o => <option key={o} value={o}>{o}</option>)}
+                                </select>
+                              ) : (
+                                <input ref={editRef} type={col.type === "number" ? "number" : "text"} value={editValue}
+                                  onChange={e => setEditValue(e.target.value)}
+                                  onBlur={() => { updateCell(realIdx, col.id, editValue); setEditCell(null); }}
+                                  onKeyDown={e => { if (e.key === "Enter") { updateCell(realIdx, col.id, editValue); setEditCell(null); } if (e.key === "Escape") setEditCell(null); }}
+                                  style={{ width:"100%", padding:"6px 8px", borderRadius:6, border:`2px solid ${LT.accent}`, fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", color:LT.text, boxSizing:"border-box" }}
+                                />
+                              )
+                            ) : (
+                              <div style={{ padding:"6px 8px", borderRadius:6, minHeight:28, display:"flex", alignItems:"center", cursor:"text", border:"2px solid transparent" }}
+                                onMouseEnter={e => e.currentTarget.style.borderColor=LT.borderLight}
+                                onMouseLeave={e => e.currentTarget.style.borderColor="transparent"}>
+                                {col.type === "email" && val ? (
+                                  <span style={{ color:LT.blue }}>{val}</span>
+                                ) : col.type === "url" && val ? (
+                                  <a href={val.startsWith("http") ? val : "https://"+val} target="_blank" rel="noreferrer" style={{ color:LT.blue, textDecoration:"none" }}>{val.replace(/^https?:\/\/(www\.)?/, "").slice(0,30)}</a>
+                                ) : col.type === "select" && val ? (
+                                  <span style={{ padding:"2px 10px", borderRadius:12, fontSize:12, fontWeight:500, background: val==="Sent"||val==="Replied" ? LT.greenBg : val==="Failed" ? LT.redBg : LT.accentBg, color: val==="Sent"||val==="Replied" ? LT.green : val==="Failed" ? LT.red : LT.accent }}>{val}</span>
+                                ) : (
+                                  <span style={{ color: val ? LT.text : LT.textTer }}>{val || "—"}</span>
+                                )}
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td style={{ padding:"8px 14px", textAlign:"center" }}>
+                        <button onClick={() => deleteRow(realIdx)} style={{ background:"none", border:"none", color:LT.textTer, cursor:"pointer", padding:4, borderRadius:4 }}
+                          onMouseEnter={e => { e.target.style.color=LT.red; e.target.style.background=LT.redBg; }}
+                          onMouseLeave={e => { e.target.style.color=LT.textTer; e.target.style.background="none"; }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          {/* Footer */}
+          <div style={{ padding:"10px 14px", borderTop:`1px solid ${LT.border}`, display:"flex", justifyContent:"space-between", alignItems:"center", background:LT.headerBg }}>
+            <button onClick={addRow} style={{ background:"none", border:"none", color:LT.accent, cursor:"pointer", fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif", display:"flex", alignItems:"center", gap:4 }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              New row
+            </button>
+            <span style={{ fontSize:12, color:LT.textTer }}>{rows.length} records · Auto-saved</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // ─── CONNECT SOURCES VIEW ───
   if (view === "connect_sheets") return (
     <div>
-      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>← Back to Data Sources</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+      <div onClick={() => setView("hub")} style={{ display:"flex", alignItems:"center", gap:6, color:"#6b6b80", cursor:"pointer", fontSize:13, fontWeight:500, marginBottom:24 }}>← Back to Data Sources</div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:28 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#10b98118", display:"flex", alignItems:"center", justifyContent:"center" }}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Connect Data Source</div>
-          <div style={{ fontSize: 13, color: "#6b6b80" }}>Choose where your contact data lives</div>
+          <div style={{ fontSize:20, fontWeight:700, color:"#f0f0f5" }}>Connect Data Source</div>
+          <div style={{ fontSize:13, color:"#6b6b80" }}>Choose where your contact data lives</div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #10b98133", borderRadius: 14, padding: "20px" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ background:"#111116", border:"1px solid #10b98133", borderRadius:14, padding:"20px" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:14 }}>
+            <div style={{ width:36, height:36, borderRadius:10, background:"#0d6b3e18", display:"flex", alignItems:"center", justifyContent:"center" }}>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z"/></svg>
             </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>Google Sheets</div>
-              <div style={{ fontSize: 12, color: "#6b6b80" }}>Paste your sheet URL to import all rows</div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:15, fontWeight:600, color:"#f0f0f5" }}>Google Sheets</div>
+              <div style={{ fontSize:12, color:"#6b6b80" }}>Paste your sheet URL to import all rows</div>
             </div>
-            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#10b98118", color: "#10b981", fontWeight: 500 }}>Available</span>
+            <span style={{ fontSize:11, padding:"3px 10px", borderRadius:8, background:"#10b98118", color:"#10b981", fontWeight:500 }}>Available</span>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div style={{ display:"flex", gap:10 }}>
             <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"} />
+              style={{ flex:1, padding:"11px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", boxSizing:"border-box" }}
+              onFocus={e => e.target.style.borderColor="#10b981"} onBlur={e => e.target.style.borderColor="#2a2a3a"} />
             <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
-              padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
+              padding:"11px 24px", borderRadius:10, border:"none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
               background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
-              color: sheetUrl ? "#000" : "#6b6b80", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
+              color: sheetUrl ? "#000" : "#6b6b80", fontSize:13, fontWeight:600, fontFamily:"'DM Sans',sans-serif", whiteSpace:"nowrap",
             }}>{loading ? "Connecting..." : "Connect"}</button>
           </div>
-          <div style={{ fontSize: 11, color: "#4a4a5a", marginTop: 10, lineHeight: 1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
+          <div style={{ fontSize:11, color:"#4a4a5a", marginTop:10, lineHeight:1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
         </div>
         {[
-          { name: "Airtable", desc: "Connect an Airtable base to sync contacts", color: "#2563eb", icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/>' },
-          { name: "CSV / XLSX Upload", desc: "Upload a spreadsheet file directly", color: "#8b5cf6", icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' },
-          { name: "Slack", desc: "Import contacts from Slack workspace", color: "#e01155", icon: '<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>' },
+          { name:"Airtable", desc:"Connect an Airtable base to sync contacts", color:"#2563eb", icon:'<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/>' },
+          { name:"CSV / XLSX Upload", desc:"Upload a spreadsheet file directly", color:"#8b5cf6", icon:'<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' },
+          { name:"Slack", desc:"Import contacts from Slack workspace", color:"#e01155", icon:'<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>' },
         ].map(src => (
-          <div key={src.name} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "20px", opacity: .5 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${src.color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: src.icon }} />
+          <div key={src.name} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"20px", opacity:.5 }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+              <div style={{ width:36, height:36, borderRadius:10, background:`${src.color}18`, display:"flex", alignItems:"center", justifyContent:"center" }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{__html:src.icon}} />
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>{src.name}</div>
-                <div style={{ fontSize: 12, color: "#6b6b80" }}>{src.desc}</div>
+              <div style={{ flex:1 }}>
+                <div style={{ fontSize:15, fontWeight:600, color:"#f0f0f5" }}>{src.name}</div>
+                <div style={{ fontSize:12, color:"#6b6b80" }}>{src.desc}</div>
               </div>
-              <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#f59e0b18", color: "#f59e0b", fontWeight: 500 }}>Coming Soon</span>
+              <span style={{ fontSize:11, padding:"3px 10px", borderRadius:8, background:"#f59e0b18", color:"#f59e0b", fontWeight:500 }}>Coming Soon</span>
             </div>
           </div>
         ))}
@@ -904,62 +1178,62 @@ function ContactsPage({ onBack, showToast, user }) {
   // ─── TABLE VIEW ───
   return (
     <div>
-      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>← Back to Data Sources</div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
+      <div onClick={() => setView("hub")} style={{ display:"flex", alignItems:"center", gap:6, color:"#6b6b80", cursor:"pointer", fontSize:13, fontWeight:500, marginBottom:20 }}>← Back to Data Sources</div>
+      <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:20 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+          <div style={{ width:40, height:40, borderRadius:12, background:"#10b98118", display:"flex", alignItems:"center", justifyContent:"center" }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z"/></svg>
           </div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#f0f0f5" }}>{sheetName || "Google Sheet"}</div>
-            <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts · <span style={{ color: "#10b981" }}>Connected</span></div>
+            <div style={{ fontSize:18, fontWeight:700, color:"#f0f0f5" }}>{sheetName || "Google Sheet"}</div>
+            <div style={{ fontSize:12, color:"#6b6b80" }}>Google Sheets · {contacts.length} contacts · <span style={{ color:"#10b981" }}>Connected</span></div>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #2a2a3a", background: "#111116", color: "#a0a0b0", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+        <div style={{ display:"flex", gap:8 }}>
+          <button onClick={connectSheet} disabled={loading} style={{ padding:"8px 16px", borderRadius:8, border:"1px solid #2a2a3a", background:"#111116", color:"#a0a0b0", fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>
             {loading ? "Syncing..." : "↻ Sync"}
           </button>
-          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #f8717133", background: "#2a0a0a", color: "#f87171", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
+          <button onClick={disconnectSheet} style={{ padding:"8px 16px", borderRadius:8, border:"1px solid #f8717133", background:"#2a0a0a", color:"#f87171", fontSize:12, fontWeight:500, cursor:"pointer", fontFamily:"'DM Sans',sans-serif" }}>Disconnect</button>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
-        {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
-          <div key={s.l} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80" }}>{s.l}</div>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(3,1fr)", gap:10, marginBottom:20 }}>
+        {[{ n:emailStats.total, l:"Total Companies", c:"#10b981" }, { n:emailStats.withEmail, l:"With Email", c:"#4ade80" }, { n:emailStats.withoutEmail, l:"Missing Email", c:"#f87171" }].map(s => (
+          <div key={s.l} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"14px", textAlign:"center" }}>
+            <div style={{ fontSize:22, fontWeight:700, color:s.c, fontFamily:"'JetBrains Mono',monospace" }}>{s.n}</div>
+            <div style={{ fontSize:11, color:"#6b6b80" }}>{s.l}</div>
           </div>
         ))}
       </div>
-      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+      <div style={{ display:"flex", gap:10, marginBottom:16 }}>
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
-          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
+          style={{ flex:1, padding:"10px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif", boxSizing:"border-box" }} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding:"10px 14px", borderRadius:10, border:"1px solid #2a2a3a", background:"#0c0c12", color:"#e0e0e8", fontSize:13, outline:"none", fontFamily:"'DM Sans',sans-serif" }}>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length}</div>
-      <div style={{ overflowX: "auto" }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
-            <thead><tr style={{ borderBottom: "1px solid #1e1e28" }}>
-              {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
-                <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
+      <div style={{ fontSize:12, color:"#6b6b80", marginBottom:8 }}>Showing {filtered.length} of {contacts.length}</div>
+      <div style={{ overflowX:"auto" }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:16, overflow:"hidden" }}>
+          <table style={{ width:"100%", borderCollapse:"collapse", minWidth:750 }}>
+            <thead><tr style={{ borderBottom:"1px solid #1e1e28" }}>
+              {["#","Company","Website","Email","Category","Country"].map(h => (
+                <th key={h} style={{ padding:"12px 14px", textAlign:"left", fontSize:11, fontWeight:600, color:"#6b6b80", letterSpacing:.5, textTransform:"uppercase" }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
-              {filtered.slice(0, 100).map((c, i) => (
-                <tr key={c.id} style={{ borderBottom: "1px solid #1a1a24" }}>
-                  <td style={{ padding: "10px 14px", fontSize: 11, color: "#4a4a5a" }}>{i + 1}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company_name}</td>
-                  <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#38bdf8", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#4a4a5a" }}>—</span>}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>{c.email || "⚠ Missing"}</td>
-                  <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#1a1a28", color: CAT[c.category]?.text || "#8888a0", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#6b6b80" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#6b6b80" }}>—</span>}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, color: "#6b6b80" }}>{c.country || "—"}</td>
+              {filtered.slice(0,100).map((c,i) => (
+                <tr key={c.id} style={{ borderBottom:"1px solid #1a1a24" }}>
+                  <td style={{ padding:"10px 14px", fontSize:11, color:"#4a4a5a" }}>{i+1}</td>
+                  <td style={{ padding:"10px 14px", fontSize:13, fontWeight:600, color:"#f0f0f5" }}>{c.company_name}</td>
+                  <td style={{ padding:"10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://"+c.website} target="_blank" rel="noreferrer" style={{ fontSize:12, color:"#38bdf8", textDecoration:"none" }}>↗ Visit</a> : <span style={{ fontSize:11, color:"#4a4a5a" }}>—</span>}</td>
+                  <td style={{ padding:"10px 14px", fontSize:12, fontFamily:"'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>{c.email || "⚠ Missing"}</td>
+                  <td style={{ padding:"10px 14px" }}>{c.category ? <span style={{ display:"inline-flex", alignItems:"center", gap:5, background:CAT[c.category]?.bg||"#1a1a28", color:CAT[c.category]?.text||"#8888a0", padding:"3px 10px", borderRadius:16, fontSize:11, fontWeight:600 }}><span style={{ width:5, height:5, borderRadius:"50%", background:CAT[c.category]?.dot||"#6b6b80" }} />{c.category}</span> : <span style={{ fontSize:11, color:"#6b6b80" }}>—</span>}</td>
+                  <td style={{ padding:"10px 14px", fontSize:12, color:"#6b6b80" }}>{c.country || "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#6b6b80", borderTop: "1px solid #1e1e28" }}>Showing first 100 of {filtered.length}</div>}
+          {filtered.length > 100 && <div style={{ padding:"12px", textAlign:"center", fontSize:12, color:"#6b6b80", borderTop:"1px solid #1e1e28" }}>Showing first 100 of {filtered.length}</div>}
         </div>
       </div>
     </div>
@@ -983,72 +1257,72 @@ function CampaignStatusPage({ onBack }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Activity /></div>
+      <div style={{ display:"flex", alignItems:"center", gap:12, marginBottom:24 }}>
+        <div style={{ width:40, height:40, borderRadius:12, background:"#6366f118", display:"flex", alignItems:"center", justifyContent:"center", color:"#6366f1" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Campaign Status</div>
-          <div style={{ fontSize: 12, color: "#6b6b80" }}>Real-time overview of all outreach campaigns</div>
+          <div style={{ fontSize:20, fontWeight:700, color:"#f0f0f5" }}>Campaign Status</div>
+          <div style={{ fontSize:12, color:"#6b6b80" }}>Real-time overview of all outreach campaigns</div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+      <div style={{ display:"grid", gridTemplateColumns:"repeat(4, 1fr)", gap:10, marginBottom:24 }}>
         {[
-          { label: "Total Sent", value: totalSent, color: "#818cf8" },
-          { label: "Delivered", value: totalDelivered, color: "#4ade80" },
-          { label: "Replied", value: totalReplied, color: "#facc15" },
-          { label: "Failed", value: totalFailed, color: "#f87171" },
+          { label:"Total Sent", value:totalSent, color:"#818cf8" },
+          { label:"Delivered", value:totalDelivered, color:"#4ade80" },
+          { label:"Replied", value:totalReplied, color:"#facc15" },
+          { label:"Failed", value:totalFailed, color:"#f87171" },
         ].map(s => (
-          <div key={s.label} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px", textAlign: "center" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          <div key={s.label} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"16px", textAlign:"center" }}>
+            <div style={{ fontSize:22, fontWeight:700, color:s.color, fontFamily:"'JetBrains Mono',monospace" }}>{s.value}</div>
+            <div style={{ fontSize:11, color:"#6b6b80", marginTop:4, fontWeight:500 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Overall Status */}
       {totalSent === 0 ? (
-        <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "20px", marginBottom: 24, textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#38bdf8", fontWeight: 600, marginBottom: 6 }}>No campaigns running</div>
-          <div style={{ fontSize: 13, color: "#6b6b80" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
+        <div style={{ background:"#0e1a2a", border:"1px solid #0ea5e933", borderRadius:12, padding:"20px", marginBottom:24, textAlign:"center" }}>
+          <div style={{ fontSize:14, color:"#38bdf8", fontWeight:600, marginBottom:6 }}>No campaigns running</div>
+          <div style={{ fontSize:13, color:"#6b6b80" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
         </div>
       ) : (
-        <div style={{ background: "#0a1a0e", border: "1px solid #10b98133", borderRadius: 12, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: "#4ade80" }}>
+        <div style={{ background:"#0a1a0e", border:"1px solid #10b98133", borderRadius:12, padding:"14px 18px", marginBottom:24, fontSize:13, color:"#4ade80" }}>
           Campaign active — {totalSent} emails sent across {campaigns.filter(c => c.sent > 0).length} categories
         </div>
       )}
 
       {/* Per Category Breakdown */}
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Category breakdown</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+      <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Category breakdown</div>
+      <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
         {campaigns.map(c => (
-          <div key={c.category} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot }} />
-                <span style={{ fontSize: 15, fontWeight: 700, color: c.color.text }}>{c.category}</span>
+          <div key={c.category} style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"18px 20px" }}>
+            <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:12 }}>
+              <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+                <span style={{ width:10, height:10, borderRadius:"50%", background:c.color.dot }} />
+                <span style={{ fontSize:15, fontWeight:700, color:c.color.text }}>{c.category}</span>
               </div>
-              <span style={{ fontSize: 12, color: "#6b6b80", background: "#1a1a28", padding: "4px 10px", borderRadius: 8 }}>
+              <span style={{ fontSize:12, color:"#6b6b80", background:"#1a1a28", padding:"4px 10px", borderRadius:8 }}>
                 {c.sent === 0 ? "Not started" : c.sent === c.total ? "Complete" : "In progress"}
               </span>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
+            <div style={{ display:"grid", gridTemplateColumns:"repeat(5, 1fr)", gap:8 }}>
               {[
-                { label: "Total", val: c.total, col: "#a0a0b0" },
-                { label: "Sent", val: c.sent, col: "#818cf8" },
-                { label: "Delivered", val: c.delivered, col: "#4ade80" },
-                { label: "Replied", val: c.replied, col: "#facc15" },
-                { label: "Failed", val: c.failed, col: "#f87171" },
+                { label:"Total", val:c.total, col:"#a0a0b0" },
+                { label:"Sent", val:c.sent, col:"#818cf8" },
+                { label:"Delivered", val:c.delivered, col:"#4ade80" },
+                { label:"Replied", val:c.replied, col:"#facc15" },
+                { label:"Failed", val:c.failed, col:"#f87171" },
               ].map(s => (
-                <div key={s.label} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
-                  <div style={{ fontSize: 10, color: "#6b6b80" }}>{s.label}</div>
+                <div key={s.label} style={{ textAlign:"center" }}>
+                  <div style={{ fontSize:16, fontWeight:700, color:s.col, fontFamily:"'JetBrains Mono',monospace" }}>{s.val}</div>
+                  <div style={{ fontSize:10, color:"#6b6b80" }}>{s.label}</div>
                 </div>
               ))}
             </div>
             {/* Progress bar */}
-            <div style={{ width: "100%", height: 4, background: "#1a1a28", borderRadius: 2, marginTop: 12, overflow: "hidden" }}>
-              <div style={{ width: c.total > 0 ? `${(c.sent / c.total) * 100}%` : "0%", height: "100%", background: c.color.dot, borderRadius: 2, transition: "width .5s ease" }} />
+            <div style={{ width:"100%", height:4, background:"#1a1a28", borderRadius:2, marginTop:12, overflow:"hidden" }}>
+              <div style={{ width: c.total > 0 ? `${(c.sent/c.total)*100}%` : "0%", height:"100%", background:c.color.dot, borderRadius:2, transition:"width .5s ease" }} />
             </div>
           </div>
         ))}
@@ -1062,55 +1336,55 @@ function ProfilePage({ user, onBack, onLogout }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: "#000", marginBottom: 16 }}>
+      <div style={{ display:"flex", flexDirection:"column", alignItems:"center", marginBottom:32 }}>
+        <div style={{ width:80, height:80, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:28, fontWeight:800, color:"#000", marginBottom:16 }}>
           {user?.username?.[0]?.toUpperCase() || "U"}
         </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#f0f0f5" }}>{user?.username}</div>
-        <div style={{ fontSize: 12, color: "#6b6b80", marginTop: 4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
+        <div style={{ fontSize:22, fontWeight:700, color:"#f0f0f5" }}>{user?.username}</div>
+        <div style={{ fontSize:12, color:"#6b6b80", marginTop:4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Account Info</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Username</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontWeight: 600 }}>{user?.username}</span>
+      <div style={{ display:"flex", flexDirection:"column", gap:12 }}>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"18px 20px" }}>
+          <div style={{ fontSize:11, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600, marginBottom:8 }}>Account Info</div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Username</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontWeight:600 }}>{user?.username}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Login Method</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontWeight: 600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Login Method</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontWeight:600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Role</span>
-            <span style={{ fontSize: 13, color: "#10b981", fontWeight: 600 }}>Admin</span>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Role</span>
+            <span style={{ fontSize:13, color:"#10b981", fontWeight:600 }}>Admin</span>
           </div>
         </div>
 
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Platform Stats</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Total Contacts</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
+        <div style={{ background:"#111116", border:"1px solid #1e1e28", borderRadius:14, padding:"18px 20px" }}>
+          <div style={{ fontSize:11, color:"#6b6b80", textTransform:"uppercase", letterSpacing:.5, fontWeight:600, marginBottom:8 }}>Platform Stats</div>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Total Contacts</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>{user?.contactsCount || 0}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Emails Sent</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0", borderBottom:"1px solid #1a1a24" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Emails Sent</span>
+            <span style={{ fontSize:13, color:"#f0f0f5", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>0</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Success Rate</span>
-            <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0%</span>
+          <div style={{ display:"flex", justifyContent:"space-between", padding:"10px 0" }}>
+            <span style={{ fontSize:13, color:"#8888a0" }}>Success Rate</span>
+            <span style={{ fontSize:13, color:"#10b981", fontFamily:"'JetBrains Mono',monospace", fontWeight:600 }}>0%</span>
           </div>
         </div>
 
         <button onClick={onLogout} style={{
-          width: "100%", padding: "14px", borderRadius: 12, border: "1px solid #f8717133",
-          background: "#2a0a0a", color: "#f87171", fontSize: 14, fontWeight: 600,
-          cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
-          display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8,
+          width:"100%", padding:"14px", borderRadius:12, border:"1px solid #f8717133",
+          background:"#2a0a0a", color:"#f87171", fontSize:14, fontWeight:600,
+          cursor:"pointer", fontFamily:"'DM Sans',sans-serif", transition:"all .2s",
+          display:"flex", alignItems:"center", justifyContent:"center", gap:8, marginTop:8,
         }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#3a0a0a"; e.currentTarget.style.borderColor = "#f87171"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#2a0a0a"; e.currentTarget.style.borderColor = "#f8717133"; }}
+        onMouseEnter={e => { e.currentTarget.style.background="#3a0a0a"; e.currentTarget.style.borderColor="#f87171"; }}
+        onMouseLeave={e => { e.currentTarget.style.background="#2a0a0a"; e.currentTarget.style.borderColor="#f8717133"; }}
         >
           <I.Logout /> Sign Out
         </button>
@@ -1126,7 +1400,7 @@ function Dashboard({ user, onLogout }) {
   const [gmailConnected, setGmailConnected] = useState(false);
   const [contactCount, setContactCount] = useState(0);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
+    { role:"assistant", content:"Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -1139,13 +1413,13 @@ function Dashboard({ user, onLogout }) {
   useEffect(() => {
     const cached = localStorage.getItem("thehotspot_contacts");
     if (cached) {
-      try { setContactCount(JSON.parse(cached).length); } catch (e) { }
+      try { setContactCount(JSON.parse(cached).length); } catch(e) {}
     } else {
-      fetchAllContacts().then(records => setContactCount(records.length)).catch(() => { });
+      fetchAllContacts().then(records => setContactCount(records.length)).catch(() => {});
     }
   }, [page]);
 
-  useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
+  useEffect(() => { chatEnd.current?.scrollIntoView({ behavior:"smooth" }); }, [messages]);
   useEffect(() => {
     const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (SR) {
@@ -1180,14 +1454,14 @@ function Dashboard({ user, onLogout }) {
   const handleSend = async (text) => {
     const msg = (text || input).trim();
     if (!msg || loading) return;
-    const userMsg = { role: "user", content: msg };
+    const userMsg = { role:"user", content:msg };
     setMessages(prev => [...prev, userMsg]);
     setInput("");
     setLoading(true);
 
     try {
       // Try Claude API via serverless function
-      const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg].map(m => ({ role: m.role, content: m.content }));
+      const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg].map(m => ({ role:m.role, content:m.content }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -1200,14 +1474,14 @@ function Dashboard({ user, onLogout }) {
       const actionMatch = aiText.match(/<action>(.*?)<\/action>/s);
       let action = null;
       let cleanText = aiText.replace(/<action>.*?<\/action>/gs, "").trim();
-      if (actionMatch) { try { action = JSON.parse(actionMatch[1]); } catch (e) { } }
+      if (actionMatch) { try { action = JSON.parse(actionMatch[1]); } catch(e) {} }
 
-      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Sorry, couldn't process that." }]);
+      setMessages(prev => [...prev, { role:"assistant", content: cleanText || "Sorry, couldn't process that." }]);
       if (action) executeAction(action);
     } catch (err) {
       // Fallback to local chatbot if API fails
       const response = getSmartResponse(msg);
-      setMessages(prev => [...prev, { role: "assistant", content: response.text }]);
+      setMessages(prev => [...prev, { role:"assistant", content: response.text }]);
       if (response.action) executeAction(response.action);
     }
     setLoading(false);
@@ -1226,72 +1500,72 @@ function Dashboard({ user, onLogout }) {
 
   // Sidebar nav items
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "campaignStatus", label: "Campaign Status", icon: "📡" },
-    { id: "totalContacts", label: "Total Contacts", icon: "👥" },
-    { id: "emailsSent", label: "Emails Sent", icon: "📧" },
-    { id: "categories", label: "Categories", icon: "📁" },
-    { id: "successRate", label: "Success Rate", icon: "✅" },
-    { id: "contacts", label: "Contacts DB", icon: "📋" },
-    { id: "profile", label: "Profile", icon: "⚙️" },
+    { id:"dashboard", label:"Dashboard", icon:"📊" },
+    { id:"campaignStatus", label:"Campaign Status", icon:"📡" },
+    { id:"totalContacts", label:"Total Contacts", icon:"👥" },
+    { id:"emailsSent", label:"Emails Sent", icon:"📧" },
+    { id:"categories", label:"Categories", icon:"📁" },
+    { id:"successRate", label:"Success Rate", icon:"✅" },
+    { id:"contacts", label:"Contacts DB", icon:"📋" },
+    { id:"profile", label:"Profile", icon:"⚙️" },
   ];
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#e0e0e8", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
+    <div style={{ fontFamily:"'DM Sans',sans-serif", background:"#09090d", color:"#e0e0e8", height:"100dvh", width:"100vw", display:"flex", flexDirection:"column", overflow:"hidden", position:"fixed", inset:0 }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* TOAST */}
       {toast && (
-        <div style={{ position: "fixed", top: 20, right: 20, background: "#10b981", color: "#000", padding: "12px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 1000, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 8px 32px #10b98144", animation: "slideIn .3s ease" }}>
+        <div style={{ position:"fixed", top:20, right:20, background:"#10b981", color:"#000", padding:"12px 20px", borderRadius:12, fontSize:13, fontWeight:600, zIndex:1000, display:"flex", alignItems:"center", gap:8, boxShadow:"0 8px 32px #10b98144", animation:"slideIn .3s ease" }}>
           <I.Zap /> {toast}
         </div>
       )}
 
       {/* OVERLAY for mobile sidebar */}
-      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 90 }} />}
+      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position:"fixed", inset:0, background:"rgba(0,0,0,0.5)", zIndex:90 }} />}
 
       {/* LEFT SIDEBAR */}
       <div style={{
-        position: "fixed", left: sidebarOpen ? 0 : "-280px", top: 0, width: 280, height: "100vh",
-        background: "#0c0c12", borderRight: "1px solid #1a1a24", zIndex: 100,
-        transition: "left .3s ease", display: "flex", flexDirection: "column", overflow: "hidden",
+        position:"fixed", left: sidebarOpen ? 0 : "-280px", top:0, width:280, height:"100vh",
+        background:"#0c0c12", borderRight:"1px solid #1a1a24", zIndex:100,
+        transition:"left .3s ease", display:"flex", flexDirection:"column", overflow:"hidden",
       }}>
         {/* Sidebar Header */}
-        <div style={{ padding: "20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#000" }}>TH</div>
+        <div style={{ padding:"20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:10 }}>
+            <div style={{ width:32, height:32, borderRadius:8, background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontWeight:800, fontSize:12, color:"#000" }}>TH</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</div>
-              <div style={{ fontSize: 10, color: "#6b6b80" }}>Grow Connections Easily</div>
+              <div style={{ fontSize:14, fontWeight:700, color:"#f0f0f5" }}>thehotspot</div>
+              <div style={{ fontSize:10, color:"#6b6b80" }}>Grow Connections Easily</div>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#6b6b80", cursor: "pointer", fontSize: 18 }}>✕</button>
+          <button onClick={() => setSidebarOpen(false)} style={{ background:"none", border:"none", color:"#6b6b80", cursor:"pointer", fontSize:18 }}>✕</button>
         </div>
 
         {/* Nav Items */}
-        <div style={{ flex: 1, padding: "12px", overflowY: "auto" }}>
+        <div style={{ flex:1, padding:"12px", overflowY:"auto" }}>
           {navItems.map(item => (
             <button key={item.id} onClick={() => navTo(item.id)} style={{
-              width: "100%", padding: "12px 14px", borderRadius: 10, border: "none", marginBottom: 4,
+              width:"100%", padding:"12px 14px", borderRadius:10, border:"none", marginBottom:4,
               background: page === item.id ? "#1a1a28" : "transparent",
               color: page === item.id ? "#f0f0f5" : "#8888a0",
-              fontSize: 13, fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-              fontFamily: "'DM Sans',sans-serif", transition: "all .15s", textAlign: "left",
+              fontSize:13, fontWeight:500, cursor:"pointer", display:"flex", alignItems:"center", gap:10,
+              fontFamily:"'DM Sans',sans-serif", transition:"all .15s", textAlign:"left",
             }}>
-              <span style={{ fontSize: 16 }}>{item.icon}</span> {item.label}
+              <span style={{ fontSize:16 }}>{item.icon}</span> {item.label}
             </button>
           ))}
         </div>
 
         {/* User + Logout */}
-        <div style={{ padding: "16px", borderTop: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#000" }}>
+        <div style={{ padding:"16px", borderTop:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+            <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:11, fontWeight:700, color:"#000" }}>
               {user?.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <span style={{ fontSize: 12, color: "#8888a0" }}>{user?.username}</span>
+            <span style={{ fontSize:12, color:"#8888a0" }}>{user?.username}</span>
           </div>
-          <button onClick={onLogout} style={{ background: "none", border: "1px solid #2a2a3a", borderRadius: 6, padding: "5px 8px", color: "#6b6b80", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <button onClick={onLogout} style={{ background:"none", border:"1px solid #2a2a3a", borderRadius:6, padding:"5px 8px", color:"#6b6b80", cursor:"pointer", display:"flex", alignItems:"center" }}>
             <I.Logout />
           </button>
         </div>
@@ -1302,57 +1576,57 @@ function Dashboard({ user, onLogout }) {
 
       {page === null ? (
         /* ═══════ CHATBOT (FULL CENTER) ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden" }}>
+        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%", minHeight:0, overflow:"hidden" }}>
           {/* Chat Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0c0c12" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ padding:"12px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", justifyContent:"space-between", background:"#0c0c12" }}>
+            <div style={{ display:"flex", alignItems:"center", gap:12 }}>
               <button onClick={() => setSidebarOpen(true)} style={{
-                background: "#18182a", border: "1px solid #2a2a3a", borderRadius: 8, padding: "8px",
-                color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center",
+                background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"8px",
+                color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center",
               }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
               </button>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width:32, height:32, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center" }}>
                 <I.Bot />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>Outreach Assistant</div>
-                <div style={{ fontSize: 11, color: "#10b981", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Online
+                <div style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>Outreach Assistant</div>
+                <div style={{ fontSize:11, color:"#10b981", display:"flex", alignItems:"center", gap:4 }}>
+                  <span style={{ width:6, height:6, borderRadius:"50%", background:"#10b981", display:"inline-block" }} /> Online
                 </div>
               </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #2a2a3a", borderRadius: 20, padding: "5px 12px 5px 5px", cursor: "pointer", transition: "all .2s" }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
-                onMouseLeave={e => e.currentTarget.style.borderColor = "#2a2a3a"}
+            <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+              <button onClick={() => setPage("profile")} style={{ display:"flex", alignItems:"center", gap:6, background:"none", border:"1px solid #2a2a3a", borderRadius:20, padding:"5px 12px 5px 5px", cursor:"pointer", transition:"all .2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor="#10b981"}
+                onMouseLeave={e => e.currentTarget.style.borderColor="#2a2a3a"}
               >
-                <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#000" }}>
+                <div style={{ width:24, height:24, borderRadius:"50%", background:"linear-gradient(135deg,#10b981,#0ea5e9)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:10, fontWeight:700, color:"#000" }}>
                   {user?.username?.[0]?.toUpperCase() || "U"}
                 </div>
-                <span style={{ fontSize: 12, color: "#8888a0" }}>{user?.username}</span>
+                <span style={{ fontSize:12, color:"#8888a0" }}>{user?.username}</span>
               </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+          <div style={{ flex:1, overflowY:"auto", padding:"16px", display:"flex", flexDirection:"column", gap:12, maxWidth:800, width:"100%", margin:"0 auto", minHeight:0, WebkitOverflowScrolling:"touch" }}>
             {messages.map((m, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+              <div key={i} style={{ display:"flex", justifyContent: m.role==="user" ? "flex-end" : "flex-start" }}>
                 <div style={{
-                  maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap",
-                  borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                  background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
-                  color: m.role === "user" ? "#000" : "#d0d0e0",
-                  fontWeight: m.role === "user" ? 500 : 400,
-                  border: m.role === "user" ? "none" : "1px solid #2a2a3a",
+                  maxWidth:"80%", padding:"12px 16px", fontSize:14, lineHeight:1.6, whiteSpace:"pre-wrap",
+                  borderRadius: m.role==="user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                  background: m.role==="user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
+                  color: m.role==="user" ? "#000" : "#d0d0e0",
+                  fontWeight: m.role==="user" ? 500 : 400,
+                  border: m.role==="user" ? "none" : "1px solid #2a2a3a",
                 }}>{m.content}</div>
               </div>
             ))}
             {loading && (
-              <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <div style={{ padding: "12px 18px", borderRadius: "16px 16px 16px 4px", background: "#18182a", border: "1px solid #2a2a3a", display: "flex", alignItems: "center", gap: 6 }}>
-                  {[0, 1, 2].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}
+              <div style={{ display:"flex", justifyContent:"flex-start" }}>
+                <div style={{ padding:"12px 18px", borderRadius:"16px 16px 16px 4px", background:"#18182a", border:"1px solid #2a2a3a", display:"flex", alignItems:"center", gap:6 }}>
+                  {[0,1,2].map(d => <div key={d} style={{ width:7, height:7, borderRadius:"50%", background:"#10b981", animation:`pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}
                 </div>
               </div>
             )}
@@ -1360,26 +1634,26 @@ function Dashboard({ user, onLogout }) {
           </div>
 
           {/* Chat Input */}
-          <div style={{ padding: "14px 16px", borderTop: "1px solid #1a1a24", background: "#0c0c12" }}>
-            <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ padding:"14px 16px", borderTop:"1px solid #1a1a24", background:"#0c0c12" }}>
+            <div style={{ maxWidth:800, margin:"0 auto", display:"flex", gap:8, alignItems:"center" }}>
               <button onClick={toggleVoice} style={{
-                width: 40, height: 40, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                width:40, height:40, borderRadius:"50%", flexShrink:0, cursor:"pointer", display:"flex", alignItems:"center", justifyContent:"center",
                 background: listening ? "#10b98133" : "#18182a", border: listening ? "2px solid #10b981" : "1px solid #2a2a3a",
                 color: listening ? "#10b981" : "#6b6b80", animation: listening ? "pulse 1.5s ease-in-out infinite" : "none",
               }}>
                 {listening ? <I.MicOff /> : <I.Mic />}
               </button>
               <input type="text" value={input} onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSend()}
+                onKeyDown={e => e.key==="Enter" && handleSend()}
                 placeholder={listening ? "Listening..." : "Type a command or ask anything..."}
-                style={{ flex: 1, background: "#111118", border: "1px solid #2a2a3a", borderRadius: 12, padding: "11px 16px", color: "#e0e0e8", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"}
-                onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                style={{ flex:1, background:"#111118", border:"1px solid #2a2a3a", borderRadius:12, padding:"11px 16px", color:"#e0e0e8", fontSize:14, outline:"none", fontFamily:"'DM Sans',sans-serif" }}
+                onFocus={e => e.target.style.borderColor="#10b981"}
+                onBlur={e => e.target.style.borderColor="#2a2a3a"}
               />
               <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-                width: 40, height: 40, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
+                width:40, height:40, borderRadius:"50%", border:"none", flexShrink:0, cursor: input.trim() ? "pointer" : "default",
                 background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
-                color: input.trim() ? "#000" : "#6b6b80", display: "flex", alignItems: "center", justifyContent: "center",
+                color: input.trim() ? "#000" : "#6b6b80", display:"flex", alignItems:"center", justifyContent:"center",
               }}>
                 <I.Send />
               </button>
@@ -1388,66 +1662,66 @@ function Dashboard({ user, onLogout }) {
         </div>
       ) : (
         /* ═══════ PAGE VIEW ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden" }}>
+        <div style={{ flex:1, display:"flex", flexDirection:"column", width:"100%", overflow:"hidden" }}>
           {/* Page Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", gap: 12, background: "#0c0c12" }}>
+          <div style={{ padding:"12px 20px", borderBottom:"1px solid #1a1a24", display:"flex", alignItems:"center", gap:12, background:"#0c0c12" }}>
             <button onClick={() => setSidebarOpen(true)} style={{
-              background: "#18182a", border: "1px solid #2a2a3a", borderRadius: 8, padding: "8px",
-              color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center",
+              background:"#18182a", border:"1px solid #2a2a3a", borderRadius:8, padding:"8px",
+              color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center",
             }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             </button>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>
+            <span style={{ fontSize:14, fontWeight:600, color:"#f0f0f5" }}>
               {navItems.find(n => n.id === page)?.icon} {navItems.find(n => n.id === page)?.label || "Page"}
             </span>
             <button onClick={() => setPage(null)} style={{
-              marginLeft: "auto", background: "none", border: "1px solid #2a2a3a", borderRadius: 8, padding: "6px 12px",
-              color: "#6b6b80", cursor: "pointer", fontSize: 12, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6,
+              marginLeft:"auto", background:"none", border:"1px solid #2a2a3a", borderRadius:8, padding:"6px 12px",
+              color:"#6b6b80", cursor:"pointer", fontSize:12, fontFamily:"'DM Sans',sans-serif", display:"flex", alignItems:"center", gap:6,
             }}>
               💬 Back to Chat
             </button>
           </div>
 
           {/* Page Content */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "24px", maxWidth: 900, width: "100%", margin: "0 auto" }}>
+          <div style={{ flex:1, overflowY:"auto", padding:"24px", maxWidth:900, width:"100%", margin:"0 auto" }}>
             {/* DASHBOARD */}
             {page === "dashboard" && (
               <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
-                  <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                  <StatCard icon={<I.Mail />} label="Emails Sent" value={user?.sentCount || 0} accent="#6366f1" onClick={() => setPage("emailsSent")} />
-                  <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
-                  <StatCard icon={<I.Check />} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:14, marginBottom:28 }}>
+                  <StatCard icon={<I.Users/>} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
+                  <StatCard icon={<I.Mail/>} label="Emails Sent" value={user?.sentCount || 0} accent="#6366f1" onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Activity/>} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
+                  <StatCard icon={<I.Check/>} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
+                <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Quick Actions</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(200px,1fr))", gap:10, marginBottom:28 }}>
                   {[
-                    { icon: <I.Mail />, label: "Send All Emails", action: () => showToast("Email sender coming soon") },
-                    { icon: <I.Activity />, label: "Campaign Status", action: () => setPage("campaignStatus") },
-                    { icon: <I.Clock />, label: "Pause Workflow", action: () => showToast("Workflow control coming soon") },
-                    { icon: <I.Zap />, label: "Resume Workflow", action: () => showToast("Workflow control coming soon") },
-                  ].map((a, i) => (
+                    { icon:<I.Mail/>, label:"Send All Emails", action:() => showToast("Email sender coming soon") },
+                    { icon:<I.Activity/>, label:"Campaign Status", action:() => setPage("campaignStatus") },
+                    { icon:<I.Clock/>, label:"Pause Workflow", action:() => showToast("Workflow control coming soon") },
+                    { icon:<I.Zap/>, label:"Resume Workflow", action:() => showToast("Workflow control coming soon") },
+                  ].map((a,i) => (
                     <button key={i} onClick={a.action} style={{
-                      background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px 18px",
-                      color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-                      fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif",
+                      background:"#111116", border:"1px solid #1e1e28", borderRadius:12, padding:"14px 18px",
+                      color:"#a0a0b0", cursor:"pointer", display:"flex", alignItems:"center", gap:10,
+                      fontSize:13, fontWeight:500, fontFamily:"'DM Sans',sans-serif",
                     }}>
-                      {a.icon} {a.label} <span style={{ marginLeft: "auto", opacity: .4 }}><I.Right /></span>
+                      {a.icon} {a.label} <span style={{ marginLeft:"auto", opacity:.4 }}><I.Right/></span>
                     </button>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Categories</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
+                <div style={{ fontSize:12, color:"#6b6b80", fontWeight:600, letterSpacing:1, textTransform:"uppercase", marginBottom:12 }}>Categories</div>
+                <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(150px,1fr))", gap:10 }}>
                   {Object.entries(CAT).map(([name, c]) => (
                     <button key={name} onClick={() => setPage("categories")} style={{
-                      background: c.bg, border: `1px solid ${c.dot}33`, borderRadius: 12, padding: 14,
-                      color: c.text, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
+                      background:c.bg, border:`1px solid ${c.dot}33`, borderRadius:12, padding:14,
+                      color:c.text, cursor:"pointer", textAlign:"left", fontFamily:"'DM Sans',sans-serif",
                     }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot }} />
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{name}</span>
+                      <div style={{ display:"flex", alignItems:"center", gap:6, marginBottom:4 }}>
+                        <span style={{ width:8, height:8, borderRadius:"50%", background:c.dot }} />
+                        <span style={{ fontSize:14, fontWeight:600 }}>{name}</span>
                       </div>
-                      <div style={{ fontSize: 11, opacity: .6 }}>0 sent</div>
+                      <div style={{ fontSize:11, opacity:.6 }}>0 sent</div>
                     </button>
                   ))}
                 </div>
