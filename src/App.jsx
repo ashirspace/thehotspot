@@ -686,167 +686,284 @@ export default function App() {
   return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
 }
 
-/* ───────── CREATE DATABASE PAGE ───────── */
+
+/* ───────── CREATE DATABASE PAGE (Multi-DB Support) ───────── */
 function CreateDatabasePage({ onBack, showToast }) {
-  const [dbName, setDbName] = useState(localStorage.getItem("thehotspot_db_name") || "My Outreach Database");
-  const [columns, setColumns] = useState(() => {
-    const s = localStorage.getItem("thehotspot_db_columns");
-    return s ? JSON.parse(s) : [
-      { id: "c1", name: "Company Name", type: "text", w: 180 },
-      { id: "c2", name: "Website", type: "url", w: 160 },
-      { id: "c3", name: "Email", type: "email", w: 180 },
-      { id: "c4", name: "Category", type: "select", w: 120, options: ["Network", "CPS", "CPL", "CPA", "Mobile"] },
-      { id: "c5", name: "Country", type: "text", w: 120 },
-      { id: "c6", name: "Status", type: "select", w: 100, options: ["Pending", "Sent", "Replied", "Failed"] },
-      { id: "c7", name: "Notes", type: "text", w: 200 },
-    ];
+  const [databases, setDatabases] = useState(() => {
+    const s = localStorage.getItem("thehotspot_databases");
+    return s ? JSON.parse(s) : [];
   });
-  const [rows, setRows] = useState(() => { const s = localStorage.getItem("thehotspot_db_rows"); return s ? JSON.parse(s) : []; });
+  const [activeDbId, setActiveDbId] = useState(null);
   const [editCell, setEditCell] = useState(null);
   const [editValue, setEditValue] = useState("");
   const [showAddCol, setShowAddCol] = useState(false);
   const [newColName, setNewColName] = useState("");
   const [newColType, setNewColType] = useState("text");
   const [dbSearch, setDbSearch] = useState("");
+  const [showNewDb, setShowNewDb] = useState(false);
+  const [newDbName, setNewDbName] = useState("");
   const editRef = useRef(null);
 
-  useEffect(() => {
-    localStorage.setItem("thehotspot_db_name", dbName);
-    localStorage.setItem("thehotspot_db_columns", JSON.stringify(columns));
-    localStorage.setItem("thehotspot_db_rows", JSON.stringify(rows));
-    const mapped = rows.map((r, i) => ({ id: i, company_name: r.c1 || "", website: r.c2 || "", email: r.c3 || "", category: r.c4 || "", country: r.c5 || "", status: (r.c6 || "pending").toLowerCase() }));
-    localStorage.setItem("thehotspot_contacts", JSON.stringify(mapped));
-  }, [dbName, columns, rows]);
+  const saveDbs = (dbs) => { setDatabases(dbs); localStorage.setItem("thehotspot_databases", JSON.stringify(dbs)); };
 
   useEffect(() => { if (editRef.current) editRef.current.focus(); }, [editCell]);
 
-  const addRow = () => { const nr = { _id: Date.now().toString() }; columns.forEach(c => { nr[c.id] = ""; }); setRows([...rows, nr]); };
-  const deleteRow = (i) => setRows(rows.filter((_, idx) => idx !== i));
-  const updateCell = (ri, cid, v) => { const u = [...rows]; u[ri] = { ...u[ri], [cid]: v }; setRows(u); };
-  const addColumn = () => { if (!newColName.trim()) return; const id = "c" + Date.now(); setColumns([...columns, { id, name: newColName.trim(), type: newColType, w: 150 }]); setRows(rows.map(r => ({ ...r, [id]: "" }))); setNewColName(""); setNewColType("text"); setShowAddCol(false); };
-  const deleteColumn = (cid) => { if (columns.length <= 1) return; setColumns(columns.filter(c => c.id !== cid)); setRows(rows.map(r => { const nr = { ...r }; delete nr[cid]; return nr; })); };
+  const defaultColumns = [
+    { id: "c1", name: "Company Name", type: "text", w: 180 },
+    { id: "c2", name: "Website", type: "url", w: 160 },
+    { id: "c3", name: "Email", type: "email", w: 180 },
+    { id: "c4", name: "Category", type: "select", w: 120, options: ["Network", "CPS", "CPL", "CPA", "Mobile"] },
+    { id: "c5", name: "Country", type: "text", w: 120 },
+    { id: "c6", name: "Status", type: "select", w: 100, options: ["Pending", "Sent", "Replied", "Failed"] },
+    { id: "c7", name: "Notes", type: "text", w: 200 },
+  ];
 
-  const filtered = rows.filter(r => !dbSearch || columns.some(c => (r[c.id] || "").toLowerCase().includes(dbSearch.toLowerCase())));
+  const createNewDb = () => {
+    const name = newDbName.trim() || "Untitled Database";
+    const newDb = { id: Date.now().toString(), name, columns: [...defaultColumns], rows: [], createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    const updated = [...databases, newDb];
+    saveDbs(updated);
+    setActiveDbId(newDb.id);
+    setNewDbName("");
+    setShowNewDb(false);
+    showToast(`"${name}" created!`);
+  };
 
-  const L = { bg: "#FAFBFC", card: "#FFF", bd: "#E8ECF0", bdL: "#F0F2F5", tx: "#1A1D21", tx2: "#5F6B7A", tx3: "#8E99A4", ac: "#4F46E5", acBg: "#EEF2FF", gn: "#059669", gnBg: "#ECFDF5", rd: "#DC2626", rdBg: "#FEF2F2", bl: "#2563EB", hd: "#F8F9FB", hv: "#F5F7FA", sh: "0 1px 3px rgba(0,0,0,0.04)" };
+  const deleteDb = (id) => {
+    const db = databases.find(d => d.id === id);
+    saveDbs(databases.filter(d => d.id !== id));
+    showToast(`"${db?.name}" deleted`);
+  };
 
-  return (
-    <div style={{ background: L.bg, position: "fixed", inset: 0, zIndex: 50, overflow: "auto", padding: "24px" }}>
-      <div onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, color: L.tx2, cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg> Back to Data Sources
-      </div>
+  const duplicateDb = (id) => {
+    const src = databases.find(d => d.id === id);
+    if (!src) return;
+    const dup = { ...JSON.parse(JSON.stringify(src)), id: Date.now().toString(), name: src.name + " (Copy)", createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() };
+    saveDbs([...databases, dup]);
+    showToast(`Duplicated "${src.name}"`);
+  };
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 40, height: 40, borderRadius: 10, background: L.acBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={L.ac} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="9" x2="9" y2="21" /></svg>
+  const activeDb = databases.find(d => d.id === activeDbId);
+  const updateActiveDb = (changes) => {
+    const updated = databases.map(d => d.id === activeDbId ? { ...d, ...changes, updatedAt: new Date().toISOString() } : d);
+    saveDbs(updated);
+  };
+
+  const addRow = () => { const nr = { _id: Date.now().toString() }; activeDb.columns.forEach(c => { nr[c.id] = ""; }); updateActiveDb({ rows: [...activeDb.rows, nr] }); };
+  const deleteRow = (i) => updateActiveDb({ rows: activeDb.rows.filter((_, idx) => idx !== i) });
+  const updateCell = (ri, cid, v) => { const u = [...activeDb.rows]; u[ri] = { ...u[ri], [cid]: v }; updateActiveDb({ rows: u }); };
+  const addColumn = () => { if (!newColName.trim()) return; const id = "c" + Date.now(); updateActiveDb({ columns: [...activeDb.columns, { id, name: newColName.trim(), type: newColType, w: 150 }], rows: activeDb.rows.map(r => ({ ...r, [id]: "" })) }); setNewColName(""); setNewColType("text"); setShowAddCol(false); };
+  const deleteColumn = (cid) => { if (activeDb.columns.length <= 1) return; updateActiveDb({ columns: activeDb.columns.filter(c => c.id !== cid), rows: activeDb.rows.map(r => { const nr = { ...r }; delete nr[cid]; return nr; }) }); };
+
+  const L = { bg: "#FAFBFC", card: "#FFF", bd: "#E8ECF0", bdL: "#F0F2F5", tx: "#1A1D21", tx2: "#5F6B7A", tx3: "#8E99A4", ac: "#4F46E5", acBg: "#EEF2FF", gn: "#059669", gnBg: "#ECFDF5", rd: "#DC2626", rdBg: "#FEF2F2", bl: "#2563EB", hd: "#F8F9FB", hv: "#F5F7FA", sh: "0 1px 3px rgba(0,0,0,0.04)", shM: "0 4px 12px rgba(0,0,0,0.06)" };
+
+  // ─── EDITOR VIEW ───
+  if (activeDb) {
+    const filtered = activeDb.rows.filter(r => !dbSearch || activeDb.columns.some(c => (r[c.id] || "").toLowerCase().includes(dbSearch.toLowerCase())));
+    return (
+      <div style={{ background: L.bg, position: "fixed", inset: 0, zIndex: 50, overflow: "auto", padding: "24px" }}>
+        <div onClick={() => { setActiveDbId(null); setEditCell(null); setDbSearch(""); }} style={{ display: "flex", alignItems: "center", gap: 6, color: L.tx2, cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg> Back to Databases
+        </div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 40, height: 40, borderRadius: 10, background: L.acBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={L.ac} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="9" x2="9" y2="21" /></svg>
+            </div>
+            <div>
+              <input value={activeDb.name} onChange={e => updateActiveDb({ name: e.target.value })} style={{ fontSize: 18, fontWeight: 700, color: L.tx, border: "none", background: "transparent", outline: "none", fontFamily: "'DM Sans',sans-serif", padding: 0, width: 300 }} />
+              <div style={{ fontSize: 12, color: L.tx2 }}>{activeDb.rows.length} records · {activeDb.columns.length} fields</div>
+            </div>
           </div>
-          <div>
-            <input value={dbName} onChange={e => setDbName(e.target.value)} style={{ fontSize: 18, fontWeight: 700, color: L.tx, border: "none", background: "transparent", outline: "none", fontFamily: "'DM Sans',sans-serif", padding: 0, width: 300 }} />
-            <div style={{ fontSize: 12, color: L.tx2 }}>{rows.length} records · {columns.length} fields</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={addRow} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: L.sh }}>+ Add Row</button>
+            <button onClick={() => setShowAddCol(!showAddCol)} style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${L.bd}`, background: L.card, color: L.tx, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: L.sh }}>+ Add Field</button>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={addRow} style={{ padding: "8px 16px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6, boxShadow: L.sh }}>+ Add Row</button>
-          <button onClick={() => setShowAddCol(!showAddCol)} style={{ padding: "8px 16px", borderRadius: 8, border: `1px solid ${L.bd}`, background: L.card, color: L.tx, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: L.sh }}>+ Add Field</button>
-        </div>
-      </div>
 
-      {showAddCol && (
-        <div style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 12, padding: "16px 20px", marginBottom: 16, boxShadow: L.sh, display: "flex", gap: 10, alignItems: "flex-end" }}>
-          <div style={{ flex: 1 }}>
-            <label style={{ fontSize: 11, fontWeight: 600, color: L.tx2, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Field Name</label>
-            <input value={newColName} onChange={e => setNewColName(e.target.value)} placeholder="e.g. Phone Number" style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }} />
+        {showAddCol && (
+          <div style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 12, padding: "16px 20px", marginBottom: 16, boxShadow: L.sh, display: "flex", gap: 10, alignItems: "flex-end" }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ fontSize: 11, fontWeight: 600, color: L.tx2, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Field Name</label>
+              <input value={newColName} onChange={e => setNewColName(e.target.value)} placeholder="e.g. Phone Number" style={{ width: "100%", padding: "8px 12px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }} />
+            </div>
+            <div>
+              <label style={{ fontSize: 11, fontWeight: 600, color: L.tx2, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Type</label>
+              <select value={newColType} onChange={e => setNewColType(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card }}>
+                {["text", "email", "url", "number", "select"].map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
+              </select>
+            </div>
+            <button onClick={addColumn} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Add</button>
+            <button onClick={() => setShowAddCol(false)} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${L.bd}`, background: L.card, color: L.tx2, fontSize: 13, cursor: "pointer" }}>Cancel</button>
           </div>
-          <div>
-            <label style={{ fontSize: 11, fontWeight: 600, color: L.tx2, display: "block", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5 }}>Type</label>
-            <select value={newColType} onChange={e => setNewColType(e.target.value)} style={{ padding: "8px 12px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card }}>
-              {["text", "email", "url", "number", "select"].map(t => <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>)}
-            </select>
-          </div>
-          <button onClick={addColumn} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>Add</button>
-          <button onClick={() => setShowAddCol(false)} style={{ padding: "8px 14px", borderRadius: 8, border: `1px solid ${L.bd}`, background: L.card, color: L.tx2, fontSize: 13, cursor: "pointer" }}>Cancel</button>
-        </div>
-      )}
+        )}
 
-      <input value={dbSearch} onChange={e => setDbSearch(e.target.value)} placeholder="Search records..." style={{ width: "100%", maxWidth: 320, padding: "9px 14px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box", marginBottom: 16 }} />
+        <input value={dbSearch} onChange={e => setDbSearch(e.target.value)} placeholder="Search records..." style={{ maxWidth: 320, padding: "9px 14px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box", marginBottom: 16 }} />
 
-      <div style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 12, overflow: "hidden", boxShadow: L.sh }}>
-        <div style={{ overflowX: "auto" }}>
-          <table style={{ width: "100%", borderCollapse: "collapse", minWidth: columns.length * 140 }}>
-            <thead>
-              <tr style={{ background: L.hd, borderBottom: `1px solid ${L.bd}` }}>
-                <th style={{ padding: "10px 14px", width: 40, textAlign: "center", fontSize: 11, color: L.tx3, fontWeight: 600 }}>#</th>
-                {columns.map(col => (
-                  <th key={col.id} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: L.tx2, letterSpacing: .3, textTransform: "uppercase", minWidth: col.w || 140 }}>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-                      <span>{col.name}</span>
-                      <button onClick={() => deleteColumn(col.id)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 2, opacity: .4, fontSize: 14 }} onMouseEnter={e => e.target.style.opacity = "1"} onMouseLeave={e => e.target.style.opacity = ".4"}>×</button>
-                    </div>
-                    <div style={{ fontSize: 10, fontWeight: 400, color: L.tx3, textTransform: "capitalize", marginTop: 2 }}>{col.type}</div>
-                  </th>
-                ))}
-                <th style={{ padding: "10px 14px", width: 60, textAlign: "center", fontSize: 11, color: L.tx3, fontWeight: 600 }}>Del</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.length === 0 ? (
-                <tr><td colSpan={columns.length + 2} style={{ padding: "48px 20px", textAlign: "center" }}>
-                  <div style={{ fontSize: 15, fontWeight: 600, color: L.tx2, marginBottom: 6 }}>{rows.length === 0 ? "No records yet" : "No matches"}</div>
-                  <div style={{ fontSize: 13, color: L.tx3, marginBottom: 16 }}>{rows.length === 0 ? "Click \"Add Row\" to start." : "Try different search."}</div>
-                  {rows.length === 0 && <button onClick={addRow} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ Add First Row</button>}
-                </td></tr>
-              ) : filtered.map((row) => {
-                const ri = rows.findIndex(r => r._id === row._id);
-                return (
-                  <tr key={row._id} style={{ borderBottom: `1px solid ${L.bdL}` }} onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
-                    <td style={{ padding: "8px 14px", fontSize: 11, color: L.tx3, textAlign: "center" }}>{ri + 1}</td>
-                    {columns.map(col => {
-                      const editing = editCell === `${row._id}-${col.id}`;
-                      const val = row[col.id] || "";
-                      return (
-                        <td key={col.id} style={{ padding: "4px 6px", fontSize: 13, color: L.tx }} onClick={() => { if (!editing) { setEditCell(`${row._id}-${col.id}`); setEditValue(val); } }}>
-                          {editing ? (
-                            col.type === "select" ? (
-                              <select ref={editRef} value={editValue} onChange={e => { updateCell(ri, col.id, e.target.value); setEditCell(null); }} onBlur={() => setEditCell(null)}
-                                style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `2px solid ${L.ac}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box" }}>
-                                <option value="">—</option>
-                                {(col.options || []).map(o => <option key={o} value={o}>{o}</option>)}
+        <div style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 12, overflow: "hidden", boxShadow: L.sh }}>
+          <div style={{ overflowX: "auto" }}>
+            <table style={{ width: "100%", borderCollapse: "collapse", minWidth: activeDb.columns.length * 140 }}>
+              <thead>
+                <tr style={{ background: L.hd, borderBottom: `1px solid ${L.bd}` }}>
+                  <th style={{ padding: "10px 14px", width: 40, textAlign: "center", fontSize: 11, color: L.tx3, fontWeight: 600 }}>#</th>
+                  {activeDb.columns.map(col => (
+                    <th key={col.id} style={{ padding: "10px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: L.tx2, letterSpacing: .3, textTransform: "uppercase", minWidth: col.w || 140 }}>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}><span>{col.name}</span>
+                        <button onClick={() => deleteColumn(col.id)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 2, opacity: .3, fontSize: 14 }} onMouseEnter={e => e.target.style.opacity = "1"} onMouseLeave={e => e.target.style.opacity = ".3"}>×</button>
+                      </div>
+                      <div style={{ fontSize: 10, fontWeight: 400, color: L.tx3, textTransform: "capitalize", marginTop: 2 }}>{col.type}</div>
+                    </th>
+                  ))}
+                  <th style={{ padding: "10px 14px", width: 50, textAlign: "center", fontSize: 11, color: L.tx3 }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.length === 0 ? (
+                  <tr><td colSpan={activeDb.columns.length + 2} style={{ padding: "48px 20px", textAlign: "center" }}>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: L.tx2, marginBottom: 6 }}>{activeDb.rows.length === 0 ? "No records yet" : "No matches"}</div>
+                    <div style={{ fontSize: 13, color: L.tx3, marginBottom: 16 }}>{activeDb.rows.length === 0 ? "Click \"+ Add Row\" to start adding contacts." : "Try a different search."}</div>
+                    {activeDb.rows.length === 0 && <button onClick={addRow} style={{ padding: "8px 20px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer" }}>+ Add First Row</button>}
+                  </td></tr>
+                ) : filtered.map(row => {
+                  const ri = activeDb.rows.findIndex(r => r._id === row._id);
+                  return (
+                    <tr key={row._id} style={{ borderBottom: `1px solid ${L.bdL}` }} onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
+                      <td style={{ padding: "8px 14px", fontSize: 11, color: L.tx3, textAlign: "center" }}>{ri + 1}</td>
+                      {activeDb.columns.map(col => {
+                        const editing = editCell === `${row._id}-${col.id}`;
+                        const val = row[col.id] || "";
+                        return (
+                          <td key={col.id} style={{ padding: "4px 6px", fontSize: 13, color: L.tx }} onClick={() => { if (!editing) { setEditCell(`${row._id}-${col.id}`); setEditValue(val); } }}>
+                            {editing ? (col.type === "select" ? (
+                              <select ref={editRef} value={editValue} onChange={e => { updateCell(ri, col.id, e.target.value); setEditCell(null); }} onBlur={() => setEditCell(null)} style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `2px solid ${L.ac}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, background: L.card, boxSizing: "border-box" }}>
+                                <option value="">—</option>{(col.options || []).map(o => <option key={o} value={o}>{o}</option>)}
                               </select>
                             ) : (
                               <input ref={editRef} type={col.type === "number" ? "number" : "text"} value={editValue} onChange={e => setEditValue(e.target.value)}
-                                onBlur={() => { updateCell(ri, col.id, editValue); setEditCell(null); }}
-                                onKeyDown={e => { if (e.key === "Enter") { updateCell(ri, col.id, editValue); setEditCell(null); } if (e.key === "Escape") setEditCell(null); }}
+                                onBlur={() => { updateCell(ri, col.id, editValue); setEditCell(null); }} onKeyDown={e => { if (e.key === "Enter") { updateCell(ri, col.id, editValue); setEditCell(null); } if (e.key === "Escape") setEditCell(null); }}
                                 style={{ width: "100%", padding: "6px 8px", borderRadius: 6, border: `2px solid ${L.ac}`, fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }} />
-                            )
-                          ) : (
-                            <div style={{ padding: "6px 8px", borderRadius: 6, minHeight: 28, display: "flex", alignItems: "center", cursor: "text", border: "2px solid transparent" }} onMouseEnter={e => e.currentTarget.style.borderColor = L.bdL} onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
-                              {col.type === "email" && val ? <span style={{ color: L.bl }}>{val}</span>
-                                : col.type === "url" && val ? <a href={val.startsWith("http") ? val : "https://" + val} target="_blank" rel="noreferrer" style={{ color: L.bl, textDecoration: "none" }}>{val.replace(/^https?:\/\/(www\.)?/, "").slice(0, 30)}</a>
-                                  : col.type === "select" && val ? <span style={{ padding: "2px 10px", borderRadius: 12, fontSize: 12, fontWeight: 500, background: val === "Sent" || val === "Replied" ? L.gnBg : val === "Failed" ? L.rdBg : L.acBg, color: val === "Sent" || val === "Replied" ? L.gn : val === "Failed" ? L.rd : L.ac }}>{val}</span>
-                                    : <span style={{ color: val ? L.tx : L.tx3 }}>{val || "—"}</span>}
-                            </div>
-                          )}
-                        </td>
-                      );
-                    })}
-                    <td style={{ padding: "8px 14px", textAlign: "center" }}>
-                      <button onClick={() => deleteRow(ri)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 4, borderRadius: 4 }}
-                        onMouseEnter={e => { e.target.style.color = L.rd; e.target.style.background = L.rdBg; }} onMouseLeave={e => { e.target.style.color = L.tx3; e.target.style.background = "none"; }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
-                      </button>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div style={{ padding: "10px 14px", borderTop: `1px solid ${L.bd}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: L.hd }}>
-          <button onClick={addRow} style={{ background: "none", border: "none", color: L.ac, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif" }}>+ New row</button>
-          <span style={{ fontSize: 12, color: L.tx3 }}>{rows.length} records · Auto-saved</span>
+                            )) : (
+                              <div style={{ padding: "6px 8px", borderRadius: 6, minHeight: 28, display: "flex", alignItems: "center", cursor: "text", border: "2px solid transparent" }} onMouseEnter={e => e.currentTarget.style.borderColor = L.bdL} onMouseLeave={e => e.currentTarget.style.borderColor = "transparent"}>
+                                {col.type === "email" && val ? <span style={{ color: L.bl }}>{val}</span>
+                                  : col.type === "url" && val ? <a href={val.startsWith("http") ? val : "https://" + val} target="_blank" rel="noreferrer" style={{ color: L.bl, textDecoration: "none" }}>{val.replace(/^https?:\/\/(www\.)?/, "").slice(0, 30)}</a>
+                                    : col.type === "select" && val ? <span style={{ padding: "2px 10px", borderRadius: 12, fontSize: 12, fontWeight: 500, background: val === "Sent" || val === "Replied" ? L.gnBg : val === "Failed" ? L.rdBg : L.acBg, color: val === "Sent" || val === "Replied" ? L.gn : val === "Failed" ? L.rd : L.ac }}>{val}</span>
+                                      : <span style={{ color: val ? L.tx : L.tx3 }}>{val || "—"}</span>}
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                      <td style={{ padding: "8px 10px", textAlign: "center" }}>
+                        <button onClick={() => deleteRow(ri)} style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 4, borderRadius: 4 }}
+                          onMouseEnter={e => { e.currentTarget.style.color = L.rd; e.currentTarget.style.background = L.rdBg; }} onMouseLeave={e => { e.currentTarget.style.color = L.tx3; e.currentTarget.style.background = "none"; }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+          <div style={{ padding: "10px 14px", borderTop: `1px solid ${L.bd}`, display: "flex", justifyContent: "space-between", alignItems: "center", background: L.hd }}>
+            <button onClick={addRow} style={{ background: "none", border: "none", color: L.ac, cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif" }}>+ New row</button>
+            <span style={{ fontSize: 12, color: L.tx3 }}>{activeDb.rows.length} records · Auto-saved</span>
+          </div>
         </div>
       </div>
+    );
+  }
+
+  // ─── DATABASE LIST VIEW ───
+  return (
+    <div style={{ background: L.bg, position: "fixed", inset: 0, zIndex: 50, overflow: "auto", padding: "24px" }}>
+      <div onClick={onBack} style={{ display: "flex", alignItems: "center", gap: 6, color: L.tx2, cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg> Back to Data Sources
+      </div>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: L.tx }}>Your Databases</div>
+          <div style={{ fontSize: 14, color: L.tx2, marginTop: 4 }}>{databases.length} database{databases.length !== 1 ? "s" : ""} created</div>
+        </div>
+        <button onClick={() => setShowNewDb(true)} style={{
+          padding: "10px 20px", borderRadius: 10, border: "none", background: L.ac, color: "#fff",
+          fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+          display: "flex", alignItems: "center", gap: 8, boxShadow: L.shM,
+        }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
+          New Database
+        </button>
+      </div>
+
+      {/* New Database Modal */}
+      {showNewDb && (
+        <div style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 14, padding: "24px", marginBottom: 20, boxShadow: L.shM }}>
+          <div style={{ fontSize: 16, fontWeight: 600, color: L.tx, marginBottom: 16 }}>Create New Database</div>
+          <div style={{ marginBottom: 16 }}>
+            <label style={{ fontSize: 12, fontWeight: 600, color: L.tx2, display: "block", marginBottom: 6, textTransform: "uppercase", letterSpacing: .5 }}>Database Name</label>
+            <input value={newDbName} onChange={e => setNewDbName(e.target.value)} placeholder="e.g. Singapore Affiliates, Q2 Outreach..."
+              autoFocus onKeyDown={e => { if (e.key === "Enter") createNewDb(); }}
+              style={{ width: "100%", padding: "10px 14px", borderRadius: 8, border: `1px solid ${L.bd}`, fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", color: L.tx, boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = L.ac} onBlur={e => e.target.style.borderColor = L.bd} />
+          </div>
+          <div style={{ fontSize: 12, color: L.tx3, marginBottom: 16, lineHeight: 1.6 }}>
+            A new database will be created with default columns: Company Name, Website, Email, Category, Country, Status, Notes. You can customize columns after creation.
+          </div>
+          <div style={{ display: "flex", gap: 10, justifyContent: "flex-end" }}>
+            <button onClick={() => { setShowNewDb(false); setNewDbName(""); }} style={{ padding: "8px 18px", borderRadius: 8, border: `1px solid ${L.bd}`, background: L.card, color: L.tx2, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Cancel</button>
+            <button onClick={createNewDb} style={{ padding: "8px 24px", borderRadius: 8, border: "none", background: L.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Create Database</button>
+          </div>
+        </div>
+      )}
+
+      {/* Database Cards */}
+      {databases.length === 0 && !showNewDb ? (
+        <div style={{ textAlign: "center", padding: "60px 20px" }}>
+          <div style={{ width: 64, height: 64, borderRadius: 20, background: L.acBg, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={L.ac} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="9" x2="9" y2="21" /></svg>
+          </div>
+          <div style={{ fontSize: 18, fontWeight: 600, color: L.tx, marginBottom: 6 }}>No databases yet</div>
+          <div style={{ fontSize: 14, color: L.tx2, maxWidth: 400, margin: "0 auto", lineHeight: 1.6, marginBottom: 20 }}>
+            Create your first database to start organizing contacts and managing outreach campaigns.
+          </div>
+          <button onClick={() => setShowNewDb(true)} style={{ padding: "10px 24px", borderRadius: 10, border: "none", background: L.ac, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Create First Database</button>
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 16 }}>
+          {databases.map(db => (
+            <div key={db.id} style={{ background: L.card, border: `1px solid ${L.bd}`, borderRadius: 14, padding: "20px", cursor: "pointer", transition: "all .2s", boxShadow: L.sh }}
+              onClick={() => setActiveDbId(db.id)}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = L.ac; e.currentTarget.style.boxShadow = L.shM; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = L.bd; e.currentTarget.style.boxShadow = L.sh; }}>
+              <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                <div style={{ width: 36, height: 36, borderRadius: 10, background: L.acBg, display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={L.ac} strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="9" x2="9" y2="21" /></svg>
+                </div>
+                <div style={{ display: "flex", gap: 4 }} onClick={e => e.stopPropagation()}>
+                  <button onClick={() => duplicateDb(db.id)} title="Duplicate" style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 4, borderRadius: 4 }}
+                    onMouseEnter={e => e.currentTarget.style.background = L.hv} onMouseLeave={e => e.currentTarget.style.background = "none"}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2" /><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" /></svg>
+                  </button>
+                  <button onClick={() => deleteDb(db.id)} title="Delete" style={{ background: "none", border: "none", color: L.tx3, cursor: "pointer", padding: 4, borderRadius: 4 }}
+                    onMouseEnter={e => { e.currentTarget.style.color = L.rd; e.currentTarget.style.background = L.rdBg; }} onMouseLeave={e => { e.currentTarget.style.color = L.tx3; e.currentTarget.style.background = "none"; }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="3 6 5 6 21 6" /><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+                  </button>
+                </div>
+              </div>
+              <div style={{ fontSize: 16, fontWeight: 600, color: L.tx, marginBottom: 4 }}>{db.name}</div>
+              <div style={{ fontSize: 13, color: L.tx2, marginBottom: 12 }}>{db.rows.length} records · {db.columns.length} fields</div>
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
+                {db.columns.slice(0, 4).map(c => (
+                  <span key={c.id} style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: L.hd, color: L.tx3, fontWeight: 500 }}>{c.name}</span>
+                ))}
+                {db.columns.length > 4 && <span style={{ fontSize: 10, padding: "2px 8px", borderRadius: 6, background: L.hd, color: L.tx3, fontWeight: 500 }}>+{db.columns.length - 4} more</span>}
+              </div>
+              <div style={{ fontSize: 11, color: L.tx3, marginTop: 12 }}>Updated {new Date(db.updatedAt).toLocaleDateString()}</div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
