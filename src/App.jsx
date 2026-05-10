@@ -1590,9 +1590,11 @@ function ProfilePage({ user, onBack, onLogout }) {
 
 /* ───────── EMAIL SENDER ───────── */
 function makeGmailMessage({ to, subject, body }) {
+  // Encode subject with RFC 2047 to handle special characters / apostrophes
+  const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
   const msg = [
     `To: ${to}`,
-    `Subject: ${subject}`,
+    `Subject: ${encodedSubject}`,
     `Content-Type: text/plain; charset=utf-8`,
     `MIME-Version: 1.0`,
     "",
@@ -1604,7 +1606,7 @@ function makeGmailMessage({ to, subject, body }) {
     .replace(/=+$/, "");
 }
 
-function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast }) {
+function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) {
   const [step, setStep] = useState("configure");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [offerContext, setOfferContext] = useState("");
@@ -1655,6 +1657,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast }) {
             category: contact.category,
             website: contact.website || "",
             offerContext,
+            senderName: user?.name || user?.username || "Ashir",
           }),
         });
         const data = await res.json();
@@ -2033,7 +2036,7 @@ function Dashboard({ user, onLogout }) {
         const genRes = await fetch("/api/generate-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext }),
+          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext, senderName: user?.name || user?.username || "Ashir" }),
         });
         const { subject, body } = await genRes.json();
         if (!contact.email) throw new Error("No email address");
@@ -2428,7 +2431,7 @@ function Dashboard({ user, onLogout }) {
             )}
 
             {/* EMAIL SENDER */}
-            {page === "emailSender" && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} />}
+            {page === "emailSender" && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
 
             {/* CONTACTS */}
             {page === "contacts" && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}

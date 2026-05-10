@@ -4,39 +4,55 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  const { company, category, website, offerContext } = req.body;
+  const { company, category, website, offerContext, senderName } = req.body;
   const API_KEY = process.env.OPENAI_API_KEY;
+  const sender = senderName || "Ashir";
 
   const fallback = {
-    subject: `Partnership Opportunity with ${company}`,
-    body: `Hi ${company} Team,\n\nI came across ${company} and wanted to reach out about a potential affiliate partnership.\n\n${offerContext ? offerContext + "\n\n" : ""}We'd love to explore how we can work together to drive mutual growth. Would you be open to a quick 15-minute call this week?\n\nLooking forward to hearing from you.\n\nBest regards,\nThehotspot Team`,
+    subject: `Quick question for ${company}`,
+    body: `Hi ${company} Team,\n\nWe run an affiliate network and think there's a real fit between what we do and what you're building.\n\n${offerContext ? offerContext + "\n\n" : ""}Want to jump on a quick call this week?\n\nBest,\n${sender}\nthehotspot`,
   };
 
   if (!API_KEY) return res.status(200).json(fallback);
 
-  const prompt = `You are an expert affiliate marketing outreach specialist. Write a highly personalized, compelling outreach email.
+  const prompt = `You are writing a cold outreach email on behalf of ${sender} from thehotspot, an affiliate marketing network.
 
-RECIPIENT DETAILS:
+RECIPIENT:
 - Company: ${company}
 - Website: ${website || "unknown"}
 - Partnership type: ${category || "affiliate"}
-${offerContext ? `- What to communicate: ${offerContext}` : ""}
+${offerContext ? `- Key message to communicate: ${offerContext}` : ""}
 
 WRITE AN EMAIL THAT:
-1. Opens with something specific about their company (reference their name, what they do based on their domain, or their niche)
-2. Gets straight to the point — what you're offering and why it benefits THEM
-3. Mentions concrete details if provided (commission rates, payouts, volumes, etc.)
-4. Is conversational and human — NOT corporate/stiff
-5. Has a clear single call-to-action at the end
-6. Is 150-200 words max — short and punchy
-7. Does NOT use these clichés: "I hope this email finds you well", "I wanted to reach out", "synergy", "leverage", "touch base"
+1. Opens with ONE sentence that references something specific about ${company} — their niche, their product, or what their domain suggests they do. Do NOT say "I came across your website."
+2. Immediately explains what thehotspot is offering and why it benefits THEM specifically
+3. Includes any concrete details from the key message (commission %, payout schedule, volumes, etc.) — if none provided, keep it brief and invite a conversation
+4. Ends with ONE clear ask — a short call, a reply, a quick chat
+5. Is 100-150 words MAXIMUM — tight and punchy, not a wall of text
+6. Sounds like a real person wrote it, not a marketing department
 
-SUBJECT LINE: Make it specific, curiosity-driven, and under 50 characters. Not generic like "Partnership Opportunity".
+SIGNATURE — end the email exactly like this (fill in ${sender}):
+Best,
+${sender}
+thehotspot
+
+BANNED WORDS AND PHRASES — DO NOT USE ANY OF THESE:
+synergy, synergies, leverage, leveraging, touch base, circle back, move the needle,
+drive value, game changer, innovative, revolutionizing, deep dive, bandwidth,
+"I hope this email finds you well", "I wanted to reach out", "I came across",
+"mutual growth", "exciting opportunity", "look forward to connecting",
+"would love to explore", "I believe there's a great opportunity",
+[Your Name], [Your Position], [Your Contact Information], [placeholder of any kind]
+
+SUBJECT LINE:
+- Under 50 characters
+- Specific and curiosity-driving — NOT "Partnership Opportunity" or "Collaboration"
+- Something the recipient would actually open
 
 Return ONLY valid JSON:
 {"subject": "...", "body": "..."}
 
-The body should use plain text with line breaks (\\n), no HTML.`;
+Body uses plain text with line breaks (\\n). No HTML. No placeholders.`;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -44,7 +60,7 @@ The body should use plain text with line breaks (\\n), no HTML.`;
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 800,
+        max_tokens: 600,
         response_format: { type: "json_object" },
         messages: [{ role: "user", content: prompt }],
       }),
