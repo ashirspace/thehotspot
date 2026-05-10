@@ -1939,7 +1939,6 @@ function Dashboard({ user, onLogout }) {
   };
   const executeAction = (action) => {
     if (!action) return;
-    if (action.type === "send_emails") { setPage("emailSender"); return; }
     if (action.type === "show_stats") { setPage("dashboard"); return; }
     if (action.type === "show_contacts") { setPage("contacts"); return; }
     const labels = {
@@ -1949,20 +1948,68 @@ function Dashboard({ user, onLogout }) {
     };
     showToast(labels[action.type] || "Feature coming soon");
   };
-  // Detect user intent locally — always fires before/after API so navigation is reliable
-  const detectLocalIntent = (msg) => {
+
+  // Parse category from user message ("send emails to Network" → "Network")
+  const parseSendIntent = (msg) => {
     const lower = msg.toLowerCase();
-    if ((lower.includes("send") && (lower.includes("email") || lower.includes("mail") || lower.includes("outreach"))) ||
-        lower.includes("email sender") || lower.includes("send campaign")) {
-      return { type: "send_emails" };
+    const isSend = (lower.includes("send") && (lower.includes("email") || lower.includes("mail") || lower.includes("outreach"))) || lower.includes("send campaign");
+    if (!isSend) return null;
+    const cats = ["network", "cps", "cpl", "cpa", "mobile"];
+    const matched = cats.find(c => lower.includes(c));
+    return { type: "send_emails", category: matched || "all" };
+  };
+
+  // Send emails inline in the chat — no page navigation
+  const runEmailCampaign = async (category) => {
+    let contacts = [];
+    try { contacts = JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch {}
+    const filtered = category && category !== "all"
+      ? contacts.filter(c => c.category?.toLowerCase() === category.toLowerCase())
+      : contacts;
+
+    if (filtered.length === 0) {
+      setMessages(prev => [...prev, { role: "assistant", content: `No contacts found${category !== "all" ? ` in the **${category.toUpperCase()}** category` : ""}. Add contacts first from the Contacts DB.` }]);
+      setLoading(false);
+      return;
     }
-    if (lower.includes("dashboard") || lower.includes("show stats") || lower.includes("open dashboard")) {
-      return { type: "show_stats" };
+    if (!gmailToken) {
+      setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected yet. Connect Gmail first — click the **📤 Email Sender** in the sidebar, then hit **Connect Gmail**.` }]);
+      setLoading(false);
+      return;
     }
-    if (lower.includes("contacts") && (lower.includes("view") || lower.includes("show") || lower.includes("open"))) {
-      return { type: "show_contacts" };
+
+    const progressId = Date.now();
+    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Starting outreach to **${filtered.length} contact${filtered.length !== 1 ? "s" : ""}**${category !== "all" ? ` (${category.toUpperCase()})` : ""}...` }]);
+
+    let sent = 0, failed = 0;
+    for (let i = 0; i < filtered.length; i++) {
+      const contact = filtered[i];
+      try {
+        const genRes = await fetch("/api/generate-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ company: contact.company || contact.name || "the company", category: contact.category, website: contact.website || "", offerContext: "" }),
+        });
+        const { subject, body } = await genRes.json();
+        if (!contact.email) throw new Error("No email address");
+        const raw = makeGmailMessage({ to: contact.email, subject, body });
+        const sendRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ raw }),
+        });
+        const sendData = await sendRes.json();
+        if (sendData.error) throw new Error(sendData.error.message);
+        sent++;
+      } catch { failed++; }
+
+      const progress = `📤 Sending... **${i + 1}/${filtered.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`;
+      setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: progress } : m));
     }
-    return null;
+
+    const summary = `✅ Campaign complete!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully\n${failed > 0 ? `• **${failed} failed** (missing email or delivery error)\n` : ""}• Category: ${category !== "all" ? category.toUpperCase() : "All categories"}\n\nFor full control — editing drafts, per-contact review — use the **📤 Email Sender** in the sidebar.`;
+    setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
+    setLoading(false);
   };
 
   const handleSend = async (text) => {
@@ -1973,9 +2020,12 @@ function Dashboard({ user, onLogout }) {
     setInput("");
     setLoading(true);
 
-    // Run local intent detection immediately — don't wait for API
-    const localIntent = detectLocalIntent(msg);
-    if (localIntent) executeAction(localIntent);
+    // Check for send-email intent — handle inline, don't navigate away
+    const sendIntent = parseSendIntent(msg);
+    if (sendIntent) {
+      await runEmailCampaign(sendIntent.category);
+      return;
+    }
 
     try {
       const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg].map(m => ({ role: m.role, content: m.content }));
@@ -1986,19 +2036,16 @@ function Dashboard({ user, onLogout }) {
       });
       const data = await res.json();
       const aiText = data.content?.[0]?.text || "";
-
-      // Also parse action tag from API response (belt and suspenders)
       const actionMatch = aiText.match(/<action>(.*?)<\/action>/s);
       let action = null;
       let cleanText = aiText.replace(/<action>.*?<\/action>/gs, "").trim();
       if (actionMatch) { try { action = JSON.parse(actionMatch[1]); } catch (e) { } }
-
-      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Opening Email Sender for you!" }]);
-      if (action && !localIntent) executeAction(action);
+      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Let me know how I can help!" }]);
+      if (action) executeAction(action);
     } catch (err) {
       const response = getSmartResponse(msg);
       setMessages(prev => [...prev, { role: "assistant", content: response.text }]);
-      if (response.action && !localIntent) executeAction(response.action);
+      if (response.action) executeAction(response.action);
     }
     setLoading(false);
   };
@@ -2191,7 +2238,7 @@ function Dashboard({ user, onLogout }) {
             {messages.length === 1 && !loading && (
               <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
                 {["📊 Show my stats", "📋 View contacts", "📧 Send emails", "📡 Campaign status"].map(chip => (
-                  <button key={chip} onClick={() => handleSend(chip.replace(/^[^\s]+\s/, ""))} style={{
+                  <button key={chip} onClick={() => handleSend(chip.replace(/^\S+\s*/, ""))} style={{
                     padding: "8px 16px", borderRadius: 20, border: "1px solid #E2E8F0", background: "#FFFFFF",
                     color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
                     transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
