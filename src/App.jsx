@@ -525,12 +525,12 @@ function getSmartResponse(text) {
 
 /* ───────── STYLES (object) ───────── */
 const S = {
-  app: { fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#e0e0e8", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%", maxWidth: "100vw", overflow: "hidden" },
-  header: { padding: "16px 28px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0c0c12" },
-  logo: { width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#000" },
+  app: { fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", color: "#0F172A", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%", maxWidth: "100vw", overflow: "hidden" },
+  header: { padding: "16px 28px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#FFFFFF" },
+  logo: { width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#fff" },
   layout: { flex: 1, display: "flex", overflow: "hidden", height: "calc(100vh - 65px)" },
   content: { flex: 1, padding: "24px 28px", overflowY: "auto" },
-  sectionLabel: { fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 },
+  sectionLabel: { fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 },
 };
 
 /* ───────── COMPONENTS ───────── */
@@ -595,8 +595,8 @@ function TotalContactsPage({ onBack, user }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Gmail Contacts</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Gmail Contacts</div>
         </div>
       </div>
       {user?.method !== "google" && (
@@ -651,8 +651,8 @@ function EmailsSentPage({ onBack }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent via thehotspot</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
+          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent via thehotspot</div>
         </div>
       </div>
       <div style={{ background: "#F0F9FF", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#0C4A6E" }}>
@@ -699,8 +699,8 @@ function CategoriesPage({ onBack }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#f9731618", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>5</div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Active Categories</div>
+          <div style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>5</div>
+          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Active Categories</div>
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -748,20 +748,20 @@ function SuccessRatePage({ onBack }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Check /></div>
         <div>
-          <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Success Rate</div>
+          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Success Rate</div>
         </div>
       </div>
       {/* Circular Progress */}
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
         <div style={{ position: "relative", width: 140, height: 140 }}>
           <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="60" cy="60" r="54" stroke="#1e1e28" strokeWidth="8" fill="none" />
+            <circle cx="60" cy="60" r="54" stroke="#E2E8F0" strokeWidth="8" fill="none" />
             <circle cx="60" cy="60" r="54" stroke={rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : "#f87171"} strokeWidth="8" fill="none"
               strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
               style={{ transition: "stroke-dashoffset 1s ease" }} />
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 36, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</div>
+            <div style={{ fontSize: 36, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</div>
           </div>
         </div>
       </div>
@@ -1286,56 +1286,56 @@ function ContactsPage({ onBack, showToast, user }) {
   // ─── CONNECT SOURCES VIEW ───
   if (view === "connect_sheets") return (
     <div>
-      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>← Back to Data Sources</div>
+      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>← Back to Data Sources</div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Connect Data Source</div>
-          <div style={{ fontSize: 13, color: "#6b6b80" }}>Choose where your contact data lives</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Connect Data Source</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Choose where your contact data lives</div>
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #10b98133", borderRadius: 14, padding: "20px" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid #10b98133", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#ECFDF5", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>Google Sheets</div>
-              <div style={{ fontSize: 12, color: "#6b6b80" }}>Paste your sheet URL to import all rows</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A" }}>Google Sheets</div>
+              <div style={{ fontSize: 12, color: "#64748B" }}>Paste your sheet URL to import all rows</div>
             </div>
-            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#10b98118", color: "#10b981", fontWeight: 500 }}>Available</span>
+            <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500, border: "1px solid #10b98133" }}>Available</span>
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"} />
+              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#F8FAFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
             <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
               padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
-              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
-              color: sheetUrl ? "#000" : "#6b6b80", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
+              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
+              color: sheetUrl ? "#fff" : "#94A3B8", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
             }}>{loading ? "Connecting..." : "Connect"}</button>
           </div>
-          <div style={{ fontSize: 11, color: "#4a4a5a", marginTop: 10, lineHeight: 1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
+          <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 10, lineHeight: 1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
         </div>
         {[
           { name: "Airtable", desc: "Connect an Airtable base to sync contacts", color: "#2563eb", icon: '<rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="9" x2="9" y2="21"/>' },
           { name: "CSV / XLSX Upload", desc: "Upload a spreadsheet file directly", color: "#8b5cf6", icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' },
           { name: "Slack", desc: "Import contacts from Slack workspace", color: "#e01155", icon: '<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>' },
         ].map(src => (
-          <div key={src.name} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "20px", opacity: .5 }}>
+          <div key={src.name} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "20px", opacity: .5, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: `${src.color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: src.icon }} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: "#f0f0f5" }}>{src.name}</div>
-                <div style={{ fontSize: 12, color: "#6b6b80" }}>{src.desc}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A" }}>{src.name}</div>
+                <div style={{ fontSize: 12, color: "#64748B" }}>{src.desc}</div>
               </div>
-              <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#f59e0b18", color: "#f59e0b", fontWeight: 500 }}>Coming Soon</span>
+              <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#FEF3C7", color: "#D97706", fontWeight: 500, border: "1px solid #f59e0b33" }}>Coming Soon</span>
             </div>
           </div>
         ))}
@@ -1346,62 +1346,62 @@ function ContactsPage({ onBack, showToast, user }) {
   // ─── TABLE VIEW ───
   return (
     <div>
-      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>← Back to Data Sources</div>
+      <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>← Back to Data Sources</div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
           </div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#f0f0f5" }}>{sheetName || "Google Sheet"}</div>
-            <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts · <span style={{ color: "#10b981" }}>Connected</span></div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A" }}>{sheetName || "Google Sheet"}</div>
+            <div style={{ fontSize: 12, color: "#64748B" }}>Google Sheets · {contacts.length} contacts · <span style={{ color: "#10b981" }}>Connected</span></div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #2a2a3a", background: "#111116", color: "#a0a0b0", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#64748B", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
             {loading ? "Syncing..." : "↻ Sync"}
           </button>
-          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #f8717133", background: "#2a0a0a", color: "#f87171", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
+          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #EF444433", background: "#FEF2F2", color: "#EF4444", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
         {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
-          <div key={s.l} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px", textAlign: "center" }}>
+          <div key={s.l} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80" }}>{s.l}</div>
+            <div style={{ fontSize: 11, color: "#64748B" }}>{s.l}</div>
           </div>
         ))}
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
-          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
+          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length}</div>
+      <div style={{ fontSize: 12, color: "#64748B", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length}</div>
       <div style={{ overflowX: "auto" }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, overflow: "hidden" }}>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
-            <thead><tr style={{ borderBottom: "1px solid #1e1e28" }}>
+            <thead><tr style={{ borderBottom: "1px solid #E2E8F0", background: "#F8FAFF" }}>
               {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
-                <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#6b6b80", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
+                <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#64748B", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {filtered.slice(0, 100).map((c, i) => (
-                <tr key={c.id} style={{ borderBottom: "1px solid #1a1a24" }}>
-                  <td style={{ padding: "10px 14px", fontSize: 11, color: "#4a4a5a" }}>{i + 1}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#f0f0f5" }}>{c.company_name}</td>
-                  <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#38bdf8", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#4a4a5a" }}>—</span>}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#a0a0b0" : "#f8717188" }}>{c.email || "⚠ Missing"}</td>
-                  <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#1a1a28", color: CAT[c.category]?.text || "#8888a0", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#6b6b80" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#6b6b80" }}>—</span>}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, color: "#6b6b80" }}>{c.country || "—"}</td>
+                <tr key={c.id} style={{ borderBottom: "1px solid #F1F5F9" }}>
+                  <td style={{ padding: "10px 14px", fontSize: 11, color: "#94A3B8" }}>{i + 1}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{c.company_name}</td>
+                  <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#0ea5e9", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#64748B" : "#EF444488" }}>{c.email || "⚠ Missing"}</td>
+                  <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#EFF1F8", color: CAT[c.category]?.text || "#64748B", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#94A3B8" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 12, color: "#64748B" }}>{c.country || "—"}</td>
                 </tr>
               ))}
             </tbody>
           </table>
-          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#6b6b80", borderTop: "1px solid #1e1e28" }}>Showing first 100 of {filtered.length}</div>}
+          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#64748B", borderTop: "1px solid #E2E8F0" }}>Showing first 100 of {filtered.length}</div>}
         </div>
       </div>
     </div>
@@ -1428,8 +1428,8 @@ function CampaignStatusPage({ onBack }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#f0f0f5" }}>Campaign Status</div>
-          <div style={{ fontSize: 12, color: "#6b6b80" }}>Real-time overview of all outreach campaigns</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Campaign Status</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>Real-time overview of all outreach campaigns</div>
         </div>
       </div>
 
@@ -1664,7 +1664,7 @@ function Dashboard({ user, onLogout }) {
   };
   const connectGmail = () => {
     const popup = window.open("", "Gmail Connect", "width=500,height=600,left=200,top=100");
-    popup.document.write(`<!DOCTYPE html><html><head><title>Connect Gmail</title></head><body style="font-family:sans-serif;background:#1a1a2e;color:#e0e0e8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#111118;border-radius:16px;padding:40px;text-align:center;max-width:360px;border:1px solid #2a2a3a;"><svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><h2 style="margin:20px 0 8px;font-size:20px;">Connect Gmail</h2><p style="color:#6b6b80;font-size:13px;margin-bottom:24px;">Connect your Gmail to enable email stats</p><button onclick="window.opener.postMessage('gmail-connected','*');window.close();" style="background:#4285F4;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Connect Gmail Account</button></div></body></html>`);
+    popup.document.write(`<!DOCTYPE html><html><head><title>Connect Gmail</title></head><body style="font-family:'DM Sans',sans-serif;background:#F0F4FF;color:#0F172A;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#FFFFFF;border-radius:20px;padding:40px;text-align:center;max-width:360px;border:1px solid #E2E8F0;box-shadow:0 8px 40px rgba(79,70,229,0.08);"><svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><h2 style="margin:20px 0 8px;font-size:20px;color:#0F172A;">Connect Gmail</h2><p style="color:#64748B;font-size:13px;margin-bottom:24px;">Connect your Gmail to enable email stats</p><button onclick="window.opener.postMessage('gmail-connected','*');window.close();" style="background:#4285F4;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Connect Gmail Account</button></div></body></html>`);
   };
   useEffect(() => {
     const h = (e) => { if (e.data === "gmail-connected") { setGmailConnected(true); showToast("Gmail connected! 🎉"); } };
