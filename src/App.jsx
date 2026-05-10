@@ -232,7 +232,7 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflowX: "hidden", overflowY: "auto", WebkitOverflowScrolling: "touch" }}>
+    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", height: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
@@ -256,34 +256,35 @@ function LoginPage({ onLogin }) {
         </div>
       </nav>
 
-      {/* ── Hero / app description ── */}
-      <div style={{ textAlign: "center", padding: "48px 24px 40px", position: "relative", zIndex: 1 }}>
-        <div style={{ display: "inline-flex", marginBottom: 16 }}>
-          <Logo size={52} />
-        </div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
-          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-          <span style={{ fontSize: 11, color: "#059669", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
-        </div>
-        <h1 style={{ fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
-          Grow your network.<br />
-          <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Automate your outreach.</span>
-        </h1>
-        <p style={{ fontSize: 15, color: "#64748B", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7 }}>
-          thehotspot is an outreach management platform for affiliate marketers and business development teams.
-          Import contacts, track campaigns by category, and send personalised emails — all from one dashboard.
-        </p>
-        {/* Feature chips */}
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 8 }}>
-          {["Contact database", "Campaign tracking", "Email automation", "Google Sheets import", "AI assistant"].map(f => (
-            <span key={f} style={{ fontSize: 12, color: "#64748B", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
-          ))}
-        </div>
-      </div>
+      {/* ── Two-column body ── */}
+      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1, gap: 48, minHeight: 0 }}>
 
-      {/* ── Login card ── */}
-      <div style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "0 20px 40px", position: "relative", zIndex: 1 }}>
-        <div style={{ width: "100%", maxWidth: 420 }}>
+        {/* Left: Hero */}
+        <div style={{ flex: 1, maxWidth: 480, paddingRight: 16 }}>
+          <div style={{ marginBottom: 16 }}>
+            <Logo size={44} />
+          </div>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 18 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
+            <span style={{ fontSize: 11, color: "#059669", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
+          </div>
+          <h1 style={{ fontSize: "clamp(26px,4vw,38px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
+            Grow your network.<br />
+            <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Automate your outreach.</span>
+          </h1>
+          <p style={{ fontSize: 14, color: "#64748B", marginBottom: 24, lineHeight: 1.7 }}>
+            thehotspot is an outreach management platform for affiliate marketers and business development teams.
+            Import contacts, track campaigns, and send personalised emails — all from one dashboard.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+            {["Contact database", "Campaign tracking", "Email automation", "Google Sheets import", "AI assistant"].map(f => (
+              <span key={f} style={{ fontSize: 12, color: "#64748B", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
+            ))}
+          </div>
+        </div>
+
+        {/* Right: Login card */}
+        <div style={{ width: "100%", maxWidth: 400, flexShrink: 0 }}>
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px rgba(79,70,229,0.08)" }}>
             <div style={{ fontSize: 18, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
             <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
@@ -392,20 +393,6 @@ function LoginPage({ onLogin }) {
           </div>
         </div>
       </div>
-
-      {/* Scroll to top button */}
-      <button onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })} style={{
-        position: "fixed", right: 20, bottom: 28, width: 40, height: 40, borderRadius: "50%",
-        background: "linear-gradient(135deg,#10b981,#0ea5e9)", border: "none",
-        color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-        boxShadow: "0 4px 16px rgba(16,185,129,0.35)", zIndex: 50, transition: "transform .2s",
-      }}
-        onMouseEnter={e => e.currentTarget.style.transform = "translateY(-3px)"}
-        onMouseLeave={e => e.currentTarget.style.transform = "translateY(0)"}
-        title="Scroll to top"
-      >
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="18 15 12 9 6 15" /></svg>
-      </button>
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
