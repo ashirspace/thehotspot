@@ -1993,7 +1993,7 @@ function Dashboard({ user, onLogout }) {
   };
 
   // Send emails inline in the chat — no page navigation
-  const runEmailCampaign = async (category, directEmails = null) => {
+  const runEmailCampaign = async (category, directEmails = null, offerContext = "") => {
     if (!gmailToken) {
       setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected yet. Connect Gmail first — open **📤 Email Sender** from the sidebar and hit **Connect Gmail**.` }]);
       setLoading(false);
@@ -2033,7 +2033,7 @@ function Dashboard({ user, onLogout }) {
         const genRes = await fetch("/api/generate-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext: "" }),
+          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext }),
         });
         const { subject, body } = await genRes.json();
         if (!contact.email) throw new Error("No email address");
@@ -2083,7 +2083,8 @@ function Dashboard({ user, onLogout }) {
       if (action === "send_emails") {
         const emails = params?.emails?.length ? params.emails : null;
         const category = params?.category || "all";
-        await runEmailCampaign(category, emails);
+        const offerContext = params?.offerContext || "";
+        await runEmailCampaign(category, emails, offerContext);
         return;
       }
       if (action === "show_stats") setPage("dashboard");
