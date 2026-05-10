@@ -232,7 +232,7 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", height: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", display: "flex", flexDirection: "column", position: "relative" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
@@ -257,10 +257,10 @@ function LoginPage({ onLogin }) {
       </nav>
 
       {/* ── Two-column body ── */}
-      <div style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1, gap: 48, minHeight: 0 }}>
+      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1, gap: 48, minHeight: 0 }}>
 
         {/* Left: Hero */}
-        <div style={{ flex: 1, maxWidth: 480, paddingRight: 16 }}>
+        <div className="lp-hero" style={{ flex: 1, maxWidth: 480, paddingRight: 16 }}>
           <div style={{ marginBottom: 16 }}>
             <Logo size={44} />
           </div>
@@ -284,7 +284,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* Right: Login card */}
-        <div style={{ width: "100%", maxWidth: 400, flexShrink: 0 }}>
+        <div className="lp-card-wrap" style={{ width: "100%", maxWidth: 400, flexShrink: 0 }}>
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px rgba(79,70,229,0.08)" }}>
             <div style={{ fontSize: 18, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
             <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
@@ -398,6 +398,20 @@ function LoginPage({ onLogin }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         *{box-sizing:border-box;margin:0;padding:0}
         input::placeholder{color:#CBD5E1}
+
+        /* Desktop: full-height, no scroll */
+        .lp-root { height:100vh; overflow:hidden; }
+        .lp-body { flex:1; min-height:0; }
+
+        /* Mobile: stacked, scrollable */
+        @media (max-width: 700px) {
+          .lp-root { height:auto; min-height:100vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+          .lp-body { flex-direction:column; align-items:stretch; padding:24px 20px 40px; gap:32px; overflow:visible; }
+          .lp-hero { max-width:100%; padding-right:0; text-align:center; }
+          .lp-hero > div:first-child { justify-content:center; display:flex; }
+          .lp-hero > div:nth-child(2) { margin-left:auto; margin-right:auto; }
+          .lp-card-wrap { max-width:100%; flex-shrink:unset; }
+        }
       `}</style>
     </div>
   );
