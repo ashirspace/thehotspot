@@ -1941,7 +1941,7 @@ function Dashboard({ user, onLogout }) {
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
                   <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                  <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" onClick={() => setPage("emailsSent")} />
                   <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
                   <StatCard icon={<I.Check />} label="Success Rate" value={sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
