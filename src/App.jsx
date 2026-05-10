@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
@@ -233,7 +233,6 @@ function LoginPage({ onLogin }) {
 
   return (
     <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", display: "flex", flexDirection: "column", position: "relative" }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
       <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e914,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
@@ -579,8 +578,8 @@ function BackButton({ onClick, label }) {
 }
 
 function TotalContactsPage({ onBack, user }) {
-  const contacts = (() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } })();
-  const countBycat = contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
+  const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const contactsByCategory = [
     { cat: "Network", count: countBycat["Network"] || 0, color: CAT.Network },
     { cat: "CPS", count: countBycat["CPS"] || 0, color: CAT.CPS },
@@ -679,8 +678,8 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
 }
 
 function CategoriesPage({ onBack }) {
-  const contacts = (() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } })();
-  const countBycat = contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
+  const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const categories = [
     { name: "Network", desc: "Affiliate network partners managing multiple programs", count: countBycat["Network"] || 0, color: CAT.Network },
     { name: "CPS", desc: "Cost Per Sale — commission per successful sale", count: countBycat["CPS"] || 0, color: CAT.CPS },
@@ -1408,8 +1407,8 @@ function ContactsPage({ onBack, showToast, user }) {
 
 /* ───────── CAMPAIGN STATUS PAGE ───────── */
 function CampaignStatusPage({ onBack, sentCount }) {
-  const contacts = (() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } })();
-  const countBycat = contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {});
+  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
+  const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const totalContacts = contacts.length;
   // Distribute sentCount proportionally across categories
   const distribute = (cat) => totalContacts > 0 && sentCount > 0 ? Math.round((countBycat[cat] || 0) / totalContacts * sentCount) : 0;
@@ -1590,7 +1589,7 @@ function Dashboard({ user, onLogout }) {
   const chatEnd = useRef(null);
   const recog = useRef(null);
 
-  // Fetch contact count from cached sheet data or Airtable
+  // Fetch contact count once on mount only
   useEffect(() => {
     const cached = localStorage.getItem("thehotspot_contacts");
     if (cached) {
@@ -1598,7 +1597,7 @@ function Dashboard({ user, onLogout }) {
     } else {
       fetchAllContacts().then(records => setContactCount(records.length)).catch(() => { });
     }
-  }, [page]);
+  }, []);
 
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
   useEffect(() => {
@@ -1730,7 +1729,6 @@ function Dashboard({ user, onLogout }) {
 
   return (
     <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", color: "#0F172A", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
-      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* TOAST */}
       {toast && (
