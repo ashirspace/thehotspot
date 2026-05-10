@@ -1886,7 +1886,7 @@ function Dashboard({ user, onLogout }) {
   const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
   const setPage = (p) => { setPageRaw(p); if (p) localStorage.setItem("thehotspot_page", p); else localStorage.removeItem("thehotspot_page"); };
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
-  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const h = (e) => setIsDesktop(e.matches);
