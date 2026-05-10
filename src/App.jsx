@@ -1573,7 +1573,9 @@ function Dashboard({ user, onLogout }) {
     mq.addEventListener("change", h);
     return () => mq.removeEventListener("change", h);
   }, []);
-  const [gmailConnected, setGmailConnected] = useState(false);
+  const [gmailConnected, setGmailConnected] = useState(() => !!(user?.gmailToken || user?.sentCount));
+  const [gmailToken, setGmailToken] = useState(() => user?.gmailToken || null);
+  const [sentCount, setSentCount] = useState(() => user?.sentCount || 0);
   const [contactCount, setContactCount] = useState(0);
   const [messages, setMessages] = useState([
     { role: "assistant", content: "Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
@@ -1663,14 +1665,51 @@ function Dashboard({ user, onLogout }) {
     setLoading(false);
   };
   const connectGmail = () => {
-    const popup = window.open("", "Gmail Connect", "width=500,height=600,left=200,top=100");
-    popup.document.write(`<!DOCTYPE html><html><head><title>Connect Gmail</title></head><body style="font-family:'DM Sans',sans-serif;background:#F0F4FF;color:#0F172A;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;"><div style="background:#FFFFFF;border-radius:20px;padding:40px;text-align:center;max-width:360px;border:1px solid #E2E8F0;box-shadow:0 8px 40px rgba(79,70,229,0.08);"><svg width="48" height="48" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg><h2 style="margin:20px 0 8px;font-size:20px;color:#0F172A;">Connect Gmail</h2><p style="color:#64748B;font-size:13px;margin-bottom:24px;">Connect your Gmail to enable email stats</p><button onclick="window.opener.postMessage('gmail-connected','*');window.close();" style="background:#4285F4;color:#fff;border:none;padding:12px 32px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;width:100%;">Connect Gmail Account</button></div></body></html>`);
+    if (!window.google?.accounts?.oauth2) {
+      showToast("Google Sign-In not available — please refresh the page.");
+      return;
+    }
+    const client = window.google.accounts.oauth2.initTokenClient({
+      client_id: GMAIL_CLIENT_ID,
+      scope: "https://www.googleapis.com/auth/gmail.readonly",
+      callback: async (response) => {
+        if (response.error) {
+          showToast("Gmail connection failed: " + response.error);
+          return;
+        }
+        const token = response.access_token;
+        try {
+          // Fetch sent email count from Gmail API
+          const res = await fetch(
+            "https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1",
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+          const data = await res.json();
+          const count = data.resultSizeEstimate || 0;
+
+          setGmailConnected(true);
+          setGmailToken(token);
+          setSentCount(count);
+
+          // Persist so it survives page refresh
+          const updatedUser = { ...user, gmailToken: token, sentCount: count };
+          localStorage.setItem("thehotspot_user", JSON.stringify(updatedUser));
+          showToast(`Gmail connected — ${count.toLocaleString()} emails sent`);
+        } catch {
+          // Token valid, stats unavailable
+          setGmailConnected(true);
+          setGmailToken(token);
+          const updatedUser = { ...user, gmailToken: token };
+          localStorage.setItem("thehotspot_user", JSON.stringify(updatedUser));
+          showToast("Gmail connected!");
+        }
+      },
+      error_callback: (err) => {
+        if (err.type !== "popup_closed") showToast("Gmail connection failed");
+      },
+    });
+    client.requestAccessToken();
   };
-  useEffect(() => {
-    const h = (e) => { if (e.data === "gmail-connected") { setGmailConnected(true); showToast("Gmail connected! 🎉"); } };
-    window.addEventListener("message", h);
-    return () => window.removeEventListener("message", h);
-  }, []);
 
   const navTo = (p) => { setPage(p); setSidebarOpen(false); };
 
@@ -1901,9 +1940,9 @@ function Dashboard({ user, onLogout }) {
               <>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
                   <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                  <StatCard icon={<I.Mail />} label="Emails Sent" value={user?.sentCount || 0} accent="#6366f1" onClick={() => setPage("emailsSent")} />
+                  <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" locked={!gmailConnected} onConnect={connectGmail} onClick={() => setPage("emailsSent")} />
                   <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
-                  <StatCard icon={<I.Check />} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                  <StatCard icon={<I.Check />} label="Success Rate" value={sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
                 <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
