@@ -1974,46 +1974,66 @@ function Dashboard({ user, onLogout }) {
     showToast(labels[action.type] || "Feature coming soon");
   };
 
-  // Parse category from user message ("send emails to Network" → "Network")
+  // Extract email addresses from any message
+  const extractEmails = (msg) => {
+    const matches = msg.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g);
+    return matches ? [...new Set(matches)] : [];
+  };
+
+  // Detect send intent: direct emails in message OR "send emails" command
   const parseSendIntent = (msg) => {
+    const emails = extractEmails(msg);
+    if (emails.length > 0) return { type: "send_emails", emails, category: null };
     const lower = msg.toLowerCase();
     const isSend = (lower.includes("send") && (lower.includes("email") || lower.includes("mail") || lower.includes("outreach"))) || lower.includes("send campaign");
     if (!isSend) return null;
     const cats = ["network", "cps", "cpl", "cpa", "mobile"];
     const matched = cats.find(c => lower.includes(c));
-    return { type: "send_emails", category: matched || "all" };
+    return { type: "send_emails", emails: null, category: matched || "all" };
   };
 
   // Send emails inline in the chat — no page navigation
-  const runEmailCampaign = async (category) => {
-    let contacts = [];
-    try { contacts = JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch {}
-    const filtered = category && category !== "all"
-      ? contacts.filter(c => c.category?.toLowerCase() === category.toLowerCase())
-      : contacts;
-
-    if (filtered.length === 0) {
-      setMessages(prev => [...prev, { role: "assistant", content: `No contacts found${category !== "all" ? ` in the **${category.toUpperCase()}** category` : ""}. Add contacts first from the Contacts DB.` }]);
-      setLoading(false);
-      return;
-    }
+  const runEmailCampaign = async (category, directEmails = null) => {
     if (!gmailToken) {
-      setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected yet. Connect Gmail first — click the **📤 Email Sender** in the sidebar, then hit **Connect Gmail**.` }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected yet. Connect Gmail first — open **📤 Email Sender** from the sidebar and hit **Connect Gmail**.` }]);
       setLoading(false);
       return;
     }
 
+    let targets = [];
+    if (directEmails && directEmails.length > 0) {
+      // Build contact-like objects from raw email addresses
+      targets = directEmails.map(email => {
+        const domain = email.split("@")[1] || "";
+        const company = domain.split(".")[0] || email;
+        return { email, company, name: company, category: "Network", website: domain };
+      });
+    } else {
+      let contacts = [];
+      try { contacts = JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch {}
+      targets = category && category !== "all"
+        ? contacts.filter(c => c.category?.toLowerCase() === category.toLowerCase())
+        : contacts;
+    }
+
+    if (targets.length === 0) {
+      setMessages(prev => [...prev, { role: "assistant", content: `No contacts found${category && category !== "all" ? ` in the **${category.toUpperCase()}** category` : ""}. Add contacts first from the Contacts DB, or type an email address directly.` }]);
+      setLoading(false);
+      return;
+    }
+
+    const label = directEmails ? directEmails.join(", ") : `${targets.length} contact${targets.length !== 1 ? "s" : ""}${category && category !== "all" ? ` (${category.toUpperCase()})` : ""}`;
     const progressId = Date.now();
-    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Starting outreach to **${filtered.length} contact${filtered.length !== 1 ? "s" : ""}**${category !== "all" ? ` (${category.toUpperCase()})` : ""}...` }]);
+    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Sending to **${label}**...` }]);
 
     let sent = 0, failed = 0;
-    for (let i = 0; i < filtered.length; i++) {
-      const contact = filtered[i];
+    for (let i = 0; i < targets.length; i++) {
+      const contact = targets[i];
       try {
         const genRes = await fetch("/api/generate-email", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company: contact.company || contact.name || "the company", category: contact.category, website: contact.website || "", offerContext: "" }),
+          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext: "" }),
         });
         const { subject, body } = await genRes.json();
         if (!contact.email) throw new Error("No email address");
@@ -2028,11 +2048,11 @@ function Dashboard({ user, onLogout }) {
         sent++;
       } catch { failed++; }
 
-      const progress = `📤 Sending... **${i + 1}/${filtered.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`;
+      const progress = `📤 Sending... **${i + 1}/${targets.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`;
       setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: progress } : m));
     }
 
-    const summary = `✅ Campaign complete!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully\n${failed > 0 ? `• **${failed} failed** (missing email or delivery error)\n` : ""}• Category: ${category !== "all" ? category.toUpperCase() : "All categories"}\n\nFor full control — editing drafts, per-contact review — use the **📤 Email Sender** in the sidebar.`;
+    const summary = `✅ Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed** (check email address or Gmail connection)` : ""}`;
     setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
     setLoading(false);
   };
@@ -2045,10 +2065,10 @@ function Dashboard({ user, onLogout }) {
     setInput("");
     setLoading(true);
 
-    // Check for send-email intent — handle inline, don't navigate away
+    // If message contains email addresses or send command — handle inline
     const sendIntent = parseSendIntent(msg);
     if (sendIntent) {
-      await runEmailCampaign(sendIntent.category);
+      await runEmailCampaign(sendIntent.category, sendIntent.emails);
       return;
     }
 
