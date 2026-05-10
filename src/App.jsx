@@ -1565,8 +1565,8 @@ function ProfilePage({ user, onBack, onLogout }) {
 function Dashboard({ user, onLogout }) {
   const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
   const setPage = (p) => { setPageRaw(p); if (p) localStorage.setItem("thehotspot_page", p); else localStorage.removeItem("thehotspot_page"); };
-  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
     const h = (e) => setIsDesktop(e.matches);
@@ -1702,7 +1702,7 @@ function Dashboard({ user, onLogout }) {
 
       {/* LEFT SIDEBAR */}
       <div style={{
-        position: "fixed", left: isDesktop ? 0 : (sidebarOpen ? 0 : "-280px"), top: 0, width: 280, height: "100vh",
+        position: "fixed", left: sidebarOpen ? 0 : "-280px", top: 0, width: 280, height: "100vh",
         background: "#FFFFFF", borderRight: "1px solid #E2E8F0", zIndex: 100,
         transition: "left .3s ease", display: "flex", flexDirection: "column", overflow: "hidden",
         boxShadow: isDesktop ? "none" : "2px 0 16px rgba(0,0,0,0.06)",
@@ -1716,7 +1716,7 @@ function Dashboard({ user, onLogout }) {
               <div style={{ fontSize: 10, color: "#94A3B8" }}>Grow Connections Easily</div>
             </div>
           </div>
-          {!isDesktop && <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>✕</button>}
+          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>✕</button>
         </div>
 
         {/* Nav Items */}
@@ -1762,16 +1762,16 @@ function Dashboard({ user, onLogout }) {
 
       {page === null ? (
         /* ═══════ CHATBOT (FULL CENTER) ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#F0F4FF", marginLeft: isDesktop ? 280 : 0, transition: "margin-left .3s ease" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#F0F4FF", marginLeft: isDesktop && sidebarOpen ? 280 : 0, transition: "margin-left .3s ease" }}>
           {/* Chat Header */}
           <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#FFFFFF" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              {!isDesktop && <button onClick={() => setSidebarOpen(true)} style={{
+              <button onClick={() => setSidebarOpen(o => !o)} style={{
                 background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
                 color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
               }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-              </button>}
+              </button>
               <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <I.Bot />
               </div>
@@ -1870,15 +1870,15 @@ function Dashboard({ user, onLogout }) {
         </div>
       ) : (
         /* ═══════ PAGE VIEW ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden", marginLeft: isDesktop ? 280 : 0, transition: "margin-left .3s ease" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden", marginLeft: isDesktop && sidebarOpen ? 280 : 0, transition: "margin-left .3s ease" }}>
           {/* Page Header */}
           <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF" }}>
-            {!isDesktop && <button onClick={() => setSidebarOpen(true)} style={{
+            <button onClick={() => setSidebarOpen(o => !o)} style={{
               background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
               color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-            </button>}
+            </button>
             <span style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>
               {navItems.find(n => n.id === page)?.icon} {navItems.find(n => n.id === page)?.label || "Page"}
             </span>
