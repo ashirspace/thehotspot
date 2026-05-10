@@ -140,7 +140,9 @@ function LoginPage({ onLogin }) {
     setGoogleLoading(true);
     const client = window.google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_LOGIN_CLIENT_ID,
-      scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets.readonly",
+      // Only request basic profile — no Gmail/Contacts scopes at login
+      // (avoids "unverified app" warning; request extra scopes later when needed)
+      scope: "email profile",
       error_callback: (err) => {
         setGoogleLoading(false);
         if (err.type === "popup_closed") {
@@ -169,31 +171,11 @@ function LoginPage({ onLogin }) {
           });
           const gUser = await res.json();
 
-          // Fetch real contacts count
-          let contactsCount = 0;
-          try {
-            const cRes = await fetch("https://people.googleapis.com/v1/people/me/connections?pageSize=1000&personFields=emailAddresses", {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const cData = await cRes.json();
-            contactsCount = cData.totalPeople || cData.connections?.length || 0;
-          } catch (e) { }
-
-          // Fetch real sent emails count
-          let sentCount = 0;
-          try {
-            const gRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=1", {
-              headers: { Authorization: `Bearer ${token}` },
-            });
-            const gData = await gRes.json();
-            sentCount = gData.resultSizeEstimate || 0;
-          } catch (e) { }
-
-          // Save to Airtable
           const gEmail = gUser.email;
           const gName = gUser.name || gEmail.split("@")[0];
           const gPic = gUser.picture || "";
 
+          // Save to Airtable
           const existing = await airtableFetch(`{user_email}='${gEmail}'`);
           if (existing.length === 0) {
             await airtableCreate({
@@ -209,15 +191,14 @@ function LoginPage({ onLogin }) {
             role: existing[0]?.fields?.role || "user",
             avatar: gPic,
             accessToken: token,
-            contactsCount,
-            sentCount,
           };
           localStorage.setItem("thehotspot_user", JSON.stringify(userData));
+          // Clear loading state BEFORE calling onLogin so we don't set state on unmounted component
+          setGoogleLoading(false);
           onLogin(userData);
         } catch (err) {
-          setError("Sign-in failed: " + err.message);
-        } finally {
           setGoogleLoading(false);
+          setError("Sign-in failed: " + err.message);
         }
       },
     });
