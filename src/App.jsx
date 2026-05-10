@@ -232,25 +232,25 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
+    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-      <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98112,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e910,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e914,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
 
       {/* ── Top nav ── */}
-      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a24", position: "relative", zIndex: 1 }}>
+      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Logo size={28} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <a href="/privacy.html" style={{ fontSize: 12, color: "#6b6b80", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #2a2a3a" }}
-            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+          <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #E2E8F0" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
             Privacy Policy
           </a>
-          <a href="/terms.html" style={{ fontSize: 12, color: "#6b6b80", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #2a2a3a" }}
-            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+          <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #E2E8F0" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
             Terms of Service
           </a>
         </div>
@@ -261,22 +261,22 @@ function LoginPage({ onLogin }) {
         <div style={{ display: "inline-flex", marginBottom: 16 }}>
           <Logo size={52} />
         </div>
-        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0a2a1a", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-          <span style={{ fontSize: 11, color: "#10b981", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
+          <span style={{ fontSize: 11, color: "#059669", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
         </div>
-        <h1 style={{ fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, color: "#f0f0f5", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
+        <h1 style={{ fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
           Grow your network.<br />
           <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Automate your outreach.</span>
         </h1>
-        <p style={{ fontSize: 15, color: "#8888a0", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7 }}>
+        <p style={{ fontSize: 15, color: "#64748B", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7 }}>
           thehotspot is an outreach management platform for affiliate marketers and business development teams.
           Import contacts, track campaigns by category, and send personalised emails — all from one dashboard.
         </p>
         {/* Feature chips */}
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 8 }}>
           {["Contact database", "Campaign tracking", "Email automation", "Google Sheets import", "AI assistant"].map(f => (
-            <span key={f} style={{ fontSize: 12, color: "#a0a0b8", background: "#111116", border: "1px solid #2a2a3a", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
+            <span key={f} style={{ fontSize: 12, color: "#64748B", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
           ))}
         </div>
       </div>
@@ -284,23 +284,23 @@ function LoginPage({ onLogin }) {
       {/* ── Login card ── */}
       <div style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "0 20px 40px", position: "relative", zIndex: 1 }}>
         <div style={{ width: "100%", maxWidth: 420 }}>
-          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 20, padding: "32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-            <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
-            <div style={{ fontSize: 13, color: "#6b6b80", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px rgba(79,70,229,0.08)" }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
+            <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
 
             {/* Google Button */}
             <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-              width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #2a2a3a",
-              background: "#0c0c12", color: "#e0e0e8", fontSize: 14, fontWeight: 500,
+              width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #E2E8F0",
+              background: "#F8FAFF", color: "#0F172A", fontSize: 14, fontWeight: 500,
               cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
               gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
               opacity: googleLoading ? 0.7 : 1,
             }}
-              onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#4285F411"; } }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.background = "#0c0c12"; }}
+              onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#EEF5FF"; } }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.background = "#F8FAFF"; }}
             >
               {googleLoading ? (
-                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#e0e0e8", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
               ) : (
                 <>
                   <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
@@ -310,66 +310,66 @@ function LoginPage({ onLogin }) {
             </button>
 
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
-              <span style={{ fontSize: 11, color: "#4a4a5a", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-              <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
+              <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
+              <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
             </div>
 
             <form onSubmit={isSignup ? handleSignup : handleLogin}>
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
+                <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
                 <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
                 />
               </div>
 
               {isSignup && (
                 <div style={{ marginBottom: 14 }}>
-                  <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
+                  <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
                   <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
-                    style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                    style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
                   />
                 </div>
               )}
 
               <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
+                <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
                 <div style={{ position: "relative" }}>
                   <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                    style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                    style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
                   />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6b80", cursor: "pointer", padding: 4 }}>
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4 }}>
                     {showPass ? <I.EyeOff /> : <I.Eye />}
                   </button>
                 </div>
               </div>
 
               {error && (
-                <div style={{ background: "#2a0a0a", border: "1px solid #f8717133", color: "#f87171", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
+                <div style={{ background: "#FEF2F2", border: "1px solid #EF444433", color: "#EF4444", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
                   {error}
                 </div>
               )}
 
               <button type="submit" disabled={loading || !username || !password} style={{
                 width: "100%", padding: "12px", borderRadius: 12, border: "none",
-                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
-                color: (username && password) ? "#000" : "#6b6b80",
+                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
+                color: (username && password) ? "#fff" : "#94A3B8",
                 fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
                 fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
                 display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
               }}>
                 {loading ? (
-                  <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#000", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+                  <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
                 ) : isSignup ? "Create Account" : "Sign In"}
               </button>
             </form>
 
             {/* Toggle Login/Signup */}
             <div style={{ textAlign: "center", marginTop: 18 }}>
-              <span style={{ fontSize: 13, color: "#6b6b80" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
+              <span style={{ fontSize: 13, color: "#64748B" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
               <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{
                 background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
               }}>
@@ -380,13 +380,13 @@ function LoginPage({ onLogin }) {
 
           {/* Footer links */}
           <div style={{ textAlign: "center", marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, color: "#4a4a5a" }}>&copy; 2026 thehotspot</span>
-            <a href="/privacy.html" style={{ fontSize: 11, color: "#6b6b80", textDecoration: "none" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+            <span style={{ fontSize: 11, color: "#94A3B8" }}>&copy; 2026 thehotspot</span>
+            <a href="/privacy.html" style={{ fontSize: 11, color: "#64748B", textDecoration: "none" }}
+              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
               Privacy Policy
             </a>
-            <a href="/terms.html" style={{ fontSize: 11, color: "#6b6b80", textDecoration: "none" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+            <a href="/terms.html" style={{ fontSize: 11, color: "#64748B", textDecoration: "none" }}
+              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
               Terms of Service
             </a>
           </div>
@@ -396,7 +396,7 @@ function LoginPage({ onLogin }) {
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         *{box-sizing:border-box;margin:0;padding:0}
-        input::placeholder{color:#4a4a5a}
+        input::placeholder{color:#CBD5E1}
       `}</style>
     </div>
   );
@@ -404,11 +404,11 @@ function LoginPage({ onLogin }) {
 
 /* ───────── CATEGORY COLORS ───────── */
 const CAT = {
-  Network: { bg: "#0f2922", text: "#34d399", dot: "#10b981" },
-  CPS: { bg: "#1a1a2e", text: "#818cf8", dot: "#6366f1" },
-  CPL: { bg: "#2a1a0e", text: "#fb923c", dot: "#f97316" },
-  CPA: { bg: "#2a0e2a", text: "#e879f9", dot: "#d946ef" },
-  Mobile: { bg: "#0e1a2a", text: "#38bdf8", dot: "#0ea5e9" },
+  Network: { bg: "#ECFDF5", text: "#065F46", dot: "#10b981" },
+  CPS: { bg: "#EEF2FF", text: "#3730A3", dot: "#6366f1" },
+  CPL: { bg: "#FFF7ED", text: "#9A3412", dot: "#f97316" },
+  CPA: { bg: "#FDF4FF", text: "#86198F", dot: "#d946ef" },
+  Mobile: { bg: "#F0F9FF", text: "#0C4A6E", dot: "#0ea5e9" },
 };
 
 /* ───────── SAMPLE DATA ───────── */
@@ -520,9 +520,9 @@ const S = {
 
 /* ───────── COMPONENTS ───────── */
 function Badge({ status }) {
-  const m = { sent: { bg: "#052e16", c: "#4ade80", l: "Sent" }, queued: { bg: "#1a1a2e", c: "#a78bfa", l: "Queued" }, failed: { bg: "#2a0a0a", c: "#f87171", l: "Failed" } };
+  const m = { sent: { bg: "#ECFDF5", c: "#059669", l: "Sent" }, queued: { bg: "#EEF2FF", c: "#4F46E5", l: "Queued" }, failed: { bg: "#FEF2F2", c: "#EF4444", l: "Failed" } };
   const s = m[status] || m.queued;
-  return <span style={{ background: s.bg, color: s.c, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase", border: `1px solid ${s.c}22` }}>{s.l}</span>;
+  return <span style={{ background: s.bg, color: s.c, padding: "3px 10px", borderRadius: 20, fontSize: 11, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase", border: `1px solid ${s.c}33` }}>{s.l}</span>;
 }
 
 function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
@@ -532,20 +532,20 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
       onClick={locked ? onConnect : onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: "#111116", border: `1px solid ${hover && !locked ? accent + "44" : "#1e1e28"}`, borderRadius: 16, padding: "20px 22px", flex: 1, minWidth: 140, position: "relative", overflow: "hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition: "all .3s ease", cursor: "pointer", transform: hover && !locked ? "translateY(-2px)" : "none" }}>
-      <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right,${accent}15,transparent 70%)` }} />
+      style={{ background: "#FFFFFF", border: `1px solid ${hover && !locked ? accent + "55" : "#E2E8F0"}`, borderRadius: 16, padding: "20px 22px", flex: 1, minWidth: 140, position: "relative", overflow: "hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition: "all .3s ease", cursor: "pointer", transform: hover && !locked ? "translateY(-2px)" : "none", boxShadow: hover && !locked ? `0 8px 24px ${accent}18` : "0 2px 8px rgba(0,0,0,0.06)" }}>
+      <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right,${accent}12,transparent 70%)` }} />
       {locked && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(9,9,13,0.75)", zIndex: 2, borderRadius: 16, cursor: "pointer", backdropFilter: "blur(4px)" }} onClick={onConnect}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6b6b80" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
-          <div style={{ fontSize: 10, color: "#6b6b80", marginTop: 6, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase" }}>Connect Gmail</div>
+        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(255,255,255,0.85)", zIndex: 2, borderRadius: 16, cursor: "pointer", backdropFilter: "blur(4px)" }} onClick={onConnect}>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>
+          <div style={{ fontSize: 10, color: "#64748B", marginTop: 6, fontWeight: 600, letterSpacing: .5, textTransform: "uppercase" }}>Connect Gmail</div>
         </div>
       )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div style={{ color: accent, marginBottom: 10, opacity: .9 }}>{icon}</div>
-        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#4a4a5a"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
+        <div style={{ width: 40, height: 40, borderRadius: 12, background: `${accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>{icon}</div>
+        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#CBD5E1"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
-      <div style={{ fontSize: 12, color: "#6b6b80", marginTop: 4, fontWeight: 500, letterSpacing: .5, textTransform: "uppercase" }}>{label}</div>
+      <div style={{ fontSize: 28, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
+      <div style={{ fontSize: 12, color: "#64748B", marginTop: 4, fontWeight: 500, letterSpacing: .5, textTransform: "uppercase" }}>{label}</div>
     </div>
   );
 }
@@ -553,9 +553,9 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
 /* ───────── DETAIL PAGES ───────── */
 function BackButton({ onClick, label }) {
   return (
-    <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: "#6b6b80", cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, transition: "color .2s" }}
-      onMouseEnter={e => e.currentTarget.style.color = "#f0f0f5"}
-      onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}
+    <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, transition: "color .2s" }}
+      onMouseEnter={e => e.currentTarget.style.color = "#0F172A"}
+      onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
       Back to Dashboard
@@ -585,31 +585,31 @@ function TotalContactsPage({ onBack, user }) {
         </div>
       </div>
       {user?.method !== "google" && (
-        <div style={{ background: "#2a1a0e", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#fb923c" }}>
+        <div style={{ background: "#FFF7ED", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#9A3412" }}>
           Sign in with Google to see your real contacts count.
         </div>
       )}
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Emails sent by category (via thehotspot)</div>
+      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Emails sent by category (via thehotspot)</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {contactsByCategory.map(c => (
-          <div key={c.cat} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 18px" }}>
+          <div key={c.cat} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
                 <span style={{ fontSize: 14, fontWeight: 600, color: c.color.text }}>{c.cat}</span>
               </div>
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</span>
+              <span style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</span>
             </div>
-            <div style={{ width: "100%", height: 6, background: "#1a1a28", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ width: "100%", height: 6, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
               <div style={{ width: `${(c.count / maxCount) * 100}%`, height: "100%", background: c.color.dot, borderRadius: 3, transition: "width .5s ease" }} />
             </div>
           </div>
         ))}
       </div>
-      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 18px", marginTop: 16 }}>
+      <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", marginTop: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, color: "#6b6b80", fontWeight: 500 }}>Recently Added</span>
-          <span style={{ fontSize: 11, color: "#4a4a5a" }}>Last 7 days</span>
+          <span style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>Recently Added</span>
+          <span style={{ fontSize: 11, color: "#94A3B8" }}>Last 7 days</span>
         </div>
         <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>0</div>
       </div>
@@ -640,29 +640,29 @@ function EmailsSentPage({ onBack }) {
           <div style={{ fontSize: 12, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Emails Sent via thehotspot</div>
         </div>
       </div>
-      <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#38bdf8" }}>
+      <div style={{ background: "#F0F9FF", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#0C4A6E" }}>
         No emails sent yet. Use thehotspot to start sending outreach emails.
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Daily Breakdown</div>
-      <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "20px" }}>
+      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Daily Breakdown</div>
+      <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
         <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160 }}>
           {emailsByDay.map(d => (
             <div key={d.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
               <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent}</span>
-              <div style={{ width: "100%", maxWidth: 40, height: 4, background: "#6366f144", borderRadius: "6px 6px 2px 2px", minHeight: 4 }} />
-              <span style={{ fontSize: 11, color: "#6b6b80", fontWeight: 500 }}>{d.day}</span>
+              <div style={{ width: "100%", maxWidth: 40, height: 4, background: "#6366f133", borderRadius: "6px 6px 2px 2px", minHeight: 4 }} />
+              <span style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>{d.day}</span>
             </div>
           ))}
         </div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
-          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Delivered</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#4ade80", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Delivered</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
         </div>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px" }}>
-          <div style={{ fontSize: 12, color: "#6b6b80", marginBottom: 6 }}>Failed</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#f87171", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Failed</div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
         </div>
       </div>
     </div>
@@ -690,9 +690,9 @@ function CategoriesPage({ onBack }) {
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         {categories.map(c => (
-          <div key={c.name} style={{ background: c.color.bg, border: `1px solid ${c.color.dot}33`, borderRadius: 14, padding: "20px 22px", transition: "transform .2s", cursor: "pointer" }}
-            onMouseEnter={e => e.currentTarget.style.transform = "translateX(4px)"}
-            onMouseLeave={e => e.currentTarget.style.transform = "translateX(0)"}
+          <div key={c.name} style={{ background: c.color.bg, border: `1px solid ${c.color.dot}44`, borderRadius: 14, padding: "20px 22px", transition: "all .2s", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
+            onMouseEnter={e => { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = `0 4px 12px ${c.color.dot}25`; }}
+            onMouseLeave={e => { e.currentTarget.style.transform = "translateX(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}
           >
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
@@ -700,11 +700,11 @@ function CategoriesPage({ onBack }) {
                   <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
                   <span style={{ fontSize: 16, fontWeight: 700, color: c.color.text }}>{c.name}</span>
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", marginLeft: 18 }}>{c.desc}</div>
+                <div style={{ fontSize: 12, color: "#64748B", marginLeft: 18 }}>{c.desc}</div>
               </div>
               <div style={{ textAlign: "right" }}>
                 <div style={{ fontSize: 24, fontWeight: 700, color: c.color.text, fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</div>
-                <div style={{ fontSize: 10, color: "#6b6b80", textTransform: "uppercase" }}>contacts</div>
+                <div style={{ fontSize: 10, color: "#94A3B8", textTransform: "uppercase" }}>contacts</div>
               </div>
             </div>
           </div>
@@ -750,12 +750,12 @@ function SuccessRatePage({ onBack }) {
           </div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
+      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
         {stats.map(s => (
-          <div key={s.label} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px", textAlign: "center" }}>
+          <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
           </div>
         ))}
       </div>
@@ -1210,53 +1210,53 @@ function ContactsPage({ onBack, showToast, user }) {
       <BackButton onClick={onBack} />
       <div style={{ textAlign: "center", marginBottom: 32 }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#f0f0f5", marginBottom: 6 }}>Contacts Database</div>
-        <div style={{ fontSize: 14, color: "#6b6b80", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#0F172A", marginBottom: 6 }}>Contacts Database</div>
+        <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
           onClick={() => setView("connect_sheets")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.background = "#0a1a0e"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98108,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(16,185,129,0.12)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}>
+          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98110,transparent 70%)" }} />
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#ECFDF5", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Connect Data Source</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>Connect Data Source</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#10b98110", color: "#10b981", fontWeight: 500 }}>{s}</span>
+              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500 }}>{s}</span>
             ))}
           </div>
         </div>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden" }}
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
           onClick={() => setView("create_db")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.background = "#0e0e1a"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#1e1e28"; e.currentTarget.style.background = "#111116"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f108,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f115", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(99,102,241,0.12)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}>
+          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f110,transparent 70%)" }} />
+          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#EEF2FF", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#f0f0f5", marginBottom: 6 }}>Create New Database</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", lineHeight: 1.6, marginBottom: 16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>Create New Database</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Custom Fields", "Manual Entry", "Full Control"].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#6366f110", color: "#6366f1", fontWeight: 500 }}>{s}</span>
+              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#EEF2FF", color: "#4F46E5", fontWeight: 500 }}>{s}</span>
             ))}
           </div>
         </div>
       </div>
       {sheetName && (
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "16px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 10 }}>Recently Connected</div>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 10 }}>Recently Connected</div>
           <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => setView("table")}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0d6b3e18", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#ECFDF5", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>{sheetName}</div>
-              <div style={{ fontSize: 12, color: "#6b6b80" }}>Google Sheets · {contacts.length} contacts</div>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>{sheetName}</div>
+              <div style={{ fontSize: 12, color: "#64748B" }}>Google Sheets · {contacts.length} contacts</div>
             </div>
             <span style={{ fontSize: 12, color: "#10b981", fontWeight: 500 }}>Open →</span>
           </div>
@@ -1421,60 +1421,60 @@ function CampaignStatusPage({ onBack }) {
       {/* Summary Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
         {[
-          { label: "Total Sent", value: totalSent, color: "#818cf8" },
-          { label: "Delivered", value: totalDelivered, color: "#4ade80" },
-          { label: "Replied", value: totalReplied, color: "#facc15" },
-          { label: "Failed", value: totalFailed, color: "#f87171" },
+          { label: "Total Sent", value: totalSent, color: "#6366f1" },
+          { label: "Delivered", value: totalDelivered, color: "#059669" },
+          { label: "Replied", value: totalReplied, color: "#D97706" },
+          { label: "Failed", value: totalFailed, color: "#EF4444" },
         ].map(s => (
-          <div key={s.label} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px", textAlign: "center" }}>
+          <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#6b6b80", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+            <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
       {/* Overall Status */}
       {totalSent === 0 ? (
-        <div style={{ background: "#0e1a2a", border: "1px solid #0ea5e933", borderRadius: 12, padding: "20px", marginBottom: 24, textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#38bdf8", fontWeight: 600, marginBottom: 6 }}>No campaigns running</div>
-          <div style={{ fontSize: 13, color: "#6b6b80" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
+        <div style={{ background: "#F0F9FF", border: "1px solid #0ea5e933", borderRadius: 12, padding: "20px", marginBottom: 24, textAlign: "center" }}>
+          <div style={{ fontSize: 14, color: "#0C4A6E", fontWeight: 600, marginBottom: 6 }}>No campaigns running</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
         </div>
       ) : (
-        <div style={{ background: "#0a1a0e", border: "1px solid #10b98133", borderRadius: 12, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: "#4ade80" }}>
+        <div style={{ background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 12, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: "#065F46" }}>
           Campaign active — {totalSent} emails sent across {campaigns.filter(c => c.sent > 0).length} categories
         </div>
       )}
 
       {/* Per Category Breakdown */}
-      <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Category breakdown</div>
+      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Category breakdown</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         {campaigns.map(c => (
-          <div key={c.category} style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
+          <div key={c.category} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
               <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                 <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot }} />
                 <span style={{ fontSize: 15, fontWeight: 700, color: c.color.text }}>{c.category}</span>
               </div>
-              <span style={{ fontSize: 12, color: "#6b6b80", background: "#1a1a28", padding: "4px 10px", borderRadius: 8 }}>
+              <span style={{ fontSize: 12, color: "#64748B", background: "#F8FAFF", border: "1px solid #E2E8F0", padding: "4px 10px", borderRadius: 8 }}>
                 {c.sent === 0 ? "Not started" : c.sent === c.total ? "Complete" : "In progress"}
               </span>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
               {[
-                { label: "Total", val: c.total, col: "#a0a0b0" },
-                { label: "Sent", val: c.sent, col: "#818cf8" },
-                { label: "Delivered", val: c.delivered, col: "#4ade80" },
-                { label: "Replied", val: c.replied, col: "#facc15" },
-                { label: "Failed", val: c.failed, col: "#f87171" },
+                { label: "Total", val: c.total, col: "#64748B" },
+                { label: "Sent", val: c.sent, col: "#6366f1" },
+                { label: "Delivered", val: c.delivered, col: "#059669" },
+                { label: "Replied", val: c.replied, col: "#D97706" },
+                { label: "Failed", val: c.failed, col: "#EF4444" },
               ].map(s => (
                 <div key={s.label} style={{ textAlign: "center" }}>
                   <div style={{ fontSize: 16, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
-                  <div style={{ fontSize: 10, color: "#6b6b80" }}>{s.label}</div>
+                  <div style={{ fontSize: 10, color: "#94A3B8" }}>{s.label}</div>
                 </div>
               ))}
             </div>
             {/* Progress bar */}
-            <div style={{ width: "100%", height: 4, background: "#1a1a28", borderRadius: 2, marginTop: 12, overflow: "hidden" }}>
+            <div style={{ width: "100%", height: 4, background: "#EFF1F8", borderRadius: 2, marginTop: 12, overflow: "hidden" }}>
               <div style={{ width: c.total > 0 ? `${(c.sent / c.total) * 100}%` : "0%", height: "100%", background: c.color.dot, borderRadius: 2, transition: "width .5s ease" }} />
             </div>
           </div>
@@ -1490,54 +1490,54 @@ function ProfilePage({ user, onBack, onLogout }) {
     <div>
       <BackButton onClick={onBack} />
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: "#000", marginBottom: 16 }}>
+        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: "#fff", marginBottom: 16 }}>
           {user?.username?.[0]?.toUpperCase() || "U"}
         </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#f0f0f5" }}>{user?.username}</div>
-        <div style={{ fontSize: 12, color: "#6b6b80", marginTop: 4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#0F172A" }}>{user?.username}</div>
+        <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Account Info</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Username</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontWeight: 600 }}>{user?.username}</span>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Account Info</div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #EFF1F8" }}>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Username</span>
+            <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 600 }}>{user?.username}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Login Method</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontWeight: 600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #EFF1F8" }}>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Login Method</span>
+            <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Role</span>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Role</span>
             <span style={{ fontSize: 13, color: "#10b981", fontWeight: 600 }}>Admin</span>
           </div>
         </div>
 
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 14, padding: "18px 20px" }}>
-          <div style={{ fontSize: 11, color: "#6b6b80", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Platform Stats</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Total Contacts</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Platform Stats</div>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #EFF1F8" }}>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Total Contacts</span>
+            <span style={{ fontSize: 13, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1a24" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Emails Sent</span>
-            <span style={{ fontSize: 13, color: "#f0f0f5", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #EFF1F8" }}>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Emails Sent</span>
+            <span style={{ fontSize: 13, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
-            <span style={{ fontSize: 13, color: "#8888a0" }}>Success Rate</span>
+            <span style={{ fontSize: 13, color: "#64748B" }}>Success Rate</span>
             <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0%</span>
           </div>
         </div>
 
         <button onClick={onLogout} style={{
-          width: "100%", padding: "14px", borderRadius: 12, border: "1px solid #f8717133",
-          background: "#2a0a0a", color: "#f87171", fontSize: 14, fontWeight: 600,
+          width: "100%", padding: "14px", borderRadius: 12, border: "1px solid #EF444433",
+          background: "#FEF2F2", color: "#EF4444", fontSize: 14, fontWeight: 600,
           cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8,
         }}
-          onMouseEnter={e => { e.currentTarget.style.background = "#3a0a0a"; e.currentTarget.style.borderColor = "#f87171"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "#2a0a0a"; e.currentTarget.style.borderColor = "#f8717133"; }}
+          onMouseEnter={e => { e.currentTarget.style.background = "#FEE2E2"; e.currentTarget.style.borderColor = "#EF4444"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = "#FEF2F2"; e.currentTarget.style.borderColor = "#EF444433"; }}
         >
           <I.Logout /> Sign Out
         </button>
@@ -1665,61 +1665,71 @@ function Dashboard({ user, onLogout }) {
   ];
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#e0e0e8", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
+    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", color: "#0F172A", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
       {/* TOAST */}
       {toast && (
-        <div style={{ position: "fixed", top: 20, right: 20, background: "#10b981", color: "#000", padding: "12px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 1000, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 8px 32px #10b98144", animation: "slideIn .3s ease" }}>
+        <div style={{ position: "fixed", top: 20, right: 20, background: "#10b981", color: "#fff", padding: "12px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 1000, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 8px 32px #10b98144", animation: "slideIn .3s ease" }}>
           <I.Zap /> {toast}
         </div>
       )}
 
       {/* OVERLAY for mobile sidebar */}
-      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 90 }} />}
+      {sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.3)", zIndex: 90 }} />}
 
       {/* LEFT SIDEBAR */}
       <div style={{
         position: "fixed", left: sidebarOpen ? 0 : "-280px", top: 0, width: 280, height: "100vh",
-        background: "#0c0c12", borderRight: "1px solid #1a1a24", zIndex: 100,
+        background: "#FFFFFF", borderRight: "1px solid #E2E8F0", zIndex: 100,
         transition: "left .3s ease", display: "flex", flexDirection: "column", overflow: "hidden",
+        boxShadow: "2px 0 16px rgba(0,0,0,0.06)",
       }}>
         {/* Sidebar Header */}
-        <div style={{ padding: "20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: "20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <Logo size={26} />
             <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</div>
-              <div style={{ fontSize: 10, color: "#6b6b80" }}>Grow Connections Easily</div>
+              <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>thehotspot</div>
+              <div style={{ fontSize: 10, color: "#94A3B8" }}>Grow Connections Easily</div>
             </div>
           </div>
-          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#6b6b80", cursor: "pointer", fontSize: 18 }}>✕</button>
+          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>✕</button>
         </div>
 
         {/* Nav Items */}
         <div style={{ flex: 1, padding: "12px", overflowY: "auto" }}>
           {navItems.map(item => (
             <button key={item.id} onClick={() => navTo(item.id)} style={{
-              width: "100%", padding: "12px 14px", borderRadius: 10, border: "none", marginBottom: 4,
-              background: page === item.id ? "#1a1a28" : "transparent",
-              color: page === item.id ? "#f0f0f5" : "#8888a0",
-              fontSize: 13, fontWeight: 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+              width: "100%", padding: "11px 14px", borderRadius: 10, border: "none", marginBottom: 2,
+              background: page === item.id ? "#EEF2FF" : "transparent",
+              color: page === item.id ? "#4F46E5" : "#64748B",
+              fontSize: 13, fontWeight: page === item.id ? 600 : 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
               fontFamily: "'DM Sans',sans-serif", transition: "all .15s", textAlign: "left",
-            }}>
+              borderLeft: page === item.id ? "3px solid #4F46E5" : "3px solid transparent",
+            }}
+              onMouseEnter={e => { if (page !== item.id) { e.currentTarget.style.background = "#F8FAFF"; e.currentTarget.style.color = "#0F172A"; } }}
+              onMouseLeave={e => { if (page !== item.id) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748B"; } }}
+            >
               <span style={{ fontSize: 16 }}>{item.icon}</span> {item.label}
             </button>
           ))}
         </div>
 
         {/* User + Logout */}
-        <div style={{ padding: "16px", borderTop: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div style={{ padding: "16px", borderTop: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#000" }}>
+            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff" }}>
               {user?.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <span style={{ fontSize: 12, color: "#8888a0" }}>{user?.username}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{user?.username}</div>
+              <div style={{ fontSize: 10, color: "#94A3B8" }}>{user?.method === "google" ? "Google account" : "Password account"}</div>
+            </div>
           </div>
-          <button onClick={onLogout} style={{ background: "none", border: "1px solid #2a2a3a", borderRadius: 6, padding: "5px 8px", color: "#6b6b80", cursor: "pointer", display: "flex", alignItems: "center" }}>
+          <button onClick={onLogout} style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 8px", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center" }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = "#EF4444"; e.currentTarget.style.color = "#EF4444"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}>
             <I.Logout />
           </button>
         </div>
@@ -1730,56 +1740,72 @@ function Dashboard({ user, onLogout }) {
 
       {page === null ? (
         /* ═══════ CHATBOT (FULL CENTER) ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden" }}>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#F0F4FF" }}>
           {/* Chat Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#0c0c12" }}>
+          <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#FFFFFF" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <button onClick={() => setSidebarOpen(true)} style={{
-                background: "#18182a", border: "1px solid #2a2a3a", borderRadius: 8, padding: "8px",
-                color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center",
+                background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
+                color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
               }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
               </button>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <I.Bot />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>Outreach Assistant</div>
+                <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>Outreach Assistant</div>
                 <div style={{ fontSize: 11, color: "#10b981", display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Online
                 </div>
               </div>
             </div>
             <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #2a2a3a", borderRadius: 20, padding: "5px 12px 5px 5px", cursor: "pointer", transition: "all .2s" }}
+              <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #E2E8F0", borderRadius: 20, padding: "5px 12px 5px 5px", cursor: "pointer", transition: "all .2s" }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
-                onMouseLeave={e => e.currentTarget.style.borderColor = "#2a2a3a"}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
               >
-                <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#000" }}>
+                <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
                   {user?.username?.[0]?.toUpperCase() || "U"}
                 </div>
-                <span style={{ fontSize: 12, color: "#8888a0" }}>{user?.username}</span>
+                <span style={{ fontSize: 12, color: "#64748B" }}>{user?.username}</span>
               </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 760, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
                 <div style={{
-                  maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.6, whiteSpace: "pre-wrap",
-                  borderRadius: m.role === "user" ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                  background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
-                  color: m.role === "user" ? "#000" : "#d0d0e0",
+                  maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.65, whiteSpace: "pre-wrap",
+                  borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                  background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#FFFFFF",
+                  color: m.role === "user" ? "#fff" : "#0F172A",
                   fontWeight: m.role === "user" ? 500 : 400,
-                  border: m.role === "user" ? "none" : "1px solid #2a2a3a",
+                  border: m.role === "user" ? "none" : "1px solid #E2E8F0",
+                  boxShadow: m.role === "user" ? "0 4px 12px rgba(16,185,129,0.25)" : "0 2px 8px rgba(0,0,0,0.06)",
                 }}>{m.content}</div>
               </div>
             ))}
+            {/* Suggested prompts — only when only the welcome message is shown */}
+            {messages.length === 1 && !loading && (
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+                {["📊 Show my stats", "📋 View contacts", "📧 Send emails", "📡 Campaign status"].map(chip => (
+                  <button key={chip} onClick={() => handleSend(chip.replace(/^[^\s]+\s/, ""))} style={{
+                    padding: "8px 16px", borderRadius: 20, border: "1px solid #E2E8F0", background: "#FFFFFF",
+                    color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                    transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#4F46E5"; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
+                  >{chip}</button>
+                ))}
+              </div>
+            )}
             {loading && (
               <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <div style={{ padding: "12px 18px", borderRadius: "16px 16px 16px 4px", background: "#18182a", border: "1px solid #2a2a3a", display: "flex", alignItems: "center", gap: 6 }}>
+                <div style={{ padding: "12px 18px", borderRadius: "18px 18px 18px 4px", background: "#FFFFFF", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
                   {[0, 1, 2].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}
                 </div>
               </div>
@@ -1788,26 +1814,32 @@ function Dashboard({ user, onLogout }) {
           </div>
 
           {/* Chat Input */}
-          <div style={{ padding: "14px 16px", borderTop: "1px solid #1a1a24", background: "#0c0c12" }}>
-            <div style={{ maxWidth: 800, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
+          <div style={{ padding: "14px 16px", borderTop: "1px solid #E2E8F0", background: "#FFFFFF" }}>
+            <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
               <button onClick={toggleVoice} style={{
-                width: 40, height: 40, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                background: listening ? "#10b98133" : "#18182a", border: listening ? "2px solid #10b981" : "1px solid #2a2a3a",
-                color: listening ? "#10b981" : "#6b6b80", animation: listening ? "pulse 1.5s ease-in-out infinite" : "none",
+                width: 44, height: 44, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                background: listening ? "#ECFDF5" : "#F8FAFF",
+                border: listening ? "2px solid #10b981" : "1px solid #E2E8F0",
+                color: listening ? "#10b981" : "#64748B",
+                boxShadow: listening ? "0 0 0 4px #10b98122" : "none",
+                animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
+                transition: "all .2s",
               }}>
                 {listening ? <I.MicOff /> : <I.Mic />}
               </button>
               <input type="text" value={input} onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === "Enter" && handleSend()}
-                placeholder={listening ? "Listening..." : "Type a command or ask anything..."}
-                style={{ flex: 1, background: "#111118", border: "1px solid #2a2a3a", borderRadius: 12, padding: "11px 16px", color: "#e0e0e8", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"}
-                onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
+                style={{ flex: 1, background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 24, padding: "11px 20px", color: "#0F172A", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)" }}
+                onFocus={e => { e.target.style.borderColor = "#10b981"; e.target.style.boxShadow = "0 0 0 3px #10b98115"; }}
+                onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)"; }}
               />
               <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-                width: 40, height: 40, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
-                background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#18182a",
-                color: input.trim() ? "#000" : "#6b6b80", display: "flex", alignItems: "center", justifyContent: "center",
+                width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
+                background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
+                color: input.trim() ? "#fff" : "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center",
+                boxShadow: input.trim() ? "0 4px 12px rgba(16,185,129,0.3)" : "none",
+                transition: "all .2s",
               }}>
                 <I.Send />
               </button>
@@ -1818,20 +1850,24 @@ function Dashboard({ user, onLogout }) {
         /* ═══════ PAGE VIEW ═══════ */
         <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden" }}>
           {/* Page Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", gap: 12, background: "#0c0c12" }}>
+          <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF" }}>
             <button onClick={() => setSidebarOpen(true)} style={{
-              background: "#18182a", border: "1px solid #2a2a3a", borderRadius: 8, padding: "8px",
-              color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center",
+              background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
+              color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
             }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
             </button>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#f0f0f5" }}>
+            <span style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>
               {navItems.find(n => n.id === page)?.icon} {navItems.find(n => n.id === page)?.label || "Page"}
             </span>
             <button onClick={() => setPage(null)} style={{
-              marginLeft: "auto", background: "none", border: "1px solid #2a2a3a", borderRadius: 8, padding: "6px 12px",
-              color: "#6b6b80", cursor: "pointer", fontSize: 12, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6,
-            }}>
+              marginLeft: "auto", background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px",
+              color: "#4F46E5", cursor: "pointer", fontSize: 12, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6,
+              fontWeight: 500,
+            }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
+            >
               💬 Back to Chat
             </button>
           </div>
@@ -1847,35 +1883,43 @@ function Dashboard({ user, onLogout }) {
                   <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
                   <StatCard icon={<I.Check />} label="Success Rate" value={user?.sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
+                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
                   {[
-                    { icon: <I.Mail />, label: "Send All Emails", action: () => showToast("Email sender coming soon") },
-                    { icon: <I.Activity />, label: "Campaign Status", action: () => setPage("campaignStatus") },
-                    { icon: <I.Clock />, label: "Pause Workflow", action: () => showToast("Workflow control coming soon") },
-                    { icon: <I.Zap />, label: "Resume Workflow", action: () => showToast("Workflow control coming soon") },
+                    { icon: <I.Mail />, label: "Send All Emails", accent: "#10b981", action: () => showToast("Email sender coming soon") },
+                    { icon: <I.Activity />, label: "Campaign Status", accent: "#6366f1", action: () => setPage("campaignStatus") },
+                    { icon: <I.Clock />, label: "Pause Workflow", accent: "#f97316", action: () => showToast("Workflow control coming soon") },
+                    { icon: <I.Zap />, label: "Resume Workflow", accent: "#0ea5e9", action: () => showToast("Workflow control coming soon") },
                   ].map((a, i) => (
                     <button key={i} onClick={a.action} style={{
-                      background: "#111116", border: "1px solid #1e1e28", borderRadius: 12, padding: "14px 18px",
-                      color: "#a0a0b0", cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
+                      background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px 18px",
+                      color: "#0F172A", cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
                       fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif",
-                    }}>
-                      {a.icon} {a.label} <span style={{ marginLeft: "auto", opacity: .4 }}><I.Right /></span>
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "all .15s",
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = a.accent; e.currentTarget.style.boxShadow = `0 4px 12px ${a.accent}20`; }}
+                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; }}
+                    >
+                      <span style={{ color: a.accent }}>{a.icon}</span> {a.label} <span style={{ marginLeft: "auto", color: "#CBD5E1" }}><I.Right /></span>
                     </button>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, color: "#6b6b80", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Categories</div>
+                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Categories</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
                   {Object.entries(CAT).map(([name, c]) => (
                     <button key={name} onClick={() => setPage("categories")} style={{
-                      background: c.bg, border: `1px solid ${c.dot}33`, borderRadius: 12, padding: 14,
+                      background: c.bg, border: `1px solid ${c.dot}44`, borderRadius: 12, padding: 14,
                       color: c.text, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
-                    }}>
+                      transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                    }}
+                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 6px 16px ${c.dot}25`; }}
+                      onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}
+                    >
                       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
                         <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot }} />
                         <span style={{ fontSize: 14, fontWeight: 600 }}>{name}</span>
                       </div>
-                      <div style={{ fontSize: 11, opacity: .6 }}>0 sent</div>
+                      <div style={{ fontSize: 11, color: c.text, opacity: .6 }}>0 sent</div>
                     </button>
                   ))}
                 </div>
@@ -1899,10 +1943,12 @@ function Dashboard({ user, onLogout }) {
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
         *{box-sizing:border-box;margin:0;padding:0}
-        html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
-        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#2a2a3a;border-radius:3px}
-        input::placeholder{color:#4a4a5a}
+        html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#F0F4FF;overflow:hidden;position:fixed;inset:0;}
+        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#CBD5E1;border-radius:3px}
+        input::placeholder{color:#CBD5E1}
+        select{color-scheme:light}
       `}</style>
     </div>
   );

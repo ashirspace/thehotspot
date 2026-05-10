@@ -1,19 +1,29 @@
-<svg viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<svg width="100%" viewBox="0 0 680 400" role="img" style="" xmlns="http://www.w3.org/2000/svg">
+  <title style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">thehotspot logo</title>
+  <desc style="fill:rgb(0, 0, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto">thehotspot brand logo with a flame-dot icon and wordmark</desc>
+
   <defs>
-    <linearGradient id="fl" x1="16" y1="0" x2="16" y2="40" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#0ea5e9"/>
-      <stop offset="55%" stop-color="#10b981"/>
-      <stop offset="100%" stop-color="#059669"/>
-    </linearGradient>
-    <linearGradient id="fl2" x1="16" y1="8" x2="16" y2="36" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.6"/>
-      <stop offset="100%" stop-color="#ffffff" stop-opacity="0.05"/>
-    </linearGradient>
+    
   </defs>
-  <!-- Outer flame body -->
-  <path d="M16 40C9 36 3 29 5 21C7 14 12 16 12 11C12 7 10 4 13 2C14 1 15 0 16 0C17 0 18 1 19 2C22 4 20 7 20 11C20 16 25 14 27 21C29 29 23 36 16 40Z" fill="url(#fl)"/>
-  <!-- Inner highlight (depth / inner flame) -->
-  <path d="M16 35C13 31 11.5 27 12.5 22.5C13 19.5 15 20 15 17C15 14 14 12 16 10C18 12 17 14 17 17C17 20 19 19.5 19.5 22.5C20.5 27 19 31 16 35Z" fill="url(#fl2)"/>
-  <!-- Core glow dot -->
-  <circle cx="16" cy="31" r="2.2" fill="white" fill-opacity="0.3"/>
+
+  <!-- flame icon -->
+  <!-- outer flame -->
+  <path d="M310 80 C310 80 290 105 285 125 C280 145 288 158 298 165 C292 150 298 138 306 132 C306 148 312 158 322 165 C330 155 338 140 334 122 C340 135 342 150 338 165 C348 158 356 144 352 122 C358 110 355 92 340 80 C345 100 336 112 328 118 C328 100 318 85 310 80Z" fill="#ff4d00" opacity="0.9" style="fill:rgb(255, 77, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:0.9;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+  <!-- inner core -->
+  <path d="M320 118 C320 118 308 132 306 145 C304 155 310 163 318 166 C315 157 318 149 323 145 C325 153 328 160 334 164 C338 156 338 144 334 136 C337 143 337 152 335 160 C341 153 344 143 340 132 C336 122 328 115 320 118Z" fill="#ffb347" style="fill:rgb(255, 179, 71);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- dot accent under flame -->
+  <circle cx="320" cy="178" r="5" fill="#ff4d00" style="fill:rgb(255, 77, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
+  <!-- wordmark: "the" muted + "hotspot" primary -->
+  <text x="340" y="148" style="fill:rgb(250, 249, 245);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:44px;font-weight:500;text-anchor:start;dominant-baseline:auto">
+    <tspan fill="var(--color-text-secondary)" font-size="44px" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:44px;font-weight:500;text-anchor:start;dominant-baseline:auto">the</tspan><tspan font-size="44px" dx="-1" style="fill:rgb(255, 77, 0);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:44px;font-weight:500;text-anchor:start;dominant-baseline:auto">hot</tspan><tspan fill="var(--color-text-primary)" font-size="44px" style="fill:rgb(250, 249, 245);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:44px;font-weight:500;text-anchor:start;dominant-baseline:auto">spot</tspan>
+  </text>
+
+  <!-- tagline -->
+  <text x="341" y="178" style="fill:rgb(194, 192, 182);stroke:none;color:rgb(255, 255, 255);stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, sans-serif;font-size:13px;font-weight:400;text-anchor:start;dominant-baseline:auto">GROW CONNECTIONS EASILY</text>
+
+  <!-- thin rule -->
+  <line x1="340" y1="190" x2="560" y2="190" stroke="var(--color-border-tertiary)" stroke-width="0.5" style="fill:rgb(0, 0, 0);stroke:rgba(222, 220, 209, 0.15);color:rgb(255, 255, 255);stroke-width:0.5px;stroke-linecap:butt;stroke-linejoin:miter;opacity:1;font-family:&quot;Anthropic Sans&quot;, -apple-system, &quot;system-ui&quot;, &quot;Segoe UI&quot;, sans-serif;font-size:16px;font-weight:400;text-anchor:start;dominant-baseline:auto"/>
+
 </svg>
