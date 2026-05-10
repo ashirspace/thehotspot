@@ -71,6 +71,32 @@ const I = {
   Logout: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></svg>,
 };
 
+/* ───────── LOGO ───────── */
+function Logo({ size = 32 }) {
+  const id = "lg" + size;
+  return (
+    <svg width={size} height={size * 1.25} viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id={id + "a"} x1="16" y1="0" x2="16" y2="40" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#0ea5e9" />
+          <stop offset="55%" stopColor="#10b981" />
+          <stop offset="100%" stopColor="#059669" />
+        </linearGradient>
+        <linearGradient id={id + "b"} x1="16" y1="8" x2="16" y2="36" gradientUnits="userSpaceOnUse">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.05" />
+        </linearGradient>
+      </defs>
+      {/* Outer flame */}
+      <path d="M16 40C9 36 3 29 5 21C7 14 12 16 12 11C12 7 10 4 13 2C14 1 15 0 16 0C17 0 18 1 19 2C22 4 20 7 20 11C20 16 25 14 27 21C29 29 23 36 16 40Z" fill={`url(#${id}a)`} />
+      {/* Inner highlight */}
+      <path d="M16 35C13 31 11.5 27 12.5 22.5C13 19.5 15 20 15 17C15 14 14 12 16 10C18 12 17 14 17 17C17 20 19 19.5 19.5 22.5C20.5 27 19 31 16 35Z" fill={`url(#${id}b)`} />
+      {/* Core glow */}
+      <circle cx="16" cy="31" r="2.2" fill="white" fillOpacity="0.3" />
+    </svg>
+  );
+}
+
 /* ───────── LOGIN PAGE ───────── */
 function LoginPage({ onLogin }) {
   const [isSignup, setIsSignup] = useState(false);
@@ -215,7 +241,7 @@ function LoginPage({ onLogin }) {
       {/* ── Top nav ── */}
       <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a24", position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#000" }}>TH</div>
+          <Logo size={28} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -231,7 +257,10 @@ function LoginPage({ onLogin }) {
       </nav>
 
       {/* ── Hero / app description ── */}
-      <div style={{ textAlign: "center", padding: "52px 24px 40px", position: "relative", zIndex: 1 }}>
+      <div style={{ textAlign: "center", padding: "48px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "inline-flex", marginBottom: 16 }}>
+          <Logo size={52} />
+        </div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0a2a1a", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
           <span style={{ fontSize: 11, color: "#10b981", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
@@ -1658,7 +1687,7 @@ function Dashboard({ user, onLogout }) {
         {/* Sidebar Header */}
         <div style={{ padding: "20px", borderBottom: "1px solid #1a1a24", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#000" }}>TH</div>
+            <Logo size={26} />
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</div>
               <div style={{ fontSize: 10, color: "#6b6b80" }}>Grow Connections Easily</div>
