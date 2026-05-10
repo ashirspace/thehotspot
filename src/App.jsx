@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo } from "react";
 
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
@@ -775,15 +775,40 @@ function SuccessRatePage({ onBack, sentCount }) {
   );
 }
 
+/* ───────── ERROR BOUNDARY ───────── */
+class AppErrorBoundary extends React.Component {
+  constructor(props) { super(props); this.state = { error: null }; }
+  static getDerivedStateFromError(error) { return { error }; }
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "#fff", borderRadius: 16, padding: 32, maxWidth: 500, width: "100%", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", border: "1px solid #E2E8F0" }}>
+            <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Something went wrong</div>
+            <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20, background: "#F8FAFF", borderRadius: 8, padding: "12px 14px", fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+              {this.state.error?.message || String(this.state.error)}
+            </div>
+            <button onClick={() => { localStorage.removeItem("thehotspot_page"); window.location.reload(); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#4F46E5", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+              Reload App
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
 /* ───────── MAIN APP ───────── */
 export default function App() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
   });
 
-  if (!user) return <LoginPage onLogin={(userData) => { localStorage.removeItem("thehotspot_page"); setUser(userData); }} />;
+  if (!user) return <AppErrorBoundary><LoginPage onLogin={(userData) => { localStorage.removeItem("thehotspot_page"); setUser(userData); }} /></AppErrorBoundary>;
 
-  return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
+  return <AppErrorBoundary><Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} /></AppErrorBoundary>;
 }
 
 
