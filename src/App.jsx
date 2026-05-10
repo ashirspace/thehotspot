@@ -73,28 +73,7 @@ const I = {
 
 /* ───────── LOGO ───────── */
 function Logo({ size = 32 }) {
-  const id = "lg" + size;
-  return (
-    <svg width={size} height={size * 1.25} viewBox="0 0 32 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <defs>
-        <linearGradient id={id + "a"} x1="16" y1="0" x2="16" y2="40" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#0ea5e9" />
-          <stop offset="55%" stopColor="#10b981" />
-          <stop offset="100%" stopColor="#059669" />
-        </linearGradient>
-        <linearGradient id={id + "b"} x1="16" y1="8" x2="16" y2="36" gradientUnits="userSpaceOnUse">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.6" />
-          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.05" />
-        </linearGradient>
-      </defs>
-      {/* Outer flame */}
-      <path d="M16 40C9 36 3 29 5 21C7 14 12 16 12 11C12 7 10 4 13 2C14 1 15 0 16 0C17 0 18 1 19 2C22 4 20 7 20 11C20 16 25 14 27 21C29 29 23 36 16 40Z" fill={`url(#${id}a)`} />
-      {/* Inner highlight */}
-      <path d="M16 35C13 31 11.5 27 12.5 22.5C13 19.5 15 20 15 17C15 14 14 12 16 10C18 12 17 14 17 17C17 20 19 19.5 19.5 22.5C20.5 27 19 31 16 35Z" fill={`url(#${id}b)`} />
-      {/* Core glow */}
-      <circle cx="16" cy="31" r="2.2" fill="white" fillOpacity="0.3" />
-    </svg>
-  );
+  return <img src="/logo.svg" height={size} style={{ width: "auto", display: "block" }} alt="thehotspot" />;
 }
 
 /* ───────── LOGIN PAGE ───────── */
