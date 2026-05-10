@@ -740,7 +740,7 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
   });
 
-  if (!user) return <LoginPage onLogin={setUser} />;
+  if (!user) return <LoginPage onLogin={(userData) => { localStorage.removeItem("thehotspot_page"); setUser(userData); }} />;
 
   return <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />;
 }
