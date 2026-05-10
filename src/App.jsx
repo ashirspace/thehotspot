@@ -206,115 +206,161 @@ function LoginPage({ onLogin }) {
   };
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", minHeight: "100vh", display: "flex", flexDirection: "column", position: "relative", overflow: "hidden" }}>
       <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
 
-      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#10b98115,transparent 70%)", top: "-100px", left: "-100px" }} />
-      <div style={{ position: "absolute", width: "300px", height: "300px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e915,transparent 70%)", bottom: "-50px", right: "-50px" }} />
+      <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98112,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
+      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e910,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
 
-      <div style={{ width: "100%", maxWidth: 420, padding: "0 20px", zIndex: 1 }}>
-        <div style={{ textAlign: "center", marginBottom: 36 }}>
-          <div style={{ width: 56, height: 56, borderRadius: 14, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "inline-flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 20, color: "#000", marginBottom: 16 }}>TH</div>
-          <div style={{ fontSize: 28, fontWeight: 700, color: "#f0f0f5", letterSpacing: -0.5 }}>thehotspot</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", marginTop: 4 }}>Grow Connections Easily</div>
+      {/* ── Top nav ── */}
+      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #1a1a24", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 12, color: "#000" }}>TH</div>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#f0f0f5" }}>thehotspot</span>
         </div>
+        <div style={{ display: "flex", gap: 8 }}>
+          <a href="/privacy.html" style={{ fontSize: 12, color: "#6b6b80", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #2a2a3a" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+            Privacy Policy
+          </a>
+          <a href="/terms.html" style={{ fontSize: 12, color: "#6b6b80", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #2a2a3a" }}
+            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+            Terms of Service
+          </a>
+        </div>
+      </nav>
 
-        <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 20, padding: "32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
-          <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
-          <div style={{ fontSize: 13, color: "#6b6b80", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
+      {/* ── Hero / app description ── */}
+      <div style={{ textAlign: "center", padding: "52px 24px 40px", position: "relative", zIndex: 1 }}>
+        <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#0a2a1a", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
+          <span style={{ fontSize: 11, color: "#10b981", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
+        </div>
+        <h1 style={{ fontSize: "clamp(28px,5vw,42px)", fontWeight: 800, color: "#f0f0f5", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
+          Grow your network.<br />
+          <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Automate your outreach.</span>
+        </h1>
+        <p style={{ fontSize: 15, color: "#8888a0", maxWidth: 480, margin: "0 auto 32px", lineHeight: 1.7 }}>
+          thehotspot is an outreach management platform for affiliate marketers and business development teams.
+          Import contacts, track campaigns by category, and send personalised emails — all from one dashboard.
+        </p>
+        {/* Feature chips */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8, justifyContent: "center", marginBottom: 8 }}>
+          {["Contact database", "Campaign tracking", "Email automation", "Google Sheets import", "AI assistant"].map(f => (
+            <span key={f} style={{ fontSize: 12, color: "#a0a0b8", background: "#111116", border: "1px solid #2a2a3a", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
+          ))}
+        </div>
+      </div>
 
-          {/* Google Button */}
-          <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-            width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #2a2a3a",
-            background: "#0c0c12", color: "#e0e0e8", fontSize: 14, fontWeight: 500,
-            cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-            gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
-            opacity: googleLoading ? 0.7 : 1,
-          }}
-            onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#4285F411"; } }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.background = "#0c0c12"; }}
-          >
-            {googleLoading ? (
-              <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#e0e0e8", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
-            ) : (
-              <>
-                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-                Continue with Google
-              </>
-            )}
-          </button>
+      {/* ── Login card ── */}
+      <div style={{ flex: 1, display: "flex", alignItems: "flex-start", justifyContent: "center", padding: "0 20px 40px", position: "relative", zIndex: 1 }}>
+        <div style={{ width: "100%", maxWidth: 420 }}>
+          <div style={{ background: "#111116", border: "1px solid #1e1e28", borderRadius: 20, padding: "32px 28px", boxShadow: "0 20px 60px rgba(0,0,0,0.4)" }}>
+            <div style={{ fontSize: 18, fontWeight: 600, color: "#f0f0f5", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
+            <div style={{ fontSize: 13, color: "#6b6b80", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-            <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
-            <span style={{ fontSize: 11, color: "#4a4a5a", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-            <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
-          </div>
+            {/* Google Button */}
+            <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
+              width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #2a2a3a",
+              background: "#0c0c12", color: "#e0e0e8", fontSize: 14, fontWeight: 500,
+              cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+              gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
+              opacity: googleLoading ? 0.7 : 1,
+            }}
+              onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#4285F411"; } }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.background = "#0c0c12"; }}
+            >
+              {googleLoading ? (
+                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#e0e0e8", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+              ) : (
+                <>
+                  <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+                  Continue with Google
+                </>
+              )}
+            </button>
 
-          <form onSubmit={isSignup ? handleSignup : handleLogin}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
-              />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+              <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
+              <span style={{ fontSize: 11, color: "#4a4a5a", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
+              <div style={{ flex: 1, height: 1, background: "#1e1e28" }} />
             </div>
 
-            {isSignup && (
+            <form onSubmit={isSignup ? handleSignup : handleLogin}>
               <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
+                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
                   style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
                   onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
                 />
               </div>
-            )}
 
-            <div style={{ marginBottom: 20 }}>
-              <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
-              <div style={{ position: "relative" }}>
-                <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                  style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
-                />
-                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6b80", cursor: "pointer", padding: 4 }}>
-                  {showPass ? <I.EyeOff /> : <I.Eye />}
-                </button>
+              {isSignup && (
+                <div style={{ marginBottom: 14 }}>
+                  <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
+                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
+                    style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                  />
+                </div>
+              )}
+
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ fontSize: 12, color: "#6b6b80", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
+                    style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #2a2a3a", background: "#0c0c12", color: "#e0e0e8", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#2a2a3a"}
+                  />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#6b6b80", cursor: "pointer", padding: 4 }}>
+                    {showPass ? <I.EyeOff /> : <I.Eye />}
+                  </button>
+                </div>
               </div>
+
+              {error && (
+                <div style={{ background: "#2a0a0a", border: "1px solid #f8717133", color: "#f87171", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
+                  {error}
+                </div>
+              )}
+
+              <button type="submit" disabled={loading || !username || !password} style={{
+                width: "100%", padding: "12px", borderRadius: 12, border: "none",
+                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
+                color: (username && password) ? "#000" : "#6b6b80",
+                fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
+                fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                {loading ? (
+                  <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#000", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+                ) : isSignup ? "Create Account" : "Sign In"}
+              </button>
+            </form>
+
+            {/* Toggle Login/Signup */}
+            <div style={{ textAlign: "center", marginTop: 18 }}>
+              <span style={{ fontSize: 13, color: "#6b6b80" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
+              <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{
+                background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+              }}>
+                {isSignup ? "Sign In" : "Sign Up"}
+              </button>
             </div>
-
-            {error && (
-              <div style={{ background: "#2a0a0a", border: "1px solid #f8717133", color: "#f87171", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
-                {error}
-              </div>
-            )}
-
-            <button type="submit" disabled={loading || !username || !password} style={{
-              width: "100%", padding: "12px", borderRadius: 12, border: "none",
-              background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a28",
-              color: (username && password) ? "#000" : "#6b6b80",
-              fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-              fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            }}>
-              {loading ? (
-                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#000", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
-              ) : isSignup ? "Create Account" : "Sign In"}
-            </button>
-          </form>
-
-          {/* Toggle Login/Signup */}
-          <div style={{ textAlign: "center", marginTop: 18 }}>
-            <span style={{ fontSize: 13, color: "#6b6b80" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
-            <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{
-              background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-            }}>
-              {isSignup ? "Sign In" : "Sign Up"}
-            </button>
           </div>
-        </div>
 
-        <div style={{ textAlign: "center", marginTop: 24, fontSize: 11, color: "#4a4a5a" }}>
-          Protected by thehotspot security
+          {/* Footer links */}
+          <div style={{ textAlign: "center", marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 11, color: "#4a4a5a" }}>&copy; 2026 thehotspot</span>
+            <a href="/privacy.html" style={{ fontSize: 11, color: "#6b6b80", textDecoration: "none" }}
+              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+              Privacy Policy
+            </a>
+            <a href="/terms.html" style={{ fontSize: 11, color: "#6b6b80", textDecoration: "none" }}
+              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#6b6b80"}>
+              Terms of Service
+            </a>
+          </div>
         </div>
       </div>
 
