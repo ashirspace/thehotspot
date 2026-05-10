@@ -1563,6 +1563,324 @@ function ProfilePage({ user, onBack, onLogout }) {
   );
 }
 
+/* ───────── EMAIL SENDER ───────── */
+function makeGmailMessage({ to, subject, body }) {
+  const msg = [
+    `To: ${to}`,
+    `Subject: ${subject}`,
+    `Content-Type: text/plain; charset=utf-8`,
+    `MIME-Version: 1.0`,
+    "",
+    body,
+  ].join("\r\n");
+  return btoa(unescape(encodeURIComponent(msg)))
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
+}
+
+function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast }) {
+  const [step, setStep] = useState("configure");
+  const [selectedCategory, setSelectedCategory] = useState("All");
+  const [offerContext, setOfferContext] = useState("");
+  const [allContacts, setAllContacts] = useState([]);
+  const [selectedIds, setSelectedIds] = useState(new Set());
+  const [drafts, setDrafts] = useState([]);
+  const [genProgress, setGenProgress] = useState({ current: 0, total: 0 });
+  const [sendProgress, setSendProgress] = useState({ current: 0, total: 0, results: [] });
+
+  useEffect(() => {
+    try {
+      const c = JSON.parse(localStorage.getItem("thehotspot_contacts")) || [];
+      setAllContacts(c);
+      setSelectedIds(new Set(c.map((_, i) => i)));
+    } catch { setAllContacts([]); }
+  }, []);
+
+  const filteredContacts = selectedCategory === "All"
+    ? allContacts
+    : allContacts.filter(c => c.category === selectedCategory);
+
+  const toggleSelect = (i) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      next.has(i) ? next.delete(i) : next.add(i);
+      return next;
+    });
+  };
+  const selectAll = () => setSelectedIds(new Set(filteredContacts.map((_, i) => i)));
+  const selectNone = () => setSelectedIds(new Set());
+
+  const generateDrafts = async () => {
+    const toGenerate = filteredContacts.filter((_, i) => selectedIds.has(i));
+    if (toGenerate.length === 0) return showToast("No contacts selected");
+    if (!gmailToken) return showToast("Please connect Gmail first to send emails");
+    setStep("generating");
+    setDrafts([]);
+    setGenProgress({ current: 0, total: toGenerate.length });
+    const newDrafts = [];
+    for (let i = 0; i < toGenerate.length; i++) {
+      const contact = toGenerate[i];
+      try {
+        const res = await fetch("/api/generate-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            company: contact.company || contact.name || "the company",
+            category: contact.category,
+            website: contact.website || "",
+            offerContext,
+          }),
+        });
+        const data = await res.json();
+        newDrafts.push({ id: i, contact, subject: data.subject || "", body: data.body || "", approved: true });
+      } catch {
+        newDrafts.push({
+          id: i, contact,
+          subject: `Partnership Opportunity — ${contact.company || contact.name || "your company"}`,
+          body: `Hi ${contact.company || contact.name || "team"},\n\nI'm reaching out from thehotspot to explore a partnership.\n\nBest regards`,
+          approved: true,
+        });
+      }
+      setDrafts([...newDrafts]);
+      setGenProgress({ current: i + 1, total: toGenerate.length });
+    }
+    setStep("review");
+  };
+
+  const updateDraft = (id, field, value) => {
+    setDrafts(prev => prev.map(d => d.id === id ? { ...d, [field]: value } : d));
+  };
+
+  const sendEmails = async () => {
+    const toSend = drafts.filter(d => d.approved);
+    if (toSend.length === 0) return showToast("No approved drafts to send");
+    setStep("sending");
+    setSendProgress({ current: 0, total: toSend.length, results: [] });
+    const results = [];
+    for (let i = 0; i < toSend.length; i++) {
+      const draft = toSend[i];
+      const email = draft.contact.email;
+      if (!email) { results.push({ ...draft, status: "failed", error: "No email address" }); setSendProgress({ current: i + 1, total: toSend.length, results: [...results] }); continue; }
+      try {
+        const raw = makeGmailMessage({ to: email, subject: draft.subject, body: draft.body });
+        const r = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ raw }),
+        });
+        const data = await r.json();
+        if (data.error) throw new Error(data.error.message);
+        results.push({ ...draft, status: "sent" });
+      } catch (e) {
+        results.push({ ...draft, status: "failed", error: e.message });
+      }
+      setSendProgress({ current: i + 1, total: toSend.length, results: [...results] });
+    }
+    setStep("done");
+  };
+
+  const sentCount = sendProgress.results.filter(r => r.status === "sent").length;
+  const failedCount = sendProgress.results.filter(r => r.status === "failed").length;
+
+  const card = { background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "24px", marginBottom: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.04)" };
+  const btn = (color) => ({ padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13 });
+
+  /* ── CONFIGURE ── */
+  if (step === "configure") return (
+    <div>
+      <div style={card}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 16 }}>1. Select Contacts</div>
+        {/* Category filter */}
+        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
+          {["All", "Network", "CPS", "CPL", "CPA", "Mobile"].map(cat => (
+            <button key={cat} onClick={() => { setSelectedCategory(cat); setSelectedIds(new Set((cat === "All" ? allContacts : allContacts.filter(c => c.category === cat)).map((_, i) => i))); }} style={{
+              padding: "6px 14px", borderRadius: 20, border: "1px solid", fontSize: 12, fontWeight: 600, cursor: "pointer",
+              background: selectedCategory === cat ? "#EEF2FF" : "#F8FAFF",
+              color: selectedCategory === cat ? "#4F46E5" : "#64748B",
+              borderColor: selectedCategory === cat ? "#4F46E5" : "#E2E8F0",
+              fontFamily: "'DM Sans',sans-serif",
+            }}>{cat}</button>
+          ))}
+        </div>
+        {/* Select all / none */}
+        <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
+          <button onClick={selectAll} style={{ ...btn(), background: "#F8FAFF", color: "#4F46E5", border: "1px solid #E2E8F0" }}>Select All</button>
+          <button onClick={selectNone} style={{ ...btn(), background: "#F8FAFF", color: "#64748B", border: "1px solid #E2E8F0" }}>Clear</button>
+          <span style={{ marginLeft: "auto", fontSize: 12, color: "#64748B", alignSelf: "center" }}>{selectedIds.size} selected</span>
+        </div>
+        {/* Contact list */}
+        <div style={{ maxHeight: 260, overflowY: "auto", border: "1px solid #E2E8F0", borderRadius: 10 }}>
+          {filteredContacts.length === 0 ? (
+            <div style={{ padding: 24, textAlign: "center", color: "#94A3B8", fontSize: 13 }}>No contacts found. Add contacts in the Contacts DB.</div>
+          ) : filteredContacts.map((c, i) => (
+            <div key={i} onClick={() => toggleSelect(i)} style={{
+              display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
+              borderBottom: i < filteredContacts.length - 1 ? "1px solid #F1F5FF" : "none",
+              cursor: "pointer", background: selectedIds.has(i) ? "#F8FAFF" : "transparent",
+              transition: "background .1s",
+            }}>
+              <div style={{
+                width: 18, height: 18, borderRadius: 4, border: `2px solid ${selectedIds.has(i) ? "#4F46E5" : "#CBD5E1"}`,
+                background: selectedIds.has(i) ? "#4F46E5" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+              }}>
+                {selectedIds.has(i) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
+              </div>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.company || c.name || "Unknown"}</div>
+                <div style={{ fontSize: 11, color: "#94A3B8" }}>{c.email || "No email"} · {c.category || "—"}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div style={card}>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>2. About Your Offer (optional)</div>
+        <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12 }}>AI will use this to personalize the outreach emails</div>
+        <textarea
+          value={offerContext}
+          onChange={e => setOfferContext(e.target.value)}
+          placeholder="e.g. We offer 30% commission on all sales, top-tier creatives, weekly payouts..."
+          rows={3}
+          style={{ width: "100%", background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "12px 14px", fontSize: 13, color: "#0F172A", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }}
+          onFocus={e => { e.target.style.borderColor = "#4F46E5"; e.target.style.boxShadow = "0 0 0 3px #4F46E515"; }}
+          onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }}
+        />
+      </div>
+
+      {!gmailToken && (
+        <div style={{ ...card, background: "#FFF7ED", border: "1px solid #FED7AA", display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
+          <span style={{ fontSize: 24 }}>📧</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#9A3412" }}>Gmail not connected</div>
+            <div style={{ fontSize: 12, color: "#C2410C" }}>You need to connect Gmail to send emails</div>
+          </div>
+          <button onClick={connectGmail} style={{ ...btn("#EA580C"), background: "#EA580C", color: "#fff" }}>Connect Gmail</button>
+        </div>
+      )}
+
+      <button
+        onClick={generateDrafts}
+        style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#E2E8F0", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 4px 16px rgba(16,185,129,0.3)" : "none", transition: "all .2s" }}
+      >
+        ✨ Generate {selectedIds.size} Draft{selectedIds.size !== 1 ? "s" : ""} with AI
+      </button>
+    </div>
+  );
+
+  /* ── GENERATING ── */
+  if (step === "generating") return (
+    <div style={card}>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center" }}>
+        ✨ Generating personalized drafts...
+      </div>
+      <div style={{ background: "#F1F5FF", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
+        <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#10b981,#0ea5e9)", width: `${genProgress.total ? (genProgress.current / genProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
+      </div>
+      <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 24 }}>{genProgress.current} / {genProgress.total} drafts created</div>
+      {drafts.length > 0 && (
+        <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
+          {drafts.map((d, i) => (
+            <div key={i} style={{ background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+              <span style={{ fontSize: 16 }}>✅</span>
+              <div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{d.contact.company || d.contact.name}</div>
+                <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.subject}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
+  /* ── REVIEW ── */
+  if (step === "review") {
+    const approvedCount = drafts.filter(d => d.approved).length;
+    return (
+      <div>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ fontSize: 14, color: "#64748B" }}><span style={{ fontWeight: 700, color: "#0F172A" }}>{approvedCount}</span> of {drafts.length} approved</div>
+          <div style={{ display: "flex", gap: 8 }}>
+            <button onClick={() => setDrafts(d => d.map(x => ({ ...x, approved: true })))} style={{ ...btn(), background: "#ECFDF5", color: "#059669", border: "1px solid #BBF7D0" }}>Approve All</button>
+            <button onClick={() => setDrafts(d => d.map(x => ({ ...x, approved: false })))} style={{ ...btn(), background: "#FEF2F2", color: "#EF4444", border: "1px solid #FECACA" }}>Reject All</button>
+          </div>
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
+          {drafts.map((d) => (
+            <div key={d.id} style={{ background: "#FFFFFF", border: `1px solid ${d.approved ? "#BBF7D0" : "#E2E8F0"}`, borderRadius: 14, padding: "18px", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", opacity: d.approved ? 1 : 0.55, transition: "all .2s" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{d.contact.company || d.contact.name}</div>
+                  <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.contact.email}</div>
+                </div>
+                <button onClick={() => updateDraft(d.id, "approved", !d.approved)} style={{
+                  padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 12,
+                  background: d.approved ? "#ECFDF5" : "#F1F5F9", color: d.approved ? "#059669" : "#64748B",
+                }}>
+                  {d.approved ? "✓ Approved" : "Approve"}
+                </button>
+              </div>
+              <div style={{ marginBottom: 8 }}>
+                <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Subject</div>
+                <input value={d.subject} onChange={e => updateDraft(d.id, "subject", e.target.value)} style={{ width: "100%", background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#0F172A", fontFamily: "'DM Sans',sans-serif", outline: "none" }} />
+              </div>
+              <div>
+                <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Body</div>
+                <textarea value={d.body} onChange={e => updateDraft(d.id, "body", e.target.value)} rows={5} style={{ width: "100%", background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#0F172A", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }} />
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={sendEmails}
+          disabled={approvedCount === 0}
+          style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "linear-gradient(135deg,#4F46E5,#0ea5e9)" : "#E2E8F0", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 4px 16px rgba(79,70,229,0.3)" : "none", transition: "all .2s" }}
+        >
+          📤 Send {approvedCount} Email{approvedCount !== 1 ? "s" : ""}
+        </button>
+      </div>
+    );
+  }
+
+  /* ── SENDING ── */
+  if (step === "sending") return (
+    <div style={card}>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center" }}>📤 Sending emails...</div>
+      <div style={{ background: "#F1F5FF", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
+        <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#4F46E5,#0ea5e9)", width: `${sendProgress.total ? (sendProgress.current / sendProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
+      </div>
+      <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 20 }}>{sendProgress.current} / {sendProgress.total} sent</div>
+      <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
+        {sendProgress.results.map((r, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: r.status === "sent" ? "#ECFDF5" : "#FEF2F2", borderRadius: 8 }}>
+            <span>{r.status === "sent" ? "✅" : "❌"}</span>
+            <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 500 }}>{r.contact.company || r.contact.name}</span>
+            {r.error && <span style={{ fontSize: 11, color: "#EF4444", marginLeft: "auto" }}>{r.error}</span>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+
+  /* ── DONE ── */
+  return (
+    <div style={{ ...card, textAlign: "center" }}>
+      <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Campaign Complete!</div>
+      <div style={{ fontSize: 14, color: "#64748B", marginBottom: 24 }}>
+        <span style={{ color: "#059669", fontWeight: 700 }}>{sentCount} sent</span>
+        {failedCount > 0 && <> · <span style={{ color: "#EF4444", fontWeight: 700 }}>{failedCount} failed</span></>}
+      </div>
+      <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
+        <button onClick={() => { setStep("configure"); setDrafts([]); setSelectedIds(new Set(allContacts.map((_, i) => i))); }} style={{ ...btn(), background: "#EEF2FF", color: "#4F46E5", border: "1px solid #C7D2FE" }}>Send Another Campaign</button>
+        <button onClick={onBack} style={{ ...btn(), background: "#F8FAFF", color: "#64748B", border: "1px solid #E2E8F0" }}>Back to Dashboard</button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
   const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
@@ -1621,16 +1939,32 @@ function Dashboard({ user, onLogout }) {
   };
   const executeAction = (action) => {
     if (!action) return;
+    if (action.type === "send_emails") { setPage("emailSender"); return; }
+    if (action.type === "show_stats") { setPage("dashboard"); return; }
+    if (action.type === "show_contacts") { setPage("contacts"); return; }
     const labels = {
-      send_emails: "Email sender coming soon — feature under development",
       pause_workflow: "Workflow control coming soon",
       resume_workflow: "Workflow control coming soon",
-      show_stats: "Opening dashboard...",
       add_contact: "Contact import coming soon",
     };
     showToast(labels[action.type] || "Feature coming soon");
-    if (action.type === "show_stats") setPage("dashboard");
   };
+  // Detect user intent locally — always fires before/after API so navigation is reliable
+  const detectLocalIntent = (msg) => {
+    const lower = msg.toLowerCase();
+    if ((lower.includes("send") && (lower.includes("email") || lower.includes("mail") || lower.includes("outreach"))) ||
+        lower.includes("email sender") || lower.includes("send campaign")) {
+      return { type: "send_emails" };
+    }
+    if (lower.includes("dashboard") || lower.includes("show stats") || lower.includes("open dashboard")) {
+      return { type: "show_stats" };
+    }
+    if (lower.includes("contacts") && (lower.includes("view") || lower.includes("show") || lower.includes("open"))) {
+      return { type: "show_contacts" };
+    }
+    return null;
+  };
+
   const handleSend = async (text) => {
     const msg = (text || input).trim();
     if (!msg || loading) return;
@@ -1639,8 +1973,11 @@ function Dashboard({ user, onLogout }) {
     setInput("");
     setLoading(true);
 
+    // Run local intent detection immediately — don't wait for API
+    const localIntent = detectLocalIntent(msg);
+    if (localIntent) executeAction(localIntent);
+
     try {
-      // Try Claude API via serverless function
       const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg].map(m => ({ role: m.role, content: m.content }));
       const res = await fetch("/api/chat", {
         method: "POST",
@@ -1650,19 +1987,18 @@ function Dashboard({ user, onLogout }) {
       const data = await res.json();
       const aiText = data.content?.[0]?.text || "";
 
-      // Extract action if present
+      // Also parse action tag from API response (belt and suspenders)
       const actionMatch = aiText.match(/<action>(.*?)<\/action>/s);
       let action = null;
       let cleanText = aiText.replace(/<action>.*?<\/action>/gs, "").trim();
       if (actionMatch) { try { action = JSON.parse(actionMatch[1]); } catch (e) { } }
 
-      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Sorry, couldn't process that." }]);
-      if (action) executeAction(action);
+      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Opening Email Sender for you!" }]);
+      if (action && !localIntent) executeAction(action);
     } catch (err) {
-      // Fallback to local chatbot if API fails
       const response = getSmartResponse(msg);
       setMessages(prev => [...prev, { role: "assistant", content: response.text }]);
-      if (response.action) executeAction(response.action);
+      if (response.action && !localIntent) executeAction(response.action);
     }
     setLoading(false);
   };
@@ -1673,7 +2009,7 @@ function Dashboard({ user, onLogout }) {
     }
     const client = window.google.accounts.oauth2.initTokenClient({
       client_id: GMAIL_CLIENT_ID,
-      scope: "https://www.googleapis.com/auth/gmail.readonly",
+      scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
       callback: async (response) => {
         if (response.error) {
           showToast("Gmail connection failed: " + response.error);
@@ -1718,6 +2054,7 @@ function Dashboard({ user, onLogout }) {
   // Sidebar nav items
   const navItems = [
     { id: "dashboard", label: "Dashboard", icon: "📊" },
+    { id: "emailSender", label: "Email Sender", icon: "📤" },
     { id: "campaignStatus", label: "Campaign Status", icon: "📡" },
     { id: "totalContacts", label: "Total Contacts", icon: "👥" },
     { id: "emailsSent", label: "Emails Sent", icon: "📧" },
@@ -1948,7 +2285,7 @@ function Dashboard({ user, onLogout }) {
                 <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
                 <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
                   {[
-                    { icon: <I.Mail />, label: "Send All Emails", accent: "#10b981", action: () => showToast("Email sender coming soon") },
+                    { icon: <I.Mail />, label: "Send All Emails", accent: "#10b981", action: () => setPage("emailSender") },
                     { icon: <I.Activity />, label: "Campaign Status", accent: "#6366f1", action: () => setPage("campaignStatus") },
                     { icon: <I.Clock />, label: "Pause Workflow", accent: "#f97316", action: () => showToast("Workflow control coming soon") },
                     { icon: <I.Zap />, label: "Resume Workflow", accent: "#0ea5e9", action: () => showToast("Workflow control coming soon") },
@@ -1987,6 +2324,9 @@ function Dashboard({ user, onLogout }) {
                 </div>
               </>
             )}
+
+            {/* EMAIL SENDER */}
+            {page === "emailSender" && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} />}
 
             {/* CONTACTS */}
             {page === "contacts" && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
