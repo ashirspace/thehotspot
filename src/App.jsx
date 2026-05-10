@@ -220,7 +220,7 @@ function LoginPage({ onLogin }) {
       {/* ── Top nav ── */}
       <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Logo size={98} />
+          <Logo size={56} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
@@ -238,7 +238,7 @@ function LoginPage({ onLogin }) {
       {/* ── Hero / app description ── */}
       <div style={{ textAlign: "center", padding: "48px 24px 40px", position: "relative", zIndex: 1 }}>
         <div style={{ display: "inline-flex", marginBottom: 16 }}>
-          <Logo size={140} />
+          <Logo size={80} />
         </div>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 20 }}>
           <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
@@ -1667,7 +1667,7 @@ function Dashboard({ user, onLogout }) {
         {/* Sidebar Header */}
         <div style={{ padding: "20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Logo size={94} />
+            <Logo size={48} />
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>thehotspot</div>
               <div style={{ fontSize: 10, color: "#94A3B8" }}>Grow Connections Easily</div>
