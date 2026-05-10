@@ -49,7 +49,7 @@ async function fetchAllContacts() {
 // 3. Create OAuth 2.0 credentials (Web Application)
 // 4. Set redirect URI to: http://localhost:5173 (for dev) or your production URL
 // 5. Paste your Client ID below
-const GMAIL_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID_HERE";
+const GMAIL_CLIENT_ID = "1033289222732-c7c1kudmf0tuh1ustp2jme38ii8kqbm5.apps.googleusercontent.com";
 const GMAIL_SCOPES = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
 const GOOGLE_LOGIN_CLIENT_ID = GMAIL_CLIENT_ID; // Same client ID for Google Sign-In
 
@@ -80,6 +80,7 @@ function LoginPage({ onLogin }) {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -131,72 +132,96 @@ function LoginPage({ onLogin }) {
   };
 
   const handleGoogleLogin = () => {
-    const script = document.createElement("script");
-    script.src = "https://accounts.google.com/gsi/client";
-    script.onload = () => {
-      window.google.accounts.oauth2.initTokenClient({
-        client_id: GOOGLE_LOGIN_CLIENT_ID,
-        scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets.readonly",
-        callback: async (response) => {
-          if (response.access_token) {
-            const token = response.access_token;
+    setError("");
+    if (!window.google?.accounts?.oauth2) {
+      setError("Google Sign-In is not available. Please refresh and try again.");
+      return;
+    }
+    setGoogleLoading(true);
+    const client = window.google.accounts.oauth2.initTokenClient({
+      client_id: GOOGLE_LOGIN_CLIENT_ID,
+      scope: "email profile https://www.googleapis.com/auth/contacts.readonly https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send https://www.googleapis.com/auth/spreadsheets.readonly",
+      error_callback: (err) => {
+        setGoogleLoading(false);
+        if (err.type === "popup_closed") {
+          setError("Sign-in cancelled. Please try again.");
+        } else {
+          setError("Google Sign-In failed: " + (err.message || err.type || "Unknown error"));
+        }
+      },
+      callback: async (response) => {
+        if (response.error) {
+          setGoogleLoading(false);
+          setError("Google Sign-In failed: " + response.error);
+          return;
+        }
+        if (!response.access_token) {
+          setGoogleLoading(false);
+          setError("No access token received. Please try again.");
+          return;
+        }
+        try {
+          const token = response.access_token;
 
-            // Fetch user info
-            const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+          // Fetch user info
+          const res = await fetch("https://www.googleapis.com/oauth2/v2/userinfo", {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          const gUser = await res.json();
+
+          // Fetch real contacts count
+          let contactsCount = 0;
+          try {
+            const cRes = await fetch("https://people.googleapis.com/v1/people/me/connections?pageSize=1000&personFields=emailAddresses", {
               headers: { Authorization: `Bearer ${token}` },
             });
-            const gUser = await res.json();
+            const cData = await cRes.json();
+            contactsCount = cData.totalPeople || cData.connections?.length || 0;
+          } catch (e) { }
 
-            // Fetch real contacts count
-            let contactsCount = 0;
-            try {
-              const cRes = await fetch("https://people.googleapis.com/v1/people/me/connections?pageSize=1000&personFields=emailAddresses", {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              const cData = await cRes.json();
-              contactsCount = cData.totalPeople || cData.connections?.length || 0;
-            } catch (e) { }
+          // Fetch real sent emails count
+          let sentCount = 0;
+          try {
+            const gRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=1", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const gData = await gRes.json();
+            sentCount = gData.resultSizeEstimate || 0;
+          } catch (e) { }
 
-            // Fetch real sent emails count
-            let sentCount = 0;
-            try {
-              const gRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?q=in:sent&maxResults=1", {
-                headers: { Authorization: `Bearer ${token}` },
-              });
-              const gData = await gRes.json();
-              sentCount = gData.resultSizeEstimate || 0;
-            } catch (e) { }
+          // Save to Airtable
+          const gEmail = gUser.email;
+          const gName = gUser.name || gEmail.split("@")[0];
+          const gPic = gUser.picture || "";
 
-            // Save to Airtable
-            const gEmail = gUser.email;
-            const gName = gUser.name || gEmail.split("@")[0];
-            const gPic = gUser.picture || "";
-
-            const existing = await airtableFetch(`{user_email}='${gEmail}'`);
-            if (existing.length === 0) {
-              await airtableCreate({
-                username: gName, user_email: gEmail, password: "", method: "google", role: "user",
-                created_at: new Date().toISOString().split("T")[0],
-              });
-            }
-
-            const userData = {
-              username: existing[0]?.fields?.username || gName,
-              email: gEmail,
-              method: "google",
-              role: existing[0]?.fields?.role || "user",
-              avatar: gPic,
-              accessToken: token,
-              contactsCount,
-              sentCount,
-            };
-            localStorage.setItem("thehotspot_user", JSON.stringify(userData));
-            onLogin(userData);
+          const existing = await airtableFetch(`{user_email}='${gEmail}'`);
+          if (existing.length === 0) {
+            await airtableCreate({
+              username: gName, user_email: gEmail, password: "", method: "google", role: "user",
+              created_at: new Date().toISOString().split("T")[0],
+            });
           }
-        },
-      }).requestAccessToken();
-    };
-    document.head.appendChild(script);
+
+          const userData = {
+            username: existing[0]?.fields?.username || gName,
+            email: gEmail,
+            method: "google",
+            role: existing[0]?.fields?.role || "user",
+            avatar: gPic,
+            accessToken: token,
+            contactsCount,
+            sentCount,
+          };
+          localStorage.setItem("thehotspot_user", JSON.stringify(userData));
+          onLogin(userData);
+        } catch (err) {
+          setError("Sign-in failed: " + err.message);
+        } finally {
+          setGoogleLoading(false);
+        }
+      },
+    });
+    client.requestAccessToken();
   };
 
   return (
@@ -218,17 +243,24 @@ function LoginPage({ onLogin }) {
           <div style={{ fontSize: 13, color: "#6b6b80", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
 
           {/* Google Button */}
-          <button onClick={handleGoogleLogin} style={{
+          <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
             width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #2a2a3a",
             background: "#0c0c12", color: "#e0e0e8", fontSize: 14, fontWeight: 500,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
             gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
+            opacity: googleLoading ? 0.7 : 1,
           }}
-            onMouseEnter={e => { e.target.style.borderColor = "#4285F4"; e.target.style.background = "#4285F411"; }}
-            onMouseLeave={e => { e.target.style.borderColor = "#2a2a3a"; e.target.style.background = "#0c0c12"; }}
+            onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#4285F411"; } }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#2a2a3a"; e.currentTarget.style.background = "#0c0c12"; }}
           >
-            <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-            Continue with Google
+            {googleLoading ? (
+              <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#e0e0e8", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
+            ) : (
+              <>
+                <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
+                Continue with Google
+              </>
+            )}
           </button>
 
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
