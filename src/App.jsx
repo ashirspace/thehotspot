@@ -2065,32 +2065,41 @@ function Dashboard({ user, onLogout }) {
     setInput("");
     setLoading(true);
 
-    // If message contains email addresses or send command — handle inline
-    const sendIntent = parseSendIntent(msg);
-    if (sendIntent) {
-      await runEmailCampaign(sendIntent.category, sendIntent.emails);
-      return;
-    }
-
     try {
-      const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg].map(m => ({ role: m.role, content: m.content }));
+      const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg]
+        .map(m => ({ role: m.role, content: m.content }));
       const res = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ messages: apiMessages }),
       });
       const data = await res.json();
-      const aiText = data.content?.[0]?.text || "";
-      const actionMatch = aiText.match(/<action>(.*?)<\/action>/s);
-      let action = null;
-      let cleanText = aiText.replace(/<action>.*?<\/action>/gs, "").trim();
-      if (actionMatch) { try { action = JSON.parse(actionMatch[1]); } catch (e) { } }
-      setMessages(prev => [...prev, { role: "assistant", content: cleanText || "Let me know how I can help!" }]);
-      if (action) executeAction(action);
+      const { message, action, params } = data;
+
+      // Show AI reply first
+      setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
+
+      // Execute whatever the AI decided
+      if (action === "send_emails") {
+        const emails = params?.emails?.length ? params.emails : null;
+        const category = params?.category || "all";
+        await runEmailCampaign(category, emails);
+        return;
+      }
+      if (action === "show_stats") setPage("dashboard");
+      if (action === "show_contacts") setPage("contacts");
+      if (action === "open_email_sender") setPage("emailSender");
+
     } catch (err) {
+      // Fallback: if API is down, try local intent detection
+      const emails = extractEmails(msg);
+      if (emails.length > 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: `Sending to ${emails.join(", ")}...` }]);
+        await runEmailCampaign("all", emails);
+        return;
+      }
       const response = getSmartResponse(msg);
       setMessages(prev => [...prev, { role: "assistant", content: response.text }]);
-      if (response.action) executeAction(response.action);
     }
     setLoading(false);
   };
