@@ -2020,8 +2020,45 @@ function Dashboard({ user, onLogout }) {
     } catch {}
   };
 
+  // Generate one email via API — returns { subject, body }
+  const generateOneEmail = async (contact, offerContext) => {
+    const res = await fetch("/api/generate-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        company: contact.company_name || contact.company || contact.name || "the company",
+        category: contact.category || "Network",
+        website: contact.website || "",
+        offerContext,
+        senderName: user?.name || user?.username || "Ashir",
+      }),
+    });
+    return res.json();
+  };
+
+  // Send one pre-generated email via Gmail — returns true/false
+  const sendOneEmail = async (to, subject, body) => {
+    const raw = makeGmailMessage({ to, subject, body });
+    const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ raw }),
+    });
+    const data = await res.json();
+    if (data.error) {
+      if (data.error.code === 401 || data.error.status === "UNAUTHENTICATED") {
+        setGmailToken(null);
+        setGmailConnected(false);
+        throw new Error("TOKEN_EXPIRED");
+      }
+      throw new Error(data.error.message);
+    }
+    return true;
+  };
+
   // Send emails inline in the chat — no page navigation
-  const runEmailCampaign = async (category, directEmails = null, offerContext = "") => {
+  // preDrafts: optional array of { subject, body } to use instead of generating
+  const runEmailCampaign = async (category, directEmails = null, offerContext = "", preDrafts = null) => {
     if (!gmailToken) {
       setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected. Click the **Connect Gmail** button in the top bar to connect, then try again.` }]);
       connectGmail();
@@ -2052,12 +2089,12 @@ function Dashboard({ user, onLogout }) {
 
     cancelCampaign.current = false;
     setCampaignRunning(true);
-    const label = directEmails ? directEmails.join(", ") : `${targets.length} contact${targets.length !== 1 ? "s" : ""}${category && category !== "all" ? ` (${category.toUpperCase()})` : ""}`;
     const progressId = Date.now();
-    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Sending to **${label}**... (say "stop" to cancel)` }]);
+    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `⏳ Generating email...` }]);
 
     let sent = 0, failed = 0;
     const sentLog = [];
+
     for (let i = 0; i < targets.length; i++) {
       if (cancelCampaign.current) {
         const cancelMsg = `⛔ Campaign cancelled.\n\n• **${sent} sent** before stopping${failed > 0 ? `\n• ${failed} failed` : ""}`;
@@ -2067,48 +2104,71 @@ function Dashboard({ user, onLogout }) {
         setLoading(false);
         return;
       }
+
       const contact = targets[i];
       try {
-        const genRes = await fetch("/api/generate-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ company: contact.company_name || contact.company || contact.name || "the company", category: contact.category || "Network", website: contact.website || "", offerContext, senderName: user?.name || user?.username || "Ashir" }),
-        });
-        const { subject, body } = await genRes.json();
-        if (!contact.email) throw new Error("No email address");
-        const raw = makeGmailMessage({ to: contact.email, subject, body });
-        const sendRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ raw }),
-        });
-        const sendData = await sendRes.json();
-        if (sendData.error) {
-          // Token expired — clear it and abort
-          if (sendData.error.code === 401 || sendData.error.status === "UNAUTHENTICATED") {
-            setGmailToken(null);
-            setGmailConnected(false);
-            const expiredMsg = `⚠️ Gmail token expired.\n\n${sent > 0 ? `${sent} emails were sent before it expired.\n\n` : ""}Click **Connect Gmail** in the top bar to reconnect, then try again.`;
-            setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: expiredMsg } : m));
-            saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
-            setCampaignRunning(false);
-            setLoading(false);
-            connectGmail();
-            return;
-          }
-          throw new Error(sendData.error.message);
+        // Use pre-generated draft if available, otherwise generate now
+        let subject, body;
+        if (preDrafts && preDrafts[i]) {
+          subject = preDrafts[i].subject;
+          body = preDrafts[i].body;
+        } else {
+          const draft = await generateOneEmail(contact, offerContext);
+          subject = draft.subject;
+          body = draft.body;
         }
+
+        if (!contact.email) throw new Error("No email address");
+
+        // Show the exact email being sent in the chat message
+        if (targets.length === 1) {
+          setMessages(prev => prev.map(m => m.id === progressId ? {
+            ...m,
+            content: `📤 Sending to **${contact.email}**:\n\n**Subject:** ${subject}\n\n${body}\n\n_Sending..._`,
+          } : m));
+        } else {
+          setMessages(prev => prev.map(m => m.id === progressId ? {
+            ...m,
+            content: `📤 **${i + 1}/${targets.length}** — Sending to **${contact.email}**\nSubject: "${subject}"${failed > 0 ? ` · ❌ ${failed} failed` : ""} · say "stop" to cancel`,
+          } : m));
+        }
+
+        await sendOneEmail(contact.email, subject, body);
         sent++;
         sentLog.push({ email: contact.email, company: contact.company_name || contact.company || contact.name, subject, sentAt: new Date().toISOString() });
-      } catch { failed++; }
 
-      const progress = `📤 Sending... **${i + 1}/${targets.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""} · say "stop" to cancel`;
-      setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: progress } : m));
+        // Show final sent confirmation for single email
+        if (targets.length === 1) {
+          setMessages(prev => prev.map(m => m.id === progressId ? {
+            ...m,
+            content: `✅ Sent to **${contact.email}**\n\n**Subject:** ${subject}\n\n${body}`,
+          } : m));
+        }
+      } catch (err) {
+        if (err.message === "TOKEN_EXPIRED") {
+          const expiredMsg = `⚠️ Gmail token expired.\n\n${sent > 0 ? `${sent} sent before expiry.\n\n` : ""}Reconnecting Gmail...`;
+          setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: expiredMsg } : m));
+          saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
+          setCampaignRunning(false);
+          setLoading(false);
+          connectGmail();
+          return;
+        }
+        failed++;
+      }
+
+      // Bulk progress after each email
+      if (targets.length > 1 && i === targets.length - 1) {
+        const summary = `✅ Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed**` : ""}`;
+        setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
+      }
     }
 
-    const summary = `✅ Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed** (check email address or Gmail connection)` : ""}`;
-    setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
-    saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
+    if (targets.length > 1) {
+      saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
+    } else if (sent > 0) {
+      saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
+    }
     setCampaignRunning(false);
     setLoading(false);
   };
@@ -2228,22 +2288,25 @@ function Dashboard({ user, onLogout }) {
       const data = await res.json();
       const { message, action, params } = data;
 
-      // Show AI reply first
-      setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
-
       // Execute whatever the AI decided
       if (action === "stop_campaign") {
         cancelCampaign.current = true;
+        setMessages(prev => [...prev, { role: "assistant", content: message || "Stopping campaign..." }]);
         setLoading(false);
         return;
       }
       if (action === "send_emails") {
+        // Don't show AI's description — it would differ from the actual generated email.
+        // runEmailCampaign will show the real email content in chat.
         const emails = params?.emails?.length ? params.emails : null;
         const category = params?.category || "all";
         const offerContext = params?.offerContext || "";
         await runEmailCampaign(category, emails, offerContext);
         return;
       }
+
+      // For all other actions: show AI reply
+      setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
       if (action === "schedule_emails") {
         try {
           const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
