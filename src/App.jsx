@@ -1913,14 +1913,6 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
 function Dashboard({ user, onLogout }) {
   const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
   const setPage = (p) => { setPageRaw(p); if (p) localStorage.setItem("thehotspot_page", p); else localStorage.removeItem("thehotspot_page"); };
-  const [isDesktop, setIsDesktop] = useState(() => window.innerWidth >= 768);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(min-width: 768px)");
-    const h = (e) => setIsDesktop(e.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
   const [gmailConnected, setGmailConnected] = useState(() => !!(user?.gmailToken || user?.sentCount));
   const [gmailToken, setGmailToken] = useState(() => user?.gmailToken || null);
   const [sentCount, setSentCount] = useState(() => user?.sentCount || 0);
@@ -2336,20 +2328,20 @@ function Dashboard({ user, onLogout }) {
     client.requestAccessToken();
   };
 
-  const navTo = (p) => { setPage(p); setSidebarOpen(false); };
-
-  // Sidebar nav items
+  // All nav items shown as dashboard cards
   const navItems = [
-    { id: "dashboard", label: "Dashboard", icon: "📊" },
-    { id: "emailSender", label: "Email Sender", icon: "📤" },
-    { id: "campaignStatus", label: "Campaign Status", icon: "📡" },
-    { id: "totalContacts", label: "Total Contacts", icon: "👥" },
-    { id: "emailsSent", label: "Emails Sent", icon: "📧" },
-    { id: "categories", label: "Categories", icon: "📁" },
-    { id: "successRate", label: "Success Rate", icon: "✅" },
-    { id: "contacts", label: "Contacts DB", icon: "📋" },
-    { id: "profile", label: "Profile", icon: "⚙️" },
+    { id: "emailSender",    label: "Email Sender",    icon: "📤", desc: "Draft & send outreach",   accent: "#10b981" },
+    { id: "contacts",       label: "Contacts DB",     icon: "📋", desc: "Manage your contacts",    accent: "#6366f1" },
+    { id: "campaignStatus", label: "Campaign Status", icon: "📡", desc: "Track active campaigns",  accent: "#f97316" },
+    { id: "totalContacts",  label: "Total Contacts",  icon: "👥", desc: "All contacts overview",   accent: "#0ea5e9" },
+    { id: "emailsSent",     label: "Emails Sent",     icon: "📧", desc: "View sent emails",        accent: "#8b5cf6" },
+    { id: "categories",     label: "Categories",      icon: "📁", desc: "Network, CPS, CPL…",      accent: "#ec4899" },
+    { id: "successRate",    label: "Success Rate",    icon: "✅", desc: "Campaign performance",    accent: "#14b8a6" },
+    { id: "profile",        label: "Settings",        icon: "⚙️", desc: "Account & preferences",  accent: "#64748B" },
   ];
+
+  const pageLabel = navItems.find(n => n.id === page)?.label || "Page";
+  const pageIcon  = navItems.find(n => n.id === page)?.icon  || "";
 
   return (
     <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", color: "#0F172A", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
@@ -2361,59 +2353,51 @@ function Dashboard({ user, onLogout }) {
         </div>
       )}
 
-      {/* OVERLAY for mobile sidebar */}
-      {!isDesktop && sidebarOpen && <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.3)", zIndex: 90 }} />}
-
-      {/* LEFT SIDEBAR */}
-      <div style={{
-        position: "fixed", left: sidebarOpen ? 0 : "-280px", top: 0, width: 280, height: "100vh",
-        background: "#FFFFFF", borderRight: "1px solid #E2E8F0", zIndex: 100,
-        transition: "left .3s ease", display: "flex", flexDirection: "column", overflow: "hidden",
-        boxShadow: isDesktop ? "none" : "2px 0 16px rgba(0,0,0,0.06)",
-      }}>
-        {/* Sidebar Header */}
-        <div style={{ padding: "20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <Logo size={26} />
-            <div>
-              <div style={{ fontSize: 14, fontWeight: 700, color: "#0F172A" }}>thehotspot</div>
-              <div style={{ fontSize: 10, color: "#94A3B8" }}>Grow Connections Easily</div>
-            </div>
-          </div>
-          <button onClick={() => setSidebarOpen(false)} style={{ background: "none", border: "none", color: "#94A3B8", cursor: "pointer", fontSize: 18, lineHeight: 1 }}>✕</button>
+      {/* ═══════ TOP NAV BAR (always visible) ═══════ */}
+      <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
+        {/* Left: logo + back breadcrumb */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+            <Logo size={24} />
+            <span style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
+          </button>
+          {page && page !== "dashboard" && (
+            <>
+              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
+              <button onClick={() => setPage("dashboard")} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", padding: 0, fontFamily: "'DM Sans',sans-serif" }}>Dashboard</button>
+              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{pageIcon} {pageLabel}</span>
+            </>
+          )}
+          {page === "dashboard" && (
+            <>
+              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Dashboard</span>
+            </>
+          )}
         </div>
-
-        {/* Nav Items */}
-        <div style={{ flex: 1, padding: "12px", overflowY: "auto" }}>
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => navTo(item.id)} style={{
-              width: "100%", padding: "11px 14px", borderRadius: 10, border: "none", marginBottom: 2,
-              background: page === item.id ? "#EEF2FF" : "transparent",
-              color: page === item.id ? "#4F46E5" : "#64748B",
-              fontSize: 13, fontWeight: page === item.id ? 600 : 500, cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-              fontFamily: "'DM Sans',sans-serif", transition: "all .15s", textAlign: "left",
-              borderLeft: page === item.id ? "3px solid #4F46E5" : "3px solid transparent",
-            }}
-              onMouseEnter={e => { if (page !== item.id) { e.currentTarget.style.background = "#F8FAFF"; e.currentTarget.style.color = "#0F172A"; } }}
-              onMouseLeave={e => { if (page !== item.id) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748B"; } }}
-            >
-              <span style={{ fontSize: 16 }}>{item.icon}</span> {item.label}
+        {/* Right: chat button + user + logout */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          {page !== null && (
+            <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+              💬 Chat
             </button>
-          ))}
-        </div>
-
-        {/* User + Logout */}
-        <div style={{ padding: "16px", borderTop: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff" }}>
+          )}
+          {page === null && (
+            <button onClick={() => setPage("dashboard")} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+              📊 Dashboard
+            </button>
+          )}
+          <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px 4px 4px", cursor: "pointer", transition: "all .2s", fontFamily: "'DM Sans',sans-serif" }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
+          >
+            <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff" }}>
               {user?.username?.[0]?.toUpperCase() || "U"}
             </div>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{user?.username}</div>
-              <div style={{ fontSize: 10, color: "#94A3B8" }}>{user?.method === "google" ? "Google account" : "Password account"}</div>
-            </div>
-          </div>
-          <button onClick={onLogout} style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 8px", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center" }}
+            <span style={{ fontSize: 12, color: "#64748B" }}>{user?.username}</span>
+          </button>
+          <button onClick={onLogout} title="Logout" style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 8px", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center", transition: "all .15s" }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = "#EF4444"; e.currentTarget.style.color = "#EF4444"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}>
             <I.Logout />
@@ -2421,213 +2405,151 @@ function Dashboard({ user, onLogout }) {
         </div>
       </div>
 
-      {/* ═══════ MAIN AREA ═══════ */}
-      {/* If page is null → show chatbot fullscreen. If page is set → show that page */}
+      {/* ═══════ MAIN CONTENT ═══════ */}
+      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
-      {page === null ? (
-        /* ═══════ CHATBOT (FULL CENTER) ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#F0F4FF", marginLeft: isDesktop && sidebarOpen ? 280 : 0, transition: "margin-left .3s ease" }}>
-          {/* Chat Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#FFFFFF" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <button onClick={() => setSidebarOpen(o => !o)} style={{
-                background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
-                color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
-              }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-              </button>
-              <div style={{ width: 34, height: 34, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        {/* CHAT VIEW */}
+        {page === null && (
+          <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#F0F4FF" }}>
+            {/* Chat assistant header */}
+            <div style={{ padding: "10px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 10, background: "#FFFFFF" }}>
+              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <I.Bot />
               </div>
               <div>
-                <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>Outreach Assistant</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Outreach Assistant</div>
                 <div style={{ fontSize: 11, color: "#10b981", display: "flex", alignItems: "center", gap: 4 }}>
                   <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Online
                 </div>
               </div>
             </div>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #E2E8F0", borderRadius: 20, padding: "5px 12px 5px 5px", cursor: "pointer", transition: "all .2s" }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
-                onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
-              >
-                <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff" }}>
-                  {user?.username?.[0]?.toUpperCase() || "U"}
-                </div>
-                <span style={{ fontSize: 12, color: "#64748B" }}>{user?.username}</span>
-              </button>
-            </div>
-          </div>
 
-          {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 760, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
-            {messages.map((m, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-                <div style={{
-                  maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.65, whiteSpace: "pre-wrap",
-                  borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                  background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#FFFFFF",
-                  color: m.role === "user" ? "#fff" : "#0F172A",
-                  fontWeight: m.role === "user" ? 500 : 400,
-                  border: m.role === "user" ? "none" : "1px solid #E2E8F0",
-                  boxShadow: m.role === "user" ? "0 4px 12px rgba(16,185,129,0.25)" : "0 2px 8px rgba(0,0,0,0.06)",
-                }}>{m.content}</div>
-              </div>
-            ))}
-            {/* Suggested prompts — only when only the welcome message is shown */}
-            {messages.length === 1 && !loading && (
-              <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
-                {["📊 Show my stats", "📋 View contacts", "📧 Send emails", "📡 Campaign status"].map(chip => (
-                  <button key={chip} onClick={() => handleSend(chip.replace(/^\S+\s*/, ""))} style={{
-                    padding: "8px 16px", borderRadius: 20, border: "1px solid #E2E8F0", background: "#FFFFFF",
-                    color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-                    transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#4F46E5"; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
-                  >{chip}</button>
-                ))}
-              </div>
-            )}
-            {loading && (
-              <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                <div style={{ padding: "12px 18px", borderRadius: "18px 18px 18px 4px", background: "#FFFFFF", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
-                  {[0, 1, 2].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}
+            {/* Messages */}
+            <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 760, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+              {messages.map((m, i) => (
+                <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+                  <div style={{
+                    maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.65, whiteSpace: "pre-wrap",
+                    borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+                    background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#FFFFFF",
+                    color: m.role === "user" ? "#fff" : "#0F172A",
+                    fontWeight: m.role === "user" ? 500 : 400,
+                    border: m.role === "user" ? "none" : "1px solid #E2E8F0",
+                    boxShadow: m.role === "user" ? "0 4px 12px rgba(16,185,129,0.25)" : "0 2px 8px rgba(0,0,0,0.06)",
+                  }}>{m.content}</div>
                 </div>
-              </div>
-            )}
-            <div ref={chatEnd} />
-          </div>
-
-          {/* Chat Input */}
-          <div style={{ padding: "14px 16px", borderTop: "1px solid #E2E8F0", background: "#FFFFFF" }}>
-            <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
-              <button onClick={toggleVoice} style={{
-                width: 44, height: 44, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                background: listening ? "#ECFDF5" : "#F8FAFF",
-                border: listening ? "2px solid #10b981" : "1px solid #E2E8F0",
-                color: listening ? "#10b981" : "#64748B",
-                boxShadow: listening ? "0 0 0 4px #10b98122" : "none",
-                animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
-                transition: "all .2s",
-              }}>
-                {listening ? <I.MicOff /> : <I.Mic />}
-              </button>
-              <input type="text" value={input} onChange={e => setInput(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSend()}
-                placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
-                style={{ flex: 1, background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 24, padding: "11px 20px", color: "#0F172A", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)" }}
-                onFocus={e => { e.target.style.borderColor = "#10b981"; e.target.style.boxShadow = "0 0 0 3px #10b98115"; }}
-                onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)"; }}
-              />
-              <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-                width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
-                background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
-                color: input.trim() ? "#fff" : "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center",
-                boxShadow: input.trim() ? "0 4px 12px rgba(16,185,129,0.3)" : "none",
-                transition: "all .2s",
-              }}>
-                <I.Send />
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : (
-        /* ═══════ PAGE VIEW ═══════ */
-        <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", overflow: "hidden", marginLeft: isDesktop && sidebarOpen ? 280 : 0, transition: "margin-left .3s ease" }}>
-          {/* Page Header */}
-          <div style={{ padding: "12px 20px", borderBottom: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 12, background: "#FFFFFF" }}>
-            <button onClick={() => setSidebarOpen(o => !o)} style={{
-              background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "8px",
-              color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center",
-            }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="18" x2="21" y2="18" /></svg>
-            </button>
-            <span style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>
-              {navItems.find(n => n.id === page)?.icon} {navItems.find(n => n.id === page)?.label || "Page"}
-            </span>
-            <button onClick={() => setPage(null)} style={{
-              marginLeft: "auto", background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 12px",
-              color: "#4F46E5", cursor: "pointer", fontSize: 12, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 6,
-              fontWeight: 500,
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "none"; }}
-            >
-              💬 Back to Chat
-            </button>
-          </div>
-
-          {/* Page Content */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "24px", maxWidth: 900, width: "100%", margin: "0 auto" }}>
-            {/* DASHBOARD */}
-            {page === "dashboard" && (
-              <>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 14, marginBottom: 28 }}>
-                  <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                  <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" onClick={() => setPage("emailsSent")} />
-                  <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
-                  <StatCard icon={<I.Check />} label="Success Rate" value={sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
-                </div>
-                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Quick Actions</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 10, marginBottom: 28 }}>
-                  {[
-                    { icon: <I.Mail />, label: "Send All Emails", accent: "#10b981", action: () => setPage("emailSender") },
-                    { icon: <I.Activity />, label: "Campaign Status", accent: "#6366f1", action: () => setPage("campaignStatus") },
-                    { icon: <I.Clock />, label: "Pause Workflow", accent: "#f97316", action: () => showToast("Workflow control coming soon") },
-                    { icon: <I.Zap />, label: "Resume Workflow", accent: "#0ea5e9", action: () => showToast("Workflow control coming soon") },
-                  ].map((a, i) => (
-                    <button key={i} onClick={a.action} style={{
-                      background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px 18px",
-                      color: "#0F172A", cursor: "pointer", display: "flex", alignItems: "center", gap: 10,
-                      fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "all .15s",
+              ))}
+              {messages.length === 1 && !loading && (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+                  {["📊 Show my stats", "📋 View contacts", "📧 Send emails", "📡 Campaign status"].map(chip => (
+                    <button key={chip} onClick={() => handleSend(chip.replace(/^\S+\s*/, ""))} style={{
+                      padding: "8px 16px", borderRadius: 20, border: "1px solid #E2E8F0", background: "#FFFFFF",
+                      color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+                      transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
                     }}
-                      onMouseEnter={e => { e.currentTarget.style.borderColor = a.accent; e.currentTarget.style.boxShadow = `0 4px 12px ${a.accent}20`; }}
-                      onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; }}
-                    >
-                      <span style={{ color: a.accent }}>{a.icon}</span> {a.label} <span style={{ marginLeft: "auto", color: "#CBD5E1" }}><I.Right /></span>
-                    </button>
+                      onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#4F46E5"; }}
+                      onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
+                    >{chip}</button>
                   ))}
                 </div>
-                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Categories</div>
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))", gap: 10 }}>
-                  {Object.entries(CAT).map(([name, c]) => (
-                    <button key={name} onClick={() => setPage("categories")} style={{
-                      background: c.bg, border: `1px solid ${c.dot}44`, borderRadius: 12, padding: 14,
-                      color: c.text, cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
-                      transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
-                    }}
-                      onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 6px 16px ${c.dot}25`; }}
-                      onMouseLeave={e => { e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}
-                    >
-                      <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
-                        <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot }} />
-                        <span style={{ fontSize: 14, fontWeight: 600 }}>{name}</span>
-                      </div>
-                      <div style={{ fontSize: 11, color: c.text, opacity: .6 }}>0 sent</div>
-                    </button>
-                  ))}
+              )}
+              {loading && (
+                <div style={{ display: "flex", justifyContent: "flex-start" }}>
+                  <div style={{ padding: "12px 18px", borderRadius: "18px 18px 18px 4px", background: "#FFFFFF", border: "1px solid #E2E8F0", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(0,0,0,0.06)" }}>
+                    {[0, 1, 2].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}
+                  </div>
                 </div>
-              </>
-            )}
+              )}
+              <div ref={chatEnd} />
+            </div>
 
-            {/* EMAIL SENDER */}
-            {page === "emailSender" && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
-
-            {/* CONTACTS */}
-            {page === "contacts" && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
-
-            {/* DETAIL PAGES */}
-            {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
-            {page === "totalContacts" && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
-            {page === "emailsSent" && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} />}
-            {page === "categories" && <CategoriesPage onBack={() => setPage("dashboard")} />}
-            {page === "successRate" && <SuccessRatePage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
-            {page === "profile" && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
+            {/* Chat Input */}
+            <div style={{ padding: "14px 16px", borderTop: "1px solid #E2E8F0", background: "#FFFFFF" }}>
+              <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
+                <button onClick={toggleVoice} style={{
+                  width: 44, height: 44, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                  background: listening ? "#ECFDF5" : "#F8FAFF",
+                  border: listening ? "2px solid #10b981" : "1px solid #E2E8F0",
+                  color: listening ? "#10b981" : "#64748B",
+                  boxShadow: listening ? "0 0 0 4px #10b98122" : "none",
+                  animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
+                  transition: "all .2s",
+                }}>
+                  {listening ? <I.MicOff /> : <I.Mic />}
+                </button>
+                <input type="text" value={input} onChange={e => setInput(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleSend()}
+                  placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
+                  style={{ flex: 1, background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 24, padding: "11px 20px", color: "#0F172A", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.04)" }}
+                  onFocus={e => { e.target.style.borderColor = "#10b981"; e.target.style.boxShadow = "0 0 0 3px #10b98115"; }}
+                  onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.04)"; }}
+                />
+                <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
+                  width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
+                  background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
+                  color: input.trim() ? "#fff" : "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center",
+                  boxShadow: input.trim() ? "0 4px 12px rgba(16,185,129,0.3)" : "none",
+                  transition: "all .2s",
+                }}>
+                  <I.Send />
+                </button>
+              </div>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* PAGE VIEW */}
+        {page !== null && (
+          <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", width: "100%" }}>
+            <div style={{ maxWidth: 960, margin: "0 auto" }}>
+
+              {/* ── DASHBOARD HOME ── */}
+              {page === "dashboard" && (
+                <>
+                  {/* Stats row */}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(190px,1fr))", gap: 14, marginBottom: 32 }}>
+                    <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
+                    <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" onClick={() => setPage("emailsSent")} />
+                    <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
+                    <StatCard icon={<I.Check />} label="Success Rate" value={sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                  </div>
+
+                  {/* All tools grid */}
+                  <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>All Tools</div>
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12 }}>
+                    {navItems.map(item => (
+                      <button key={item.id} onClick={() => setPage(item.id)} style={{
+                        background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 18px 16px",
+                        cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
+                        boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "all .15s",
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.borderColor = item.accent; e.currentTarget.style.boxShadow = `0 6px 20px ${item.accent}20`; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
+                      >
+                        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${item.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 10 }}>
+                          {item.icon}
+                        </div>
+                        <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 3 }}>{item.label}</div>
+                        <div style={{ fontSize: 12, color: "#94A3B8" }}>{item.desc}</div>
+                      </button>
+                    ))}
+                  </div>
+                </>
+              )}
+
+              {/* ── OTHER PAGES ── */}
+              {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
+              {page === "contacts"       && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
+              {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
+              {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
+              {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} />}
+              {page === "categories"     && <CategoriesPage onBack={() => setPage("dashboard")} />}
+              {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
+              {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
+            </div>
+          </div>
+        )}
+      </div>
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
