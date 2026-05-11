@@ -9,50 +9,40 @@ export default async function handler(req, res) {
   const sender = senderName || "Ashir";
 
   const fallback = {
-    subject: `Quick question for ${company}`,
-    body: `Hi ${company} Team,\n\nWe run an affiliate network and think there's a real fit between what we do and what you're building.\n\n${offerContext ? offerContext + "\n\n" : ""}Want to jump on a quick call this week?\n\nBest,\n${sender}\nthehotspot`,
+    subject: `Quick opportunity for ${company}`,
+    body: `Hi ${company},\n\n${offerContext ? offerContext + "\n\n" : "We run a high-performing affiliate network and think there's a strong fit with what you do.\n\n"}Open to a quick 10-min call this week?\n\nBest,\n${sender}\nthehotspot`,
   };
 
   if (!API_KEY) return res.status(200).json(fallback);
 
-  const prompt = `You are writing a cold outreach email on behalf of ${sender} from thehotspot, an affiliate marketing network.
+  const prompt = `Write a cold outreach email from ${sender} at thehotspot (affiliate marketing network) to ${company}.
 
-RECIPIENT:
-- Company: ${company}
-- Website: ${website || "unknown"}
+CONTEXT:
+- Their website/domain: ${website || "unknown"}
 - Partnership type: ${category || "affiliate"}
-${offerContext ? `- Key message to communicate: ${offerContext}` : ""}
+${offerContext ? `- Key offer details: ${offerContext}` : ""}
 
-WRITE AN EMAIL THAT:
-1. Opens with ONE sentence that references something specific about ${company} — their niche, their product, or what their domain suggests they do. Do NOT say "I came across your website."
-2. Immediately explains what thehotspot is offering and why it benefits THEM specifically
-3. Includes any concrete details from the key message (commission %, payout schedule, volumes, etc.) — if none provided, keep it brief and invite a conversation
-4. Ends with ONE clear ask — a short call, a reply, a quick chat
-5. Is 100-150 words MAXIMUM — tight and punchy, not a wall of text
-6. Sounds like a real person wrote it, not a marketing department
+RULES — follow every one exactly:
+1. Body must be UNDER 400 CHARACTERS total (count every character including spaces and line breaks)
+2. Do NOT waste characters on pleasantries — open with the value immediately
+3. First line: one short sentence about what thehotspot offers and why it fits ${company}
+4. Second line: the specific benefit — commission %, payout terms, traffic volume, or whatever is most compelling from the offer details
+5. Third line: single clear ask — "Open to a quick call?" or "Want the details?" or similar
+6. Sign off: "Best,\n${sender}\nthehotspot" — no other contact info
+7. Tone: direct, confident, human — like a message from a real person, not a marketing email
+8. NO filler words: not "hope", not "reach out", not "touch base", not "synergy", not "excited"
+9. Subject line: under 45 characters, specific, makes them curious — NOT "Partnership Opportunity"
 
-SIGNATURE — end the email exactly like this (fill in ${sender}):
-Best,
-${sender}
-thehotspot
+BAD example (too long, cliché):
+"Hi Team, I hope this message finds you well. I wanted to reach out about a potential partnership opportunity that could benefit both our organizations..."
 
-BANNED WORDS AND PHRASES — DO NOT USE ANY OF THESE:
-synergy, synergies, leverage, leveraging, touch base, circle back, move the needle,
-drive value, game changer, innovative, revolutionizing, deep dive, bandwidth,
-"I hope this email finds you well", "I wanted to reach out", "I came across",
-"mutual growth", "exciting opportunity", "look forward to connecting",
-"would love to explore", "I believe there's a great opportunity",
-[Your Name], [Your Position], [Your Contact Information], [placeholder of any kind]
+GOOD example (tight, direct):
+"Hi Acme,\n\nWe place high-intent leads with CPS networks — your offers match exactly what our publishers want.\n\n35% commission, weekly payouts. Worth 10 mins?\n\nBest,\nAshir\nthehotspot"
 
-SUBJECT LINE:
-- Under 50 characters
-- Specific and curiosity-driving — NOT "Partnership Opportunity" or "Collaboration"
-- Something the recipient would actually open
-
-Return ONLY valid JSON:
+Return ONLY valid JSON (no markdown, no extra text):
 {"subject": "...", "body": "..."}
 
-Body uses plain text with line breaks (\\n). No HTML. No placeholders.`;
+Body uses \\n for line breaks. No HTML. No placeholder brackets.`;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -60,7 +50,7 @@ Body uses plain text with line breaks (\\n). No HTML. No placeholders.`;
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 600,
+        max_tokens: 400,
         response_format: { type: "json_object" },
         messages: [{ role: "user", content: prompt }],
       }),
@@ -68,9 +58,18 @@ Body uses plain text with line breaks (\\n). No HTML. No placeholders.`;
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     const parsed = JSON.parse(data.choices?.[0]?.message?.content || "{}");
+
+    // Enforce 400 char limit on body — trim if model ignored the rule
+    let body = parsed.body || fallback.body;
+    if (body.length > 420) {
+      // Find last sentence end before 400 chars and cut there
+      const cut = body.lastIndexOf("\n", 400);
+      body = cut > 200 ? body.slice(0, cut) + `\n\nBest,\n${sender}\nthehotspot` : body.slice(0, 400);
+    }
+
     res.status(200).json({
       subject: parsed.subject || fallback.subject,
-      body: parsed.body || fallback.body,
+      body,
     });
   } catch {
     res.status(200).json(fallback);
