@@ -31,15 +31,23 @@ HOW TO DETECT ACTIONS (check in this order):
 
 2. EMAIL ADDRESSES IN MESSAGE → action: "send_emails"
    Examples: "send to john@gmail.com", "email this: abc@company.com"
-   params: { "emails": ["john@gmail.com"], "offerContext": "<everything the user said about what to write>" }
+   params: { "emails": ["john@gmail.com"], "offerContext": "<everything the user said about what to write>", "maxChars": <number or null> }
 
 3. SEND EMAILS TO CATEGORY → action: "send_emails"
    Examples: "send emails to network companies", "CPS walo ko mail karo"
-   params: { "category": "Network", "offerContext": "<any offer details>" }
+   params: { "category": "Network", "offerContext": "<any offer details>", "maxChars": <number or null> }
 
 4. SEND ALL EMAILS → action: "send_emails"
    Examples: "send emails", "start outreach", "blast emails", "sabko mail karo"
-   params: { "category": "all", "offerContext": "" }
+   params: { "category": "all", "offerContext": "", "maxChars": null }
+
+LENGTH CONTROL — detect whenever user mentions email length:
+- "short email" / "chhota email" / "brief" → maxChars: 200
+- "long email" / "detailed email" / "lamba email" / "lamba" → maxChars: 800
+- "medium email" / "normal length" → maxChars: 400
+- "X characters" / "X words" → convert to chars (1 word ≈ 6 chars), set maxChars: X (for chars) or X*6 (for words)
+- "200 character email", "500 char", "make it longer", "make it shorter" → set maxChars accordingly
+- No length mentioned → maxChars: null (use default 400)
 
 5. SCHEDULE EMAILS → action: "schedule_emails"
    Examples: "send emails tomorrow at 9am", "schedule outreach for Friday", "kal subah bhejo"

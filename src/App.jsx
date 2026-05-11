@@ -2021,7 +2021,7 @@ function Dashboard({ user, onLogout }) {
   };
 
   // Generate one email via API — returns { subject, body }
-  const generateOneEmail = async (contact, offerContext) => {
+  const generateOneEmail = async (contact, offerContext, maxChars) => {
     const res = await fetch("/api/generate-email", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -2031,6 +2031,7 @@ function Dashboard({ user, onLogout }) {
         website: contact.website || "",
         offerContext,
         senderName: user?.name || user?.username || "Ashir",
+        maxChars: maxChars || null,
       }),
     });
     return res.json();
@@ -2058,7 +2059,7 @@ function Dashboard({ user, onLogout }) {
 
   // Send emails inline in the chat — no page navigation
   // preDrafts: optional array of { subject, body } to use instead of generating
-  const runEmailCampaign = async (category, directEmails = null, offerContext = "", preDrafts = null) => {
+  const runEmailCampaign = async (category, directEmails = null, offerContext = "", preDrafts = null, maxChars = null) => {
     if (!gmailToken) {
       setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected. Click the **Connect Gmail** button in the top bar to connect, then try again.` }]);
       connectGmail();
@@ -2113,7 +2114,7 @@ function Dashboard({ user, onLogout }) {
           subject = preDrafts[i].subject;
           body = preDrafts[i].body;
         } else {
-          const draft = await generateOneEmail(contact, offerContext);
+          const draft = await generateOneEmail(contact, offerContext, maxChars);
           subject = draft.subject;
           body = draft.body;
         }
@@ -2301,7 +2302,8 @@ function Dashboard({ user, onLogout }) {
         const emails = params?.emails?.length ? params.emails : null;
         const category = params?.category || "all";
         const offerContext = params?.offerContext || "";
-        await runEmailCampaign(category, emails, offerContext);
+        const maxChars = params?.maxChars || null;
+        await runEmailCampaign(category, emails, offerContext, null, maxChars);
         return;
       }
 
