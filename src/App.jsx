@@ -2023,7 +2023,8 @@ function Dashboard({ user, onLogout }) {
   // Send emails inline in the chat — no page navigation
   const runEmailCampaign = async (category, directEmails = null, offerContext = "") => {
     if (!gmailToken) {
-      setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected yet. Connect Gmail first — open **📤 Email Sender** from the sidebar and hit **Connect Gmail**.` }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `Gmail is not connected. Click the **Connect Gmail** button in the top bar to connect, then try again.` }]);
+      connectGmail();
       setLoading(false);
       return;
     }
@@ -2082,7 +2083,21 @@ function Dashboard({ user, onLogout }) {
           body: JSON.stringify({ raw }),
         });
         const sendData = await sendRes.json();
-        if (sendData.error) throw new Error(sendData.error.message);
+        if (sendData.error) {
+          // Token expired — clear it and abort
+          if (sendData.error.code === 401 || sendData.error.status === "UNAUTHENTICATED") {
+            setGmailToken(null);
+            setGmailConnected(false);
+            const expiredMsg = `⚠️ Gmail token expired.\n\n${sent > 0 ? `${sent} emails were sent before it expired.\n\n` : ""}Click **Connect Gmail** in the top bar to reconnect, then try again.`;
+            setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: expiredMsg } : m));
+            saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
+            setCampaignRunning(false);
+            setLoading(false);
+            connectGmail();
+            return;
+          }
+          throw new Error(sendData.error.message);
+        }
         sent++;
         sentLog.push({ email: contact.email, company: contact.company_name || contact.company || contact.name, subject, sentAt: new Date().toISOString() });
       } catch { failed++; }
@@ -2376,7 +2391,7 @@ function Dashboard({ user, onLogout }) {
             </>
           )}
         </div>
-        {/* Right: chat button + user + logout */}
+        {/* Right: chat button + Gmail + user + logout */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {page !== null && (
             <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
@@ -2388,6 +2403,18 @@ function Dashboard({ user, onLogout }) {
               📊 Dashboard
             </button>
           )}
+          {/* Gmail connect button — always visible, shows status */}
+          <button onClick={connectGmail} style={{
+            display: "flex", alignItems: "center", gap: 6, borderRadius: 20, padding: "6px 14px",
+            fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+            background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
+            border: gmailConnected ? "1px solid #10b98140" : "1px solid #f9731640",
+            color: gmailConnected ? "#059669" : "#ea580c",
+            transition: "all .15s",
+          }}>
+            <span style={{ width: 7, height: 7, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", display: "inline-block" }} />
+            {gmailConnected ? "Gmail ✓" : "Connect Gmail"}
+          </button>
           <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px 4px 4px", cursor: "pointer", transition: "all .2s", fontFamily: "'DM Sans',sans-serif" }}
             onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
             onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
