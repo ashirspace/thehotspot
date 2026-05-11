@@ -1934,6 +1934,8 @@ function Dashboard({ user, onLogout }) {
   const [toast, setToast] = useState(null);
   const chatEnd = useRef(null);
   const recog = useRef(null);
+  const cancelCampaign = useRef(false);
+  const [campaignRunning, setCampaignRunning] = useState(false);
 
   // Fetch contact count once on mount only
   useEffect(() => {
@@ -1944,6 +1946,28 @@ function Dashboard({ user, onLogout }) {
       fetchAllContacts().then(records => setContactCount(records.length)).catch(() => { });
     }
   }, []);
+
+  // Check for scheduled campaigns every minute
+  useEffect(() => {
+    const checkScheduled = () => {
+      try {
+        const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
+        const now = Date.now();
+        const due = scheduled.filter(s => new Date(s.scheduledFor).getTime() <= now);
+        const remaining = scheduled.filter(s => new Date(s.scheduledFor).getTime() > now);
+        if (due.length > 0) {
+          localStorage.setItem("thehotspot_scheduled", JSON.stringify(remaining));
+          due.forEach(s => {
+            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled campaign is starting now...` }]);
+            runEmailCampaign(s.category || "all", null, s.offerContext || "");
+          });
+        }
+      } catch {}
+    };
+    checkScheduled();
+    const interval = setInterval(checkScheduled, 60000);
+    return () => clearInterval(interval);
+  }, [gmailToken]);
 
   useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
   useEffect(() => {
@@ -1995,6 +2019,15 @@ function Dashboard({ user, onLogout }) {
     return { type: "send_emails", emails: null, category: matched || "all" };
   };
 
+  // Save a campaign to history
+  const saveCampaignHistory = (entry) => {
+    try {
+      const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+      history.unshift({ ...entry, id: Date.now(), date: new Date().toISOString() });
+      localStorage.setItem("thehotspot_campaigns", JSON.stringify(history.slice(0, 50))); // keep last 50
+    } catch {}
+  };
+
   // Send emails inline in the chat — no page navigation
   const runEmailCampaign = async (category, directEmails = null, offerContext = "") => {
     if (!gmailToken) {
@@ -2005,7 +2038,6 @@ function Dashboard({ user, onLogout }) {
 
     let targets = [];
     if (directEmails && directEmails.length > 0) {
-      // Build contact-like objects from raw email addresses
       targets = directEmails.map(email => {
         const domain = email.split("@")[1] || "";
         const company = domain.split(".")[0] || email;
@@ -2025,12 +2057,23 @@ function Dashboard({ user, onLogout }) {
       return;
     }
 
+    cancelCampaign.current = false;
+    setCampaignRunning(true);
     const label = directEmails ? directEmails.join(", ") : `${targets.length} contact${targets.length !== 1 ? "s" : ""}${category && category !== "all" ? ` (${category.toUpperCase()})` : ""}`;
     const progressId = Date.now();
-    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Sending to **${label}**...` }]);
+    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `📤 Sending to **${label}**... (say "stop" to cancel)` }]);
 
     let sent = 0, failed = 0;
+    const sentLog = [];
     for (let i = 0; i < targets.length; i++) {
+      if (cancelCampaign.current) {
+        const cancelMsg = `⛔ Campaign cancelled.\n\n• **${sent} sent** before stopping${failed > 0 ? `\n• ${failed} failed` : ""}`;
+        setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: cancelMsg } : m));
+        saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
+        setCampaignRunning(false);
+        setLoading(false);
+        return;
+      }
       const contact = targets[i];
       try {
         const genRes = await fetch("/api/generate-email", {
@@ -2049,15 +2092,114 @@ function Dashboard({ user, onLogout }) {
         const sendData = await sendRes.json();
         if (sendData.error) throw new Error(sendData.error.message);
         sent++;
+        sentLog.push({ email: contact.email, company: contact.company_name || contact.company || contact.name, subject, sentAt: new Date().toISOString() });
       } catch { failed++; }
 
-      const progress = `📤 Sending... **${i + 1}/${targets.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""}`;
+      const progress = `📤 Sending... **${i + 1}/${targets.length}** — ✅ ${sent} sent${failed > 0 ? ` · ❌ ${failed} failed` : ""} · say "stop" to cancel`;
       setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: progress } : m));
     }
 
     const summary = `✅ Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed** (check email address or Gmail connection)` : ""}`;
     setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
+    saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
+    setCampaignRunning(false);
     setLoading(false);
+  };
+
+  // Add a contact from chat
+  const chatAddContact = ({ email, company, name, category, website }) => {
+    if (!email) return "No email address provided — can't add contact.";
+    try {
+      const contacts = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+      if (contacts.find(c => c.email === email)) return `**${email}** is already in your contacts.`;
+      const newContact = {
+        id: "c_" + Date.now(),
+        email,
+        company: company || name || email.split("@")[0],
+        name: name || company || email.split("@")[0],
+        category: category || "Network",
+        website: website || "",
+        status: "Pending",
+        createdAt: new Date().toISOString(),
+      };
+      contacts.push(newContact);
+      localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
+      setContactCount(contacts.length);
+      return `✅ Added **${newContact.company}** (${email}) to **${newContact.category}** contacts.`;
+    } catch {
+      return "Failed to save contact — try again.";
+    }
+  };
+
+  // Remove contact(s) from chat
+  const chatRemoveContact = ({ email, category }) => {
+    try {
+      let contacts = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+      const before = contacts.length;
+      if (email) {
+        contacts = contacts.filter(c => c.email !== email);
+      } else if (category) {
+        contacts = contacts.filter(c => c.category?.toLowerCase() !== category.toLowerCase());
+      }
+      const removed = before - contacts.length;
+      if (removed === 0) return `No contacts found matching that criteria.`;
+      localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
+      setContactCount(contacts.length);
+      return `🗑️ Removed **${removed} contact${removed !== 1 ? "s" : ""}**.`;
+    } catch {
+      return "Failed to remove contact — try again.";
+    }
+  };
+
+  // Show campaign history
+  const showCampaignHistory = () => {
+    try {
+      const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+      if (history.length === 0) return "No campaigns sent yet. Start your first outreach by saying **\"send emails\"**.";
+      const lines = history.slice(0, 5).map((h, i) => {
+        const date = new Date(h.date).toLocaleString();
+        const status = h.cancelled ? "⛔ Cancelled" : "✅ Completed";
+        const cat = h.category && h.category !== "all" ? ` · ${h.category.toUpperCase()}` : "";
+        return `**${i + 1}. ${date}**${cat}\n${status} · ${h.sent} sent${h.failed > 0 ? ` · ${h.failed} failed` : ""}${h.offerContext ? `\n_"${h.offerContext.slice(0, 60)}${h.offerContext.length > 60 ? "..." : ""}"_` : ""}`;
+      });
+      return `📋 **Campaign History** (last ${history.slice(0, 5).length} campaigns)\n\n${lines.join("\n\n")}`;
+    } catch {
+      return "Could not load campaign history.";
+    }
+  };
+
+  // Send follow-up emails to contacts from past campaigns who haven't replied
+  const runFollowUpCampaign = async (offerContext = "", daysAgo = 3) => {
+    if (!gmailToken) {
+      setMessages(prev => [...prev, { role: "assistant", content: `Connect Gmail first to send follow-ups.` }]);
+      return;
+    }
+    try {
+      const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+      const cutoff = Date.now() - daysAgo * 24 * 60 * 60 * 1000;
+      const recentContacts = [];
+      history.forEach(h => {
+        if (new Date(h.date).getTime() >= cutoff && h.contacts) {
+          h.contacts.forEach(c => {
+            if (!recentContacts.find(r => r.email === c.email)) {
+              recentContacts.push(c);
+            }
+          });
+        }
+      });
+      if (recentContacts.length === 0) {
+        setMessages(prev => [...prev, { role: "assistant", content: `No emails found sent in the last ${daysAgo} days to follow up on.` }]);
+        setLoading(false);
+        return;
+      }
+      const followUpContext = offerContext || `This is a follow-up to my previous email. Just checking if you had a chance to review it.`;
+      const targets = recentContacts.map(c => ({ email: c.email, company: c.company, name: c.company, category: "Network", website: "" }));
+      setMessages(prev => [...prev, { role: "assistant", content: `📬 Sending follow-ups to **${targets.length} contact${targets.length !== 1 ? "s"  : ""}** from the last ${daysAgo} days...` }]);
+      await runEmailCampaign("all", targets.map(t => t.email), followUpContext);
+    } catch {
+      setMessages(prev => [...prev, { role: "assistant", content: "Failed to load past campaigns for follow-up." }]);
+      setLoading(false);
+    }
   };
 
   const handleSend = async (text) => {
@@ -2083,11 +2225,51 @@ function Dashboard({ user, onLogout }) {
       setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
 
       // Execute whatever the AI decided
+      if (action === "stop_campaign") {
+        cancelCampaign.current = true;
+        setLoading(false);
+        return;
+      }
       if (action === "send_emails") {
         const emails = params?.emails?.length ? params.emails : null;
         const category = params?.category || "all";
         const offerContext = params?.offerContext || "";
         await runEmailCampaign(category, emails, offerContext);
+        return;
+      }
+      if (action === "schedule_emails") {
+        try {
+          const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
+          scheduled.push({ scheduledFor: params.scheduledFor, category: params.category || "all", offerContext: params.offerContext || "" });
+          localStorage.setItem("thehotspot_scheduled", JSON.stringify(scheduled));
+          const timeStr = new Date(params.scheduledFor).toLocaleString();
+          setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled! Emails will send on **${timeStr}**. Keep this tab open for it to fire.` }]);
+        } catch {
+          setMessages(prev => [...prev, { role: "assistant", content: "Couldn't schedule — try again." }]);
+        }
+        setLoading(false);
+        return;
+      }
+      if (action === "send_followup") {
+        await runFollowUpCampaign(params?.offerContext || "", params?.daysAgo || 3);
+        return;
+      }
+      if (action === "add_contact") {
+        const result = chatAddContact(params || {});
+        setMessages(prev => [...prev, { role: "assistant", content: result }]);
+        setLoading(false);
+        return;
+      }
+      if (action === "remove_contact") {
+        const result = chatRemoveContact(params || {});
+        setMessages(prev => [...prev, { role: "assistant", content: result }]);
+        setLoading(false);
+        return;
+      }
+      if (action === "show_history") {
+        const historyMsg = showCampaignHistory();
+        setMessages(prev => [...prev, { role: "assistant", content: historyMsg }]);
+        setLoading(false);
         return;
       }
       if (action === "show_stats") setPage("dashboard");
