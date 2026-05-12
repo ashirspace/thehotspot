@@ -891,7 +891,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
     return acc;
   }, {}), [history]);
 
-  const displayTotal = sentCount || totalSentLocal;
+  const displayTotal = totalSentLocal;
 
   const tabStyle = (active) => ({
     padding: "8px 20px", borderRadius: 8, border: "none", cursor: "pointer",
@@ -3325,9 +3325,9 @@ function Dashboard({ user, onLogout }) {
                   {/* Stats row */}
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(190px,1fr))", gap: 14, marginBottom: 32 }}>
                     <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                    <StatCard icon={<I.Mail />} label="Emails Sent" value={sentCount} accent="#6366f1" onClick={() => setPage("emailsSent")} />
+                    <StatCard icon={<I.Mail />} label="Emails Sent" value={(() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })()} accent="#6366f1" onClick={() => setPage("emailsSent")} />
                     <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
-                    <StatCard icon={<I.Check />} label="Success Rate" value={sentCount ? "94%" : "0%"} accent="#0ea5e9" onClick={() => setPage("successRate")} />
+                    <StatCard icon={<I.Check />} label="Success Rate" value={(() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "0%"; } catch { return "0%"; } })()} accent="#0ea5e9" onClick={() => setPage("successRate")} />
                   </div>
 
                   {/* All tools grid */}
