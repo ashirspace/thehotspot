@@ -614,6 +614,64 @@ function BackButton({ onClick, label }) {
   );
 }
 
+/* ───────── SHARED EMAIL PREVIEW MODAL ───────── */
+function EmailPreviewModal({ email: e, onClose }) {
+  const cat = CAT[e.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
+  const sentDate = e.sentAt || e.campaignDate
+    ? new Date(e.sentAt || e.campaignDate).toLocaleString("en", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })
+    : null;
+
+  return (
+    <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={ev => ev.stopPropagation()} style={{ background: "#FFF", borderRadius: 20, width: "100%", maxWidth: 540, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(0,0,0,0.22)", overflow: "hidden" }}>
+
+        {/* Header */}
+        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #EFF1F8", flexShrink: 0 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <div style={{ width: 38, height: 38, borderRadius: 10, background: `${cat.dot}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
+                {(e.company || e.email || "?")[0].toUpperCase()}
+              </div>
+              <div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{e.company || e.email}</div>
+                <div style={{ fontSize: 12, color: "#64748B" }}>To: {e.email}</div>
+              </div>
+            </div>
+            <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 20, color: "#94A3B8", cursor: "pointer", lineHeight: 1, padding: 4 }}>✕</button>
+          </div>
+          <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
+            {sentDate && <span style={{ fontSize: 11, color: "#94A3B8" }}>{sentDate}</span>}
+            {e.category && e.category !== "all" && (
+              <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 20 }}>{e.category}</span>
+            )}
+            <span style={{ fontSize: 11, background: "#ECFDF5", color: "#059669", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}>✓ Sent</span>
+          </div>
+        </div>
+
+        {/* Subject */}
+        <div style={{ padding: "14px 24px 0", flexShrink: 0 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Subject</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{e.subject || "—"}</div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding: "14px 24px 24px", overflowY: "auto", flex: 1 }}>
+          <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Message</div>
+          {e.body ? (
+            <div style={{ fontSize: 14, color: "#0F172A", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "#F8FAFF", borderRadius: 12, padding: "16px 18px", border: "1px solid #EFF1F8", fontFamily: "'DM Sans',sans-serif" }}>
+              {e.body}
+            </div>
+          ) : (
+            <div style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic", background: "#F8FAFF", borderRadius: 12, padding: "16px 18px", border: "1px solid #EFF1F8" }}>
+              Email body not stored for this email — full body is saved for all emails sent going forward.
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function TotalContactsPage({ onBack, user }) {
   const CATS = ["Network", "CPS", "CPL", "CPA", "Mobile"];
   const emptyForm = { name: "", email: "", company: "", website: "", category: "Network", country: "", notes: "" };
@@ -867,6 +925,7 @@ function TotalContactsPage({ onBack, user }) {
 function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
   const [tab, setTab] = useState("overview"); // "overview" | "history"
   const [expandedId, setExpandedId] = useState(null);
+  const [openEmail, setOpenEmail] = useState(null);
 
   const history = useMemo(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; }
@@ -1067,13 +1126,16 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
                       <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                         <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Recipients</div>
                         {h.contacts.map((c, i) => (
-                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                          <div key={i} onClick={() => setOpenEmail({ ...c, category: h.category })} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #E2E8F0", cursor: "pointer", transition: "all .15s" }}
+                            onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(99,102,241,0.1)"; }}
+                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "none"; }}
+                          >
                             <span style={{ fontSize: 16 }}>✅</span>
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{c.company || c.email}</div>
                               {c.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {c.subject}</div>}
                             </div>
-                            <span style={{ fontSize: 11, color: "#94A3B8", flexShrink: 0 }}>{c.email}</span>
+                            <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 500, flexShrink: 0 }}>View →</span>
                           </div>
                         ))}
                       </div>
@@ -1087,6 +1149,9 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
           })}
         </div>
       )}
+
+      {/* Email preview modal */}
+      {openEmail && <EmailPreviewModal email={openEmail} onClose={() => setOpenEmail(null)} />}
     </div>
   );
 }
@@ -2030,58 +2095,7 @@ function CampaignStatusPage({ onBack }) {
       )}
 
       {/* Email preview modal */}
-      {openEmail && (() => {
-        const cat = CAT[openEmail.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
-        const sentDate = new Date(openEmail.sentAt || openEmail.campaignDate).toLocaleString("en", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
-        return (
-          <div onClick={() => setOpenEmail(null)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-            <div onClick={e => e.stopPropagation()} style={{ background: "#FFF", borderRadius: 20, width: "100%", maxWidth: 540, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(0,0,0,0.22)", overflow: "hidden" }}>
-
-              {/* Modal header */}
-              <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #EFF1F8", flexShrink: 0 }}>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                    <div style={{ width: 38, height: 38, borderRadius: 10, background: `${cat.dot}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
-                      {(openEmail.company || openEmail.email || "?")[0].toUpperCase()}
-                    </div>
-                    <div>
-                      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{openEmail.company || openEmail.email}</div>
-                      <div style={{ fontSize: 12, color: "#64748B" }}>To: {openEmail.email}</div>
-                    </div>
-                  </div>
-                  <button onClick={() => setOpenEmail(null)} style={{ background: "none", border: "none", fontSize: 20, color: "#94A3B8", cursor: "pointer", lineHeight: 1, padding: 4 }}>✕</button>
-                </div>
-                {/* Meta row */}
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  <span style={{ fontSize: 11, color: "#94A3B8" }}>{sentDate}</span>
-                  {openEmail.category && openEmail.category !== "all" && (
-                    <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 20 }}>{openEmail.category}</span>
-                  )}
-                  <span style={{ fontSize: 11, background: "#ECFDF5", color: "#059669", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}>✓ Sent</span>
-                </div>
-              </div>
-
-              {/* Subject */}
-              <div style={{ padding: "14px 24px 0", flexShrink: 0 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Subject</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>{openEmail.subject || "—"}</div>
-              </div>
-
-              {/* Body */}
-              <div style={{ padding: "14px 24px 24px", overflowY: "auto", flex: 1 }}>
-                <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Message</div>
-                {openEmail.body ? (
-                  <div style={{ fontSize: 14, color: "#0F172A", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "#F8FAFF", borderRadius: 12, padding: "16px 18px", border: "1px solid #EFF1F8", fontFamily: "'DM Sans',sans-serif" }}>
-                    {openEmail.body}
-                  </div>
-                ) : (
-                  <div style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic" }}>Email body not available — only emails sent after this update are stored.</div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {openEmail && <EmailPreviewModal email={openEmail} onClose={() => setOpenEmail(null)} />}
     </div>
   );
 }
