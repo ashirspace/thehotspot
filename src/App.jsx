@@ -1597,6 +1597,7 @@ function ContactsPage({ onBack, showToast, user }) {
   const [filterCat, setFilterCat] = useState("All");
   const [emailStats, setEmailStats] = useState({ total: 0, withEmail: 0, withoutEmail: 0 });
   const [sheetName, setSheetName] = useState(localStorage.getItem("thehotspot_sheet_name") || "");
+  // Always start at hub — never auto-redirect to table view
 
   const getSheetId = (url) => {
     const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
@@ -1666,17 +1667,6 @@ function ContactsPage({ onBack, showToast, user }) {
     showToast("Sheet disconnected");
   };
 
-  useEffect(() => {
-    const cached = localStorage.getItem("thehotspot_contacts");
-    if (cached) {
-      try {
-        const parsed = JSON.parse(cached);
-        setContacts(parsed); setConnected(true); setView("table");
-        const withEmail = parsed.filter(c => c.email).length;
-        setEmailStats({ total: parsed.length, withEmail, withoutEmail: parsed.length - withEmail });
-      } catch (e) { }
-    }
-  }, []);
 
   const categories = ["All", ...new Set(contacts.map(c => c.category).filter(Boolean))];
   const filtered = contacts.filter(c => {
@@ -1727,21 +1717,6 @@ function ContactsPage({ onBack, showToast, user }) {
           </div>
         </div>
       </div>
-      {sheetName && (
-        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 10 }}>Recently Connected</div>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, cursor: "pointer" }} onClick={() => setView("table")}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#ECFDF5", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
-            </div>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A" }}>{sheetName}</div>
-              <div style={{ fontSize: 12, color: "#64748B" }}>Google Sheets · {contacts.length} contacts</div>
-            </div>
-            <span style={{ fontSize: 12, color: "#10b981", fontWeight: 500 }}>Open →</span>
-          </div>
-        </div>
-      )}
     </div>
   );
 
