@@ -1242,7 +1242,7 @@ class AppErrorBoundary extends React.Component {
             <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20, background: "#F8FAFF", borderRadius: 8, padding: "12px 14px", fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
               {this.state.error?.message || String(this.state.error)}
             </div>
-            <button onClick={() => { localStorage.removeItem("thehotspot_page"); window.location.reload(); }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#4F46E5", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
+            <button onClick={() => { window.location.href = "/"; }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#4F46E5", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
               Reload App
             </button>
           </div>
@@ -1259,7 +1259,7 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
   });
 
-  if (!user) return <AppErrorBoundary><LoginPage onLogin={(userData) => { localStorage.removeItem("thehotspot_page"); setUser(userData); }} /></AppErrorBoundary>;
+  if (!user) return <AppErrorBoundary><LoginPage onLogin={(userData) => { window.history.replaceState({}, "", "/"); setUser(userData); }} /></AppErrorBoundary>;
 
   return <AppErrorBoundary><Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} /></AppErrorBoundary>;
 }
@@ -2671,8 +2671,41 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
 
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
-  const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
-  const setPage = (p) => { setPageRaw(p); if (p) localStorage.setItem("thehotspot_page", p); else localStorage.removeItem("thehotspot_page"); };
+  // URL ↔ page mapping
+  const PAGE_TO_PATH = {
+    null:           "/",
+    dashboard:      "/dashboard",
+    emailSender:    "/email-sender",
+    emailTemplates: "/email-templates",
+    contacts:       "/contacts",
+    campaignStatus: "/campaign-status",
+    totalContacts:  "/total-contacts",
+    emailsSent:     "/emails-sent",
+    categories:     "/categories",
+    successRate:    "/success-rate",
+    profile:        "/profile",
+  };
+  const PATH_TO_PAGE = Object.fromEntries(Object.entries(PAGE_TO_PATH).map(([k, v]) => [v, k === "null" ? null : k]));
+
+  const pageFromPath = () => {
+    const p = window.location.pathname;
+    return p in PATH_TO_PAGE ? PATH_TO_PAGE[p] : null;
+  };
+
+  const [page, setPageRaw] = useState(() => pageFromPath());
+
+  const setPage = (p) => {
+    setPageRaw(p);
+    const path = PAGE_TO_PATH[p] ?? "/";
+    if (window.location.pathname !== path) window.history.pushState({ page: p }, "", path);
+  };
+
+  // Handle browser back/forward
+  useEffect(() => {
+    const onPop = () => setPageRaw(pageFromPath());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
   const [gmailConnected, setGmailConnected] = useState(() => !!(user?.gmailToken || user?.sentCount));
   const [gmailToken, setGmailToken] = useState(() => user?.gmailToken || null);
   const [sentCount, setSentCount] = useState(() => user?.sentCount || 0);
