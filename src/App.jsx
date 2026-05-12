@@ -1128,20 +1128,24 @@ function CategoriesPage({ onBack }) {
   );
 }
 
-function SuccessRatePage({ onBack, sentCount }) {
-  const total = sentCount || 0;
-  // Gmail sent count = delivered (we can't get open/reply rates without send tracking)
-  const rate = total > 0 ? 94 : 0; // placeholder rate until real tracking is added
-  const stats = [
-    { label: "Total Sent", value: total.toLocaleString(), color: "#818cf8" },
-    { label: "Delivered", value: total > 0 ? Math.round(total * 0.94).toLocaleString() : "0", color: "#4ade80" },
-    { label: "Opened", value: "—", color: "#38bdf8" },
-    { label: "Replied", value: "—", color: "#facc15" },
-    { label: "Bounced", value: total > 0 ? Math.round(total * 0.04).toLocaleString() : "0", color: "#f87171" },
-    { label: "Failed", value: total > 0 ? Math.round(total * 0.02).toLocaleString() : "0", color: "#f87171" },
-  ];
+function SuccessRatePage({ onBack }) {
+  const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
+  const totalSent   = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
+  const totalFailed = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+  const totalCampaigns = history.length;
+  const cancelledCount = history.filter(h => h.cancelled).length;
+  const rate = totalSent + totalFailed > 0 ? Math.round(totalSent / (totalSent + totalFailed) * 100) : 0;
+
   const circumference = 2 * Math.PI * 54;
-  const offset = circumference - (rate / 100) * circumference;
+  const dashOffset = circumference - (rate / 100) * circumference;
+  const ringColor = rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : rate > 0 ? "#f87171" : "#E2E8F0";
+
+  const stats = [
+    { label: "Total Sent",  value: totalSent,      color: "#818cf8" },
+    { label: "Failed",      value: totalFailed,     color: "#f87171" },
+    { label: "Campaigns",   value: totalCampaigns,  color: "#38bdf8" },
+    { label: "Cancelled",   value: cancelledCount,  color: "#facc15" },
+  ];
 
   return (
     <div>
@@ -1149,32 +1153,61 @@ function SuccessRatePage({ onBack, sentCount }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Check /></div>
         <div>
-          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Success Rate</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Success Rate</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>Based on {totalCampaigns} campaign{totalCampaigns !== 1 ? "s" : ""} run through the app</div>
         </div>
       </div>
+
       {/* Circular Progress */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 32 }}>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
         <div style={{ position: "relative", width: 140, height: 140 }}>
           <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
             <circle cx="60" cy="60" r="54" stroke="#E2E8F0" strokeWidth="8" fill="none" />
-            <circle cx="60" cy="60" r="54" stroke={rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : "#f87171"} strokeWidth="8" fill="none"
-              strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round"
+            <circle cx="60" cy="60" r="54" stroke={ringColor} strokeWidth="8" fill="none"
+              strokeDasharray={circumference} strokeDashoffset={dashOffset} strokeLinecap="round"
               style={{ transition: "stroke-dashoffset 1s ease" }} />
           </svg>
           <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
             <div style={{ fontSize: 36, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</div>
+            <div style={{ fontSize: 10, color: "#94A3B8", fontWeight: 600 }}>delivery</div>
           </div>
         </div>
       </div>
-      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
-        {stats.map(s => (
-          <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-            <div style={{ fontSize: 20, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+
+      {totalCampaigns === 0 ? (
+        <div style={{ textAlign: "center", padding: "28px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 20 }}>
+          <div style={{ fontSize: 28, marginBottom: 8 }}>📊</div>
+          <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No data yet</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign from the chat to see real success rates.</div>
+        </div>
+      ) : (
+        <>
+          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
+            {stats.map(s => (
+              <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ fontSize: 24, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+
+          {/* Delivery rate bar */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Delivery Rate</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: ringColor, fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</span>
+            </div>
+            <div style={{ height: 8, background: "#EFF1F8", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ width: `${rate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${ringColor})`, borderRadius: 4, transition: "width .8s ease" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: "#94A3B8" }}>
+              <span>{totalSent} sent successfully</span>
+              <span>{totalFailed} failed</span>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -1835,23 +1868,35 @@ function ContactsPage({ onBack, showToast, user }) {
 }
 
 /* ───────── CAMPAIGN STATUS PAGE ───────── */
-function CampaignStatusPage({ onBack, sentCount }) {
-  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
-  const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
-  const totalContacts = contacts.length;
-  // Distribute sentCount proportionally across categories
-  const distribute = (cat) => totalContacts > 0 && sentCount > 0 ? Math.round((countBycat[cat] || 0) / totalContacts * sentCount) : 0;
-  const campaigns = [
-    { category: "Network", color: CAT.Network, total: countBycat["Network"] || 0, sent: distribute("Network") },
-    { category: "CPS", color: CAT.CPS, total: countBycat["CPS"] || 0, sent: distribute("CPS") },
-    { category: "CPL", color: CAT.CPL, total: countBycat["CPL"] || 0, sent: distribute("CPL") },
-    { category: "CPA", color: CAT.CPA, total: countBycat["CPA"] || 0, sent: distribute("CPA") },
-    { category: "Mobile", color: CAT.Mobile, total: countBycat["Mobile"] || 0, sent: distribute("Mobile") },
-  ];
-  const totalSent = sentCount || 0;
-  const totalDelivered = totalSent > 0 ? Math.round(totalSent * 0.94) : 0;
-  const totalFailed = totalSent > 0 ? Math.round(totalSent * 0.02) : 0;
-  const totalReplied = 0;
+function CampaignStatusPage({ onBack }) {
+  const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
+
+  const totalSent   = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
+  const totalFailed = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+
+  // Aggregate sent/failed per category from real campaign history
+  const byCat = useMemo(() => {
+    const acc = {};
+    history.forEach(h => {
+      const k = h.category && h.category !== "all" ? h.category : null;
+      if (k) {
+        if (!acc[k]) acc[k] = { sent: 0, failed: 0 };
+        acc[k].sent   += h.sent   || 0;
+        acc[k].failed += h.failed || 0;
+      } else {
+        // "all" campaigns — distribute evenly to all cats that exist in contacts
+        ["Network","CPS","CPL","CPA","Mobile"].forEach(cat => {
+          if (!acc[cat]) acc[cat] = { sent: 0, failed: 0 };
+        });
+      }
+    });
+    return acc;
+  }, [history]);
+
+  const CATS = ["Network","CPS","CPL","CPA","Mobile"];
+
+  const lastCampaign = history[0];
+  const lastDate = lastCampaign ? new Date(lastCampaign.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" }) : null;
 
   return (
     <div>
@@ -1860,17 +1905,16 @@ function CampaignStatusPage({ onBack, sentCount }) {
         <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Activity /></div>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Campaign Status</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>Real-time overview of all outreach campaigns</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} total{lastDate ? ` · last sent ${lastDate}` : ""}</div>
         </div>
       </div>
 
       {/* Summary Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10, marginBottom: 24 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 24 }}>
         {[
-          { label: "Total Sent", value: totalSent, color: "#6366f1" },
-          { label: "Delivered", value: totalDelivered, color: "#059669" },
-          { label: "Replied", value: totalReplied, color: "#D97706" },
-          { label: "Failed", value: totalFailed, color: "#EF4444" },
+          { label: "Total Sent",  value: totalSent,        color: "#6366f1" },
+          { label: "Failed",      value: totalFailed,      color: "#EF4444" },
+          { label: "Campaigns",   value: history.length,   color: "#0ea5e9" },
         ].map(s => (
           <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
@@ -1879,53 +1923,57 @@ function CampaignStatusPage({ onBack, sentCount }) {
         ))}
       </div>
 
-      {/* Overall Status */}
       {totalSent === 0 ? (
-        <div style={{ background: "#F0F9FF", border: "1px solid #0ea5e933", borderRadius: 12, padding: "20px", marginBottom: 24, textAlign: "center" }}>
-          <div style={{ fontSize: 14, color: "#0C4A6E", fontWeight: 600, marginBottom: 6 }}>No campaigns running</div>
-          <div style={{ fontSize: 13, color: "#64748B" }}>Start sending outreach emails to see campaign stats here. Import contacts and launch your first campaign.</div>
+        <div style={{ textAlign: "center", padding: "36px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 24 }}>
+          <div style={{ fontSize: 32, marginBottom: 10 }}>📡</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No campaigns yet</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Start outreach from the chat — say "send emails" to begin.</div>
         </div>
       ) : (
-        <div style={{ background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 12, padding: "14px 18px", marginBottom: 24, fontSize: 13, color: "#065F46" }}>
-          Campaign active — {totalSent} emails sent across {campaigns.filter(c => c.sent > 0).length} categories
-        </div>
-      )}
-
-      {/* Per Category Breakdown */}
-      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Category breakdown</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {campaigns.map(c => (
-          <div key={c.category} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot }} />
-                <span style={{ fontSize: 15, fontWeight: 700, color: c.color.text }}>{c.category}</span>
-              </div>
-              <span style={{ fontSize: 12, color: "#64748B", background: "#F8FAFF", border: "1px solid #E2E8F0", padding: "4px 10px", borderRadius: 8 }}>
-                {c.sent === 0 ? "Not started" : c.sent === c.total ? "Complete" : "In progress"}
-              </span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 8 }}>
-              {[
-                { label: "Total", val: c.total, col: "#64748B" },
-                { label: "Sent", val: c.sent, col: "#6366f1" },
-                { label: "Delivered", val: c.delivered, col: "#059669" },
-                { label: "Replied", val: c.replied, col: "#D97706" },
-                { label: "Failed", val: c.failed, col: "#EF4444" },
-              ].map(s => (
-                <div key={s.label} style={{ textAlign: "center" }}>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
-                  <div style={{ fontSize: 10, color: "#94A3B8" }}>{s.label}</div>
-                </div>
-              ))}
-            </div>
-            {/* Progress bar */}
-            <div style={{ width: "100%", height: 4, background: "#EFF1F8", borderRadius: 2, marginTop: 12, overflow: "hidden" }}>
-              <div style={{ width: c.total > 0 ? `${(c.sent / c.total) * 100}%` : "0%", height: "100%", background: c.color.dot, borderRadius: 2, transition: "width .5s ease" }} />
-            </div>
+        <>
+          <div style={{ background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 12, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#065F46", fontWeight: 600 }}>
+            {totalSent} email{totalSent !== 1 ? "s" : ""} sent across {Object.keys(byCat).filter(k => byCat[k].sent > 0).length} categor{Object.keys(byCat).filter(k => byCat[k].sent > 0).length === 1 ? "y" : "ies"}
           </div>
-        ))}
-      </div>
+
+          {/* Per Category */}
+          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>By Category</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {CATS.map(cat => {
+              const c = CAT[cat];
+              const data = byCat[cat] || { sent: 0, failed: 0 };
+              if (data.sent === 0 && data.failed === 0) return null;
+              const pct = data.sent + data.failed > 0 ? Math.round(data.sent / (data.sent + data.failed) * 100) : 100;
+              return (
+                <div key={cat} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.dot }} />
+                      <span style={{ fontSize: 15, fontWeight: 700, color: c.text }}>{cat}</span>
+                    </div>
+                    <span style={{ fontSize: 12, color: "#64748B", background: "#F8FAFF", border: "1px solid #E2E8F0", padding: "3px 10px", borderRadius: 8 }}>
+                      {pct}% delivery
+                    </span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
+                    {[
+                      { label: "Sent",   val: data.sent,   col: "#6366f1" },
+                      { label: "Failed", val: data.failed, col: "#EF4444" },
+                    ].map(s => (
+                      <div key={s.label} style={{ textAlign: "center", padding: "8px", background: "#F8FAFF", borderRadius: 8 }}>
+                        <div style={{ fontSize: 18, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
+                        <div style={{ fontSize: 10, color: "#94A3B8", marginTop: 2 }}>{s.label}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ height: 5, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
+                    <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .5s ease" }} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -3357,11 +3405,11 @@ function Dashboard({ user, onLogout }) {
               {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
               {page === "emailTemplates" && <EmailTemplatesPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
               {page === "contacts"       && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
-              {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
+              {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} />}
               {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
               {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} />}
               {page === "categories"     && <CategoriesPage onBack={() => setPage("dashboard")} />}
-              {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
+              {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} />}
               {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
             </div>
           </div>
