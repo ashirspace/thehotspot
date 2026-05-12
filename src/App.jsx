@@ -1909,6 +1909,315 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   );
 }
 
+/* ───────── EMAIL TEMPLATES PAGE ───────── */
+const TEMPLATES = [
+  {
+    id: "Partnership",
+    icon: "🤝",
+    label: "Partnership",
+    desc: "Natural fit between both companies",
+    angle: "I think there's a natural fit between what we do and what you've built — would love to explore.",
+    color: "#6366f1",
+    fields: ["recipientCompany", "contactName", "website", "angle"],
+  },
+  {
+    id: "Revenue",
+    icon: "💰",
+    label: "Revenue",
+    desc: "Drive traffic, leads, or sales to them",
+    angle: "We can drive qualified traffic and leads to your platform through our owned channels.",
+    color: "#10b981",
+    fields: ["recipientCompany", "contactName", "website", "angle"],
+  },
+  {
+    id: "Integration",
+    icon: "🔗",
+    label: "Integration",
+    desc: "Our users want their product",
+    angle: "Our customers keep asking for a solution like yours — there could be a strong integration opportunity here.",
+    color: "#0ea5e9",
+    fields: ["recipientCompany", "contactName", "website", "angle"],
+  },
+  {
+    id: "Agency",
+    icon: "🏢",
+    label: "Agency",
+    desc: "Client results & case study angle",
+    angle: "We specialise in amplifying great work — we've seen strong results taking campaigns like yours to a wider audience.",
+    color: "#f97316",
+    fields: ["recipientCompany", "contactName", "website", "angle"],
+  },
+  {
+    id: "Startup",
+    icon: "🚀",
+    label: "Startup",
+    desc: "Growth & distribution angle",
+    angle: "We have an audience that maps perfectly to your ideal customer — interested in exploring a distribution play?",
+    color: "#ec4899",
+    fields: ["recipientCompany", "contactName", "website", "angle"],
+  },
+];
+
+function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user }) {
+  const [step, setStep] = useState("pick"); // pick | fill | preview
+  const [template, setTemplate] = useState(null);
+  const [form, setForm] = useState({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "600" });
+  const [generating, setGenerating] = useState(false);
+  const [email, setEmail] = useState({ subject: "", body: "" });
+  const [sending, setSending] = useState(false);
+
+  const T = { bg: "#F0F4FF", card: "#FFF", bd: "#E2E8F0", tx: "#0F172A", tx2: "#64748B", tx3: "#94A3B8", ac: "#4F46E5", acBg: "#EEF2FF" };
+  const inp = { background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: T.tx, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const lbl = { fontSize: 12, fontWeight: 600, color: T.tx2, marginBottom: 6, display: "block" };
+
+  const generate = async () => {
+    if (!form.recipientCompany.trim()) { showToast("Enter recipient company name"); return; }
+    setGenerating(true);
+    try {
+      const res = await fetch("/api/generate-email", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          company: form.recipientCompany,
+          category: template.id,
+          website: form.website,
+          offerContext: form.angle || template.angle,
+          senderName: user?.name || user?.username || "Ashir Ayaan",
+          senderCompany: user?.company || "Ibra Digitals Branding Services LLC",
+          senderRole: user?.role_title || "",
+          maxChars: parseInt(form.maxChars) || 600,
+        }),
+      });
+      const data = await res.json();
+      setEmail({ subject: data.subject || "", body: data.body || "" });
+      setStep("preview");
+    } catch {
+      showToast("Failed to generate email — try again");
+    }
+    setGenerating(false);
+  };
+
+  const sendEmail = async () => {
+    if (!gmailToken) { connectGmail(); showToast("Connect Gmail first"); return; }
+    if (!form.recipientCompany.trim()) { showToast("No recipient email"); return; }
+    setSending(true);
+    try {
+      const toEmail = form.recipientEmail || (form.website ? `info@${form.website.replace(/https?:\/\//, "").split("/")[0]}` : null);
+      if (!toEmail) { showToast("Enter recipient email address"); setSending(false); return; }
+      const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(email.subject)))}?=`;
+      const msg = [`To: ${toEmail}`, `Subject: ${encodedSubject}`, `Content-Type: text/plain; charset=utf-8`, `MIME-Version: 1.0`, "", email.body].join("\r\n");
+      const raw = btoa(unescape(encodeURIComponent(msg))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const sendRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ raw }),
+      });
+      const sendData = await sendRes.json();
+      if (sendData.error) throw new Error(sendData.error.message);
+      showToast(`Sent to ${toEmail}`);
+      setStep("pick");
+      setTemplate(null);
+      setForm({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "600" });
+      setEmail({ subject: "", body: "" });
+    } catch (e) {
+      showToast("Send failed: " + e.message);
+    }
+    setSending(false);
+  };
+
+  /* ── STEP 1: PICK TEMPLATE ── */
+  if (step === "pick") return (
+    <div>
+      <div style={{ marginBottom: 24 }}>
+        <div style={{ fontSize: 20, fontWeight: 700, color: T.tx, marginBottom: 6 }}>Email Templates</div>
+        <div style={{ fontSize: 14, color: T.tx2 }}>Pick a template category, fill in the details, and get a professional email ready to send.</div>
+      </div>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
+        {TEMPLATES.map(t => (
+          <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: t.angle })); setStep("fill"); }} style={{
+            background: "#FFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "22px 20px",
+            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
+            boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "all .15s",
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = t.color; e.currentTarget.style.boxShadow = `0 6px 24px ${t.color}22`; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
+          >
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 14 }}>{t.icon}</div>
+            <div style={{ fontSize: 15, fontWeight: 700, color: T.tx, marginBottom: 5 }}>{t.label}</div>
+            <div style={{ fontSize: 13, color: T.tx2, lineHeight: 1.5, marginBottom: 14 }}>{t.desc}</div>
+            <div style={{ fontSize: 12, color: t.color, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
+              Use this template <span>→</span>
+            </div>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  /* ── STEP 2: FILL VARIABLES ── */
+  if (step === "fill") return (
+    <div style={{ maxWidth: 600 }}>
+      <button onClick={() => setStep("pick")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+        ← Back to templates
+      </button>
+      {/* Template badge */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${template.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.icon}</div>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, color: T.tx }}>{template.label} Email</div>
+          <div style={{ fontSize: 13, color: T.tx2 }}>{template.desc}</div>
+        </div>
+      </div>
+
+      <div style={{ background: "#FFF", borderRadius: 16, border: "1px solid #E2E8F0", padding: 24, display: "flex", flexDirection: "column", gap: 18 }}>
+        {/* Recipient info */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #F1F5FF", paddingBottom: 8 }}>Recipient</div>
+        <div>
+          <label style={lbl}>Company Name *</label>
+          <input style={inp} placeholder="e.g. AdCombo, Notion, Shopify" value={form.recipientCompany} onChange={e => setForm(f => ({ ...f, recipientCompany: e.target.value }))}
+            onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
+            onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+          <div>
+            <label style={lbl}>Contact Name <span style={{ color: T.tx3, fontWeight: 400 }}>(optional)</span></label>
+            <input style={inp} placeholder="e.g. John, Sarah" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))}
+              onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
+              onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          </div>
+          <div>
+            <label style={lbl}>Their Email <span style={{ color: T.tx3, fontWeight: 400 }}>(to send)</span></label>
+            <input style={inp} placeholder="partner@company.com" value={form.recipientEmail || ""} onChange={e => setForm(f => ({ ...f, recipientEmail: e.target.value }))}
+              onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
+              onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          </div>
+        </div>
+        <div>
+          <label style={lbl}>Their Website <span style={{ color: T.tx3, fontWeight: 400 }}>(helps personalize)</span></label>
+          <input style={inp} placeholder="e.g. adcombo.com" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
+            onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
+            onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+        </div>
+
+        {/* Angle / message */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #F1F5FF", paddingBottom: 8, marginTop: 4 }}>Email Angle</div>
+        <div>
+          <label style={lbl}>What's your pitch? <span style={{ color: T.tx3, fontWeight: 400 }}>(pre-filled, edit freely)</span></label>
+          <textarea style={{ ...inp, minHeight: 90, resize: "vertical", lineHeight: 1.6 }} value={form.angle} onChange={e => setForm(f => ({ ...f, angle: e.target.value }))}
+            onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
+            onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          <div style={{ fontSize: 11, color: T.tx3, marginTop: 5 }}>Be specific — mention commission %, offer types, audience size, or any details that make this relevant to them.</div>
+        </div>
+
+        {/* Length */}
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #F1F5FF", paddingBottom: 8, marginTop: 4 }}>Length</div>
+        <div style={{ display: "flex", gap: 10 }}>
+          {[["Short", "200"], ["Medium", "600"], ["Detailed", "900"]].map(([label, val]) => (
+            <button key={val} onClick={() => setForm(f => ({ ...f, maxChars: val }))} style={{
+              flex: 1, padding: "10px 8px", borderRadius: 10, border: form.maxChars === val ? `2px solid ${template.color}` : "1px solid #E2E8F0",
+              background: form.maxChars === val ? `${template.color}10` : "#F8FAFF",
+              color: form.maxChars === val ? template.color : T.tx2,
+              fontSize: 13, fontWeight: form.maxChars === val ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+              transition: "all .15s",
+            }}>
+              {label}
+              <div style={{ fontSize: 10, opacity: .7, marginTop: 2 }}>{val === "200" ? "~2-3 lines" : val === "600" ? "~4-5 lines" : "~6-8 lines"}</div>
+            </button>
+          ))}
+        </div>
+
+        <button onClick={generate} disabled={generating || !form.recipientCompany.trim()} style={{
+          marginTop: 8, padding: "13px 20px", borderRadius: 12, border: "none", cursor: form.recipientCompany.trim() ? "pointer" : "default",
+          background: form.recipientCompany.trim() ? `linear-gradient(135deg, ${template.color}, ${template.color}cc)` : "#EFF1F8",
+          color: form.recipientCompany.trim() ? "#fff" : "#94A3B8", fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+          boxShadow: form.recipientCompany.trim() ? `0 4px 14px ${template.color}40` : "none", transition: "all .2s",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>
+          {generating ? (
+            <>{[0,1,2].map(d => <span key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite`, display: "inline-block" }} />)}</>
+          ) : "✨ Generate Email"}
+        </button>
+      </div>
+    </div>
+  );
+
+  /* ── STEP 3: PREVIEW & SEND ── */
+  return (
+    <div style={{ maxWidth: 680 }}>
+      <button onClick={() => setStep("fill")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+        ← Back to edit
+      </button>
+
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div>
+          <div style={{ fontSize: 18, fontWeight: 700, color: T.tx }}>Your Email</div>
+          <div style={{ fontSize: 13, color: T.tx2 }}>Edit below if needed, then send.</div>
+        </div>
+        <button onClick={generate} disabled={generating} style={{ padding: "8px 16px", borderRadius: 10, border: `1px solid ${template.color}`, background: "none", color: template.color, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+          {generating ? "Regenerating..." : "↻ Regenerate"}
+        </button>
+      </div>
+
+      <div style={{ background: "#FFF", borderRadius: 16, border: "1px solid #E2E8F0", padding: 24, marginBottom: 16 }}>
+        {/* Subject */}
+        <div style={{ marginBottom: 16 }}>
+          <label style={{ ...lbl, color: template.color }}>Subject Line</label>
+          <input style={{ ...inp, fontWeight: 600, fontSize: 15 }} value={email.subject} onChange={e => setEmail(em => ({ ...em, subject: e.target.value }))}
+            onFocus={e => { e.target.style.borderColor = template.color; e.target.style.boxShadow = `0 0 0 3px ${template.color}15`; }}
+            onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          <div style={{ fontSize: 11, color: email.subject.length > 50 ? "#ef4444" : T.tx3, marginTop: 4 }}>
+            {email.subject.length} / 50 chars {email.subject.length > 50 ? "⚠️ too long" : "✓"}
+          </div>
+        </div>
+        {/* Divider */}
+        <div style={{ height: 1, background: "#F1F5FF", margin: "4px 0 16px" }} />
+        {/* Body */}
+        <div>
+          <label style={{ ...lbl, color: template.color }}>Email Body</label>
+          <textarea style={{ ...inp, minHeight: 260, resize: "vertical", lineHeight: 1.8, whiteSpace: "pre-wrap" }}
+            value={email.body} onChange={e => setEmail(em => ({ ...em, body: e.target.value }))}
+            onFocus={e => { e.target.style.borderColor = template.color; e.target.style.boxShadow = `0 0 0 3px ${template.color}15`; }}
+            onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          <div style={{ fontSize: 11, color: T.tx3, marginTop: 4 }}>{email.body.length} chars · {email.body.split(/\s+/).filter(Boolean).length} words</div>
+        </div>
+      </div>
+
+      {/* Recipient email input if not provided */}
+      {!form.recipientEmail && (
+        <div style={{ background: "#FFF7ED", border: "1px solid #fed7aa", borderRadius: 12, padding: "14px 18px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 16 }}>⚠️</span>
+          <div style={{ flex: 1 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: "#92400e", marginBottom: 6 }}>Add recipient email to send</div>
+            <input style={{ ...inp, width: "100%", background: "#fff", fontSize: 13 }} placeholder="partner@company.com"
+              value={form.recipientEmail || ""} onChange={e => setForm(f => ({ ...f, recipientEmail: e.target.value }))}
+              onFocus={e => { e.target.style.borderColor = "#f97316"; e.target.style.boxShadow = "0 0 0 3px #f9731615"; }}
+              onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
+          </div>
+        </div>
+      )}
+
+      {/* Actions */}
+      <div style={{ display: "flex", gap: 10 }}>
+        <button onClick={sendEmail} disabled={sending} style={{
+          flex: 1, padding: "13px 20px", borderRadius: 12, border: "none", cursor: "pointer",
+          background: `linear-gradient(135deg, ${template.color}, ${template.color}cc)`,
+          color: "#fff", fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+          boxShadow: `0 4px 14px ${template.color}40`, transition: "all .2s",
+          display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+        }}>
+          {sending ? "Sending..." : "📤 Send Email"}
+        </button>
+        <button onClick={() => { navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`); showToast("Copied to clipboard"); }} style={{
+          padding: "13px 18px", borderRadius: 12, border: "1px solid #E2E8F0", background: "#F8FAFF",
+          color: T.tx2, fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 500,
+        }}>
+          Copy
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout }) {
   const [page, setPageRaw] = useState(() => localStorage.getItem("thehotspot_page") || null);
@@ -2412,14 +2721,15 @@ function Dashboard({ user, onLogout }) {
 
   // All nav items shown as dashboard cards
   const navItems = [
-    { id: "emailSender",    label: "Email Sender",    icon: "📤", desc: "Draft & send outreach",   accent: "#10b981" },
-    { id: "contacts",       label: "Contacts DB",     icon: "📋", desc: "Manage your contacts",    accent: "#6366f1" },
-    { id: "campaignStatus", label: "Campaign Status", icon: "📡", desc: "Track active campaigns",  accent: "#f97316" },
-    { id: "totalContacts",  label: "Total Contacts",  icon: "👥", desc: "All contacts overview",   accent: "#0ea5e9" },
-    { id: "emailsSent",     label: "Emails Sent",     icon: "📧", desc: "View sent emails",        accent: "#8b5cf6" },
-    { id: "categories",     label: "Categories",      icon: "📁", desc: "Network, CPS, CPL…",      accent: "#ec4899" },
-    { id: "successRate",    label: "Success Rate",    icon: "✅", desc: "Campaign performance",    accent: "#14b8a6" },
-    { id: "profile",        label: "Settings",        icon: "⚙️", desc: "Account & preferences",  accent: "#64748B" },
+    { id: "emailSender",    label: "Email Sender",      icon: "📤", desc: "Draft & send outreach",      accent: "#10b981" },
+    { id: "emailTemplates", label: "Email Templates",   icon: "✍️", desc: "Pick template & generate",   accent: "#6366f1" },
+    { id: "contacts",       label: "Contacts DB",       icon: "📋", desc: "Manage your contacts",       accent: "#f97316" },
+    { id: "campaignStatus", label: "Campaign Status",   icon: "📡", desc: "Track active campaigns",     accent: "#0ea5e9" },
+    { id: "totalContacts",  label: "Total Contacts",    icon: "👥", desc: "All contacts overview",      accent: "#8b5cf6" },
+    { id: "emailsSent",     label: "Emails Sent",       icon: "📧", desc: "View sent emails",           accent: "#ec4899" },
+    { id: "categories",     label: "Categories",        icon: "📁", desc: "Network, CPS, CPL…",         accent: "#14b8a6" },
+    { id: "successRate",    label: "Success Rate",      icon: "✅", desc: "Campaign performance",       accent: "#f59e0b" },
+    { id: "profile",        label: "Settings",          icon: "⚙️", desc: "Account & preferences",     accent: "#64748B" },
   ];
 
   const pageLabel = navItems.find(n => n.id === page)?.label || "Page";
@@ -2633,6 +2943,7 @@ function Dashboard({ user, onLogout }) {
 
               {/* ── OTHER PAGES ── */}
               {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
+              {page === "emailTemplates" && <EmailTemplatesPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
               {page === "contacts"       && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
               {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} sentCount={sentCount} />}
               {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
