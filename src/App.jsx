@@ -1961,7 +1961,7 @@ const TEMPLATES = [
 function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user }) {
   const [step, setStep] = useState("pick"); // pick | fill | preview
   const [template, setTemplate] = useState(null);
-  const [form, setForm] = useState({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "600" });
+  const [form, setForm] = useState({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "560" });
   const [generating, setGenerating] = useState(false);
   const [email, setEmail] = useState({ subject: "", body: "" });
   const [sending, setSending] = useState(false);
@@ -2112,7 +2112,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         {/* Length */}
         <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #F1F5FF", paddingBottom: 8, marginTop: 4 }}>Length</div>
         <div style={{ display: "flex", gap: 10 }}>
-          {[["Short", "200"], ["Medium", "600"], ["Detailed", "900"]].map(([label, val]) => (
+          {[["Short", "350", "4–6 lines"], ["Medium", "560", "6–8 lines"], ["Detailed", "850", "10–12 lines"]].map(([label, val, hint]) => (
             <button key={val} onClick={() => setForm(f => ({ ...f, maxChars: val }))} style={{
               flex: 1, padding: "10px 8px", borderRadius: 10, border: form.maxChars === val ? `2px solid ${template.color}` : "1px solid #E2E8F0",
               background: form.maxChars === val ? `${template.color}10` : "#F8FAFF",
@@ -2121,7 +2121,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
               transition: "all .15s",
             }}>
               {label}
-              <div style={{ fontSize: 10, opacity: .7, marginTop: 2 }}>{val === "200" ? "~2-3 lines" : val === "600" ? "~4-5 lines" : "~6-8 lines"}</div>
+              <div style={{ fontSize: 10, opacity: .7, marginTop: 2 }}>{hint}</div>
             </button>
           ))}
         </div>

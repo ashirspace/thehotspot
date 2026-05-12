@@ -14,7 +14,14 @@ export default async function handler(req, res) {
   const sender      = senderName    || "Ashir Ayaan";
   const senderCo    = senderCompany || "Ibra Digitals Branding Services LLC";
   const senderTitle = senderRole    || "";
-  const charLimit   = Math.min(Math.max(parseInt(maxChars) || 600, 100), 1200);
+  const charLimit   = Math.min(Math.max(parseInt(maxChars) || 560, 100), 1200);
+  // Map char limits to line targets for the prompt
+  const lineTarget  = charLimit <= 400 ? "4–6 lines" : charLimit <= 650 ? "6–8 lines" : "10–12 lines";
+  const lineDetail  = charLimit <= 400
+    ? "4 to 6 lines of actual content. Each line is one short sentence or phrase. No padding, no filler."
+    : charLimit <= 650
+    ? "6 to 8 lines of content. Can include 2 short paragraphs. Still tight — every sentence earns its place."
+    : "10 to 12 lines of content. Use 3–4 paragraphs. Give full context: who you are, what you offer, why it fits them, and what you want from them.";
 
   const fallback = {
     subject: `Quick question for ${company}`,
@@ -37,10 +44,7 @@ export default async function handler(req, res) {
   };
   const angle = angleMap[category] || (offerContext ? "Custom — see offer details below" : "Partnership — natural fit between both companies");
 
-  const lengthNote = charLimit <= 250 ? "2–3 sentences before CTA. Ruthlessly short."
-    : charLimit <= 500 ? "3–4 short sentences. Under 100 words."
-    : charLimit <= 750 ? "4–5 sentences. Under 150 words."
-    : "5–6 sentences. Under 200 words. Still tight.";
+  const lengthNote = lineDetail;
 
   const prompt = `You are an expert B2B outreach copywriter. Write ONE cold email following the rules and examples below exactly.
 
@@ -143,7 +147,8 @@ ${senderCo}
 - [placeholder] / [Your Name] / [insert] — any unfilled brackets
 - More than ONE call-to-action
 
-## LENGTH: Body under ${charLimit} characters. ${lengthNote}
+## LENGTH: Write exactly ${lineTarget} of content in the body. ${lengthNote}
+Count lines carefully — a blank line between paragraphs does NOT count as a content line.
 
 Return ONLY valid JSON — no markdown, no explanation:
 {"subject": "...", "body": "..."}
