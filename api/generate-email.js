@@ -9,27 +9,26 @@ export default async function handler(req, res) {
   const sender = senderName || "Ashir Ayaan";
   const charLimit = Math.min(Math.max(parseInt(maxChars) || 600, 100), 1200);
 
-  // Category-specific angles
   const categoryAngles = {
     Network: {
-      angle: "We drive quality traffic through our owned properties (TravelNags, Khoj Coupons, TopVPN) and want to explore your network's offers",
-      value: "High-intent traffic, diverse geo coverage (Singapore, UAE, UK, USA, India), experienced media buying team",
+      angle: "We drive quality traffic through our owned properties — TravelNags, Khoj Coupons, TopVPN — and want to explore your network's offers.",
+      value: "High-intent traffic, geo coverage across Singapore, UAE, UK, USA, India. Experienced media buying team.",
     },
     CPS: {
-      angle: "We drive sales through content marketing and SEO on our niche properties",
-      value: "Conversion-optimized content, organic traffic, established audience trust",
+      angle: "We drive sales through content marketing and SEO on our niche properties.",
+      value: "Conversion-optimized content, organic traffic, established audience trust.",
     },
     CPL: {
-      angle: "We generate qualified leads through targeted content and paid campaigns",
-      value: "High-quality leads, compliance-first approach, multi-geo capability",
+      angle: "We generate qualified leads through targeted content and paid campaigns.",
+      value: "High-quality leads, compliance-first approach, multi-geo capability.",
     },
     CPA: {
-      angle: "We deliver verified actions through our performance marketing channels",
-      value: "Fraud-free traffic, real user engagement, transparent reporting",
+      angle: "We deliver verified actions through our performance marketing channels.",
+      value: "Fraud-free traffic, real user engagement, transparent reporting.",
     },
     Mobile: {
-      angle: "We drive app installs and mobile engagement through our digital properties",
-      value: "Mobile-first audience, geo-targeted campaigns, measurable results",
+      angle: "We drive app installs and mobile engagement through our digital properties.",
+      value: "Mobile-first audience, geo-targeted campaigns, measurable results.",
     },
   };
 
@@ -37,50 +36,94 @@ export default async function handler(req, res) {
 
   const fallback = {
     subject: `Quick question for ${company}`,
-    body: `Hi ${company},\n\n${offerContext || cat.angle}.\n\nWe're Ibra Digitals — an affiliate marketing agency across Singapore, UAE, UK, USA, and India. ${cat.value}.\n\nOpen to a quick chat?\n\nBest,\n${sender}\nIbra Digitals Branding Services LLC`,
+    body: `Hi ${company},\n\n${cat.angle}\n\nIbra Digitals is an affiliate marketing agency across Singapore, UAE, UK, USA, and India. ${cat.value}\n\nOpen to a quick chat?\n\nBest,\n${sender}\nIbra Digitals Branding Services LLC`,
   };
 
   if (!API_KEY) return res.status(200).json(fallback);
 
-  const lengthGuidance = charLimit <= 250
-    ? "Ultra-short: 2-3 lines max before CTA. Every word must earn its place."
-    : charLimit <= 500
-    ? "Concise: under 150 words. Tight paragraphs, no filler."
-    : charLimit <= 750
-    ? "Medium: 150-200 words. Can include more context about the offer."
-    : "Detailed: 200-250 words max. Full context, specific value proposition, clear CTA.";
+  const prompt = `You are an expert outreach copywriter. Your task is to write ONE cold outreach email following the exact template and rules below.
 
-  const prompt = `You are a professional outreach copywriter for Ibra Digitals Branding Services LLC — an international affiliate marketing and digital branding agency operating across Singapore, UAE, UK, USA, and India.
+---
 
-Write a cold outreach email to ${company} (website: ${website || "unknown"}) for a ${category || "affiliate"} partnership.
+## WHO YOU ARE WRITING FOR:
+- Sender: ${sender}
+- Company: Ibra Digitals Branding Services LLC
+- What they do: International affiliate marketing and digital branding agency (Singapore, UAE, UK, USA, India)
+- Their properties: TravelNags, Khoj Coupons, TopVPN
 
-SENDER: ${sender}, Ibra Digitals Branding Services LLC
+## WHO YOU ARE WRITING TO:
+- Company: ${company}
+- Website: ${website || "unknown"}
+- Partnership type: ${category || "Network"}
+${offerContext ? `- Specific offer to mention: ${offerContext}` : `- Angle to use: ${cat.angle}\n- Value to highlight: ${cat.value}`}
 
-${offerContext ? `OFFER DETAILS TO INCLUDE: ${offerContext}` : `CATEGORY ANGLE: ${cat.angle}\nVALUE TO HIGHLIGHT: ${cat.value}`}
+---
 
-LENGTH: Body must be UNDER ${charLimit} CHARACTERS. ${lengthGuidance}
+## PERFECT EXAMPLE EMAIL (copy this exact style, structure, and tone):
 
-EMAIL STRUCTURE (follow exactly):
-1. Subject: Under 8 words, specific, curiosity-driving — NOT "Partnership Opportunity" or generic phrases
-2. Line 1 (Hook): Reference something specific about ${company} — their domain, niche, or what they do. Shows you did research.
-3. Lines 2-3 (Bridge): Connect their work to what Ibra Digitals does. ONE sentence on what Ibra Digitals is.
-4. Lines 4-5 (Value): What's in it for THEM — be specific. Use the offer details or category angle above.
-5. Line 6 (CTA): One simple, low-friction ask — "Open to a quick chat?" or "Worth a 10-minute call?" or "Interested?"
-6. Sign-off: "${sender}\nIbra Digitals Branding Services LLC"
+Subject: Driving Traffic to [Network]'s Offers
 
-HARD RULES — violating any of these is a failure:
-- NEVER start with "I hope this email finds you well", "I wanted to reach out", "I came across"
-- NEVER use "Dear Sir/Madam" — use "${company}" or a contact name
-- NEVER use these words: synergy, leverage, innovative, revolutionizing, excited, touch base, circle back, game changer, mutual benefit, look forward to connecting
-- NEVER use placeholder text like [Your Name], [Company], [insert], etc.
-- Subject must be under 8 words
-- Exactly ONE CTA — not two
-- Sign off as "${sender}" not "The Team" or "[Name]"
+Hi [Company],
 
-Return ONLY valid JSON:
-{"subject": "...", "body": "..."}
+Noticed [Company] has a strong presence in [their niche] — exactly the kind of network our media buying team targets.
 
-Body uses \\n for line breaks. No HTML.`;
+Ibra Digitals is an affiliate agency operating across Singapore, UAE, UK and India. We run owned properties (TravelNags, Khoj Coupons, TopVPN) and push quality traffic to affiliate offers.
+
+We'd love to explore if there's a fit — our audience converts well on [relevant offer type].
+
+Open to a quick chat this week?
+
+Best,
+Ashir Ayaan
+Ibra Digitals Branding Services LLC
+
+---
+
+## NOW WRITE THE ACTUAL EMAIL FOR ${company}:
+
+Follow this checklist line by line:
+
+SUBJECT LINE:
+✅ Under 8 words
+✅ Specific to ${company} or their niche
+✅ Curiosity-driving
+✅ No ALL CAPS, no "Partnership Opportunity", no "Collaboration Request"
+
+BODY LINE 1 (Hook):
+✅ Start with "Hi ${company}," (use company name, never "Dear Sir/Madam")
+✅ Next sentence: reference something specific about ${company} based on their domain/niche/category
+✅ Do NOT start with "I hope", "I wanted to", "I came across", "We noticed that" (too weak)
+
+BODY LINES 2-3 (Bridge):
+✅ ONE sentence saying what Ibra Digitals is
+✅ ONE sentence connecting their work to what Ibra Digitals does
+
+BODY LINES 4-5 (Value — what's in it for THEM):
+✅ Specific benefit: ${offerContext || cat.value}
+✅ Make it about their gain, not your need
+
+BODY LINE 6 (CTA):
+✅ Exactly ONE ask
+✅ Low-friction: "Open to a quick chat?" or "Worth a 10-minute call?" or "Interested in exploring?"
+✅ NOT "Please schedule a 30-minute call" or "Let me know your availability"
+
+SIGN-OFF:
+✅ "Best," then new line "${sender}" then new line "Ibra Digitals Branding Services LLC"
+
+BANNED WORDS (using any of these = failure):
+❌ hope, synergy, leverage, innovative, excited, touch base, circle back, game changer
+❌ "I hope this email finds you well"
+❌ "I wanted to reach out"
+❌ "mutual benefit" / "mutual growth"
+❌ "look forward to connecting"
+❌ "I came across your website"
+❌ [placeholder], [Your Name], [Company], [insert anything]
+❌ "revolutionizing" / "disrupting"
+
+LENGTH: Body must be under ${charLimit} characters total.
+
+Return ONLY valid JSON, nothing else:
+{"subject": "the subject line here", "body": "the full email body here with \\n for line breaks"}`;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -88,16 +131,22 @@ Body uses \\n for line breaks. No HTML.`;
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: Math.ceil(charLimit / 2) + 200,
+        max_tokens: Math.ceil(charLimit / 2) + 300,
         response_format: { type: "json_object" },
-        messages: [{ role: "user", content: prompt }],
+        messages: [
+          {
+            role: "system",
+            content: "You are an expert outreach email copywriter. You follow instructions exactly. You never use clichés. You write like a real person. You always return valid JSON with 'subject' and 'body' keys.",
+          },
+          { role: "user", content: prompt },
+        ],
       }),
     });
+
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     const parsed = JSON.parse(data.choices?.[0]?.message?.content || "{}");
 
-    // Enforce char limit server-side
     let body = parsed.body || fallback.body;
     const hardLimit = charLimit + 80;
     if (body.length > hardLimit) {
