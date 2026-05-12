@@ -8,8 +8,10 @@ const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || "";
 const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || "";
 const AIRTABLE_TABLE = import.meta.env.VITE_AIRTABLE_TABLE_NAME || "Users";
 const AIRTABLE_CONTACTS_TABLE = import.meta.env.VITE_AIRTABLE_CONTACTS_TABLE || "Contacts";
+const AIRTABLE_MANUAL_TABLE = "manually added";
 const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE}`;
 const AIRTABLE_CONTACTS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_CONTACTS_TABLE)}`;
+const AIRTABLE_MANUAL_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_MANUAL_TABLE)}`;
 
 // Airtable helper functions
 async function airtableFetch(filterFormula) {
@@ -41,6 +43,41 @@ async function fetchAllContacts() {
     offset = data.offset || null;
   } while (offset);
   return allRecords;
+}
+
+// "manually added" table helpers
+async function manualContactCreate(fields) {
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) return null;
+  try {
+    const res = await fetch(AIRTABLE_MANUAL_URL, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ records: [{ fields: { Name: fields.name || "", Email: fields.email || "", Company: fields.company || "", Website: fields.website || "", Category: fields.category || "", Country: fields.country || "", Notes: fields.notes || "" } }] }),
+    });
+    const data = await res.json();
+    return data.records?.[0]?.id || null;
+  } catch { return null; }
+}
+
+async function manualContactUpdate(airtableId, fields) {
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !airtableId) return;
+  try {
+    await fetch(`${AIRTABLE_MANUAL_URL}/${airtableId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields: { Name: fields.name || "", Email: fields.email || "", Company: fields.company || "", Website: fields.website || "", Category: fields.category || "", Country: fields.country || "", Notes: fields.notes || "" } }),
+    });
+  } catch { /* silent */ }
+}
+
+async function manualContactDelete(airtableId) {
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !airtableId) return;
+  try {
+    await fetch(`${AIRTABLE_MANUAL_URL}/${airtableId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` },
+    });
+  } catch { /* silent */ }
 }
 
 // Gmail OAuth Config — Replace with your Google Cloud Console credentials
@@ -604,19 +641,39 @@ function TotalContactsPage({ onBack, user }) {
   const openAdd = () => { setForm(emptyForm); setEditId(null); setFormError(""); setShowModal(true); };
   const openEdit = (c) => { setForm({ name: c.name || "", email: c.email || "", company: c.company || "", website: c.website || "", category: c.category || "Network", country: c.country || "", notes: c.notes || "" }); setEditId(c.id); setFormError(""); setShowModal(true); };
 
-  const submitForm = () => {
+  const submitForm = async () => {
     if (!form.email.trim()) { setFormError("Email is required"); return; }
     if (!/\S+@\S+\.\S+/.test(form.email)) { setFormError("Enter a valid email address"); return; }
     if (!editId && contacts.find(c => c.email === form.email.trim())) { setFormError("This email already exists"); return; }
-    if (editId) {
-      save(contacts.map(c => c.id === editId ? { ...c, ...form, email: form.email.trim() } : c));
-    } else {
-      save([...contacts, { ...form, email: form.email.trim(), id: "c_" + Date.now(), status: "Pending", createdAt: new Date().toISOString() }]);
-    }
     setShowModal(false);
+    if (editId) {
+      const existing = contacts.find(c => c.id === editId);
+      const updated = { ...existing, ...form, email: form.email.trim() };
+      save(contacts.map(c => c.id === editId ? updated : c));
+      if (existing?.airtableId) manualContactUpdate(existing.airtableId, updated);
+    } else {
+      const newContact = { ...form, email: form.email.trim(), id: "c_" + Date.now(), status: "Pending", createdAt: new Date().toISOString() };
+      // Save to localStorage first, then get Airtable ID and update
+      const withAirtable = { ...newContact };
+      manualContactCreate(newContact).then(airtableId => {
+        if (airtableId) {
+          setContacts(prev => {
+            const updated = prev.map(c => c.id === newContact.id ? { ...c, airtableId } : c);
+            localStorage.setItem("thehotspot_contacts", JSON.stringify(updated));
+            return updated;
+          });
+        }
+      });
+      save([...contacts, withAirtable]);
+    }
   };
 
-  const deleteContact = (id) => { if (window.confirm("Delete this contact?")) save(contacts.filter(c => c.id !== id)); };
+  const deleteContact = (id) => {
+    if (!window.confirm("Delete this contact?")) return;
+    const contact = contacts.find(c => c.id === id);
+    save(contacts.filter(c => c.id !== id));
+    if (contact?.airtableId) manualContactDelete(contact.airtableId);
+  };
 
   const inp = { background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#0F172A", outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
   const lbl = { fontSize: 11, fontWeight: 600, color: "#64748B", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: .5 };
