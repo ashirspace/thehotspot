@@ -1860,108 +1860,164 @@ function ContactsPage({ onBack, showToast, user }) {
 
 /* ───────── CAMPAIGN STATUS PAGE ───────── */
 function CampaignStatusPage({ onBack }) {
+  const [now, setNow] = useState(() => Date.now());
+
+  // Refresh the "X minutes ago" timestamps every minute
+  useEffect(() => {
+    const t = setInterval(() => setNow(Date.now()), 60000);
+    return () => clearInterval(t);
+  }, []);
+
   const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
 
-  const totalSent   = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
-  const totalFailed = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+  const cutoff24h = now - 24 * 60 * 60 * 1000;
+  const last24    = useMemo(() => history.filter(h => new Date(h.date).getTime() >= cutoff24h), [history, cutoff24h]);
+  const older     = useMemo(() => history.filter(h => new Date(h.date).getTime() <  cutoff24h), [history, cutoff24h]);
 
-  // Aggregate sent/failed per category from real campaign history
-  const byCat = useMemo(() => {
-    const acc = {};
-    history.forEach(h => {
-      const k = h.category && h.category !== "all" ? h.category : null;
-      if (k) {
-        if (!acc[k]) acc[k] = { sent: 0, failed: 0 };
-        acc[k].sent   += h.sent   || 0;
-        acc[k].failed += h.failed || 0;
-      } else {
-        // "all" campaigns — distribute evenly to all cats that exist in contacts
-        ["Network","CPS","CPL","CPA","Mobile"].forEach(cat => {
-          if (!acc[cat]) acc[cat] = { sent: 0, failed: 0 };
-        });
-      }
+  const sent24    = useMemo(() => last24.reduce((s, h) => s + (h.sent   || 0), 0), [last24]);
+  const failed24  = useMemo(() => last24.reduce((s, h) => s + (h.failed || 0), 0), [last24]);
+  const totalSent = useMemo(() => history.reduce((s, h) => s + (h.sent  || 0), 0), [history]);
+
+  // All individual emails sent in last 24h, flattened and sorted newest first
+  const emails24 = useMemo(() => {
+    const list = [];
+    last24.forEach(h => {
+      (h.contacts || []).forEach(c => {
+        list.push({ ...c, campaignDate: h.date, category: h.category, failed: false });
+      });
+      // if failed contacts were tracked separately — currently they aren't, so just show count
     });
-    return acc;
-  }, [history]);
+    list.sort((a, b) => new Date(b.campaignDate) - new Date(a.campaignDate));
+    return list;
+  }, [last24]);
 
-  const CATS = ["Network","CPS","CPL","CPA","Mobile"];
+  const timeAgo = (dateStr) => {
+    const diff = now - new Date(dateStr).getTime();
+    const mins = Math.floor(diff / 60000);
+    if (mins < 1)  return "just now";
+    if (mins < 60) return `${mins}m ago`;
+    const hrs = Math.floor(mins / 60);
+    if (hrs < 24)  return `${hrs}h ago`;
+    return new Date(dateStr).toLocaleDateString("en", { day: "numeric", month: "short" });
+  };
 
-  const lastCampaign = history[0];
-  const lastDate = lastCampaign ? new Date(lastCampaign.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" }) : null;
+  const deliveryRate = sent24 + failed24 > 0 ? Math.round(sent24 / (sent24 + failed24) * 100) : 0;
 
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Activity /></div>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Activity /></div>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Campaign Status</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} total{lastDate ? ` · last sent ${lastDate}` : ""}</div>
+          <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
+            {last24.length > 0 ? `${last24.length} campaign${last24.length !== 1 ? "s" : ""} in the last 24 hours` : "No activity in last 24 hours"}
+            {totalSent > 0 && ` · ${totalSent} sent all time`}
+          </div>
         </div>
       </div>
 
-      {/* Summary Cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 24 }}>
+      {/* 24h stat cards */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
         {[
-          { label: "Total Sent",  value: totalSent,        color: "#6366f1" },
-          { label: "Failed",      value: totalFailed,      color: "#EF4444" },
-          { label: "Campaigns",   value: history.length,   color: "#0ea5e9" },
+          { label: "Sent (24h)",     value: sent24,         color: "#6366f1",  bg: "#6366f108" },
+          { label: "Failed (24h)",   value: failed24,       color: "#EF4444",  bg: "#EF444408" },
+          { label: "Campaigns (24h)",value: last24.length,  color: "#0ea5e9",  bg: "#0ea5e908" },
         ].map(s => (
-          <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          <div key={s.label} style={{ background: s.bg, border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize: 26, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
+            <div style={{ fontSize: 10, color: "#64748B", marginTop: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
           </div>
         ))}
       </div>
 
-      {totalSent === 0 ? (
-        <div style={{ textAlign: "center", padding: "36px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 24 }}>
+      {/* Delivery rate bar — only show if there was activity */}
+      {(sent24 + failed24) > 0 && (
+        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 18px", marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Delivery Rate (24h)</span>
+            <span style={{ fontSize: 14, fontWeight: 700, color: deliveryRate >= 80 ? "#059669" : deliveryRate >= 50 ? "#D97706" : "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{deliveryRate}%</span>
+          </div>
+          <div style={{ height: 8, background: "#EFF1F8", borderRadius: 4, overflow: "hidden" }}>
+            <div style={{ width: `${deliveryRate}%`, height: "100%", background: deliveryRate >= 80 ? "linear-gradient(90deg,#6366f1,#10b981)" : deliveryRate >= 50 ? "linear-gradient(90deg,#6366f1,#f59e0b)" : "#EF4444", borderRadius: 4, transition: "width .6s ease" }} />
+          </div>
+          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "#94A3B8" }}>
+            <span>{sent24} delivered</span>
+            <span>{failed24} failed</span>
+          </div>
+        </div>
+      )}
+
+      {/* Emails sent in last 24h */}
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>
+        Emails Sent — Last 24 Hours
+      </div>
+
+      {emails24.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 20 }}>
           <div style={{ fontSize: 32, marginBottom: 10 }}>📡</div>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No campaigns yet</div>
-          <div style={{ fontSize: 13, color: "#64748B" }}>Start outreach from the chat — say "send emails" to begin.</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No emails sent in the last 24 hours</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
         </div>
       ) : (
-        <>
-          <div style={{ background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 12, padding: "12px 16px", marginBottom: 20, fontSize: 13, color: "#065F46", fontWeight: 600 }}>
-            {totalSent} email{totalSent !== 1 ? "s" : ""} sent across {Object.keys(byCat).filter(k => byCat[k].sent > 0).length} categor{Object.keys(byCat).filter(k => byCat[k].sent > 0).length === 1 ? "y" : "ies"}
-          </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+          {emails24.map((e, i) => {
+            const cat = CAT[e.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
+            return (
+              <div key={i} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                {/* Status dot */}
+                <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
+                {/* Avatar */}
+                <div style={{ width: 34, height: 34, borderRadius: 9, background: `${cat.dot}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
+                  {(e.company || e.email || "?")[0].toUpperCase()}
+                </div>
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A", marginBottom: 1 }}>{e.company || e.email}</div>
+                  {e.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {e.subject}</div>}
+                  {!e.subject && <div style={{ fontSize: 11, color: "#94A3B8" }}>{e.email}</div>}
+                </div>
+                {/* Category badge */}
+                {e.category && e.category !== "all" && (
+                  <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>{e.category}</span>
+                )}
+                {/* Time */}
+                <span style={{ fontSize: 11, color: "#94A3B8", flexShrink: 0, fontFamily: "'JetBrains Mono',monospace" }}>{timeAgo(e.campaignDate)}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
 
-          {/* Per Category */}
-          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>By Category</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-            {CATS.map(cat => {
-              const c = CAT[cat];
-              const data = byCat[cat] || { sent: 0, failed: 0 };
-              if (data.sent === 0 && data.failed === 0) return null;
-              const pct = data.sent + data.failed > 0 ? Math.round(data.sent / (data.sent + data.failed) * 100) : 100;
-              return (
-                <div key={cat} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.dot }} />
-                      <span style={{ fontSize: 15, fontWeight: 700, color: c.text }}>{cat}</span>
-                    </div>
-                    <span style={{ fontSize: 12, color: "#64748B", background: "#F8FAFF", border: "1px solid #E2E8F0", padding: "3px 10px", borderRadius: 8 }}>
-                      {pct}% delivery
-                    </span>
+      {/* Older campaigns summary */}
+      {older.length > 0 && (
+        <>
+          <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>
+            All Time · {older.length + last24.length} Campaigns
+          </div>
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
+              <span style={{ fontSize: 13, color: "#64748B" }}>Older than 24h</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{older.reduce((s, h) => s + (h.sent || 0), 0)} sent</span>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {older.slice(0, 5).map(h => (
+                <div key={h.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #EFF1F8" }}>
+                  <div>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{h.category || "Campaign"}</span>
+                    {h.cancelled && <span style={{ fontSize: 10, color: "#f59e0b", background: "#FEF3C7", padding: "1px 7px", borderRadius: 20, marginLeft: 8, fontWeight: 600 }}>Cancelled</span>}
                   </div>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8, marginBottom: 10 }}>
-                    {[
-                      { label: "Sent",   val: data.sent,   col: "#6366f1" },
-                      { label: "Failed", val: data.failed, col: "#EF4444" },
-                    ].map(s => (
-                      <div key={s.label} style={{ textAlign: "center", padding: "8px", background: "#F8FAFF", borderRadius: 8 }}>
-                        <div style={{ fontSize: 18, fontWeight: 700, color: s.col, fontFamily: "'JetBrains Mono',monospace" }}>{s.val}</div>
-                        <div style={{ fontSize: 10, color: "#94A3B8", marginTop: 2 }}>{s.label}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div style={{ height: 5, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
-                    <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .5s ease" }} />
+                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                    <span style={{ fontSize: 12, color: "#059669", fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>{h.sent} sent</span>
+                    {h.failed > 0 && <span style={{ fontSize: 11, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{h.failed} failed</span>}
+                    <span style={{ fontSize: 11, color: "#94A3B8" }}>{timeAgo(h.date)}</span>
                   </div>
                 </div>
-              );
-            })}
+              ))}
+              {older.length > 5 && <div style={{ fontSize: 12, color: "#94A3B8", textAlign: "center", paddingTop: 6 }}>+{older.length - 5} more campaigns — see full history in Emails Sent</div>}
+            </div>
           </div>
         </>
       )}
