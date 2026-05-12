@@ -6,40 +6,81 @@ export default async function handler(req, res) {
 
   const { company, category, website, offerContext, senderName, maxChars } = req.body;
   const API_KEY = process.env.OPENAI_API_KEY;
-  const sender = senderName || "Ashir";
-  const charLimit = Math.min(Math.max(parseInt(maxChars) || 400, 100), 1200);
+  const sender = senderName || "Ashir Ayaan";
+  const charLimit = Math.min(Math.max(parseInt(maxChars) || 600, 100), 1200);
+
+  // Category-specific angles
+  const categoryAngles = {
+    Network: {
+      angle: "We drive quality traffic through our owned properties (TravelNags, Khoj Coupons, TopVPN) and want to explore your network's offers",
+      value: "High-intent traffic, diverse geo coverage (Singapore, UAE, UK, USA, India), experienced media buying team",
+    },
+    CPS: {
+      angle: "We drive sales through content marketing and SEO on our niche properties",
+      value: "Conversion-optimized content, organic traffic, established audience trust",
+    },
+    CPL: {
+      angle: "We generate qualified leads through targeted content and paid campaigns",
+      value: "High-quality leads, compliance-first approach, multi-geo capability",
+    },
+    CPA: {
+      angle: "We deliver verified actions through our performance marketing channels",
+      value: "Fraud-free traffic, real user engagement, transparent reporting",
+    },
+    Mobile: {
+      angle: "We drive app installs and mobile engagement through our digital properties",
+      value: "Mobile-first audience, geo-targeted campaigns, measurable results",
+    },
+  };
+
+  const cat = categoryAngles[category] || categoryAngles["Network"];
 
   const fallback = {
-    subject: `Quick opportunity for ${company}`,
-    body: `Hi ${company},\n\n${offerContext ? offerContext + "\n\n" : "We run a high-performing affiliate network and think there's a strong fit with what you do.\n\n"}Open to a quick 10-min call this week?\n\nBest,\n${sender}\nthehotspot`,
+    subject: `Quick question for ${company}`,
+    body: `Hi ${company},\n\n${offerContext || cat.angle}.\n\nWe're Ibra Digitals — an affiliate marketing agency across Singapore, UAE, UK, USA, and India. ${cat.value}.\n\nOpen to a quick chat?\n\nBest,\n${sender}\nIbra Digitals Branding Services LLC`,
   };
 
   if (!API_KEY) return res.status(200).json(fallback);
 
-  const prompt = `Write a cold outreach email from ${sender} at thehotspot (affiliate marketing network) to ${company}.
+  const lengthGuidance = charLimit <= 250
+    ? "Ultra-short: 2-3 lines max before CTA. Every word must earn its place."
+    : charLimit <= 500
+    ? "Concise: under 150 words. Tight paragraphs, no filler."
+    : charLimit <= 750
+    ? "Medium: 150-200 words. Can include more context about the offer."
+    : "Detailed: 200-250 words max. Full context, specific value proposition, clear CTA.";
 
-CONTEXT:
-- Their website/domain: ${website || "unknown"}
-- Partnership type: ${category || "affiliate"}
-${offerContext ? `- Key offer details: ${offerContext}` : ""}
+  const prompt = `You are a professional outreach copywriter for Ibra Digitals Branding Services LLC — an international affiliate marketing and digital branding agency operating across Singapore, UAE, UK, USA, and India.
 
-RULES — follow every one exactly:
-1. Body must be UNDER ${charLimit} CHARACTERS total (count every character including spaces and line breaks)
-2. ${charLimit <= 250 ? "Ultra-short: 1-2 sentences max before the ask. Every word must earn its place." : charLimit <= 450 ? "Concise: get to the point fast, no fluff." : charLimit <= 700 ? "Medium length: can include more context about the offer, 2-3 short paragraphs." : "Detailed: give full context — who thehotspot is, what the offer includes, why it fits them, success examples if relevant, clear CTA."}
-3. Open with the value immediately — no pleasantries, no "I hope this email finds you well"
-4. Include the specific benefit — commission %, payout terms, traffic volume, whatever is most compelling from the offer details
-5. End with a single clear ask — "Open to a quick call?" or "Want the details?" or similar
-6. Sign off: "Best,\n${sender}\nthehotspot" — no other contact info
-7. Tone: direct, confident, human — like a message from a real person, not a marketing department
-8. NO filler words: not "hope", not "reach out", not "touch base", not "synergy", not "excited", not "innovative"
-9. Subject line: under 50 characters, specific, makes them curious — NOT "Partnership Opportunity"
+Write a cold outreach email to ${company} (website: ${website || "unknown"}) for a ${category || "affiliate"} partnership.
 
-${charLimit <= 250 ? `GOOD example for ultra-short (${charLimit} chars):\n"Hi Acme,\n\nWe send high-intent CPS leads your way — 35% commission, weekly payouts.\n\nWorth 10 mins?\n\nBest,\n${sender}\nthehotspot"` : charLimit >= 700 ? `GOOD example for detailed (${charLimit} chars):\nOpen with their niche, explain thehotspot's network size/quality, lay out the full offer details, mention why this fits them specifically, then a clear CTA.` : `GOOD example:\n"Hi Acme,\n\nWe place high-intent leads with CPS networks — your offers match exactly what our publishers want.\n\n35% commission, weekly payouts. No minimums.\n\nWorth 10 mins this week?\n\nBest,\n${sender}\nthehotspot"`}
+SENDER: ${sender}, Ibra Digitals Branding Services LLC
 
-Return ONLY valid JSON (no markdown, no extra text):
+${offerContext ? `OFFER DETAILS TO INCLUDE: ${offerContext}` : `CATEGORY ANGLE: ${cat.angle}\nVALUE TO HIGHLIGHT: ${cat.value}`}
+
+LENGTH: Body must be UNDER ${charLimit} CHARACTERS. ${lengthGuidance}
+
+EMAIL STRUCTURE (follow exactly):
+1. Subject: Under 8 words, specific, curiosity-driving — NOT "Partnership Opportunity" or generic phrases
+2. Line 1 (Hook): Reference something specific about ${company} — their domain, niche, or what they do. Shows you did research.
+3. Lines 2-3 (Bridge): Connect their work to what Ibra Digitals does. ONE sentence on what Ibra Digitals is.
+4. Lines 4-5 (Value): What's in it for THEM — be specific. Use the offer details or category angle above.
+5. Line 6 (CTA): One simple, low-friction ask — "Open to a quick chat?" or "Worth a 10-minute call?" or "Interested?"
+6. Sign-off: "${sender}\nIbra Digitals Branding Services LLC"
+
+HARD RULES — violating any of these is a failure:
+- NEVER start with "I hope this email finds you well", "I wanted to reach out", "I came across"
+- NEVER use "Dear Sir/Madam" — use "${company}" or a contact name
+- NEVER use these words: synergy, leverage, innovative, revolutionizing, excited, touch base, circle back, game changer, mutual benefit, look forward to connecting
+- NEVER use placeholder text like [Your Name], [Company], [insert], etc.
+- Subject must be under 8 words
+- Exactly ONE CTA — not two
+- Sign off as "${sender}" not "The Team" or "[Name]"
+
+Return ONLY valid JSON:
 {"subject": "...", "body": "..."}
 
-Body uses \\n for line breaks. No HTML. No placeholder brackets.`;
+Body uses \\n for line breaks. No HTML.`;
 
   try {
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -47,7 +88,7 @@ Body uses \\n for line breaks. No HTML. No placeholder brackets.`;
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${API_KEY}` },
       body: JSON.stringify({
         model: "gpt-4o-mini",
-        max_tokens: 400,
+        max_tokens: Math.ceil(charLimit / 2) + 200,
         response_format: { type: "json_object" },
         messages: [{ role: "user", content: prompt }],
       }),
@@ -56,12 +97,14 @@ Body uses \\n for line breaks. No HTML. No placeholder brackets.`;
     if (data.error) throw new Error(data.error.message);
     const parsed = JSON.parse(data.choices?.[0]?.message?.content || "{}");
 
-    // Enforce char limit server-side — trim if model ignored the rule
+    // Enforce char limit server-side
     let body = parsed.body || fallback.body;
-    const hardLimit = charLimit + 60; // small buffer for signature
+    const hardLimit = charLimit + 80;
     if (body.length > hardLimit) {
       const cut = body.lastIndexOf("\n", charLimit);
-      body = cut > charLimit * 0.5 ? body.slice(0, cut) + `\n\nBest,\n${sender}\nthehotspot` : body.slice(0, charLimit);
+      body = cut > charLimit * 0.5
+        ? body.slice(0, cut) + `\n\nBest,\n${sender}\nIbra Digitals Branding Services LLC`
+        : body.slice(0, charLimit);
     }
 
     res.status(200).json({

@@ -16,7 +16,7 @@ export default async function handler(req, res) {
     });
   }
 
-  const systemPrompt = `You are a smart, helpful AI assistant built into thehotspot — an affiliate marketing outreach platform. You help users send emails, manage contacts, and run outreach campaigns.
+  const systemPrompt = `You are a smart, helpful AI assistant built into thehotspot — the outreach platform for Ibra Digitals Branding Services LLC, an international affiliate marketing and digital branding agency (Singapore, UAE, UK, USA, India). You help Ashir Ayaan send professional outreach emails, manage affiliate contacts, and run campaigns.
 
 ALWAYS respond with valid JSON only, no extra text:
 {"message": "your reply here", "action": "action_name", "params": {}}
