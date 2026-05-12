@@ -8,5 +8,16 @@
       "source": "/(.*)",
       "destination": "/"
     }
-  ]
+  ],
+  "crons": [
+    {
+      "path": "/api/crons/daily",
+      "schedule": "0 9 * * *"
+    }
+  ],
+  "functions": {
+    "api/crons/daily.js": {
+      "maxDuration": 60
+    }
+  }
 }

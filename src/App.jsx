@@ -468,7 +468,18 @@ const CONTACTS = [];
 const STATS = { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 };
 
 /* ───────── SMART CHATBOT (works without API) ───────── */
-const STATS_DATA = { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 };
+const getStatsData = () => {
+  try {
+    const campaigns = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+    const contacts = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+    const manual = JSON.parse(localStorage.getItem("thehotspot_manual_contacts") || "[]");
+    const sent = campaigns.reduce((s, h) => s + (h.sent || 0), 0);
+    const failed = campaigns.reduce((s, h) => s + (h.failed || 0), 0);
+    const rate = sent + failed > 0 ? Math.round(sent / (sent + failed) * 100) : 0;
+    return { totalContacts: contacts.length + manual.length, emailsSent: sent, categories: 5, successRate: rate };
+  } catch { return { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 }; }
+};
+const STATS_DATA = getStatsData();
 
 function getSmartResponse(text) {
   const lower = text.toLowerCase();
@@ -926,9 +937,23 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
   const [tab, setTab] = useState("overview"); // "overview" | "history"
   const [expandedId, setExpandedId] = useState(null);
   const [openEmail, setOpenEmail] = useState(null);
+  const [remoteLoaded, setRemoteLoaded] = useState(false);
 
-  const history = useMemo(() => {
+  const [history, setHistory] = useState(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; }
+  });
+
+  // Fetch from Airtable in the background and merge
+  useEffect(() => {
+    fetch("/api/campaigns/list")
+      .then(r => r.json())
+      .then(data => {
+        if (data.configured && data.campaigns?.length > 0) {
+          setHistory(data.campaigns);
+          setRemoteLoaded(true);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   // Aggregate stats from local campaign history
@@ -1928,13 +1953,23 @@ function CampaignStatusPage({ onBack }) {
   const [now, setNow] = useState(() => Date.now());
   const [openEmail, setOpenEmail] = useState(null); // { company, email, subject, body, sentAt, category }
 
+  const [history, setHistory] = useState(() => {
+    try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; }
+  });
+
   // Refresh the "X minutes ago" timestamps every minute
   useEffect(() => {
     const t = setInterval(() => setNow(Date.now()), 60000);
     return () => clearInterval(t);
   }, []);
 
-  const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
+  // Pull live data from Airtable
+  useEffect(() => {
+    fetch("/api/campaigns/list")
+      .then(r => r.json())
+      .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
+      .catch(() => {});
+  }, []);
 
   const cutoff24h = now - 24 * 60 * 60 * 1000;
   const last24    = useMemo(() => history.filter(h => new Date(h.date).getTime() >= cutoff24h), [history, cutoff24h]);
@@ -2163,16 +2198,31 @@ function ProfilePage({ user, onBack, onLogout }) {
 }
 
 /* ───────── EMAIL SENDER ───────── */
-function makeGmailMessage({ to, subject, body }) {
-  // Encode subject with RFC 2047 to handle special characters / apostrophes
+function makeGmailMessage({ to, subject, body, html = false }) {
   const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
+  let content, contentType;
+  if (html) {
+    const escaped = body
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;");
+    // Re-apply <a> tags that were already injected (they got escaped above — undo)
+    const withLinks = escaped
+      .replace(/&lt;a href="([^"]+)"&gt;([^<]+)&lt;\/a&gt;/g, '<a href="$1">$2</a>')
+      .replace(/&lt;img ([^/]+)\/&gt;/g, '<img $1/>');
+    content = `<html><body style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#1a1a1a;max-width:600px">${withLinks.replace(/\n/g, "<br>\n")}</body></html>`;
+    contentType = "text/html";
+  } else {
+    content = body;
+    contentType = "text/plain";
+  }
   const msg = [
     `To: ${to}`,
     `Subject: ${encodedSubject}`,
-    `Content-Type: text/plain; charset=utf-8`,
+    `Content-Type: ${contentType}; charset=utf-8`,
     `MIME-Version: 1.0`,
     "",
-    body,
+    content,
   ].join("\r\n");
   return btoa(unescape(encodeURIComponent(msg)))
     .replace(/\+/g, "-")
@@ -2963,13 +3013,43 @@ function Dashboard({ user, onLogout }) {
     return { type: "send_emails", emails: null, category: matched || "all" };
   };
 
-  // Save a campaign to history
+  // Daily send limits — warm-up schedule to protect Gmail account health
+  const getDailyLimit = () => {
+    const firstSend = localStorage.getItem("thehotspot_first_send");
+    if (!firstSend) { localStorage.setItem("thehotspot_first_send", new Date().toISOString()); return 10; }
+    const days = Math.floor((Date.now() - new Date(firstSend).getTime()) / 86400000);
+    if (days < 7)  return 10;
+    if (days < 14) return 20;
+    if (days < 21) return 35;
+    return 50;
+  };
+  const getTodaySentCount = () => {
+    try {
+      const d = JSON.parse(localStorage.getItem("thehotspot_daily_sends") || "{}");
+      return d.date === new Date().toDateString() ? d.count : 0;
+    } catch { return 0; }
+  };
+  const incrementDailySendCount = () => {
+    try {
+      const d = JSON.parse(localStorage.getItem("thehotspot_daily_sends") || "{}");
+      const today = new Date().toDateString();
+      localStorage.setItem("thehotspot_daily_sends", JSON.stringify({ date: today, count: d.date === today ? d.count + 1 : 1 }));
+    } catch {}
+  };
+
+  // Save a campaign to history — localStorage (instant) + Airtable (background)
   const saveCampaignHistory = (entry) => {
+    const record = { ...entry, id: Date.now(), date: new Date().toISOString() };
     try {
       const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-      history.unshift({ ...entry, id: Date.now(), date: new Date().toISOString() });
-      localStorage.setItem("thehotspot_campaigns", JSON.stringify(history.slice(0, 50))); // keep last 50
+      history.unshift(record);
+      localStorage.setItem("thehotspot_campaigns", JSON.stringify(history.slice(0, 50)));
     } catch {}
+    fetch("/api/campaigns/create", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ userId: user?.username || user?.email || "unknown", ...record }),
+    }).catch(() => {});
   };
 
   // Generate one email via API — returns { subject, body }
@@ -2991,9 +3071,22 @@ function Dashboard({ user, onLogout }) {
     return res.json();
   };
 
-  // Send one pre-generated email via Gmail — returns true/false
+  // Send one pre-generated email via Gmail — returns { threadId }
   const sendOneEmail = async (to, subject, body) => {
-    const raw = makeGmailMessage({ to, subject, body });
+    const trackId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+    const origin = window.location.origin;
+
+    // Wrap bare URLs with click tracking
+    const trackedBody = body.replace(/https?:\/\/[^\s)>\]"]+/g, (url) =>
+      `<a href="${origin}/api/track?type=click&id=${trackId}&e=${encodeURIComponent(to)}&url=${encodeURIComponent(url)}">${url}</a>`
+    );
+
+    // Append unsubscribe footer + open-tracking pixel
+    const htmlBody = trackedBody
+      + `\n\n---\nTo unsubscribe, reply STOP.`
+      + `\n<img src="${origin}/api/track?type=open&id=${trackId}&e=${encodeURIComponent(to)}" width="1" height="1" style="display:none;width:1px;height:1px" alt="" />`;
+
+    const raw = makeGmailMessage({ to, subject, body: htmlBody, html: true });
     const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
       method: "POST",
       headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
@@ -3008,7 +3101,7 @@ function Dashboard({ user, onLogout }) {
       }
       throw new Error(data.error.message);
     }
-    return true;
+    return { threadId: data.threadId || null };
   };
 
   // Send emails inline in the chat — no page navigation
@@ -3040,6 +3133,20 @@ function Dashboard({ user, onLogout }) {
       setMessages(prev => [...prev, { role: "assistant", content: `No contacts found${category && category !== "all" ? ` in the **${category.toUpperCase()}** category` : ""}. Add contacts first from the Contacts DB, or type an email address directly.` }]);
       setLoading(false);
       return;
+    }
+
+    // Rate limit check — warm-up schedule protects Gmail account health
+    const dailyLimit = getDailyLimit();
+    const todaySent  = getTodaySentCount();
+    const remaining  = dailyLimit - todaySent;
+    if (remaining <= 0) {
+      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Daily limit reached (${dailyLimit}/day). This protects your Gmail account from spam flags. Resets at midnight — you have **${dailyLimit} sends** again tomorrow.` }]);
+      setLoading(false);
+      return;
+    }
+    if (targets.length > remaining) {
+      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Only **${remaining} sends** left today (daily limit: ${dailyLimit}). Sending to the first ${remaining} contacts.` }]);
+      targets = targets.slice(0, remaining);
     }
 
     cancelCampaign.current = false;
@@ -3088,9 +3195,13 @@ function Dashboard({ user, onLogout }) {
           } : m));
         }
 
-        await sendOneEmail(contact.email, subject, body);
+        const { threadId } = await sendOneEmail(contact.email, subject, body);
         sent++;
-        sentLog.push({ email: contact.email, company: contact.company_name || contact.company || contact.name, subject, body, sentAt: new Date().toISOString() });
+        incrementDailySendCount();
+        sentLog.push({ email: contact.email, company: contact.company_name || contact.company || contact.name, subject, body, sentAt: new Date().toISOString(), threadId });
+
+        // Human-like pacing between sends (reduces spam-flag risk)
+        if (targets.length > 1) await new Promise(r => setTimeout(r, 2500));
 
         // Show final sent confirmation for single email
         if (targets.length === 1) {
@@ -3119,10 +3230,14 @@ function Dashboard({ user, onLogout }) {
       }
     }
 
-    if (targets.length > 1) {
+    if (sent > 0) {
       saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
-    } else if (sent > 0) {
-      saveCampaignHistory({ category, offerContext, sent, failed, cancelled: false, contacts: sentLog });
+      // Register follow-up sequences for all sent contacts (fire and forget)
+      fetch("/api/sequences/create", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ contacts: sentLog, step: 1 }),
+      }).catch(() => {});
     }
     setCampaignRunning(false);
     setLoading(false);
@@ -3264,12 +3379,28 @@ function Dashboard({ user, onLogout }) {
       // For all other actions: show AI reply
       setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
       if (action === "schedule_emails") {
+        const timeStr = new Date(params.scheduledFor).toLocaleString();
         try {
-          const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
-          scheduled.push({ scheduledFor: params.scheduledFor, category: params.category || "all", offerContext: params.offerContext || "" });
-          localStorage.setItem("thehotspot_scheduled", JSON.stringify(scheduled));
-          const timeStr = new Date(params.scheduledFor).toLocaleString();
-          setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled! Emails will send on **${timeStr}**. Keep this tab open for it to fire.` }]);
+          const r = await fetch("/api/schedule-campaign", {
+            method: "POST", headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              userId: user?.username || user?.email || "unknown",
+              scheduledFor: params.scheduledFor,
+              category: params.category || "all",
+              offerContext: params.offerContext || "",
+              maxChars: params.maxChars || null,
+            }),
+          });
+          const data = await r.json();
+          if (data.success) {
+            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled for **${timeStr}**. The daily cron will send these at 9 AM — no need to keep the tab open.` }]);
+          } else {
+            // Fallback to localStorage if Airtable not configured
+            const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
+            scheduled.push({ scheduledFor: params.scheduledFor, category: params.category || "all", offerContext: params.offerContext || "" });
+            localStorage.setItem("thehotspot_scheduled", JSON.stringify(scheduled));
+            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled for **${timeStr}** (browser-only — keep the tab open). Set up Airtable to enable server-side scheduling.` }]);
+          }
         } catch {
           setMessages(prev => [...prev, { role: "assistant", content: "Couldn't schedule — try again." }]);
         }
@@ -3298,6 +3429,69 @@ function Dashboard({ user, onLogout }) {
         setLoading(false);
         return;
       }
+      if (action === "find_leads") {
+        const { leads = [], category: leadCat = "Network" } = params || {};
+        if (!leads.length) {
+          setLoading(false);
+          return;
+        }
+        try {
+          const existing = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+          const newLeads = leads
+            .filter(l => l.email && !existing.find(e => e.email === l.email))
+            .map(l => ({
+              id: "c_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
+              email: l.email,
+              company: l.company || l.email.split("@")[0],
+              company_name: l.company || l.email.split("@")[0],
+              name: l.company || l.email.split("@")[0],
+              category: l.category || leadCat,
+              website: l.website || "",
+              description: l.description || "",
+              createdAt: new Date().toISOString(),
+            }));
+          if (newLeads.length > 0) {
+            localStorage.setItem("thehotspot_contacts", JSON.stringify([...newLeads, ...existing]));
+            setContactCount(prev => prev + newLeads.length);
+          }
+          const suffix = newLeads.length > 0
+            ? `\n\n✅ **${newLeads.length} new leads added** to your contacts. Say "send emails to ${leadCat}" to reach out.`
+            : leads.length > 0 ? `\n\n_(All ${leads.length} were already in your contacts.)_` : "";
+          setMessages(prev => [...prev, { role: "assistant", content: message + suffix }]);
+        } catch {
+          setMessages(prev => [...prev, { role: "assistant", content: message }]);
+        }
+        setLoading(false);
+        return;
+      }
+      if (action === "check_replies") {
+        try {
+          const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+          const recent = history.flatMap(h => (h.contacts || []).filter(c => c.threadId).map(c => ({ email: c.email, threadId: c.threadId })));
+          if (!recent.length) {
+            setMessages(prev => [...prev, { role: "assistant", content: "No sent emails with reply tracking found. Campaigns sent before this update don't have thread IDs." }]);
+            setLoading(false);
+            return;
+          }
+          const r = await fetch("/api/check-replies", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ gmailToken, threads: recent.slice(0, 50) }),
+          });
+          const data = await r.json();
+          const repliedList = data.replied || [];
+          const msg = repliedList.length > 0
+            ? `📬 **${repliedList.length} reply${repliedList.length > 1 ? "s" : ""} found!**\n\n${repliedList.map(r => `• **${r.email}** — replied ${r.repliedAt ? new Date(r.repliedAt).toLocaleDateString() : ""}`).join("\n")}\n\n${data.notReplied?.length > 0 ? `${data.notReplied.length} contacts still haven't replied.` : ""}`
+            : `No replies yet out of ${data.checked} tracked emails. Consider sending a follow-up — say "send follow-up".`;
+          setMessages(prev => [...prev, { role: "assistant", content: msg }]);
+        } catch {
+          setMessages(prev => [...prev, { role: "assistant", content: "Couldn't check replies right now — make sure Gmail is connected." }]);
+        }
+        setLoading(false);
+        return;
+      }
+      // show_page (new) and legacy page navigation actions
+      if (action === "show_page" && params?.page) setPage(params.page);
       if (action === "show_stats") setPage("dashboard");
       if (action === "show_contacts") setPage("contacts");
       if (action === "open_email_sender") setPage("emailSender");
@@ -3320,46 +3514,54 @@ function Dashboard({ user, onLogout }) {
       showToast("Google Sign-In not available — please refresh the page.");
       return;
     }
-    const client = window.google.accounts.oauth2.initTokenClient({
-      client_id: GMAIL_CLIENT_ID,
-      scope: "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
-      callback: async (response) => {
-        if (response.error) {
-          showToast("Gmail connection failed: " + response.error);
-          return;
-        }
-        const token = response.access_token;
-        try {
-          // Fetch sent email count from Gmail API
-          const res = await fetch(
-            "https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1",
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          const data = await res.json();
-          const count = data.resultSizeEstimate || 0;
 
-          setGmailConnected(true);
-          setGmailToken(token);
-          setSentCount(count);
+    const scope = "https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send";
 
-          // Persist so it survives page refresh
-          const updatedUser = { ...user, gmailToken: token, sentCount: count };
-          localStorage.setItem("thehotspot_user", JSON.stringify(updatedUser));
-          showToast(`Gmail connected — ${count.toLocaleString()} emails sent`);
-        } catch {
-          // Token valid, stats unavailable
-          setGmailConnected(true);
-          setGmailToken(token);
-          const updatedUser = { ...user, gmailToken: token };
-          localStorage.setItem("thehotspot_user", JSON.stringify(updatedUser));
-          showToast("Gmail connected!");
-        }
-      },
-      error_callback: (err) => {
-        if (err.type !== "popup_closed") showToast("Gmail connection failed");
-      },
-    });
-    client.requestAccessToken();
+    const applyToken = async (token, label) => {
+      try {
+        const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1", { headers: { Authorization: `Bearer ${token}` } });
+        const data = await res.json();
+        const count = data.resultSizeEstimate || 0;
+        setGmailConnected(true); setGmailToken(token); setSentCount(count);
+        localStorage.setItem("thehotspot_user", JSON.stringify({ ...user, gmailToken: token, sentCount: count }));
+        showToast(label || `Gmail connected — ${count.toLocaleString()} emails sent`);
+      } catch {
+        setGmailConnected(true); setGmailToken(token);
+        localStorage.setItem("thehotspot_user", JSON.stringify({ ...user, gmailToken: token }));
+        showToast(label || "Gmail connected!");
+      }
+    };
+
+    const useLegacyFlow = () => {
+      const c = window.google.accounts.oauth2.initTokenClient({
+        client_id: GMAIL_CLIENT_ID, scope,
+        callback: async (r) => { if (r.error) { showToast("Gmail connection failed: " + r.error); return; } await applyToken(r.access_token); },
+        error_callback: (e) => { if (e.type !== "popup_closed") showToast("Gmail connection failed"); },
+      });
+      c.requestAccessToken();
+    };
+
+    // Try Authorization Code flow (gets refresh token for background sending without browser)
+    try {
+      if (!window.google.accounts.oauth2.initCodeClient) { useLegacyFlow(); return; }
+      const c = window.google.accounts.oauth2.initCodeClient({
+        client_id: GMAIL_CLIENT_ID, scope, ux_mode: "popup",
+        callback: async (r) => {
+          if (r.error) { useLegacyFlow(); return; }
+          try {
+            const res = await fetch("/api/auth", {
+              method: "POST", headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ code: r.code, userId: user?.username || user?.email || "unknown" }),
+            });
+            const data = await res.json();
+            if (data.access_token) {
+              await applyToken(data.access_token, data.backgroundEnabled ? "Gmail connected + background sending enabled" : null);
+            } else { useLegacyFlow(); }
+          } catch { useLegacyFlow(); }
+        },
+      });
+      c.requestCode();
+    } catch { useLegacyFlow(); }
   };
 
   // All nav items shown as dashboard cards
