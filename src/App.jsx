@@ -1999,11 +1999,10 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
 
   const sendEmail = async () => {
     if (!gmailToken) { connectGmail(); showToast("Connect Gmail first"); return; }
-    if (!form.recipientCompany.trim()) { showToast("No recipient email"); return; }
+    const toEmail = form.recipientEmail?.trim();
+    if (!toEmail) { showToast("Enter recipient email address first"); return; }
     setSending(true);
     try {
-      const toEmail = form.recipientEmail || (form.website ? `info@${form.website.replace(/https?:\/\//, "").split("/")[0]}` : null);
-      if (!toEmail) { showToast("Enter recipient email address"); setSending(false); return; }
       const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(email.subject)))}?=`;
       const msg = [`To: ${toEmail}`, `Subject: ${encodedSubject}`, `Content-Type: text/plain; charset=utf-8`, `MIME-Version: 1.0`, "", email.body].join("\r\n");
       const raw = btoa(unescape(encodeURIComponent(msg))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
@@ -2013,11 +2012,20 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         body: JSON.stringify({ raw }),
       });
       const sendData = await sendRes.json();
-      if (sendData.error) throw new Error(sendData.error.message);
-      showToast(`Sent to ${toEmail}`);
+      if (sendData.error) {
+        // Token expired — reconnect automatically
+        if (sendData.error.code === 401 || (sendData.error.message || "").toLowerCase().includes("auth")) {
+          showToast("Gmail token expired — reconnecting...");
+          setSending(false);
+          connectGmail();
+          return;
+        }
+        throw new Error(sendData.error.message);
+      }
+      showToast(`✅ Sent to ${toEmail}`);
       setStep("pick");
       setTemplate(null);
-      setForm({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "600" });
+      setForm({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "560" });
       setEmail({ subject: "", body: "" });
     } catch (e) {
       showToast("Send failed: " + e.message);
