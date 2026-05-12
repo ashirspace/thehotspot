@@ -578,57 +578,221 @@ function BackButton({ onClick, label }) {
 }
 
 function TotalContactsPage({ onBack, user }) {
-  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
-  const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
-  const contactsByCategory = [
-    { cat: "Network", count: countBycat["Network"] || 0, color: CAT.Network },
-    { cat: "CPS", count: countBycat["CPS"] || 0, color: CAT.CPS },
-    { cat: "CPL", count: countBycat["CPL"] || 0, color: CAT.CPL },
-    { cat: "CPA", count: countBycat["CPA"] || 0, color: CAT.CPA },
-    { cat: "Mobile", count: countBycat["Mobile"] || 0, color: CAT.Mobile },
-  ];
-  const total = contacts.length || user?.contactsCount || 0;
-  const maxCount = Math.max(...contactsByCategory.map(c => c.count), 1);
+  const CATS = ["Network", "CPS", "CPL", "CPA", "Mobile"];
+  const emptyForm = { name: "", email: "", company: "", website: "", category: "Network", country: "", notes: "" };
+
+  const [contacts, setContacts] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } });
+  const [search, setSearch] = useState("");
+  const [filterCat, setFilterCat] = useState("All");
+  const [showModal, setShowModal] = useState(false);
+  const [editId, setEditId] = useState(null);
+  const [form, setForm] = useState(emptyForm);
+  const [formError, setFormError] = useState("");
+
+  const save = (list) => { setContacts(list); localStorage.setItem("thehotspot_contacts", JSON.stringify(list)); };
+
+  const filtered = useMemo(() => contacts.filter(c => {
+    const matchCat = filterCat === "All" || c.category === filterCat;
+    const q = search.toLowerCase();
+    const matchSearch = !q || [c.name, c.email, c.company, c.country].some(f => (f || "").toLowerCase().includes(q));
+    return matchCat && matchSearch;
+  }), [contacts, search, filterCat]);
+
+  const countByCat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
+  const maxCount = Math.max(...CATS.map(k => countByCat[k] || 0), 1);
+
+  const openAdd = () => { setForm(emptyForm); setEditId(null); setFormError(""); setShowModal(true); };
+  const openEdit = (c) => { setForm({ name: c.name || "", email: c.email || "", company: c.company || "", website: c.website || "", category: c.category || "Network", country: c.country || "", notes: c.notes || "" }); setEditId(c.id); setFormError(""); setShowModal(true); };
+
+  const submitForm = () => {
+    if (!form.email.trim()) { setFormError("Email is required"); return; }
+    if (!/\S+@\S+\.\S+/.test(form.email)) { setFormError("Enter a valid email address"); return; }
+    if (!editId && contacts.find(c => c.email === form.email.trim())) { setFormError("This email already exists"); return; }
+    if (editId) {
+      save(contacts.map(c => c.id === editId ? { ...c, ...form, email: form.email.trim() } : c));
+    } else {
+      save([...contacts, { ...form, email: form.email.trim(), id: "c_" + Date.now(), status: "Pending", createdAt: new Date().toISOString() }]);
+    }
+    setShowModal(false);
+  };
+
+  const deleteContact = (id) => { if (window.confirm("Delete this contact?")) save(contacts.filter(c => c.id !== id)); };
+
+  const inp = { background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#0F172A", outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const lbl = { fontSize: 11, fontWeight: 600, color: "#64748B", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: .5 };
+  const focusStyle = (e) => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; };
+  const blurStyle  = (e) => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; };
 
   return (
     <div>
-      <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><I.Users /></div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{total}</div>
-          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Gmail Contacts</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A" }}>Total Contacts</div>
+          <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{contacts.length} contact{contacts.length !== 1 ? "s" : ""} total</div>
         </div>
+        <button onClick={openAdd} style={{
+          display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, border: "none",
+          background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff",
+          fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+          boxShadow: "0 4px 12px #6366f140",
+        }}>
+          + Add Contact
+        </button>
       </div>
-      {user?.method !== "google" && (
-        <div style={{ background: "#FFF7ED", border: "1px solid #f9731633", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#9A3412" }}>
-          Sign in with Google to see your real contacts count.
+
+      {/* Category bar */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
+        {CATS.map(cat => {
+          const c = CAT[cat] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
+          const count = countByCat[cat] || 0;
+          return (
+            <button key={cat} onClick={() => setFilterCat(filterCat === cat ? "All" : cat)} style={{
+              background: "#FFFFFF", border: filterCat === cat ? `2px solid ${c.dot}` : "1px solid #E2E8F0",
+              borderRadius: 12, padding: "12px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+            }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+                  <span style={{ fontSize: 13, fontWeight: 600, color: c.text || "#0F172A" }}>{cat}</span>
+                </div>
+                <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
+              </div>
+              <div style={{ width: "100%", height: 5, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
+                <div style={{ width: `${(count / maxCount) * 100}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .6s ease" }} />
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Search + filter row */}
+      <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
+        <input style={{ ...inp, flex: 1 }} placeholder="Search by name, email, company..." value={search} onChange={e => setSearch(e.target.value)} onFocus={focusStyle} onBlur={blurStyle} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ ...inp, width: "auto", paddingRight: 28, cursor: "pointer" }}>
+          <option value="All">All Categories</option>
+          {CATS.map(c => <option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      {/* Contact list */}
+      {filtered.length === 0 ? (
+        <div style={{ textAlign: "center", padding: "48px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
+          <div style={{ fontSize: 32, marginBottom: 12 }}>👥</div>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
+          <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20 }}>{contacts.length === 0 ? "Add your first contact to get started." : "Try a different search or filter."}</div>
+          {contacts.length === 0 && <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Add Contact</button>}
+        </div>
+      ) : (
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div style={{ fontSize: 11, color: "#94A3B8", fontWeight: 600, letterSpacing: .5, textTransform: "uppercase", marginBottom: 4 }}>{filtered.length} contact{filtered.length !== 1 ? "s" : ""}</div>
+          {filtered.map(c => {
+            const cat = CAT[c.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
+            return (
+              <div key={c.id} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.04)", transition: "box-shadow .15s" }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.08)"}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.04)"}
+              >
+                {/* Avatar */}
+                <div style={{ width: 38, height: 38, borderRadius: "50%", background: `${cat.dot}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
+                  {(c.company || c.name || c.email || "?")[0].toUpperCase()}
+                </div>
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 2 }}>{c.company || c.name || "—"}</div>
+                  <div style={{ fontSize: 12, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.email}</div>
+                </div>
+                {/* Category badge */}
+                <span style={{ padding: "3px 10px", borderRadius: 20, background: cat.bg || `${cat.dot}15`, color: cat.text || cat.dot, fontSize: 11, fontWeight: 600, flexShrink: 0 }}>{c.category}</span>
+                {/* Country */}
+                {c.country && <span style={{ fontSize: 12, color: "#94A3B8", flexShrink: 0 }}>{c.country}</span>}
+                {/* Actions */}
+                <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+                  <button onClick={() => openEdit(c)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #E2E8F0", background: "#F8FAFF", color: "#64748B", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Edit</button>
+                  <button onClick={() => deleteContact(c.id)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #fee2e2", background: "#fef2f2", color: "#ef4444", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>✕</button>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
-      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Emails sent by category (via thehotspot)</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {contactsByCategory.map(c => (
-          <div key={c.cat} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
-                <span style={{ fontSize: 14, fontWeight: 600, color: c.color.text }}>{c.cat}</span>
-              </div>
-              <span style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</span>
+
+      {/* Add / Edit Modal */}
+      {showModal && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
+          <div style={{ background: "#FFF", borderRadius: 18, padding: 28, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.2)", maxHeight: "90vh", overflowY: "auto" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "#0F172A" }}>{editId ? "Edit Contact" : "Add Contact"}</div>
+              <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", fontSize: 20, color: "#94A3B8", cursor: "pointer", lineHeight: 1 }}>✕</button>
             </div>
-            <div style={{ width: "100%", height: 6, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
-              <div style={{ width: `${(c.count / maxCount) * 100}%`, height: "100%", background: c.color.dot, borderRadius: 3, transition: "width .5s ease" }} />
+
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={lbl}>Company</label>
+                  <input style={inp} placeholder="AdCombo Ltd" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+                </div>
+                <div>
+                  <label style={lbl}>Contact Name</label>
+                  <input style={inp} placeholder="John Smith" value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+                </div>
+              </div>
+
+              <div>
+                <label style={lbl}>Email Address *</label>
+                <input style={inp} placeholder="partner@company.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+              </div>
+
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                <div>
+                  <label style={lbl}>Website</label>
+                  <input style={inp} placeholder="company.com" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+                </div>
+                <div>
+                  <label style={lbl}>Country</label>
+                  <input style={inp} placeholder="UAE, UK, India…" value={form.country} onChange={e => setForm(f => ({ ...f, country: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+                </div>
+              </div>
+
+              <div>
+                <label style={lbl}>Category</label>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                  {CATS.map(cat => {
+                    const c = CAT[cat] || {};
+                    return (
+                      <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))} style={{
+                        padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+                        border: form.category === cat ? `2px solid ${c.dot || "#6366f1"}` : "1px solid #E2E8F0",
+                        background: form.category === cat ? (c.bg || "#EEF2FF") : "#F8FAFF",
+                        color: form.category === cat ? (c.text || "#4F46E5") : "#64748B",
+                      }}>{cat}</button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div>
+                <label style={lbl}>Notes <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#94A3B8" }}>(optional)</span></label>
+                <textarea style={{ ...inp, minHeight: 70, resize: "vertical", lineHeight: 1.6 }} placeholder="Any context about this contact…" value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
+              </div>
+
+              {formError && <div style={{ fontSize: 12, color: "#ef4444", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, padding: "8px 12px" }}>{formError}</div>}
+
+              <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                <button onClick={submitForm} style={{
+                  flex: 1, padding: "12px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 4px 12px #6366f140",
+                }}>
+                  {editId ? "Save Changes" : "Add Contact"}
+                </button>
+                <button onClick={() => setShowModal(false)} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#F8FAFF", color: "#64748B", fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+                  Cancel
+                </button>
+              </div>
             </div>
           </div>
-        ))}
-      </div>
-      <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px 18px", marginTop: 16, boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-          <span style={{ fontSize: 13, color: "#64748B", fontWeight: 500 }}>Recently Added</span>
-          <span style={{ fontSize: 11, color: "#94A3B8" }}>Last 7 days</span>
         </div>
-        <div style={{ fontSize: 32, fontWeight: 700, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", marginTop: 8 }}>0</div>
-      </div>
+      )}
     </div>
   );
 }
