@@ -59,19 +59,52 @@ ${offerContext ? `- Specific offer to mention: ${offerContext}` : `- Angle to us
 
 ---
 
-## PERFECT EXAMPLE EMAIL (copy this exact style, structure, and tone):
+## PERFECT EXAMPLE EMAILS (copy this exact style, structure, and tone):
 
-Subject: Driving Traffic to [Network]'s Offers
+Example 1 — Network category:
+Subject: Your Network + Our Traffic — Good Fit?
 
-Hi [Company],
+Hi AdCombo,
 
-Noticed [Company] has a strong presence in [their niche] — exactly the kind of network our media buying team targets.
+AdCombo's CPA network covers exactly the geos our media buying team targets — we push high-intent traffic across UAE, UK, and India daily.
 
-Ibra Digitals is an affiliate agency operating across Singapore, UAE, UK and India. We run owned properties (TravelNags, Khoj Coupons, TopVPN) and push quality traffic to affiliate offers.
+Ibra Digitals is an affiliate marketing agency running owned properties (TravelNags, Khoj Coupons, TopVPN) with audiences that convert well on performance offers.
 
-We'd love to explore if there's a fit — our audience converts well on [relevant offer type].
+Worth a quick 10-minute call to see if there's a fit?
+
+Best,
+Ashir Ayaan
+Ibra Digitals Branding Services LLC
+
+---
+
+Example 2 — CPS category:
+Subject: Driving Sales for [Company]'s Offers
+
+Hi MaxBounty,
+
+MaxBounty's reputation for high-converting CPS offers makes them a natural fit for our content-driven traffic strategy.
+
+Ibra Digitals runs niche properties across travel, tech, and finance with audiences already primed to buy — we drive organic sales, not just clicks.
 
 Open to a quick chat this week?
+
+Best,
+Ashir Ayaan
+Ibra Digitals Branding Services LLC
+
+---
+
+Example 3 — Mobile category:
+Subject: App Installs From Our Mobile Audience?
+
+Hi Mobvista,
+
+Mobvista's mobile-first platform aligns perfectly with the audience we've built across our digital properties — highly engaged, geo-targeted users in Asia and the Gulf.
+
+Ibra Digitals specialises in driving quality app installs and mobile engagement across Singapore, UAE, India, and the UK.
+
+Interested in exploring a campaign together?
 
 Best,
 Ashir Ayaan
