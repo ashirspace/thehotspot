@@ -2539,6 +2539,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   const [step, setStep] = useState("pick"); // pick | fill | preview
   const [template, setTemplate] = useState(null);
   const [form, setForm] = useState({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "560" });
+  const [regeneratingAngle, setRegeneratingAngle] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [email, setEmail] = useState({ subject: "", body: "" });
   const [sending, setSending] = useState(false);
@@ -2691,18 +2692,25 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
             <label style={{ ...lbl, marginBottom: 0 }}>What's your pitch? <span style={{ color: T.tx3, fontWeight: 400 }}>(edit freely)</span></label>
             <button
               type="button"
-              onClick={() => {
-                const angles = TEMPLATE_ANGLES[template.id] || [];
-                const current = form.angle;
-                const others = angles.filter(a => a !== current);
-                const pool = others.length > 0 ? others : angles;
-                setForm(f => ({ ...f, angle: pool[Math.floor(Math.random() * pool.length)] }));
+              disabled={regeneratingAngle}
+              onClick={async () => {
+                setRegeneratingAngle(true);
+                try {
+                  const res = await fetch("/api/generate-angle", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ category: template.id, current: form.angle }),
+                  });
+                  const data = await res.json();
+                  if (data.angle) setForm(f => ({ ...f, angle: data.angle }));
+                } catch { /* silent */ }
+                setRegeneratingAngle(false);
               }}
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid #E2E8F0", background: "#F8FAFF", color: "#6366f1", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0 }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#6366f1"; }}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid #E2E8F0", background: "#F8FAFF", color: regeneratingAngle ? "#94A3B8" : "#6366f1", fontSize: 12, fontWeight: 600, cursor: regeneratingAngle ? "default" : "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0, transition: "all .15s" }}
+              onMouseEnter={e => { if (!regeneratingAngle) { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#6366f1"; } }}
               onMouseLeave={e => { e.currentTarget.style.background = "#F8FAFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
             >
-              ↻ Regenerate
+              {regeneratingAngle ? "Generating..." : "↻ Regenerate"}
             </button>
           </div>
           <textarea style={{ ...inp, minHeight: 90, resize: "vertical", lineHeight: 1.6 }} value={form.angle} onChange={e => setForm(f => ({ ...f, angle: e.target.value }))}
