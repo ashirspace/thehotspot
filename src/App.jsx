@@ -618,7 +618,17 @@ function TotalContactsPage({ onBack, user }) {
   const CATS = ["Network", "CPS", "CPL", "CPA", "Mobile"];
   const emptyForm = { name: "", email: "", company: "", website: "", category: "Network", country: "", notes: "" };
 
-  const [contacts, setContacts] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_manual_contacts")) || []; } catch { return []; } });
+  const [contacts, setContacts] = useState(() => {
+    try {
+      const manual = JSON.parse(localStorage.getItem("thehotspot_manual_contacts") || "[]");
+      // Also migrate any manually-added contacts (have an "id" field) from the old shared key
+      const old = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]").filter(c => c.id && c.id.startsWith("c_"));
+      if (old.length === 0) return manual;
+      const merged = [...manual, ...old.filter(o => !manual.find(m => m.email === o.email))];
+      localStorage.setItem("thehotspot_manual_contacts", JSON.stringify(merged));
+      return merged;
+    } catch { return []; }
+  });
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
   const [showModal, setShowModal] = useState(false);
