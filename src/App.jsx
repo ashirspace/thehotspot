@@ -2558,7 +2558,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
           company: form.recipientCompany,
           category: template.id,
           website: form.website,
-          offerContext: form.angle || template.angle,
+          offerContext: form.angle || pickAngle(template.id),
           senderName: user?.name || user?.username || "Ashir Ayaan",
           senderCompany: user?.company || "Ibra Digitals Branding Services LLC",
           senderRole: user?.role_title || "",
@@ -2687,7 +2687,24 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         {/* Angle / message */}
         <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #F1F5FF", paddingBottom: 8, marginTop: 4 }}>Email Angle</div>
         <div>
-          <label style={lbl}>What's your pitch? <span style={{ color: T.tx3, fontWeight: 400 }}>(pre-filled, edit freely)</span></label>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
+            <label style={{ ...lbl, marginBottom: 0 }}>What's your pitch? <span style={{ color: T.tx3, fontWeight: 400 }}>(edit freely)</span></label>
+            <button
+              type="button"
+              onClick={() => {
+                const angles = TEMPLATE_ANGLES[template.id] || [];
+                const current = form.angle;
+                const others = angles.filter(a => a !== current);
+                const pool = others.length > 0 ? others : angles;
+                setForm(f => ({ ...f, angle: pool[Math.floor(Math.random() * pool.length)] }));
+              }}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid #E2E8F0", background: "#F8FAFF", color: "#6366f1", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0 }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#6366f1"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "#F8FAFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
+            >
+              ↻ Regenerate
+            </button>
+          </div>
           <textarea style={{ ...inp, minHeight: 90, resize: "vertical", lineHeight: 1.6 }} value={form.angle} onChange={e => setForm(f => ({ ...f, angle: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
             onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
