@@ -855,45 +855,228 @@ function TotalContactsPage({ onBack, user }) {
 }
 
 function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
-  const total = sentCount || 0;
+  const [tab, setTab] = useState("overview"); // "overview" | "history"
+  const [expandedId, setExpandedId] = useState(null);
+
+  const history = useMemo(() => {
+    try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; }
+  }, []);
+
+  // Aggregate stats from local campaign history
+  const totalSentLocal = useMemo(() => history.reduce((s, h) => s + (h.sent || 0), 0), [history]);
+  const totalFailed    = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+  const totalCancelled = useMemo(() => history.filter(h => h.cancelled).length, [history]);
+  const deliveryRate   = totalSentLocal + totalFailed > 0 ? Math.round(totalSentLocal / (totalSentLocal + totalFailed) * 100) : 0;
+
+  // Last 7 days bar chart from history
+  const last7 = useMemo(() => {
+    const days = Array.from({ length: 7 }, (_, i) => {
+      const d = new Date(); d.setDate(d.getDate() - (6 - i));
+      return { label: d.toLocaleDateString("en", { weekday: "short" }), date: d.toDateString(), sent: 0 };
+    });
+    history.forEach(h => {
+      const hDate = new Date(h.date).toDateString();
+      const slot = days.find(d => d.date === hDate);
+      if (slot) slot.sent += h.sent || 0;
+    });
+    return days;
+  }, [history]);
+  const maxBar = Math.max(...last7.map(d => d.sent), 1);
+
+  // Category breakdown
+  const byCat = useMemo(() => history.reduce((acc, h) => {
+    const k = h.category || "other";
+    if (!acc[k]) acc[k] = 0;
+    acc[k] += h.sent || 0;
+    return acc;
+  }, {}), [history]);
+
+  const displayTotal = sentCount || totalSentLocal;
+
+  const tabStyle = (active) => ({
+    padding: "8px 20px", borderRadius: 8, border: "none", cursor: "pointer",
+    fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600, transition: "all .15s",
+    background: active ? "#6366f1" : "transparent",
+    color: active ? "#fff" : "#64748B",
+  });
 
   return (
     <div>
-      <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
-        <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{total.toLocaleString()}</div>
-          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Total Emails Sent (Gmail)</div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <div style={{ width: 44, height: 44, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
+          <div>
+            <div style={{ fontSize: 28, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{displayTotal.toLocaleString()}</div>
+            <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5, marginTop: 2 }}>Emails Sent</div>
+          </div>
+        </div>
+        {/* Tab toggle */}
+        <div style={{ display: "flex", background: "#F1F5FF", borderRadius: 10, padding: 3, gap: 2 }}>
+          <button style={tabStyle(tab === "overview")} onClick={() => setTab("overview")}>Overview</button>
+          <button style={tabStyle(tab === "history")} onClick={() => setTab("history")}>History</button>
         </div>
       </div>
+
       {!gmailConnected && (
-        <div style={{ background: "#F0F9FF", border: "1px solid #0ea5e933", borderRadius: 12, padding: "14px 18px", marginBottom: 20, marginTop: 16, fontSize: 13, color: "#0C4A6E" }}>
-          Connect Gmail from the Dashboard to see your real sent email count.
+        <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#92400E", display: "flex", alignItems: "center", gap: 8 }}>
+          <span>⚠️</span> Connect Gmail from the top bar to sync your total sent count.
         </div>
       )}
-      <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12, marginTop: 24 }}>Daily Breakdown</div>
-      <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-        <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 160 }}>
-          {emailsByDay.map(d => (
-            <div key={d.day} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-              <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent}</span>
-              <div style={{ width: "100%", maxWidth: 40, height: 4, background: "#6366f133", borderRadius: "6px 6px 2px 2px", minHeight: 4 }} />
-              <span style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>{d.day}</span>
+
+      {tab === "overview" && (
+        <>
+          {/* Stats row */}
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+            {[
+              { label: "Sent", value: totalSentLocal, color: "#6366f1", bg: "#6366f110" },
+              { label: "Failed", value: totalFailed, color: "#EF4444", bg: "#EF444410" },
+              { label: "Campaigns", value: history.length, color: "#0ea5e9", bg: "#0ea5e910" },
+            ].map(s => (
+              <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)", textAlign: "center" }}>
+                <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5, marginTop: 4 }}>{s.label}</div>
+              </div>
+            ))}
+          </div>
+
+          {/* Delivery rate bar */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>Delivery Rate</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>{deliveryRate}%</div>
             </div>
-          ))}
+            <div style={{ height: 8, background: "#EFF1F8", borderRadius: 4, overflow: "hidden" }}>
+              <div style={{ width: `${deliveryRate}%`, height: "100%", background: "linear-gradient(90deg,#6366f1,#059669)", borderRadius: 4, transition: "width .6s ease" }} />
+            </div>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: "#94A3B8" }}>
+              <span>{totalSentLocal} delivered</span>
+              <span>{totalFailed} failed</span>
+            </div>
+          </div>
+
+          {/* 7-day bar chart */}
+          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 16 }}>Last 7 Days</div>
+            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100 }}>
+              {last7.map(d => {
+                const pct = d.sent / maxBar;
+                return (
+                  <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                    <span style={{ fontSize: 10, color: d.sent > 0 ? "#6366f1" : "#CBD5E1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent || ""}</span>
+                    <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 60 }}>
+                      <div style={{ width: "100%", height: `${Math.max(pct * 60, d.sent > 0 ? 6 : 3)}px`, background: d.sent > 0 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "#EFF1F8", borderRadius: "4px 4px 2px 2px", transition: "height .4s ease" }} />
+                    </div>
+                    <span style={{ fontSize: 10, color: "#94A3B8", fontWeight: 500 }}>{d.label}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* By category */}
+          {Object.keys(byCat).length > 0 && (
+            <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+              <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 14 }}>By Category</div>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([cat, count]) => {
+                  const c = CAT[cat] || { dot: "#94A3B8", text: "#64748B" };
+                  const pct = totalSentLocal > 0 ? Math.round(count / totalSentLocal * 100) : 0;
+                  return (
+                    <div key={cat}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{cat}</span>
+                        </div>
+                        <span style={{ fontSize: 12, fontWeight: 700, color: "#0F172A", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
+                      </div>
+                      <div style={{ height: 5, background: "#EFF1F8", borderRadius: 3, overflow: "hidden" }}>
+                        <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .5s ease" }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {history.length === 0 && (
+            <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>📭</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No emails sent yet</div>
+              <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === "history" && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {history.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
+              <div style={{ fontSize: 32, marginBottom: 10 }}>📭</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No campaigns yet</div>
+              <div style={{ fontSize: 13, color: "#64748B" }}>Your sent campaigns will appear here.</div>
+            </div>
+          ) : history.map(h => {
+            const isOpen = expandedId === h.id;
+            const cat = CAT[h.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
+            const dateStr = new Date(h.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+            return (
+              <div key={h.id} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+                <button onClick={() => setExpandedId(isOpen ? null : h.id)} style={{
+                  width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
+                  background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textAlign: "left",
+                }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 9, background: cat.bg || `${cat.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <span style={{ fontSize: 16 }}>📧</span>
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{h.category || "Campaign"}</span>
+                      {h.cancelled && <span style={{ fontSize: 10, fontWeight: 600, color: "#f59e0b", background: "#FEF3C7", padding: "1px 7px", borderRadius: 20 }}>Cancelled</span>}
+                    </div>
+                    <div style={{ fontSize: 11, color: "#94A3B8" }}>{dateStr}</div>
+                  </div>
+                  <div style={{ display: "flex", gap: 12, flexShrink: 0, alignItems: "center" }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>{h.sent} sent</span>
+                    {h.failed > 0 && <span style={{ fontSize: 12, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{h.failed} failed</span>}
+                    <span style={{ color: "#94A3B8", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "rotate(0)", transition: "transform .2s", display: "inline-block" }}>›</span>
+                  </div>
+                </button>
+
+                {isOpen && (
+                  <div style={{ borderTop: "1px solid #EFF1F8", padding: "12px 16px", background: "#F8FAFF" }}>
+                    {h.offerContext && (
+                      <div style={{ fontSize: 12, color: "#64748B", marginBottom: 10, padding: "8px 12px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #E2E8F0", lineHeight: 1.6 }}>
+                        <strong style={{ color: "#0F172A" }}>Offer:</strong> {h.offerContext}
+                      </div>
+                    )}
+                    {h.contacts && h.contacts.length > 0 ? (
+                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                        <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Recipients</div>
+                        {h.contacts.map((c, i) => (
+                          <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#FFFFFF", borderRadius: 8, border: "1px solid #E2E8F0" }}>
+                            <span style={{ fontSize: 16 }}>✅</span>
+                            <div style={{ flex: 1, minWidth: 0 }}>
+                              <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{c.company || c.email}</div>
+                              {c.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {c.subject}</div>}
+                            </div>
+                            <span style={{ fontSize: 11, color: "#94A3B8", flexShrink: 0 }}>{c.email}</span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <div style={{ fontSize: 12, color: "#94A3B8" }}>No recipient details recorded.</div>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
-      </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12, marginTop: 16 }}>
-        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Delivered</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
-        </div>
-        <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 12, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-          <div style={{ fontSize: 12, color: "#64748B", marginBottom: 6 }}>Failed</div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>0</div>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
