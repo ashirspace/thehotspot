@@ -618,7 +618,7 @@ function TotalContactsPage({ onBack, user }) {
   const CATS = ["Network", "CPS", "CPL", "CPA", "Mobile"];
   const emptyForm = { name: "", email: "", company: "", website: "", category: "Network", country: "", notes: "" };
 
-  const [contacts, setContacts] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } });
+  const [contacts, setContacts] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_manual_contacts")) || []; } catch { return []; } });
   const [search, setSearch] = useState("");
   const [filterCat, setFilterCat] = useState("All");
   const [showModal, setShowModal] = useState(false);
@@ -626,7 +626,7 @@ function TotalContactsPage({ onBack, user }) {
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState("");
 
-  const save = (list) => { setContacts(list); localStorage.setItem("thehotspot_contacts", JSON.stringify(list)); };
+  const save = (list) => { setContacts(list); localStorage.setItem("thehotspot_manual_contacts", JSON.stringify(list)); };
 
   const filtered = useMemo(() => contacts.filter(c => {
     const matchCat = filterCat === "All" || c.category === filterCat;
@@ -659,7 +659,7 @@ function TotalContactsPage({ onBack, user }) {
         if (airtableId) {
           setContacts(prev => {
             const updated = prev.map(c => c.id === newContact.id ? { ...c, airtableId } : c);
-            localStorage.setItem("thehotspot_contacts", JSON.stringify(updated));
+            localStorage.setItem("thehotspot_manual_contacts", JSON.stringify(updated));
             return updated;
           });
         }
@@ -1082,7 +1082,13 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
 }
 
 function CategoriesPage({ onBack }) {
-  const contacts = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_contacts")) || []; } catch { return []; } }, []);
+  const contacts = useMemo(() => {
+    try {
+      const sheet = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+      const manual = JSON.parse(localStorage.getItem("thehotspot_manual_contacts") || "[]");
+      return [...sheet, ...manual];
+    } catch { return []; }
+  }, []);
   const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const categories = [
     { name: "Network", desc: "Affiliate network partners managing multiple programs", count: countBycat["Network"] || 0, color: CAT.Network },
