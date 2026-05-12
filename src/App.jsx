@@ -2484,52 +2484,55 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
 }
 
 /* ───────── EMAIL TEMPLATES PAGE ───────── */
+const TEMPLATE_ANGLES = {
+  Partnership: [
+    "I think there's a natural fit between what we do and what you've built — would love to explore.",
+    "Both companies are operating in the same space — a partnership could unlock reach for both sides.",
+    "I've been following your work and think there's a clear overlap between our audiences and goals.",
+    "The way you've positioned your brand aligns closely with what our network is looking for in partners.",
+    "There's a straightforward collaboration opportunity here — happy to walk through the details on a short call.",
+  ],
+  Revenue: [
+    "We can drive qualified traffic and leads to your platform through our owned channels.",
+    "Our media properties attract exactly the kind of audience your offers are built for.",
+    "We've consistently delivered strong ROI for partners in your vertical — worth a quick conversation.",
+    "Our performance network covers the geos and verticals where you're looking to grow revenue.",
+    "We generate commission-based revenue for partners by sending targeted traffic from niche properties.",
+  ],
+  Integration: [
+    "Our customers keep asking for a solution like yours — there could be a strong integration opportunity here.",
+    "We've had multiple users request a native connection to your platform — the demand is already there.",
+    "An integration between our tools would unlock a workflow our users are actively asking for.",
+    "Your product fills a gap our customers encounter daily — a two-way integration makes sense.",
+    "The overlap between our user bases makes a native integration a low-effort, high-impact move.",
+  ],
+  Agency: [
+    "We specialise in amplifying great work — we've seen strong results taking campaigns like yours to a wider audience.",
+    "We run paid distribution for agencies — taking great creative and making sure the right people see it.",
+    "Your recent campaigns show exactly the kind of execution we help scale across new channels.",
+    "We partner with agencies to extend campaign reach without adding headcount on your side.",
+    "We've helped agencies turn award-winning work into measurable performance by expanding distribution.",
+  ],
+  Startup: [
+    "We have an audience that maps perfectly to your ideal customer — interested in exploring a distribution play?",
+    "We can get your product in front of an engaged, relevant audience faster than most paid channels.",
+    "Early-stage growth is where we excel — our owned properties drive targeted signups for B2B startups.",
+    "Our network has helped several startups at your stage build their first 10,000 users through content and SEO.",
+    "The fastest path to your ICP right now might be through channels you haven't tested yet — let's talk.",
+  ],
+};
+
+const pickAngle = (id) => {
+  const angles = TEMPLATE_ANGLES[id] || [];
+  return angles[Math.floor(Math.random() * angles.length)] || "";
+};
+
 const TEMPLATES = [
-  {
-    id: "Partnership",
-    icon: "🤝",
-    label: "Partnership",
-    desc: "Natural fit between both companies",
-    angle: "I think there's a natural fit between what we do and what you've built — would love to explore.",
-    color: "#6366f1",
-    fields: ["recipientCompany", "contactName", "website", "angle"],
-  },
-  {
-    id: "Revenue",
-    icon: "💰",
-    label: "Revenue",
-    desc: "Drive traffic, leads, or sales to them",
-    angle: "We can drive qualified traffic and leads to your platform through our owned channels.",
-    color: "#10b981",
-    fields: ["recipientCompany", "contactName", "website", "angle"],
-  },
-  {
-    id: "Integration",
-    icon: "🔗",
-    label: "Integration",
-    desc: "Our users want their product",
-    angle: "Our customers keep asking for a solution like yours — there could be a strong integration opportunity here.",
-    color: "#0ea5e9",
-    fields: ["recipientCompany", "contactName", "website", "angle"],
-  },
-  {
-    id: "Agency",
-    icon: "🏢",
-    label: "Agency",
-    desc: "Client results & case study angle",
-    angle: "We specialise in amplifying great work — we've seen strong results taking campaigns like yours to a wider audience.",
-    color: "#f97316",
-    fields: ["recipientCompany", "contactName", "website", "angle"],
-  },
-  {
-    id: "Startup",
-    icon: "🚀",
-    label: "Startup",
-    desc: "Growth & distribution angle",
-    angle: "We have an audience that maps perfectly to your ideal customer — interested in exploring a distribution play?",
-    color: "#ec4899",
-    fields: ["recipientCompany", "contactName", "website", "angle"],
-  },
+  { id: "Partnership", icon: "🤝", label: "Partnership", desc: "Natural fit between both companies",     color: "#6366f1", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Revenue",     icon: "💰", label: "Revenue",     desc: "Drive traffic, leads, or sales to them", color: "#10b981", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Integration", icon: "🔗", label: "Integration", desc: "Our users want their product",           color: "#0ea5e9", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Agency",      icon: "🏢", label: "Agency",      desc: "Client results & case study angle",      color: "#f97316", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Startup",     icon: "🚀", label: "Startup",     desc: "Growth & distribution angle",            color: "#ec4899", fields: ["recipientCompany", "contactName", "website", "angle"] },
 ];
 
 function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user }) {
@@ -2616,7 +2619,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
         {TEMPLATES.map(t => (
-          <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: t.angle })); setStep("fill"); }} style={{
+          <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: pickAngle(t.id) })); setStep("fill"); }} style={{
             background: "#FFF", border: "1px solid #E2E8F0", borderRadius: 16, padding: "22px 20px",
             cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
             boxShadow: "0 1px 4px rgba(0,0,0,0.05)", transition: "all .15s",
