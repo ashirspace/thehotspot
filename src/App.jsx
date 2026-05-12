@@ -2030,7 +2030,9 @@ function Dashboard({ user, onLogout }) {
         category: contact.category || "Network",
         website: contact.website || "",
         offerContext,
-        senderName: user?.name || user?.username || "Ashir",
+        senderName: user?.name || user?.username || "Ashir Ayaan",
+        senderCompany: user?.company || "Ibra Digitals Branding Services LLC",
+        senderRole: user?.role_title || "",
         maxChars: maxChars || null,
       }),
     });
