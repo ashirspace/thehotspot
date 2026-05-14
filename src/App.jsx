@@ -141,100 +141,6 @@ function Logo({ size = 32 }) {
 }
 
 /* ───────── LOGIN PAGE ───────── */
-function GlitterCanvas() {
-  const canvasRef = useRef(null);
-  const particles = useRef([]);
-  const raf = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext("2d");
-    const COLORS = ["#FFD700","#FFC0CB","#10b981","#0ea5e9","#a78bfa","#f9a8d4","#ffffff","#67e8f9","#6ee7b7","#fbbf24"];
-
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight; };
-    resize();
-    window.addEventListener("resize", resize);
-
-    const star = (ctx, x, y, r, rotation) => {
-      ctx.save();
-      ctx.translate(x, y);
-      ctx.rotate(rotation);
-      ctx.beginPath();
-      for (let i = 0; i < 4; i++) {
-        const angle = (i * Math.PI) / 2;
-        const inner = r * 0.35;
-        ctx.lineTo(Math.cos(angle) * r, Math.sin(angle) * r);
-        ctx.lineTo(Math.cos(angle + Math.PI / 4) * inner, Math.sin(angle + Math.PI / 4) * inner);
-      }
-      ctx.closePath();
-      ctx.restore();
-    };
-
-    const spawn = (x, y, burst = 3) => {
-      for (let i = 0; i < burst; i++) {
-        const angle = Math.random() * Math.PI * 2;
-        const speed = Math.random() * 2.5 + 0.5;
-        particles.current.push({
-          x: x + (Math.random() - 0.5) * 16,
-          y: y + (Math.random() - 0.5) * 16,
-          vx: Math.cos(angle) * speed * 0.6,
-          vy: Math.sin(angle) * speed - 1.2,
-          size: Math.random() * 5 + 2,
-          rotation: Math.random() * Math.PI * 2,
-          spin: (Math.random() - 0.5) * 0.18,
-          life: 1,
-          decay: Math.random() * 0.018 + 0.012,
-          color: COLORS[Math.floor(Math.random() * COLORS.length)],
-          type: Math.random() > 0.5 ? "star" : "circle",
-        });
-      }
-    };
-
-    const onMove = (e) => spawn(e.clientX, e.clientY, 4);
-    const onClick = (e) => spawn(e.clientX, e.clientY, 18);
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("click", onClick);
-
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.current = particles.current.filter(p => p.life > 0);
-      for (const p of particles.current) {
-        p.x += p.vx;
-        p.y += p.vy;
-        p.vy += 0.04;
-        p.rotation += p.spin;
-        p.life -= p.decay;
-        p.size *= 0.985;
-        ctx.globalAlpha = Math.max(0, p.life);
-        ctx.fillStyle = p.color;
-        ctx.shadowColor = p.color;
-        ctx.shadowBlur = 6;
-        if (p.type === "star") {
-          star(ctx, p.x, p.y, p.size, p.rotation);
-          ctx.fill();
-        } else {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size * 0.6, 0, Math.PI * 2);
-          ctx.fill();
-        }
-      }
-      ctx.globalAlpha = 1;
-      ctx.shadowBlur = 0;
-      raf.current = requestAnimationFrame(animate);
-    };
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      window.removeEventListener("mousemove", onMove);
-      window.removeEventListener("click", onClick);
-      cancelAnimationFrame(raf.current);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} style={{ position: "fixed", inset: 0, pointerEvents: "none", zIndex: 0 }} />;
-}
-
 function LoginPage({ onLogin }) {
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
@@ -371,12 +277,11 @@ function LoginPage({ onLogin }) {
   return (
     <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", display: "flex", flexDirection: "column", position: "relative" }}>
 
-      <GlitterCanvas />
       <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
       <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e914,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
 
       {/* ── Top nav ── */}
-      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 2 }}>
+      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Logo size={28} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
@@ -394,7 +299,7 @@ function LoginPage({ onLogin }) {
       </nav>
 
       {/* ── Two-column body ── */}
-      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 2, gap: 48, minHeight: 0 }}>
+      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1, gap: 48, minHeight: 0 }}>
 
         {/* Left: Hero */}
         <div className="lp-hero" style={{ flex: 1, maxWidth: 480, paddingRight: 16 }}>
