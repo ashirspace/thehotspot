@@ -4568,7 +4568,7 @@ function Dashboard({ user, onLogout }) {
                       <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>Outreach Assistant</span>
                       <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", padding: "2px 7px", borderRadius: 20, background: "#10b98118", color: "#10b981", border: "1px solid #10b98130" }}>AI</span>
                     </div>
-                    <div style={{ fontSize: 11, color: "#475569" }}>Powered by Claude · Always ready</div>
+                    <div style={{ fontSize: 11, color: "#475569" }}>Always ready</div>
                   </div>
                 </div>
                 <button onClick={() => setMessages(prev => [prev[0]])} title="Clear chat" style={{
@@ -4714,7 +4714,7 @@ function Dashboard({ user, onLogout }) {
                       <I.Send />
                     </button>
                   </div>
-                  <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 7 }}>Press Enter to send · Powered by Claude</div>
+                  <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 7 }}>Press Enter to send</div>
                 </div>
               </div>
 
