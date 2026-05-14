@@ -177,14 +177,15 @@ function LoginPage({ onLogin }) {
         const rec = records[0];
         const user = rec.fields;
         const userData = {
-          username: user.username, email: user.user_email, method: "password", role: user.role || "user",
-          airtableId: rec.id,
-          name: user.full_name || "",
-          company: user.company || "",
-          role_title: user.role_title || "",
-          website: user.website || "",
-          phone: user.phone || "",
-          profileComplete: !!(user.full_name && user.company),
+          username:    user.username,
+          email:       user.user_email,
+          airtableId:  rec.id,
+          name:        user.full_name || "",
+          company:     user.company || "",
+          role_title:  user.role_title || "",
+          website:     user.website || "",
+          phone:       user.phone || "",
+          profileComplete: !!(user.profile_complete || (user.full_name && user.company)),
         };
         localStorage.setItem("thehotspot_user", JSON.stringify(userData));
         onLogin(userData);
@@ -277,19 +278,17 @@ function LoginPage({ onLogin }) {
 
           const existingFields = existing[0]?.fields || {};
           const userData = {
-            username: existingFields.username || gName,
-            email: gEmail,
-            method: "google",
-            role: existingFields.role || "user",
-            avatar: gPic,
+            username:    existingFields.username || gName,
+            email:       gEmail,
+            avatar:      gPic,
             accessToken: token,
             airtableId,
-            name: existingFields.full_name || gName,
-            company: existingFields.company || "",
-            role_title: existingFields.role_title || "",
-            website: existingFields.website || "",
-            phone: existingFields.phone || "",
-            profileComplete: !!(existingFields.full_name && existingFields.company),
+            name:        existingFields.full_name || gName,
+            company:     existingFields.company || "",
+            role_title:  existingFields.role_title || "",
+            website:     existingFields.website || "",
+            phone:       existingFields.phone || "",
+            profileComplete: !!(existingFields.profile_complete || (existingFields.full_name && existingFields.company)),
           };
           localStorage.setItem("thehotspot_user", JSON.stringify(userData));
           // Clear loading state BEFORE calling onLogin so we don't set state on unmounted component
