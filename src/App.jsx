@@ -155,7 +155,29 @@ function Logo({ size = 32 }) {
 }
 
 /* ───────── LOGIN PAGE ───────── */
+function useExternalLinkTransition() {
+  useEffect(() => {
+    const handler = (e) => {
+      const a = e.target.closest('a[href]');
+      if (!a) return;
+      const h = a.getAttribute('href');
+      if (!h || h.startsWith('#') || h.startsWith('/') || h.startsWith('mailto:')) return;
+      e.preventDefault();
+      const o = document.createElement('div');
+      o.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';
+      o.innerHTML = '<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';
+      document.body.appendChild(o);
+      requestAnimationFrame(() => { o.style.opacity = '1'; });
+      setTimeout(() => { window.open(h, a.getAttribute('target') || '_self'); }, 400);
+      setTimeout(() => { o.style.opacity = '0'; setTimeout(() => o.remove(), 300); }, 700);
+    };
+    document.addEventListener('click', handler);
+    return () => document.removeEventListener('click', handler);
+  }, []);
+}
+
 function LoginPage({ onLogin }) {
+  useExternalLinkTransition();
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
