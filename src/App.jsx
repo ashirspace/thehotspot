@@ -4,7 +4,7 @@ import {
   LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuMessageSquare,
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
-  LuClock,
+  LuClock, LuChevronRight,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
@@ -1864,6 +1864,170 @@ function OnboardingModal({ user, onComplete }) {
         </button>
       </div>
     </div>
+  );
+}
+
+/* ───────── DASHBOARD PAGE ───────── */
+function DashboardPage({ user, contactCount, setPage }) {
+  const emailsSent = (() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })();
+  const successRate = (() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; } catch { return "—"; } })();
+  const recentCampaigns = (() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]").slice(-3).reverse(); } catch { return []; } })();
+
+  const [statsRef, statsVisible] = useReveal(0.1);
+  const [col1Ref, col1Visible] = useReveal(0.1);
+  const [col2Ref, col2Visible] = useReveal(0.1);
+  const [col3Ref, col3Visible] = useReveal(0.1);
+  const [actRef, actVisible] = useReveal(0.1);
+
+  const hour = new Date().getHours();
+  const greeting = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
+  const dateStr = new Date().toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" });
+
+  const ToolBtn = ({ id, icon, label, desc, accent }) => (
+    <button onClick={() => setPage(id)} style={{
+      background: "#0d0d12", border: "1px solid #ffffff08", borderRadius: 10, padding: "14px 16px",
+      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s", width: "100%",
+    }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}44`; e.currentTarget.style.background = "#13131a"; e.currentTarget.style.transform = "translateX(3px)"; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.transform = "none"; }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${accent}18`, border: `1px solid ${accent}25`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, flexShrink: 0 }}>{icon}</div>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
+          <div style={{ fontSize: 11, color: "#64748B", lineHeight: 1.4 }}>{desc}</div>
+        </div>
+        <LuChevronRight size={14} style={{ color: "#334155", flexShrink: 0 }} />
+      </div>
+    </button>
+  );
+
+  const revealStyle = (visible, delay = 0) => ({
+    opacity: visible ? 1 : 0,
+    transform: visible ? "translateY(0)" : "translateY(36px)",
+    transition: `opacity 0.6s ease ${delay}s, transform 0.6s ease ${delay}s`,
+  });
+
+  return (
+    <>
+      {/* Greeting */}
+      <div style={{ marginBottom: 28 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 4 }}>
+          Good {greeting}, {user?.username?.split(" ")[0] || "there"}.
+        </div>
+        <div style={{ fontSize: 13, color: "#64748B" }}>{dateStr} · Here's your outreach hub.</div>
+      </div>
+
+      {/* Stat cards */}
+      <div ref={statsRef} style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+        {[
+          { label: "Contacts", value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={16} />, sub: "in database" },
+          { label: "Emails Sent", value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={16} />, sub: "total delivered" },
+          { label: "Categories", value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={16} />, sub: "active groups" },
+          { label: "Success Rate", value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={16} />, sub: "delivery rate" },
+        ].map((s, i) => (
+          <button key={s.label} onClick={() => setPage(s.page)} style={{
+            ...revealStyle(statsVisible, i * 0.07),
+            background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "20px 18px",
+            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: `border-color .15s, background .15s, opacity 0.6s ease ${i * 0.07}s, transform 0.6s ease ${i * 0.07}s`,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = `${s.color}44`; e.currentTarget.style.background = "#16161e"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+              <div style={{ width: 32, height: 32, borderRadius: 8, background: `${s.color}18`, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>{s.icon}</div>
+              <LuChevronRight size={13} style={{ color: "#334155" }} />
+            </div>
+            <div style={{ fontSize: 28, fontWeight: 900, color: "#F1F5F9", letterSpacing: -1, marginBottom: 4, lineHeight: 1 }}>{s.value}</div>
+            <div style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8", marginBottom: 2 }}>{s.label}</div>
+            <div style={{ fontSize: 10, color: "#475569" }}>{s.sub}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Three tool groups */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+
+        {/* Outreach */}
+        <div ref={col1Ref} style={{ ...revealStyle(col1Visible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #10b981" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><LuSend size={15} /></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#10b981", letterSpacing: 0.8, textTransform: "uppercase" }}>Outreach</div>
+          </div>
+          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Write and send personalized cold emails to your contact list.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <ToolBtn id="emailSender" icon={<LuSend size={16} />} label="Email Sender" desc="Bulk send AI-generated campaigns" accent="#10b981" />
+            <ToolBtn id="emailTemplates" icon={<LuFilePen size={16} />} label="Email Templates" desc="Generate single targeted emails" accent="#6366f1" />
+          </div>
+        </div>
+
+        {/* Contacts & Data */}
+        <div ref={col2Ref} style={{ ...revealStyle(col2Visible, 0.1), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #f97316" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#f9731618", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><LuClipboardList size={15} /></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#f97316", letterSpacing: 0.8, textTransform: "uppercase" }}>Contacts & Data</div>
+          </div>
+          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Manage your prospect database across all categories.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <ToolBtn id="contacts" icon={<LuClipboardList size={16} />} label="Contacts DB" desc="Add, edit and manage contacts" accent="#f97316" />
+            <ToolBtn id="totalContacts" icon={<LuUsers size={16} />} label="Total Contacts" desc="Full contacts overview" accent="#8b5cf6" />
+            <ToolBtn id="categories" icon={<LuFolder size={16} />} label="Categories" desc="Network, CPS, CPL, CPA, Mobile" accent="#14b8a6" />
+          </div>
+        </div>
+
+        {/* Analytics */}
+        <div ref={col3Ref} style={{ ...revealStyle(col3Visible, 0.2), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #0ea5e9" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><LuTrendingUp size={15} /></div>
+            <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9", letterSpacing: 0.8, textTransform: "uppercase" }}>Analytics</div>
+          </div>
+          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Track campaign performance and measure reply rates.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <ToolBtn id="campaignStatus" icon={<LuRadio size={16} />} label="Campaign Status" desc="Monitor active campaigns live" accent="#0ea5e9" />
+            <ToolBtn id="emailsSent" icon={<LuMail size={16} />} label="Emails Sent" desc="Full history and delivery stats" accent="#ec4899" />
+            <ToolBtn id="successRate" icon={<LuTrendingUp size={16} />} label="Success Rate" desc="Open rates and performance" accent="#f59e0b" />
+          </div>
+        </div>
+
+      </div>
+
+      {/* Recent campaigns */}
+      {recentCampaigns.length > 0 && (
+        <div ref={actRef} style={{ ...revealStyle(actVisible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "20px 22px", marginBottom: 16 }}>
+          <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Recent Campaigns</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+            {recentCampaigns.map((c, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: i < recentCampaigns.length - 1 ? "1px solid #ffffff08" : "none" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.cancelled ? "#f43737" : c.failed > 0 ? "#f59e0b" : "#10b981", flexShrink: 0 }} />
+                  <div>
+                    <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1" }}>{c.category || "All"} · {c.sent || 0} sent{c.failed ? `, ${c.failed} failed` : ""}</div>
+                    <div style={{ fontSize: 10, color: "#475569" }}>{c.date ? new Date(c.date).toLocaleDateString("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</div>
+                  </div>
+                </div>
+                <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: c.cancelled ? "#f4373720" : c.failed > c.sent ? "#f59e0b20" : "#10b98120", color: c.cancelled ? "#f43737" : c.failed > c.sent ? "#f59e0b" : "#10b981" }}>
+                  {c.cancelled ? "Cancelled" : c.failed > 0 ? "Partial" : "Delivered"}
+                </span>
+              </div>
+            ))}
+          </div>
+          <button onClick={() => setPage("emailsSent")} style={{ marginTop: 12, background: "none", border: "none", color: "#475569", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", padding: 0 }}
+            onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
+            onMouseLeave={e => e.currentTarget.style.color = "#475569"}
+          >View all campaigns →</button>
+        </div>
+      )}
+
+      {/* Settings link */}
+      <div style={{ display: "flex", justifyContent: "flex-end" }}>
+        <button onClick={() => setPage("settings")} style={{ background: "none", border: "none", color: "#475569", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 5, padding: "6px 0" }}
+          onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
+          onMouseLeave={e => e.currentTarget.style.color = "#475569"}
+        >
+          <LuSettings size={13} /> Settings & Account
+        </button>
+      </div>
+    </>
   );
 }
 
@@ -4471,106 +4635,7 @@ function Dashboard({ user, onLogout }) {
             <div style={{ maxWidth: 960, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
 
               {/* ── DASHBOARD HOME ── */}
-              {page === "dashboard" && (() => {
-                const emailsSent = (() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })();
-                const successRate = (() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; } catch { return "—"; } })();
-                const ToolBtn = ({ id, icon, label, desc, accent }) => (
-                  <button onClick={() => setPage(id)} style={{
-                    background: "#111116", border: "1px solid #ffffff0d", borderRadius: 12, padding: "16px",
-                    cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s", width: "100%",
-                  }}
-                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; }}
-                  >
-                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                      <div style={{ width: 36, height: 36, borderRadius: 9, background: `${accent}18`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, flexShrink: 0 }}>{icon}</div>
-                      <div>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
-                        <div style={{ fontSize: 11, color: "#64748B" }}>{desc}</div>
-                      </div>
-                    </div>
-                  </button>
-                );
-                const SectionLabel = ({ children, color = "#64748B" }) => (
-                  <div style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 10 }}>{children}</div>
-                );
-                return (
-                  <>
-                    {/* Greeting */}
-                    <div style={{ marginBottom: 28 }}>
-                      <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 4 }}>
-                        Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, {user?.username?.split(" ")[0] || "there"}.
-                      </div>
-                      <div style={{ fontSize: 13, color: "#64748B" }}>Here's your outreach hub. What do you want to do today?</div>
-                    </div>
-
-                    {/* Stats */}
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 32 }}>
-                      {[
-                        { label: "Contacts", value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={15} /> },
-                        { label: "Emails Sent", value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={15} /> },
-                        { label: "Categories", value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={15} /> },
-                        { label: "Success Rate", value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={15} /> },
-                      ].map(s => (
-                        <button key={s.label} onClick={() => setPage(s.page)} style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 12, padding: "16px 14px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s" }}
-                          onMouseEnter={e => { e.currentTarget.style.borderColor = `${s.color}40`; e.currentTarget.style.background = "#16161e"; }}
-                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
-                        >
-                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
-                            <div style={{ width: 28, height: 28, borderRadius: 7, background: `${s.color}18`, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>{s.icon}</div>
-                          </div>
-                          <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 2 }}>{s.value}</div>
-                          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>{s.label}</div>
-                        </button>
-                      ))}
-                    </div>
-
-                    {/* Grouped tools */}
-                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, alignItems: "start" }}>
-
-                      {/* Outreach */}
-                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
-                        <SectionLabel color="#10b981">Outreach</SectionLabel>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                          <ToolBtn id="emailSender" icon={<LuSend size={16} />} label="Email Sender" desc="Draft & send campaigns" accent="#10b981" />
-                          <ToolBtn id="emailTemplates" icon={<LuFilePen size={16} />} label="Email Templates" desc="Pick template & generate" accent="#6366f1" />
-                        </div>
-                      </div>
-
-                      {/* Contacts & Data */}
-                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
-                        <SectionLabel color="#f97316">Contacts & Data</SectionLabel>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                          <ToolBtn id="contacts" icon={<LuClipboardList size={16} />} label="Contacts DB" desc="Manage your contacts" accent="#f97316" />
-                          <ToolBtn id="totalContacts" icon={<LuUsers size={16} />} label="Total Contacts" desc="All contacts overview" accent="#8b5cf6" />
-                          <ToolBtn id="categories" icon={<LuFolder size={16} />} label="Categories" desc="Network, CPS, CPL…" accent="#14b8a6" />
-                        </div>
-                      </div>
-
-                      {/* Analytics */}
-                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
-                        <SectionLabel color="#0ea5e9">Analytics</SectionLabel>
-                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                          <ToolBtn id="campaignStatus" icon={<LuRadio size={16} />} label="Campaign Status" desc="Track active campaigns" accent="#0ea5e9" />
-                          <ToolBtn id="emailsSent" icon={<LuMail size={16} />} label="Emails Sent" desc="View sent email history" accent="#ec4899" />
-                          <ToolBtn id="successRate" icon={<LuTrendingUp size={16} />} label="Success Rate" desc="Campaign performance" accent="#f59e0b" />
-                        </div>
-                      </div>
-
-                    </div>
-
-                    {/* Settings link */}
-                    <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
-                      <button onClick={() => setPage("settings")} style={{ background: "none", border: "none", color: "#475569", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 5, padding: "6px 0" }}
-                        onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
-                        onMouseLeave={e => e.currentTarget.style.color = "#475569"}
-                      >
-                        <LuSettings size={13} /> Settings & Account
-                      </button>
-                    </div>
-                  </>
-                );
-              })()}
+              {page === "dashboard" && <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />}
 
               {/* ── OTHER PAGES ── */}
               {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
