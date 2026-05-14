@@ -1,0 +1,169 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Automation — thehotspot</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
+    nav { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff0d; background: #09090dcc; backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo { width: 28px; height: 28px; object-fit: contain; }
+    .nav-name { font-size: 16px; font-weight: 700; color: #F1F5F9; letter-spacing: -0.3px; }
+    .nav-cta { padding: 8px 20px; border-radius: 20px; background: linear-gradient(135deg,#10b981,#0ea5e9); color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; transition: all .2s; }
+    .nav-cta:hover { opacity: .85; }
+    .nav-back { padding: 8px 20px; border-radius: 20px; border: 1px solid #ffffff15; background: transparent; color: #94A3B8; font-size: 13px; font-weight: 600; text-decoration: none; transition: all .2s; margin-right: 8px; }
+    .nav-back:hover { border-color: #10b98140; color: #10b981; }
+
+    .hero { max-width: 800px; margin: 0 auto; padding: 80px 32px 64px; text-align: center; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: #10b98112; border: 1px solid #10b98130; border-radius: 20px; padding: 5px 16px; margin-bottom: 24px; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .badge-text { font-size: 11px; color: #10b981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(32px,5vw,52px); font-weight: 900; letter-spacing: -2px; line-height: 1.08; margin-bottom: 20px; }
+    .hero p { font-size: 16px; color: #94A3B8; line-height: 1.8; max-width: 580px; margin: 0 auto 36px; }
+    .hero-btn { display: inline-block; padding: 14px 36px; border-radius: 24px; background: linear-gradient(135deg,#10b981,#0ea5e9); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 24px rgba(16,185,129,0.35); transition: all .2s; }
+    .hero-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(16,185,129,0.45); }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 0 32px 80px; }
+    .section-label { font-size: 11px; font-weight: 700; color: #10b981; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 10px; }
+    .section-title { font-size: clamp(22px,2.8vw,32px); font-weight: 800; letter-spacing: -0.8px; margin-bottom: 14px; }
+    .section-sub { font-size: 14px; color: #64748B; line-height: 1.75; max-width: 560px; margin-bottom: 40px; }
+
+    .features-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 72px; }
+    .feature-card { background: #111116; border: 1px solid #ffffff0d; border-radius: 16px; padding: 24px 22px; transition: border-color .2s, transform .2s; }
+    .feature-card:hover { border-color: #10b98140; transform: translateY(-2px); }
+    .feature-icon { width: 44px; height: 44px; border-radius: 12px; background: #10b98115; display: flex; align-items: center; justify-content: center; font-size: 20px; margin-bottom: 14px; }
+    .feature-title { font-size: 14px; font-weight: 700; color: #F1F5F9; margin-bottom: 8px; }
+    .feature-desc { font-size: 12px; color: #64748B; line-height: 1.7; }
+
+    .process { background: #111116; border: 1px solid #ffffff0d; border-radius: 20px; padding: 40px; margin-bottom: 72px; }
+    .process-steps { display: flex; flex-direction: column; gap: 0; }
+    .step { display: flex; gap: 20px; align-items: flex-start; padding: 22px 0; border-bottom: 1px solid #ffffff08; }
+    .step:last-child { border-bottom: none; padding-bottom: 0; }
+    .step:first-child { padding-top: 0; }
+    .step-num { width: 36px; height: 36px; border-radius: 50%; background: linear-gradient(135deg,#10b981,#0ea5e9); display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; color: #fff; flex-shrink: 0; }
+    .step-title { font-size: 14px; font-weight: 700; color: #F1F5F9; margin-bottom: 5px; }
+    .step-desc { font-size: 13px; color: #64748B; line-height: 1.65; }
+
+    .use-cases { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 72px; }
+    .use-case { background: #111116; border: 1px solid #ffffff0d; border-radius: 14px; padding: 20px 22px; display: flex; gap: 14px; align-items: flex-start; }
+    .use-case-dot { width: 8px; height: 8px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; margin-top: 5px; flex-shrink: 0; }
+    .use-case-text { font-size: 13px; color: #CBD5E1; line-height: 1.6; }
+    .use-case-text strong { color: #F1F5F9; display: block; margin-bottom: 3px; font-size: 14px; }
+
+    .cta-box { background: linear-gradient(135deg,#0d1f14,#0d1827); border: 1px solid #10b98120; border-radius: 20px; padding: 48px 40px; text-align: center; }
+    .cta-box h3 { font-size: 24px; font-weight: 800; margin-bottom: 10px; letter-spacing: -0.5px; }
+    .cta-box p { font-size: 14px; color: #64748B; margin-bottom: 28px; }
+    .cta-btn { display: inline-block; padding: 13px 36px; border-radius: 24px; background: linear-gradient(135deg,#10b981,#0ea5e9); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 20px rgba(16,185,129,0.3); transition: all .2s; }
+    .cta-btn:hover { transform: translateY(-1px); }
+
+    footer { border-top: 1px solid #ffffff0d; padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+    .footer-copy { font-size: 12px; color: #94A3B8; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 12px; color: #64748B; text-decoration: none; transition: color .15s; }
+    .footer-links a:hover { color: #10b981; }
+
+    .glow1 { position: fixed; width: 600px; height: 600px; border-radius: 50%; background: radial-gradient(circle,#10b98110,transparent 70%); top: -200px; left: -200px; pointer-events: none; }
+    .glow2 { position: fixed; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle,#0ea5e90c,transparent 70%); bottom: -100px; right: -100px; pointer-events: none; }
+
+    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
+    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
+
+    @media(max-width:700px){
+      nav{padding:14px 20px;} .hero{padding:48px 20px 40px;} .container{padding:0 20px 60px;}
+      .features-grid{grid-template-columns:1fr;} .use-cases{grid-template-columns:1fr;}
+      .process{padding:24px 20px;} .cta-box{padding:32px 22px;} footer{padding:20px;}
+    }
+  </style>
+</head>
+<body>
+  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
+    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
+    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+  </div>
+  <script>
+    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
+    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
+  </script>
+
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+
+  <nav>
+    <a href="/" class="nav-brand"><img src="/logo.png" class="nav-logo" alt="logo"/><span class="nav-name">thehotspot</span></a>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <a href="/" class="nav-back">← Back</a>
+      <a href="/contact.html" class="nav-cta">Get Started</a>
+    </div>
+  </nav>
+
+  <div class="hero">
+    <div class="badge"><span class="badge-dot"></span><span class="badge-text">Service</span></div>
+    <h1>AI <span style="background:linear-gradient(135deg,#10b981,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">Automation</span></h1>
+    <p>Replace repetitive manual work with intelligent systems that run 24/7. From lead outreach to internal workflows — we automate the tasks that slow your business down.</p>
+    <a href="/contact.html" class="hero-btn">Start Automating →</a>
+  </div>
+
+  <div class="container">
+
+    <div style="margin-bottom:72px;">
+      <div class="section-label">What We Automate</div>
+      <div class="section-title">Every repetitive task is a candidate</div>
+      <div class="section-sub">If your team does it more than twice a week, we can automate it. Here's what we build most often.</div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">📧</div><div class="feature-title">Outreach & Follow-ups</div><div class="feature-desc">Automated cold email sequences, follow-up drips, and reply detection — sent from your real inbox.</div></div>
+        <div class="feature-card"><div class="feature-icon">🔍</div><div class="feature-title">Lead Scraping</div><div class="feature-desc">AI agents that continuously find and qualify new leads from the web, then add them to your pipeline.</div></div>
+        <div class="feature-card"><div class="feature-icon">📊</div><div class="feature-title">Reporting & Analytics</div><div class="feature-desc">Auto-generated weekly reports pulled from your tools — no manual spreadsheet work required.</div></div>
+        <div class="feature-card"><div class="feature-icon">🔔</div><div class="feature-title">Notifications & Alerts</div><div class="feature-desc">Real-time Slack/email alerts triggered by business events — new lead, campaign result, task overdue.</div></div>
+        <div class="feature-card"><div class="feature-icon">🗂️</div><div class="feature-title">Data Entry & Syncing</div><div class="feature-desc">Sync data between CRMs, databases, and spreadsheets automatically with zero human involvement.</div></div>
+        <div class="feature-card"><div class="feature-icon">🤝</div><div class="feature-title">Client Onboarding</div><div class="feature-desc">Automate intake forms, welcome emails, document collection, and first-week communications.</div></div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:72px;">
+      <div class="section-label">How It Works</div>
+      <div class="section-title">From idea to running automation in days</div>
+      <div class="process">
+        <div class="process-steps">
+          <div class="step"><div class="step-num">1</div><div><div class="step-title">Discovery Call</div><div class="step-desc">We map out your current workflows, identify the highest-value automation opportunities, and agree on a scope.</div></div></div>
+          <div class="step"><div class="step-num">2</div><div><div class="step-title">System Design</div><div class="step-desc">We design the automation architecture — tools, triggers, logic, and integrations — and walk you through the plan.</div></div></div>
+          <div class="step"><div class="step-num">3</div><div><div class="step-title">Build & Test</div><div class="step-desc">We build the automation, run it against real data, and refine until it works perfectly across edge cases.</div></div></div>
+          <div class="step"><div class="step-num">4</div><div><div class="step-title">Deploy & Hand Off</div><div class="step-desc">We deploy to your environment, document everything, and train your team. Ongoing support available.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-bottom:72px;">
+      <div class="section-label">Use Cases</div>
+      <div class="section-title">Real automation for real businesses</div>
+      <div class="use-cases">
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>Sales Teams</strong>Auto-qualify inbound leads, assign to reps, and trigger personalised first-touch emails.</div></div>
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>Marketing Agencies</strong>Automated client reporting, campaign performance alerts, and proposal generation.</div></div>
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>E-commerce</strong>Order confirmation flows, abandoned cart sequences, and post-purchase review requests.</div></div>
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>SaaS Products</strong>Trial-to-paid drip campaigns, churn detection alerts, and automated renewal reminders.</div></div>
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>Recruitment</strong>Candidate screening flows, interview scheduling, and rejection/offer email automation.</div></div>
+        <div class="use-case"><div class="use-case-dot"></div><div class="use-case-text"><strong>Consulting Firms</strong>Automated project status updates, invoice reminders, and client check-in sequences.</div></div>
+      </div>
+    </div>
+
+    <div class="cta-box">
+      <h3>Ready to automate your workflow?</h3>
+      <p>Tell us what's slowing your team down. We'll design a system to fix it.</p>
+      <a href="/contact.html" class="cta-btn">Get Your Proposal →</a>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 thehotspot. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+    </div>
+  </footer>
+</body>
+</html>
