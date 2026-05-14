@@ -609,7 +609,7 @@ function LoginPage({ onLogin }) {
 
             {/* Bottom bar */}
             <div style={{ borderTop: "1px solid #ffffff08", paddingTop: 24, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026 Gone Rogue. All rights reserved.</span>
+              <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026 thehotspot. All rights reserved.</span>
               <div style={{ display: "flex", gap: 20 }}>
                 <a href="/privacy.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Privacy Policy</a>
                 <a href="/terms.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Terms of Service</a>
