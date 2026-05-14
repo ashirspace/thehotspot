@@ -176,8 +176,26 @@ function useExternalLinkTransition() {
   }, []);
 }
 
+function useReveal(threshold = 0.12) {
+  const ref = useRef(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const obs = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setVisible(true); obs.disconnect(); }
+    }, { threshold });
+    obs.observe(el);
+    return () => obs.disconnect();
+  }, []);
+  return [ref, visible];
+}
+
 function LoginPage({ onLogin }) {
   useExternalLinkTransition();
+  const [featRef, featVisible] = useReveal();
+  const [agentsRef, agentsVisible] = useReveal();
+  const [outcomeRef, outcomeVisible] = useReveal();
   const [isSignup, setIsSignup] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -476,59 +494,72 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Features ── */}
-        <div style={{ maxWidth: 960, margin: "0 auto 72px", padding: "0 32px" }}>
-          <div style={{ textAlign: "center", marginBottom: 36 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>What We Provide</div>
-            <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8 }}>Everything you need to scale outreach</div>
+        <div ref={featRef} style={{ maxWidth: 960, margin: "0 auto 140px", padding: "0 32px" }}>
+          <div style={{ textAlign: "center", marginBottom: 48, opacity: featVisible ? 1 : 0, transform: featVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>What We Provide</div>
+            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>Everything you need to scale outreach</div>
+            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Six modules working together so you never have to touch the pipeline manually.</div>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
             {[
-              { icon: <LuUsers size={18} />, title: "Lead Generation", desc: "AI finds qualified prospects in any industry or region and adds them to your contacts instantly.", accent: "#10b981" },
-              { icon: <LuMail size={18} />, title: "Cold Email Campaigns", desc: "Unique, personalised emails for every contact — written by AI, never copy-paste.", accent: "#0ea5e9" },
-              { icon: <LuClock size={18} />, title: "Follow-up Sequences", desc: "3-step automated drip at Day 0, 3, and 7. Stops the moment a prospect replies.", accent: "#6366f1" },
-              { icon: <LuTrendingUp size={18} />, title: "Campaign Analytics", desc: "Real-time open and click tracking embedded in every email you send.", accent: "#f59e0b" },
-              { icon: <LuClipboardList size={18} />, title: "Contact Database", desc: "Organise hundreds of contacts across Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
-              { icon: <LuSend size={18} />, title: "Gmail Integration", desc: "Emails send from your own Gmail. Better deliverability, real sender trust.", accent: "#14b8a6" },
-            ].map(f => (
-              <div key={f.title} style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px 20px", transition: "border-color .2s" }}
+              { icon: <LuUsers size={20} />, title: "Lead Generation", desc: "AI finds qualified prospects in any industry or region and adds them to your contacts instantly.", accent: "#10b981" },
+              { icon: <LuMail size={20} />, title: "Cold Email Campaigns", desc: "Unique, personalised emails for every contact — written by AI, never copy-paste.", accent: "#0ea5e9" },
+              { icon: <LuClock size={20} />, title: "Follow-up Sequences", desc: "3-step automated drip at Day 0, 3, and 7. Stops the moment a prospect replies.", accent: "#6366f1" },
+              { icon: <LuTrendingUp size={20} />, title: "Campaign Analytics", desc: "Real-time open and click tracking embedded in every email you send.", accent: "#f59e0b" },
+              { icon: <LuClipboardList size={20} />, title: "Contact Database", desc: "Organise hundreds of contacts across Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
+              { icon: <LuSend size={20} />, title: "Gmail Integration", desc: "Emails send from your own Gmail. Better deliverability, real sender trust.", accent: "#14b8a6" },
+            ].map((f, i) => (
+              <div key={f.title} style={{
+                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px 24px",
+                opacity: featVisible ? 1 : 0,
+                transform: featVisible ? "translateY(0)" : "translateY(52px)",
+                transition: `opacity 0.65s ease ${0.1 + i * 0.09}s, transform 0.65s ease ${0.1 + i * 0.09}s, border-color 0.2s`,
+              }}
                 onMouseEnter={e => e.currentTarget.style.borderColor = `${f.accent}40`}
                 onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff0d"}
               >
-                <div style={{ width: 40, height: 40, borderRadius: 12, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 14 }}>{f.icon}</div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{f.title}</div>
-                <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65 }}>{f.desc}</div>
+                <div style={{ width: 46, height: 46, borderRadius: 14, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 16 }}>{f.icon}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>{f.title}</div>
+                <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{f.desc}</div>
               </div>
             ))}
           </div>
         </div>
 
         {/* ── AI Agents ── */}
-        <div style={{ maxWidth: 760, margin: "0 auto 72px", padding: "0 32px" }}>
-          <div style={{ textAlign: "center", marginBottom: 36 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>Meet the Team</div>
-            <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8 }}>5 AI agents working for you 24/7</div>
+        <div ref={agentsRef} style={{ maxWidth: 800, margin: "0 auto 140px", padding: "0 32px" }}>
+          <div style={{ textAlign: "center", marginBottom: 48, opacity: agentsVisible ? 1 : 0, transform: agentsVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
+            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>5 AI agents working for you 24/7</div>
+            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 2, background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, overflow: "hidden" }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {[
-              { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria.", color: "#10b981", icon: <LuUsers size={15} /> },
-              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#0ea5e9", icon: <LuFilePen size={15} /> },
-              { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects warm-up limits, paces sends to avoid spam, and reports results.", color: "#6366f1", icon: <LuSend size={15} /> },
-              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#f59e0b", icon: <LuRadio size={15} /> },
-              { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks opens, clicks, reply rates, and campaign success — surfaces what's working so you can double down.", color: "#ec4899", icon: <LuChartBar size={15} /> },
+              { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria.", color: "#10b981", icon: <LuUsers size={16} /> },
+              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#0ea5e9", icon: <LuFilePen size={16} /> },
+              { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects warm-up limits, paces sends to avoid spam, and reports results.", color: "#6366f1", icon: <LuSend size={16} /> },
+              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#f59e0b", icon: <LuRadio size={16} /> },
+              { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks opens, clicks, reply rates, and campaign success — surfaces what's working so you can double down.", color: "#ec4899", icon: <LuChartBar size={16} /> },
             ].map((a, i) => (
-              <div key={i} style={{ display: "flex", gap: 16, padding: "18px 22px", alignItems: "flex-start", borderBottom: i < 4 ? "1px solid #ffffff08" : "none", background: "#111116", transition: "background .15s" }}
+              <div key={i} style={{
+                display: "flex", gap: 18, padding: "22px 26px", alignItems: "flex-start",
+                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16,
+                opacity: agentsVisible ? 1 : 0,
+                transform: agentsVisible ? "translateY(0)" : "translateY(52px)",
+                transition: `opacity 0.65s ease ${0.1 + i * 0.1}s, transform 0.65s ease ${0.1 + i * 0.1}s, background 0.15s`,
+              }}
                 onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
                 onMouseLeave={e => e.currentTarget.style.background = "#111116"}
               >
-                <div style={{ width: 38, height: 38, borderRadius: 10, background: `${a.color}18`, border: `1px solid ${a.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: a.color, flexShrink: 0 }}>
+                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${a.color}18`, border: `1px solid ${a.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: a.color, flexShrink: 0 }}>
                   {a.icon}
                 </div>
                 <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{a.name}</span>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}18`, border: `1px solid ${a.color}30`, padding: "2px 8px", borderRadius: 20 }}>{a.role}</span>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>{a.name}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}18`, border: `1px solid ${a.color}30`, padding: "2px 9px", borderRadius: 20 }}>{a.role}</span>
                   </div>
-                  <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{a.desc}</div>
+                  <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.65 }}>{a.desc}</div>
                 </div>
               </div>
             ))}
@@ -536,30 +567,38 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── How it grows your business ── */}
-        <div style={{ maxWidth: 960, margin: "0 auto 72px", padding: "0 32px" }}>
-          <div style={{ background: "linear-gradient(135deg,#0d1f14,#0d1827)", border: "1px solid #10b98120", borderRadius: 20, padding: "40px 40px 36px" }}>
-            <div style={{ textAlign: "center", marginBottom: 32 }}>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>The Outcome</div>
-              <div style={{ fontSize: "clamp(18px,2.2vw,24px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.6 }}>How thehotspot grows your business</div>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-              {[
-                { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily so your pipeline never dries up — even when you're offline.", icon: <LuZap size={14} /> },
-                { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. The follow-up agent handles every sequence automatically.", icon: <LuCheck size={14} /> },
-                { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a blast. Higher reply rates, more conversions.", icon: <LuSparkles size={14} /> },
-                { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns and subject lines get the best response.", icon: <LuTrendingUp size={14} /> },
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
-                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#10b98120", border: "1px solid #10b98135", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0, marginTop: 1 }}>
-                    {item.icon}
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 4 }}>{item.point}</div>
-                    <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65 }}>{item.detail}</div>
-                  </div>
+        <div ref={outcomeRef} style={{ maxWidth: 960, margin: "0 auto 140px", padding: "0 32px" }}>
+          <div style={{ textAlign: "center", marginBottom: 48, opacity: outcomeVisible ? 1 : 0, transform: outcomeVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>The Outcome</div>
+            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>How thehotspot grows your business</div>
+            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Real results, not vanity metrics — what you'll see in your pipeline after week one.</div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+            {[
+              { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily so your pipeline never dries up — even when you're offline.", icon: <LuZap size={16} />, accent: "#10b981" },
+              { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. The follow-up agent handles every sequence automatically.", icon: <LuCheck size={16} />, accent: "#0ea5e9" },
+              { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a blast. Higher reply rates, more conversions.", icon: <LuSparkles size={16} />, accent: "#6366f1" },
+              { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns and subject lines get the best response.", icon: <LuTrendingUp size={16} />, accent: "#ec4899" },
+            ].map((item, i) => (
+              <div key={i} style={{
+                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px 26px",
+                display: "flex", gap: 18, alignItems: "flex-start",
+                opacity: outcomeVisible ? 1 : 0,
+                transform: outcomeVisible ? "translateY(0)" : "translateY(52px)",
+                transition: `opacity 0.65s ease ${0.1 + i * 0.1}s, transform 0.65s ease ${0.1 + i * 0.1}s, border-color 0.2s`,
+              }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = `${item.accent}40`}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff0d"}
+              >
+                <div style={{ width: 42, height: 42, borderRadius: 12, background: `${item.accent}18`, border: `1px solid ${item.accent}35`, display: "flex", alignItems: "center", justifyContent: "center", color: item.accent, flexShrink: 0 }}>
+                  {item.icon}
                 </div>
-              ))}
-            </div>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{item.point}</div>
+                  <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{item.detail}</div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
