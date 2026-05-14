@@ -454,16 +454,16 @@ function LoginPage({ onLogin }) {
       <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1 }}>
 
         {/* ── HERO ── */}
-        <div style={{ maxWidth: 800, margin: "0 auto", padding: "80px 32px 64px", textAlign: "center" }}>
+        <div style={{ maxWidth: 960, margin: "0 auto", padding: "96px 40px 72px", textAlign: "center" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#10b98112", border: "1px solid #10b98130", borderRadius: 20, padding: "5px 16px", marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981" }} />
             <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
           </div>
-          <h1 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -2, marginBottom: 20, lineHeight: 1.08 }}>
+          <h1 style={{ fontSize: "clamp(36px,5.5vw,68px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -3, marginBottom: 20, lineHeight: 1.06 }}>
             Stop chasing clients.<br />
             <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the work.</span>
           </h1>
-          <p style={{ fontSize: 16, color: "#94A3B8", lineHeight: 1.8, maxWidth: 560, margin: "0 auto 36px" }}>
+          <p style={{ fontSize: 17, color: "#94A3B8", lineHeight: 1.8, maxWidth: 640, margin: "0 auto 40px" }}>
             thehotspot is your always-on outbound engine. It finds leads, writes personalised emails, sends campaigns, follows up automatically, and tracks every open — while you focus on closing.
           </p>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
@@ -477,7 +477,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Stats bar ── */}
-        <div style={{ maxWidth: 900, margin: "0 auto 72px", padding: "0 32px" }}>
+        <div style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
             {[
               { value: "5", label: "AI Agents", color: "#10b981" },
@@ -494,7 +494,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Features ── */}
-        <div ref={featRef} style={{ maxWidth: 960, margin: "0 auto 140px", padding: "0 32px" }}>
+        <div ref={featRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: featVisible ? 1 : 0, transform: featVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>What We Provide</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>Everything you need to scale outreach</div>
@@ -527,13 +527,13 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── AI Agents ── */}
-        <div ref={agentsRef} style={{ maxWidth: 800, margin: "0 auto 140px", padding: "0 32px" }}>
+        <div ref={agentsRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: agentsVisible ? 1 : 0, transform: agentsVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>5 AI agents working for you 24/7</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
             {[
               { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria.", color: "#10b981", icon: <LuUsers size={16} /> },
               { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#0ea5e9", icon: <LuFilePen size={16} /> },
@@ -567,7 +567,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── How it grows your business ── */}
-        <div ref={outcomeRef} style={{ maxWidth: 960, margin: "0 auto 140px", padding: "0 32px" }}>
+        <div ref={outcomeRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: outcomeVisible ? 1 : 0, transform: outcomeVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>The Outcome</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>How thehotspot grows your business</div>
@@ -603,7 +603,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Final CTA ── */}
-        <div style={{ maxWidth: 600, margin: "0 auto 64px", padding: "0 32px", textAlign: "center" }}>
+        <div style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 40px", textAlign: "center" }}>
           <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 12 }}>Ready to automate your outreach?</div>
           <p style={{ fontSize: 14, color: "#64748B", marginBottom: 28 }}>Join businesses using AI to fill their pipeline on autopilot.</p>
           <button onClick={() => setShowLogin(true)} style={{ padding: "14px 40px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 40px #10b98135" }}>
@@ -613,7 +613,7 @@ function LoginPage({ onLogin }) {
 
         {/* ── Footer ── */}
         <footer style={{ borderTop: "1px solid #ffffff0d", padding: "56px 40px 32px", marginTop: 16 }}>
-          <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ maxWidth: 1280, margin: "0 auto" }}>
 
             {/* Top row — brand + columns */}
             <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
