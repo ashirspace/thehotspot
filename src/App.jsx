@@ -582,7 +582,7 @@ function LoginPage({ onLogin }) {
               {/* Company */}
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Company</div>
-                {[["Blog", "#"], ["Glossary", "#"], ["FAQ", "#"], ["Contact", "#"]].map(([label, href]) => (
+                {[["Blog", "/blog.html"], ["Glossary", "/glossary.html"], ["FAQ", "/faq.html"], ["Contact", "/contact.html"]].map(([label, href]) => (
                   <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
                     onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
                     onMouseLeave={e => e.currentTarget.style.color = "#64748B"}

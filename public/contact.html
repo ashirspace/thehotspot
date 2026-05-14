@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Contact — thehotspot</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
+
+    nav { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff0d; background: #09090dcc; backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo { width: 28px; height: 28px; object-fit: contain; }
+    .nav-name { font-size: 16px; font-weight: 700; color: #F1F5F9; letter-spacing: -0.3px; }
+    .nav-back { padding: 8px 20px; border-radius: 20px; border: 1px solid #ffffff15; background: transparent; color: #94A3B8; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: all .2s; }
+    .nav-back:hover { border-color: #10b98140; color: #10b981; }
+
+    .hero { max-width: 680px; margin: 0 auto; padding: 72px 32px 48px; text-align: center; }
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: #10b98112; border: 1px solid #10b98130; border-radius: 20px; padding: 5px 16px; margin-bottom: 24px; }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; }
+    .badge-text { font-size: 11px; color: #10b981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+    .hero h1 { font-size: clamp(28px, 4vw, 42px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; }
+    .hero p { font-size: 15px; color: #94A3B8; line-height: 1.75; max-width: 520px; margin: 0 auto; }
+
+    .container { max-width: 680px; margin: 0 auto; padding: 0 32px 80px; }
+
+    .card { background: #111116; border: 1px solid #ffffff0d; border-radius: 20px; padding: 40px 36px; }
+    .card-title { font-size: 18px; font-weight: 800; color: #F1F5F9; letter-spacing: -0.4px; margin-bottom: 6px; }
+    .card-subtitle { font-size: 13px; color: #64748B; margin-bottom: 32px; line-height: 1.6; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label { font-size: 12px; font-weight: 600; color: #94A3B8; }
+    label .req { color: #10b981; margin-left: 2px; }
+    input, select, textarea { width: 100%; background: #0d0d12; border: 1px solid #ffffff12; border-radius: 10px; padding: 11px 14px; color: #F1F5F9; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color .15s; }
+    input::placeholder, textarea::placeholder { color: #475569; }
+    input:focus, select:focus, textarea:focus { border-color: #10b98160; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748B' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+    select option { background: #0d0d12; color: #F1F5F9; }
+    textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+
+    .phone-wrap { display: flex; gap: 8px; }
+    .phone-code { width: 72px; flex-shrink: 0; text-align: center; }
+
+    .submit-btn { width: 100%; margin-top: 24px; padding: 14px; border-radius: 12px; border: none; background: linear-gradient(135deg, #10b981, #0ea5e9); color: #fff; font-size: 15px; font-weight: 700; font-family: 'DM Sans', sans-serif; cursor: pointer; box-shadow: 0 4px 20px rgba(16,185,129,0.3); transition: all .2s; letter-spacing: -0.2px; }
+    .submit-btn:hover { transform: translateY(-1px); box-shadow: 0 8px 28px rgba(16,185,129,0.4); }
+    .submit-btn:active { transform: translateY(0); }
+
+    .success { display: none; text-align: center; padding: 40px 0; }
+    .success-icon { width: 56px; height: 56px; border-radius: 50%; background: #10b98120; border: 1px solid #10b98140; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; font-size: 24px; }
+    .success h3 { font-size: 18px; font-weight: 700; margin-bottom: 8px; }
+    .success p { font-size: 13px; color: #64748B; }
+
+    footer { border-top: 1px solid #ffffff0d; padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12; }
+    .footer-copy { font-size: 12px; color: #94A3B8; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { font-size: 12px; color: #64748B; text-decoration: none; transition: color .15s; }
+    .footer-links a:hover { color: #10b981; }
+
+    .glow1 { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle,#10b98110,transparent 70%); top: -150px; left: -150px; pointer-events: none; z-index: 0; }
+    .glow2 { position: fixed; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle,#0ea5e90c,transparent 70%); bottom: -100px; right: -100px; pointer-events: none; z-index: 0; }
+
+    @media (max-width: 600px) {
+      nav { padding: 14px 20px; }
+      .hero { padding: 48px 20px 32px; }
+      .container { padding: 0 20px 60px; }
+      .card { padding: 28px 22px; }
+      .form-grid { grid-template-columns: 1fr; }
+      .form-group.full { grid-column: 1; }
+      footer { padding: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="glow1"></div>
+  <div class="glow2"></div>
+
+  <nav>
+    <a href="/" class="nav-brand">
+      <img src="/logo.png" alt="thehotspot" class="nav-logo" />
+      <span class="nav-name">thehotspot</span>
+    </a>
+    <a href="/" class="nav-back">← Back</a>
+  </nav>
+
+  <div class="hero">
+    <div class="badge"><span class="badge-dot"></span><span class="badge-text">Get In Touch</span></div>
+    <h1>Contact <span style="background:linear-gradient(135deg,#10b981,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">thehotspot</span></h1>
+    <p>Ready to automate your workflows or build a high-performance web product? Let's talk through your goals and see what's possible.</p>
+  </div>
+
+  <div class="container">
+    <div class="card">
+      <div class="card-title">Let's Build Something</div>
+      <div class="card-subtitle">Fill out the form below and we'll get back to you within 24 hours.</div>
+
+      <form id="contactForm" onsubmit="handleSubmit(event)">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>Name <span class="req">*</span></label>
+            <input type="text" placeholder="John Doe" required />
+          </div>
+          <div class="form-group">
+            <label>Company <span class="req">*</span></label>
+            <input type="text" placeholder="Company" required />
+          </div>
+          <div class="form-group">
+            <label>Work Email <span class="req">*</span></label>
+            <input type="email" placeholder="john@company.com" required />
+          </div>
+          <div class="form-group">
+            <label>Phone <span class="req">*</span></label>
+            <div class="phone-wrap">
+              <input type="text" class="phone-code" value="+91" />
+              <input type="tel" placeholder="081234 56789" required style="flex:1;width:auto;" />
+            </div>
+          </div>
+          <div class="form-group full">
+            <label>What do you need help with? <span class="req">*</span></label>
+            <select required>
+              <option value="" disabled selected>Select a service</option>
+              <option>AI Automation</option>
+              <option>Web Development</option>
+              <option>AI Agents</option>
+              <option>API Integration</option>
+              <option>Full-Stack Product Build</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Budget Range <span class="req">*</span></label>
+            <select required>
+              <option value="" disabled selected>Select your budget</option>
+              <option>Under $1,000</option>
+              <option>$1,000 – $5,000</option>
+              <option>$5,000 – $10,000</option>
+              <option>$10,000 – $25,000</option>
+              <option>$25,000+</option>
+              <option>Let's discuss</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>Tell us more <span class="req">*</span></label>
+            <textarea placeholder="Describe your project briefly..." required></textarea>
+          </div>
+        </div>
+        <button type="submit" class="submit-btn">Get Your Proposal</button>
+      </form>
+
+      <div class="success" id="successMsg">
+        <div class="success-icon">✓</div>
+        <h3>We got your message!</h3>
+        <p>We'll review your project details and get back to you within 24 hours.</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <span class="footer-copy">© 2026 thehotspot. All rights reserved.</span>
+    <div class="footer-links">
+      <a href="/privacy.html">Privacy Policy</a>
+      <a href="/terms.html">Terms of Service</a>
+    </div>
+  </footer>
+
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      document.getElementById('contactForm').style.display = 'none';
+      document.getElementById('successMsg').style.display = 'block';
+    }
+  </script>
+</body>
+</html>
