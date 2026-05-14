@@ -4527,12 +4527,21 @@ function Dashboard({ user, onLogout }) {
 
         {/* CHAT VIEW */}
         {page === null && (() => {
+          const isHero = messages.length === 1 && messages[0].role === "assistant";
+
+          const suggestions = [
+            { icon: "📧", label: "Send emails", sub: "to all Network companies" },
+            { icon: "📊", label: "Campaign status", sub: "check active campaigns" },
+            { icon: "➕", label: "Add a contact", sub: "to any category" },
+            { icon: "🔁", label: "Send follow-ups", sub: "to recent outreach" },
+          ];
+
           const renderMsg = (text) => {
             const lines = text.split("\n");
             return lines.map((line, li) => {
               const parts = line.split(/(\*\*[^*]+\*\*)/g);
               return (
-                <div key={li} style={{ minHeight: li < lines.length - 1 ? "1.7em" : undefined }}>
+                <div key={li} style={{ minHeight: li < lines.length - 1 ? "1.5em" : undefined }}>
                   {parts.map((p, pi) =>
                     p.startsWith("**") && p.endsWith("**")
                       ? <strong key={pi} style={{ color: "#f1f5f9", fontWeight: 700 }}>{p.slice(2, -2)}</strong>
@@ -4546,70 +4555,118 @@ function Dashboard({ user, onLogout }) {
           return (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#09090d" }}>
 
-              {/* ── Messages ── */}
-              <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+              {isHero ? (
+                /* ── HERO / EMPTY STATE ── */
+                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 0", gap: 28, overflow: "hidden" }}>
+                  {/* Glow + Avatar */}
+                  <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <div style={{ position: "absolute", width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, #10b98122 0%, transparent 70%)", pointerEvents: "none" }} />
+                    <div style={{ position: "absolute", width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, #0ea5e918 0%, transparent 70%)", pointerEvents: "none" }} />
+                    <div style={{ width: 68, height: 68, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 8px #10b98112, 0 0 0 16px #10b9810a, 0 8px 32px #10b98130", position: "relative" }}>
+                      <I.Bot style={{ width: 30, height: 30 }} />
+                    </div>
+                  </div>
 
-                {/* Message bubbles */}
-                {messages.map((m, i) => (
-                  <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", gap: 10, alignItems: "flex-end" }}>
-                    {m.role === "assistant" && (
-                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2, boxShadow: "0 0 10px #10b98125" }}>
+                  {/* Greeting */}
+                  <div style={{ textAlign: "center" }}>
+                    <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>
+                      Hey, {user?.username || "there"} 👋
+                    </div>
+                    <div style={{ fontSize: 13.5, color: "#64748B", maxWidth: 340, lineHeight: 1.6 }}>
+                      I can send emails, manage contacts, check campaign stats — just tell me what you need.
+                    </div>
+                  </div>
+
+                  {/* Suggestion cards */}
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, maxWidth: 460, width: "100%" }}>
+                    {suggestions.map((s, i) => (
+                      <button key={i} onClick={() => handleSend(`${s.label} ${s.sub}`)} style={{
+                        background: "#111116", border: "1px solid #ffffff0e", borderRadius: 14,
+                        padding: "14px 16px", cursor: "pointer", textAlign: "left",
+                        display: "flex", flexDirection: "column", gap: 5,
+                        transition: "all .18s", fontFamily: "'DM Sans',sans-serif",
+                      }}
+                        onMouseEnter={e => { e.currentTarget.style.background = "#15151d"; e.currentTarget.style.borderColor = "#10b98128"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = "#111116"; e.currentTarget.style.borderColor = "#ffffff0e"; e.currentTarget.style.transform = "translateY(0)"; }}
+                      >
+                        <span style={{ fontSize: 20, lineHeight: 1 }}>{s.icon}</span>
+                        <span style={{ fontSize: 12.5, fontWeight: 600, color: "#CBD5E1" }}>{s.label}</span>
+                        <span style={{ fontSize: 11.5, color: "#475569", lineHeight: 1.3 }}>{s.sub}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* ── CHAT MESSAGES ── */
+                <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 16, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+                  {messages.map((m, i) => (
+                    <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", gap: 10, alignItems: "flex-end" }}>
+                      {m.role === "assistant" && (
+                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2, boxShadow: "0 0 12px #10b98120" }}>
+                          <I.Bot />
+                        </div>
+                      )}
+                      <div style={{
+                        maxWidth: "76%", padding: "12px 16px", fontSize: 13.5, lineHeight: 1.75,
+                        borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
+                        background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#111116",
+                        color: m.role === "user" ? "#fff" : "#CBD5E1",
+                        fontWeight: m.role === "user" ? 500 : 400,
+                        border: m.role === "user" ? "none" : "1px solid #ffffff0d",
+                        boxShadow: m.role === "user" ? "0 4px 16px #10b98128" : "0 2px 8px rgba(0,0,0,0.25)",
+                      }}>{renderMsg(m.content)}</div>
+                    </div>
+                  ))}
+
+                  {/* Typing indicator */}
+                  {loading && (
+                    <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
+                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 12px #10b98120" }}>
                         <I.Bot />
                       </div>
-                    )}
-                    <div style={{
-                      maxWidth: "78%", padding: "13px 17px", fontSize: 13.5, lineHeight: 1.75,
-                      borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
-                      background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#111116",
-                      color: m.role === "user" ? "#fff" : "#CBD5E1",
-                      fontWeight: m.role === "user" ? 500 : 400,
-                      border: m.role === "user" ? "none" : "1px solid #ffffff0d",
-                      boxShadow: m.role === "user" ? "0 4px 16px #10b98128" : "0 2px 12px rgba(0,0,0,0.3)",
-                    }}>{renderMsg(m.content)}</div>
-                  </div>
-                ))}
-
-                {/* Typing indicator */}
-                {loading && (
-                  <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 10px #10b98125" }}>
-                      <I.Bot />
+                      <div style={{ padding: "13px 17px", borderRadius: "4px 18px 18px 18px", background: "#111116", border: "1px solid #ffffff0d", display: "flex", alignItems: "center", gap: 5 }}>
+                        {[0, 1, 2].map(d => (
+                          <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: `hsl(${152 + d * 12},70%,50%)`, animation: `pulse 1.1s ease-in-out ${d * 0.18}s infinite` }} />
+                        ))}
+                      </div>
                     </div>
-                    <div style={{ padding: "14px 18px", borderRadius: "4px 18px 18px 18px", background: "#111116", border: "1px solid #ffffff0d", display: "flex", alignItems: "center", gap: 5, boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
-                      {[0, 1, 2].map(d => (
-                        <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: `hsl(${152 + d * 12},70%,50%)`, animation: `pulse 1.1s ease-in-out ${d * 0.18}s infinite` }} />
-                      ))}
-                    </div>
-                  </div>
-                )}
+                  )}
 
-                <div ref={chatEnd} />
-              </div>
+                  <div ref={chatEnd} />
+                </div>
+              )}
 
-              {/* ── Input ── */}
-              <div style={{ padding: "14px 20px 16px", borderTop: "1px solid #ffffff08", background: "#111116", flexShrink: 0 }}>
-                <div style={{ maxWidth: 800, margin: "0 auto" }}>
-                  <div style={{ display: "flex", gap: 8, alignItems: "center", background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 28, padding: "6px 6px 6px 16px", transition: "border-color .2s, box-shadow .2s" }}
-                    onFocus={() => {}} // handled on input
-                  >
-                    <button onClick={toggleVoice} style={{
-                      width: 34, height: 34, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                      background: listening ? "#10b98120" : "transparent", border: listening ? "1px solid #10b98150" : "1px solid transparent",
+              {/* ── Input bar ── */}
+              <div style={{ padding: isHero ? "20px 24px 24px" : "12px 20px 16px", borderTop: isHero ? "none" : "1px solid #ffffff08", background: isHero ? "transparent" : "#111116", flexShrink: 0 }}>
+                <div style={{ maxWidth: 600, margin: "0 auto" }}>
+                  <div style={{
+                    display: "flex", gap: 8, alignItems: "center",
+                    background: "#111116", border: "1px solid #ffffff14",
+                    borderRadius: 30, padding: "6px 6px 6px 18px",
+                    boxShadow: isHero ? "0 4px 32px rgba(0,0,0,0.4)" : "none",
+                    transition: "border-color .2s, box-shadow .2s",
+                  }}>
+                    <button onClick={toggleVoice} title={listening ? "Stop" : "Voice input"} style={{
+                      width: 34, height: 34, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      background: listening ? "#10b98118" : "transparent",
+                      border: listening ? "1px solid #10b98148" : "1px solid transparent",
                       color: listening ? "#10b981" : "#475569", transition: "all .2s",
                       animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
                     }}>
                       {listening ? <I.MicOff /> : <I.Mic />}
                     </button>
-                    <input type="text" value={input} onChange={e => setInput(e.target.value)}
+                    <input
+                      type="text" value={input} onChange={e => setInput(e.target.value)}
                       onKeyDown={e => e.key === "Enter" && handleSend()}
-                      placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
+                      placeholder={listening ? "Listening..." : "Message your assistant..."}
                       style={{ flex: 1, background: "transparent", border: "none", color: "#E2E8F0", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", padding: "6px 0" }}
                     />
                     <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
                       width: 38, height: 38, borderRadius: "50%", border: "none", flexShrink: 0,
                       cursor: input.trim() ? "pointer" : "default",
-                      background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1e1e28",
-                      color: input.trim() ? "#fff" : "#475569",
+                      background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
+                      color: input.trim() ? "#fff" : "#334155",
                       display: "flex", alignItems: "center", justifyContent: "center",
                       boxShadow: input.trim() ? "0 4px 14px #10b98135" : "none",
                       transition: "all .2s",
@@ -4617,7 +4674,7 @@ function Dashboard({ user, onLogout }) {
                       <I.Send />
                     </button>
                   </div>
-                  <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 7 }}>Press Enter to send</div>
+                  <div style={{ fontSize: 10, color: "#1e293b", textAlign: "center", marginTop: 6, letterSpacing: 0.3 }}>Press Enter to send</div>
                 </div>
               </div>
 
