@@ -4546,32 +4546,6 @@ function Dashboard({ user, onLogout }) {
           return (
             <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#09090d" }}>
 
-              {/* ── Header ── */}
-              <div style={{ padding: "13px 20px", borderBottom: "1px solid #ffffff08", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111116", flexShrink: 0 }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                  <div style={{ position: "relative" }}>
-                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 18px #10b98135" }}>
-                      <I.Bot />
-                    </div>
-                    <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "#10b981", border: "2px solid #111116", animation: "pulse 2s ease-in-out infinite" }} />
-                  </div>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
-                      <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>Outreach Assistant</span>
-                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", padding: "2px 7px", borderRadius: 20, background: "#10b98118", color: "#10b981", border: "1px solid #10b98130" }}>AI</span>
-                    </div>
-                    <div style={{ fontSize: 11, color: "#475569" }}>Always ready</div>
-                  </div>
-                </div>
-                <button onClick={() => setMessages(prev => [prev[0]])} title="Clear chat" style={{
-                  background: "none", border: "1px solid #ffffff08", borderRadius: 8, padding: "5px 11px",
-                  fontSize: 11, fontWeight: 600, color: "#475569", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
-                }}
-                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#f4373744"; e.currentTarget.style.color = "#f43737"; }}
-                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.color = "#475569"; }}
-                >Clear</button>
-              </div>
-
               {/* ── Messages ── */}
               <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
 
