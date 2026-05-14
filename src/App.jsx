@@ -1343,82 +1343,167 @@ function CategoriesPage({ onBack }) {
 
 function SuccessRatePage({ onBack }) {
   const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
-  const totalSent   = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
-  const totalFailed = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+  const totalSent      = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
+  const totalFailed    = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
   const totalCampaigns = history.length;
   const cancelledCount = history.filter(h => h.cancelled).length;
-  const rate = totalSent + totalFailed > 0 ? Math.round(totalSent / (totalSent + totalFailed) * 100) : 0;
-
-  const circumference = 2 * Math.PI * 54;
-  const dashOffset = circumference - (rate / 100) * circumference;
+  const totalAttempted = totalSent + totalFailed;
+  const rate = totalAttempted > 0 ? Math.round(totalSent / totalAttempted * 100) : 0;
   const ringColor = rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : rate > 0 ? "#f87171" : "#ffffff20";
 
-  const stats = [
-    { label: "Total Sent",  value: totalSent,      color: "#818cf8" },
-    { label: "Failed",      value: totalFailed,     color: "#f87171" },
-    { label: "Campaigns",   value: totalCampaigns,  color: "#38bdf8" },
-    { label: "Cancelled",   value: cancelledCount,  color: "#facc15" },
-  ];
+  const Arrow = () => (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, flexShrink: 0 }}>
+      <div style={{ width: 1, height: 28, background: "linear-gradient(180deg,#ffffff15,#ffffff30)" }} />
+      <svg width="10" height="8" viewBox="0 0 10 8"><path d="M5 8L0 0h10z" fill="#ffffff25" /></svg>
+    </div>
+  );
+
+  const FlowNode = ({ icon, label, value, sub, color, dim = false }) => (
+    <div style={{ background: dim ? "#0d0d12" : "#111116", border: `1px solid ${color}25`, borderRadius: 14, padding: "16px 18px", textAlign: "center", minWidth: 120, opacity: dim ? 0.5 : 1 }}>
+      <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", color, margin: "0 auto 10px" }}>{icon}</div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 2 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
+      {sub && <div style={{ fontSize: 10, color: "#64748B" }}>{sub}</div>}
+    </div>
+  );
 
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Check /></div>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>Success Rate</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>Based on {totalCampaigns} campaign{totalCampaigns !== 1 ? "s" : ""} run through the app</div>
-        </div>
-      </div>
 
-      {/* Circular Progress */}
-      <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
-        <div style={{ position: "relative", width: 140, height: 140 }}>
-          <svg width="140" height="140" viewBox="0 0 120 120" style={{ transform: "rotate(-90deg)" }}>
-            <circle cx="60" cy="60" r="54" stroke="#ffffff20" strokeWidth="8" fill="none" />
-            <circle cx="60" cy="60" r="54" stroke={ringColor} strokeWidth="8" fill="none"
-              strokeDasharray={circumference} strokeDashoffset={dashOffset} strokeLinecap="round"
-              style={{ transition: "stroke-dashoffset 1s ease" }} />
-          </svg>
-          <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
-            <div style={{ fontSize: 36, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</div>
-            <div style={{ fontSize: 10, color: "#94A3B8", fontWeight: 600 }}>delivery</div>
-          </div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Campaign Pipeline</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>{totalCampaigns} campaign{totalCampaigns !== 1 ? "s" : ""} · {totalAttempted} emails attempted</div>
+        </div>
+        {/* Rate badge */}
+        <div style={{ background: `${ringColor}15`, border: `1px solid ${ringColor}35`, borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 900, color: ringColor, letterSpacing: -1 }}>{rate}%</div>
+          <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Success Rate</div>
         </div>
       </div>
 
       {totalCampaigns === 0 ? (
-        <div style={{ textAlign: "center", padding: "28px 24px", background: "#111116", borderRadius: 14, border: "1px dashed #ffffff10", marginBottom: 20 }}>
-          <LuChartBar size={28} style={{ marginBottom: 8, color: "#CBD5E1" }} />
-          <div style={{ fontSize: 14, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>No data yet</div>
-          <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign from the chat to see real success rates.</div>
+        <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
+          <LuChartBar size={32} style={{ marginBottom: 12, color: "#334155" }} />
+          <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No pipeline data yet</div>
+          <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign to see your outreach funnel here.</div>
         </div>
       ) : (
         <>
-          <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 }}>Breakdown</div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 20 }}>
-            {stats.map(s => (
-              <div key={s.label} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "16px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "#64748B", marginTop: 4, fontWeight: 500 }}>{s.label}</div>
+          {/* Flowchart */}
+          <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "28px 24px", marginBottom: 20 }}>
+            <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 20 }}>Outreach Flow</div>
+
+            {/* Vertical pipeline */}
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
+
+              {/* Node 1 — Campaigns */}
+              <FlowNode icon={<LuZap size={16} />} label="Campaigns Run" value={totalCampaigns} sub="outreach batches started" color="#6366f1" />
+              <Arrow />
+
+              {/* Node 2 — Attempted */}
+              <FlowNode icon={<LuSend size={16} />} label="Emails Attempted" value={totalAttempted} sub={`${totalCampaigns} campaign${totalCampaigns !== 1 ? "s" : ""} × contacts`} color="#0ea5e9" />
+              <Arrow />
+
+              {/* Split node */}
+              <div style={{ display: "flex", gap: 0, alignItems: "flex-start", width: "100%" }}>
+                {/* Left line */}
+                <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", paddingRight: 0 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", width: "100%" }}>
+                    <div style={{ height: 1, background: "#ffffff15", width: "50%" }} />
+                    <div style={{ width: 1, height: 24, background: "#10b98130", marginRight: "calc(50% - 1px)" }} />
+                  </div>
+                </div>
+                {/* Centre dot */}
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ffffff20", flexShrink: 0, marginTop: -5, zIndex: 1 }} />
+                {/* Right line */}
+                <div style={{ flex: 1, paddingLeft: 0 }}>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
+                    <div style={{ height: 1, background: "#ffffff15", width: "50%" }} />
+                    <div style={{ width: 1, height: 24, background: "#f8717130", marginLeft: "calc(50% - 1px)" }} />
+                  </div>
+                </div>
               </div>
-            ))}
+
+              {/* Two outcome nodes */}
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, width: "100%" }}>
+                <div style={{ background: "#0d1f0f", border: "1px solid #10b98125", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", margin: "0 auto 10px" }}><LuCheck size={16} /></div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#10b981", letterSpacing: -1, marginBottom: 2 }}>{totalSent}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#10b981", marginBottom: 4 }}>Delivered</div>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>{rate}% of attempted</div>
+                  {/* Mini bar */}
+                  <div style={{ height: 4, background: "#ffffff10", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
+                    <div style={{ width: `${rate}%`, height: "100%", background: "#10b981", borderRadius: 2 }} />
+                  </div>
+                </div>
+
+                <div style={{ background: "#1f0d0d", border: "1px solid #f8717125", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f8717118", display: "flex", alignItems: "center", justifyContent: "center", color: "#f87171", margin: "0 auto 10px" }}><LuX size={16} /></div>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: "#f87171", letterSpacing: -1, marginBottom: 2 }}>{totalFailed}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "#f87171", marginBottom: 4 }}>Failed</div>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>{totalAttempted > 0 ? 100 - rate : 0}% of attempted</div>
+                  {/* Mini bar */}
+                  <div style={{ height: 4, background: "#ffffff10", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
+                    <div style={{ width: `${totalAttempted > 0 ? 100 - rate : 0}%`, height: "100%", background: "#f87171", borderRadius: 2 }} />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
-          {/* Delivery rate bar */}
-          <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 10 }}>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Delivery Rate</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: ringColor, fontFamily: "'JetBrains Mono',monospace" }}>{rate}%</span>
+          {/* Summary bar */}
+          <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "16px 20px", marginBottom: 14 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
+              <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>Overall Delivery</span>
+              <span style={{ fontSize: 12, fontWeight: 700, color: ringColor }}>{rate}%</span>
             </div>
-            <div style={{ height: 8, background: "#ffffff10", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ width: `${rate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${ringColor})`, borderRadius: 4, transition: "width .8s ease" }} />
+            <div style={{ height: 6, background: "#ffffff0d", borderRadius: 3, overflow: "hidden" }}>
+              <div style={{ width: `${rate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${ringColor})`, borderRadius: 3, transition: "width .8s ease" }} />
             </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: "#94A3B8" }}>
-              <span>{totalSent} sent successfully</span>
-              <span>{totalFailed} failed</span>
+            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
+              {[
+                { label: "Campaigns", value: totalCampaigns, color: "#6366f1" },
+                { label: "Cancelled", value: cancelledCount, color: "#facc15" },
+                { label: "Delivered", value: totalSent, color: "#10b981" },
+                { label: "Failed", value: totalFailed, color: "#f87171" },
+              ].map(s => (
+                <div key={s.label} style={{ textAlign: "center" }}>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: s.color }}>{s.value}</div>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>{s.label}</div>
+                </div>
+              ))}
             </div>
           </div>
+
+          {/* Per-campaign breakdown */}
+          {history.length > 0 && (
+            <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ padding: "14px 18px", borderBottom: "1px solid #ffffff08", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>Per Campaign</div>
+              {history.slice(-6).reverse().map((h, i) => {
+                const total = (h.sent || 0) + (h.failed || 0);
+                const pct = total > 0 ? Math.round((h.sent || 0) / total * 100) : 0;
+                const col = pct >= 80 ? "#10b981" : pct >= 50 ? "#facc15" : "#f87171";
+                return (
+                  <div key={i} style={{ padding: "12px 18px", borderBottom: i < Math.min(history.length, 6) - 1 ? "1px solid #ffffff08" : "none" }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "#E2E8F0" }}>{h.category || "Campaign"} · {h.date ? new Date(h.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "–"}</div>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: col }}>{pct}%</div>
+                    </div>
+                    <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", background: col, borderRadius: 2 }} />
+                    </div>
+                    <div style={{ display: "flex", gap: 12, marginTop: 5, fontSize: 10, color: "#64748B" }}>
+                      <span style={{ color: "#10b981" }}>✓ {h.sent || 0}</span>
+                      <span style={{ color: "#f87171" }}>✗ {h.failed || 0}</span>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </>
       )}
     </div>
