@@ -1581,15 +1581,104 @@ class AppErrorBoundary extends React.Component {
   }
 }
 
+/* ───────── ONBOARDING MODAL ───────── */
+function OnboardingModal({ user, onComplete }) {
+  const [form, setForm] = useState({
+    fullName: user?.name || "",
+    email: user?.email || "",
+    company: user?.company || "",
+    role: user?.role_title || "",
+    website: user?.website || "",
+    phone: user?.phone || "",
+  });
+  const [saving, setSaving] = useState(false);
+  const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
+
+  const canSubmit = form.fullName.trim() && form.company.trim();
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    setSaving(true);
+    const updated = {
+      ...user,
+      name: form.fullName.trim(),
+      email: form.email.trim() || user?.email || "",
+      company: form.company.trim(),
+      role_title: form.role.trim(),
+      website: form.website.trim(),
+      phone: form.phone.trim(),
+      profileComplete: true,
+    };
+    localStorage.setItem("thehotspot_user", JSON.stringify(updated));
+    setSaving(false);
+    onComplete(updated);
+  };
+
+  const inp = {
+    width: "100%", background: "#0d0d12", border: "1px solid #ffffff15",
+    borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14,
+    fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box",
+  };
+  const lbl = { display: "block", color: "#94A3B8", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "'DM Sans',sans-serif" };
+
+  const fields = [
+    { key: "fullName", label: "Full Name", placeholder: "John Smith", required: true, full: true },
+    { key: "email",    label: "Email Address", placeholder: "john@company.com", type: "email", full: true },
+    { key: "company",  label: "Company Name", placeholder: "Acme Corp", required: true },
+    { key: "role",     label: "Job Title", placeholder: "Marketing Manager" },
+    { key: "website",  label: "Website (optional)", placeholder: "https://acme.com" },
+    { key: "phone",    label: "Phone (optional)", placeholder: "+1 555 000 0000" },
+  ];
+
+  return (
+    <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div style={{ background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 480, boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
+        <div style={{ textAlign: "center", marginBottom: 28 }}>
+          <img src="/logo.png" alt="logo" style={{ width: 52, height: 52, objectFit: "contain", marginBottom: 14 }} />
+          <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", marginBottom: 6 }}>Welcome to thehotspot!</div>
+          <div style={{ color: "#64748B", fontSize: 13, fontFamily: "'DM Sans',sans-serif", lineHeight: 1.55 }}>Fill in your details so every outreach email you send is signed with the right sender info.</div>
+        </div>
+
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 12px", marginBottom: 24 }}>
+          {fields.map(f => (
+            <div key={f.key} style={f.full ? { gridColumn: "1 / -1" } : {}}>
+              <label style={lbl}>{f.label}{f.required && <span style={{ color: "#10b981", marginLeft: 3 }}>*</span>}</label>
+              <input type={f.type || "text"} value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} style={inp} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
+            </div>
+          ))}
+        </div>
+
+        <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "none", background: canSubmit ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24", color: canSubmit ? "#fff" : "#475569", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", cursor: canSubmit ? "pointer" : "default", transition: "all .2s", boxShadow: canSubmit ? "0 4px 16px rgba(16,185,129,0.28)" : "none" }}>
+          {saving ? "Saving…" : "Save & Continue →"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── MAIN APP ───────── */
 export default function App() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
   });
+  const [showOnboarding, setShowOnboarding] = useState(() => {
+    try { const u = JSON.parse(localStorage.getItem("thehotspot_user")); return !!(u && !u.profileComplete); } catch { return false; }
+  });
 
-  if (!user) return <AppErrorBoundary><LoginPage onLogin={(userData) => { window.history.replaceState({}, "", "/"); setUser(userData); }} /></AppErrorBoundary>;
+  const handleLogin = (userData) => {
+    window.history.replaceState({}, "", "/");
+    setUser(userData);
+    if (!userData.profileComplete) setShowOnboarding(true);
+  };
 
-  return <AppErrorBoundary><Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} /></AppErrorBoundary>;
+  if (!user) return <AppErrorBoundary><LoginPage onLogin={handleLogin} /></AppErrorBoundary>;
+
+  return (
+    <AppErrorBoundary>
+      <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />
+      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} />}
+    </AppErrorBoundary>
+  );
 }
 
 
@@ -2606,7 +2695,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
             category: contact.category,
             website: contact.website || "",
             offerContext,
-            senderName: user?.name || user?.username || "Ashir",
+            senderName: user?.name || user?.username || "",
           }),
         });
         const data = await res.json();
@@ -2935,8 +3024,8 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
           category: template.id,
           website: form.website,
           offerContext: form.angle || pickAngle(template.id),
-          senderName: user?.name || user?.username || "Ashir Ayaan",
-          senderCompany: user?.company || "Ibra Digitals Branding Services LLC",
+          senderName: user?.name || user?.username || "",
+          senderCompany: user?.company || "",
           senderRole: user?.role_title || "",
           maxChars: parseInt(form.maxChars) || 600,
         }),
@@ -3394,8 +3483,8 @@ function Dashboard({ user, onLogout }) {
         category: contact.category || "Network",
         website: contact.website || "",
         offerContext,
-        senderName: user?.name || user?.username || "Ashir Ayaan",
-        senderCompany: user?.company || "Ibra Digitals Branding Services LLC",
+        senderName: user?.name || user?.username || "",
+        senderCompany: user?.company || "",
         senderRole: user?.role_title || "",
         maxChars: maxChars || null,
       }),
