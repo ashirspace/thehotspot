@@ -38,6 +38,15 @@ async function airtableCreate(fields) {
   return await res.json();
 }
 
+async function airtableUpdateUser(recordId, fields) {
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !recordId) return;
+  await fetch(`${AIRTABLE_URL}/${recordId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+  });
+}
+
 // Fetch all contacts from Airtable (with pagination)
 async function fetchAllContacts() {
   let allRecords = [];
@@ -161,8 +170,18 @@ function LoginPage({ onLogin }) {
     try {
       const records = await airtableFetch(`AND({username}='${username}',{password}='${password}')`);
       if (records.length > 0) {
-        const user = records[0].fields;
-        const userData = { username: user.username, email: user.user_email, method: "password", role: user.role || "user" };
+        const rec = records[0];
+        const user = rec.fields;
+        const userData = {
+          username: user.username, email: user.user_email, method: "password", role: user.role || "user",
+          airtableId: rec.id,
+          name: user.full_name || "",
+          company: user.company || "",
+          role_title: user.role_title || "",
+          website: user.website || "",
+          phone: user.phone || "",
+          profileComplete: !!(user.full_name && user.company),
+        };
         localStorage.setItem("thehotspot_user", JSON.stringify(userData));
         onLogin(userData);
       } else {
@@ -188,12 +207,13 @@ function LoginPage({ onLogin }) {
       if (existing.length > 0) { setError("Username already taken"); setLoading(false); return; }
 
       // Create new user
-      await airtableCreate({
+      const created = await airtableCreate({
         username, user_email: email, password, method: "password", role: "user",
         created_at: new Date().toISOString().split("T")[0],
       });
+      const newRecordId = created?.records?.[0]?.id || "";
 
-      const userData = { username, email, method: "password", role: "user" };
+      const userData = { username, email, method: "password", role: "user", airtableId: newRecordId, profileComplete: false };
       localStorage.setItem("thehotspot_user", JSON.stringify(userData));
       onLogin(userData);
     } catch (err) {
@@ -248,20 +268,30 @@ function LoginPage({ onLogin }) {
 
           // Save to Airtable
           const existing = await airtableFetch(`{user_email}='${gEmail}'`);
+          let airtableId = existing[0]?.id || "";
           if (existing.length === 0) {
-            await airtableCreate({
+            const created = await airtableCreate({
               username: gName, user_email: gEmail, password: "", method: "google", role: "user",
               created_at: new Date().toISOString().split("T")[0],
             });
+            airtableId = created?.records?.[0]?.id || "";
           }
 
+          const existingFields = existing[0]?.fields || {};
           const userData = {
-            username: existing[0]?.fields?.username || gName,
+            username: existingFields.username || gName,
             email: gEmail,
             method: "google",
-            role: existing[0]?.fields?.role || "user",
+            role: existingFields.role || "user",
             avatar: gPic,
             accessToken: token,
+            airtableId,
+            name: existingFields.full_name || gName,
+            company: existingFields.company || "",
+            role_title: existingFields.role_title || "",
+            website: existingFields.website || "",
+            phone: existingFields.phone || "",
+            profileComplete: !!(existingFields.full_name && existingFields.company),
           };
           localStorage.setItem("thehotspot_user", JSON.stringify(userData));
           // Clear loading state BEFORE calling onLogin so we don't set state on unmounted component
@@ -1596,7 +1626,7 @@ function OnboardingModal({ user, onComplete }) {
 
   const canSubmit = form.fullName.trim() && form.company.trim();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
     const updated = {
@@ -1610,6 +1640,15 @@ function OnboardingModal({ user, onComplete }) {
       profileComplete: true,
     };
     localStorage.setItem("thehotspot_user", JSON.stringify(updated));
+    // Sync to Airtable Users table in background
+    airtableUpdateUser(user?.airtableId, {
+      full_name: updated.name,
+      company: updated.company,
+      role_title: updated.role_title,
+      website: updated.website,
+      phone: updated.phone,
+      profile_complete: true,
+    });
     setSaving(false);
     onComplete(updated);
   };
