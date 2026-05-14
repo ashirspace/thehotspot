@@ -550,18 +550,73 @@ function LoginPage({ onLogin }) {
           </button>
         </div>
 
-        {/* ── Footer / company bar ── */}
-        <div style={{ borderTop: "1px solid #ffffff0d", padding: "20px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Logo size={20} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8" }}>thehotspot</span>
+        {/* ── Footer ── */}
+        <footer style={{ borderTop: "1px solid #ffffff0d", padding: "56px 40px 32px", marginTop: 16 }}>
+          <div style={{ maxWidth: 960, margin: "0 auto" }}>
+
+            {/* Top row — brand + columns */}
+            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
+
+              {/* Brand */}
+              <div>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
+                  <Logo size={26} />
+                  <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
+                </div>
+                <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.75, maxWidth: 280 }}>
+                  We build AI systems and web products that help businesses move faster and scale smarter.
+                </p>
+              </div>
+
+              {/* Services */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Services</div>
+                {["AI Automation", "Web Development", "AI Agents", "API Integration"].map(s => (
+                  <div key={s} style={{ fontSize: 13, color: "#64748B", marginBottom: 10, cursor: "pointer", transition: "color .15s" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
+                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
+                  >{s}</div>
+                ))}
+              </div>
+
+              {/* Company */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Company</div>
+                {[["Blog", "#"], ["Glossary", "#"], ["FAQ", "#"], ["Contact", "#"], ["Privacy", "/privacy.html"], ["Terms", "/terms.html"]].map(([label, href]) => (
+                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
+                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
+                  >{label}</a>
+                ))}
+              </div>
+
+              {/* Connect */}
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Connect</div>
+                {[
+                  { label: "Twitter / X", href: "#" },
+                  { label: "LinkedIn", href: "#" },
+                  { label: "Instagram", href: "#" },
+                  { label: "GitHub", href: "#" },
+                ].map(({ label, href }) => (
+                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
+                    onMouseEnter={e => e.currentTarget.style.color = "#0ea5e9"}
+                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
+                  >{label}</a>
+                ))}
+              </div>
+            </div>
+
+            {/* Bottom bar */}
+            <div style={{ borderTop: "1px solid #ffffff08", paddingTop: 24, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+              <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026 Gone Rogue. All rights reserved.</span>
+              <div style={{ display: "flex", gap: 20 }}>
+                <a href="/privacy.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Privacy Policy</a>
+                <a href="/terms.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Terms of Service</a>
+              </div>
+            </div>
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <a href="/privacy.html" style={{ fontSize: 12, color: "#475569", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#475569"}>Privacy</a>
-            <a href="/terms.html" style={{ fontSize: 12, color: "#475569", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#475569"}>Terms</a>
-            <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026</span>
-          </div>
-        </div>
+        </footer>
       </div>
 
       <style>{`
@@ -581,6 +636,12 @@ function LoginPage({ onLogin }) {
         }
         @media (max-width:600px) {
           .lp-feat-grid { grid-template-columns:1fr !important; }
+        }
+        @media (max-width:760px) {
+          .lp-footer-grid { grid-template-columns:1fr 1fr !important; }
+        }
+        @media (max-width:480px) {
+          .lp-footer-grid { grid-template-columns:1fr !important; }
         }
       `}</style>
     </div>
