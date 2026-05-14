@@ -299,34 +299,120 @@ function LoginPage({ onLogin }) {
       </nav>
 
       {/* ── Two-column body ── */}
-      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "center", justifyContent: "center", padding: "0 32px", position: "relative", zIndex: 1, gap: 48, minHeight: 0 }}>
+      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "stretch", justifyContent: "center", position: "relative", zIndex: 1, gap: 0, minHeight: 0, overflow: "hidden" }}>
 
-        {/* Left: Hero */}
-        <div className="lp-hero" style={{ flex: 1, maxWidth: 480, paddingRight: 16 }}>
-          <div style={{ marginBottom: 16 }}>
-            <Logo size={44} />
+        {/* Left: Marketing panel — scrollable */}
+        <div className="lp-hero" style={{ flex: 1, overflowY: "auto", padding: "40px 40px 60px 40px", display: "flex", flexDirection: "column", gap: 40 }}>
+
+          {/* Hero */}
+          <div>
+            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 18 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
+              <span style={{ fontSize: 11, color: "#059669", fontWeight: 700, letterSpacing: .8, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
+            </div>
+            <h1 style={{ fontSize: "clamp(24px,3.2vw,36px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.18 }}>
+              Close more deals.<br />
+              <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the outreach.</span>
+            </h1>
+            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.75, maxWidth: 480 }}>
+              thehotspot gives your business a full autonomous outbound engine — finding leads, writing personalised emails, sending campaigns, following up, and tracking results. All without lifting a finger.
+            </p>
           </div>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 18 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-            <span style={{ fontSize: 11, color: "#059669", fontWeight: 600, letterSpacing: .5 }}>Outreach Automation Platform</span>
-          </div>
-          <h1 style={{ fontSize: "clamp(26px,4vw,38px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.15 }}>
-            Grow your network.<br />
-            <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Automate your outreach.</span>
-          </h1>
-          <p style={{ fontSize: 14, color: "#64748B", marginBottom: 24, lineHeight: 1.7 }}>
-            thehotspot is an outreach management platform for affiliate marketers and business development teams.
-            Import contacts, track campaigns, and send personalised emails — all from one dashboard.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {["Contact database", "Campaign tracking", "Email automation", "Google Sheets import", "AI assistant"].map(f => (
-              <span key={f} style={{ fontSize: 12, color: "#64748B", background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px" }}>{f}</span>
+
+          {/* Stats row */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+            {[
+              { value: "5", label: "AI Agents" },
+              { value: "50+", label: "Emails / Day" },
+              { value: "3-Step", label: "Auto Follow-ups" },
+              { value: "Live", label: "Open Tracking" },
+            ].map(s => (
+              <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 14px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", letterSpacing: -0.5 }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "#64748B", marginTop: 3, fontWeight: 500 }}>{s.label}</div>
+              </div>
             ))}
           </div>
+
+          {/* Features */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>What We Provide</div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              {[
+                { icon: <LuUsers size={16} />, title: "Lead Generation", desc: "AI searches the web for qualified prospects in any industry or region — added to your contacts instantly.", accent: "#10b981" },
+                { icon: <LuMail size={16} />, title: "Cold Email Campaigns", desc: "Personalised emails written by AI for every contact. Each one unique, on-brand, and optimised to get replies.", accent: "#0ea5e9" },
+                { icon: <LuClock size={16} />, title: "Follow-up Sequences", desc: "3-step automated drip — Day 0, Day 3, Day 7. Stops automatically the moment a prospect replies.", accent: "#6366f1" },
+                { icon: <LuTrendingUp size={16} />, title: "Campaign Analytics", desc: "Real-time open rates and click tracking embedded in every email sent. Know exactly who's interested.", accent: "#f59e0b" },
+                { icon: <LuClipboardList size={16} />, title: "Contact Database", desc: "Manage hundreds of contacts across 5 categories: Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
+                { icon: <LuSend size={16} />, title: "Gmail Integration", desc: "Emails land in inboxes from your own Gmail — not a shared domain. Better deliverability, more trust.", accent: "#14b8a6" },
+              ].map(f => (
+                <div key={f.title} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 10 }}>{f.icon}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 5 }}>{f.title}</div>
+                  <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* AI Agents */}
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Our AI Agents</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {[
+                { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria. Returns verified contact info.", color: "#10b981" },
+                { name: "Email Writer Agent", role: "Content Generation", desc: "Generates a unique, personalised cold email for every single contact — never sends the same email twice.", color: "#0ea5e9" },
+                { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects daily warm-up limits, paces sends to avoid spam flags, and reports results.", color: "#6366f1" },
+                { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies automatically, and sends follow-up emails only to contacts who haven't responded.", color: "#f59e0b" },
+                { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks open rates, click-throughs, reply rates, and campaign success — surfaces insights so you know what's working.", color: "#ec4899" },
+              ].map((a, i) => (
+                <div key={i} style={{ display: "flex", gap: 14, background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "14px 16px", alignItems: "flex-start", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
+                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `${a.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: a.color }} />
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{a.name}</span>
+                      <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}15`, padding: "2px 8px", borderRadius: 20 }}>{a.role}</span>
+                    </div>
+                    <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{a.desc}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* How it grows your business */}
+          <div style={{ background: "linear-gradient(135deg,#0F172A,#1e293b)", borderRadius: 18, padding: "28px 28px 24px" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>How thehotspot Grows Your Business</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+              {[
+                { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily, so your pipeline never dries up — even when you're busy or offline." },
+                { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. Our follow-up agent handles every sequence automatically." },
+                { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a copy-paste blast. Higher reply rates, more conversions." },
+                { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns, subject lines, and angles get the best response." },
+              ].map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#10b98120", border: "1px solid #10b98140", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
+                    <LuCheck size={11} color="#10b981" />
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{item.point}</div>
+                    <div style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.6 }}>{item.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div style={{ fontSize: 11, color: "#94A3B8", textAlign: "center" }}>&copy; 2026 thehotspot · <a href="/privacy.html" style={{ color: "#64748B", textDecoration: "none" }}>Privacy</a> · <a href="/terms.html" style={{ color: "#64748B", textDecoration: "none" }}>Terms</a></div>
         </div>
 
-        {/* Right: Login card */}
-        <div className="lp-card-wrap" style={{ width: "100%", maxWidth: 400, flexShrink: 0 }}>
+        {/* Divider */}
+        <div style={{ width: 1, background: "#E2E8F0", flexShrink: 0 }} />
+
+        {/* Right: Login card — sticky */}
+        <div className="lp-card-wrap" style={{ width: 420, flexShrink: 0, overflowY: "auto", padding: "40px 32px", display: "flex", flexDirection: "column", justifyContent: "center", background: "#FFFFFF" }}>
           <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px rgba(79,70,229,0.08)" }}>
             <div style={{ fontSize: 18, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
             <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
@@ -421,18 +507,6 @@ function LoginPage({ onLogin }) {
             </div>
           </div>
 
-          {/* Footer links */}
-          <div style={{ textAlign: "center", marginTop: 20, display: "flex", alignItems: "center", justifyContent: "center", gap: 16, flexWrap: "wrap" }}>
-            <span style={{ fontSize: 11, color: "#94A3B8" }}>&copy; 2026 thehotspot</span>
-            <a href="/privacy.html" style={{ fontSize: 11, color: "#64748B", textDecoration: "none" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
-              Privacy Policy
-            </a>
-            <a href="/terms.html" style={{ fontSize: 11, color: "#64748B", textDecoration: "none" }}
-              onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
-              Terms of Service
-            </a>
-          </div>
         </div>
       </div>
 
@@ -440,19 +514,14 @@ function LoginPage({ onLogin }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         *{box-sizing:border-box;margin:0;padding:0}
         input::placeholder{color:#CBD5E1}
-
-        /* Desktop: full-height, no scroll */
         .lp-root { height:100vh; overflow:hidden; }
-        .lp-body { flex:1; min-height:0; }
-
-        /* Mobile: stacked, scrollable */
-        @media (max-width: 700px) {
-          .lp-root { height:auto; min-height:100vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
-          .lp-body { flex-direction:column; align-items:stretch; padding:24px 20px 40px; gap:32px; overflow:visible; }
-          .lp-hero { max-width:100%; padding-right:0; text-align:center; }
-          .lp-hero > div:first-child { justify-content:center; display:flex; }
-          .lp-hero > div:nth-child(2) { margin-left:auto; margin-right:auto; }
-          .lp-card-wrap { max-width:100%; flex-shrink:unset; }
+        .lp-body { flex:1; min-height:0; overflow:hidden; }
+        .lp-hero::-webkit-scrollbar{width:4px} .lp-hero::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:3px}
+        @media (max-width:780px) {
+          .lp-root { height:auto; overflow-y:auto; }
+          .lp-body { flex-direction:column; overflow:visible; }
+          .lp-hero { padding:28px 20px 32px; }
+          .lp-card-wrap { width:100% !important; padding:28px 20px 48px; border-top:1px solid #E2E8F0; }
         }
       `}</style>
     </div>
