@@ -1614,64 +1614,68 @@ class AppErrorBoundary extends React.Component {
 /* ───────── ONBOARDING MODAL ───────── */
 function OnboardingModal({ user, onComplete }) {
   const [form, setForm] = useState({
-    fullName: user?.name || "",
-    email: user?.email || "",
-    company: user?.company || "",
-    role: user?.role_title || "",
-    website: user?.website || "",
-    phone: user?.phone || "",
+    fullName:  user?.name     || "",
+    username:  user?.username || "",
+    email:     user?.email    || "",
+    password:  "",
+    company:   user?.company  || "",
+    phone:     user?.phone    || "",
+    role:      user?.role_title || "",
+    website:   user?.website  || "",
   });
   const [saving, setSaving] = useState(false);
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
-  const canSubmit = form.fullName.trim() && form.company.trim();
+  const canSubmit = form.fullName.trim() && form.username.trim() && form.email.trim() && form.password.trim() && form.company.trim() && form.phone.trim();
 
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
     const updated = {
       ...user,
-      name: form.fullName.trim(),
-      email: form.email.trim() || user?.email || "",
-      company: form.company.trim(),
+      name:       form.fullName.trim(),
+      username:   form.username.trim(),
+      email:      form.email.trim(),
+      company:    form.company.trim(),
+      phone:      form.phone.trim(),
       role_title: form.role.trim(),
-      website: form.website.trim(),
-      phone: form.phone.trim(),
+      website:    form.website.trim(),
       profileComplete: true,
     };
     localStorage.setItem("thehotspot_user", JSON.stringify(updated));
-    // Sync to Airtable Users table in background
     airtableUpdateUser(user?.airtableId, {
-      full_name: updated.name,
-      company: updated.company,
-      role_title: updated.role_title,
-      website: updated.website,
-      phone: updated.phone,
+      full_name:        updated.name,
+      username:         updated.username,
+      user_email:       updated.email,
+      password:         form.password.trim(),
+      company:          updated.company,
+      phone:            updated.phone,
+      role_title:       updated.role_title,
+      website:          updated.website,
       profile_complete: true,
     });
     setSaving(false);
     onComplete(updated);
   };
 
-  const inp = {
-    width: "100%", background: "#0d0d12", border: "1px solid #ffffff15",
-    borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14,
-    fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box",
-  };
+  const inp = { width: "100%", background: "#0d0d12", border: "1px solid #ffffff15", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
   const lbl = { display: "block", color: "#94A3B8", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "'DM Sans',sans-serif" };
+  const req  = <span style={{ color: "#10b981", marginLeft: 3 }}>*</span>;
 
   const fields = [
-    { key: "fullName", label: "Full Name", placeholder: "John Smith", required: true, full: true },
-    { key: "email",    label: "Email Address", placeholder: "john@company.com", type: "email", full: true },
-    { key: "company",  label: "Company Name", placeholder: "Acme Corp", required: true },
-    { key: "role",     label: "Job Title", placeholder: "Marketing Manager" },
-    { key: "website",  label: "Website (optional)", placeholder: "https://acme.com" },
-    { key: "phone",    label: "Phone (optional)", placeholder: "+1 555 000 0000" },
+    { key: "fullName", label: "Full Name",       placeholder: "John Smith",           required: true, full: true },
+    { key: "company",  label: "Company Name",    placeholder: "Acme Corp",            required: true },
+    { key: "username", label: "Username",         placeholder: "johnsmith",            required: true },
+    { key: "email",    label: "Email Address",   placeholder: "john@company.com",     required: true, type: "email" },
+    { key: "password", label: "Password",        placeholder: "••••••••",             required: true, type: "password" },
+    { key: "phone",    label: "Contact Number",  placeholder: "+1 555 000 0000",      required: true },
+    { key: "role",     label: "Job Title",       placeholder: "Marketing Manager" },
+    { key: "website",  label: "Website",         placeholder: "https://acme.com" },
   ];
 
   return (
     <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 480, boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
+      <div style={{ background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <img src="/logo.png" alt="logo" style={{ width: 52, height: 52, objectFit: "contain", marginBottom: 14 }} />
           <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", marginBottom: 6 }}>Welcome to thehotspot!</div>
@@ -1681,7 +1685,7 @@ function OnboardingModal({ user, onComplete }) {
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 12px", marginBottom: 24 }}>
           {fields.map(f => (
             <div key={f.key} style={f.full ? { gridColumn: "1 / -1" } : {}}>
-              <label style={lbl}>{f.label}{f.required && <span style={{ color: "#10b981", marginLeft: 3 }}>*</span>}</label>
+              <label style={lbl}>{f.label}{f.required && req}</label>
               <input type={f.type || "text"} value={form[f.key]} onChange={e => set(f.key, e.target.value)} placeholder={f.placeholder} style={inp} onKeyDown={e => e.key === "Enter" && handleSubmit()} />
             </div>
           ))}
