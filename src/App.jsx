@@ -3235,7 +3235,7 @@ function Dashboard({ user, onLogout }) {
     const path = PAGE_TO_PATH[p] ?? "/";
     if (window.location.pathname !== path) window.history.pushState({ page: p }, "", path);
     setPageLoading(true);
-    setTimeout(() => { setPageRaw(p); setPageLoading(false); }, 2000);
+    setTimeout(() => { setPageRaw(p); setPageLoading(false); }, 1000);
   };
 
   // Handle browser back/forward
