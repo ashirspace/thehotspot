@@ -4,6 +4,7 @@ import {
   LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuMessageSquare,
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
+  LuClock,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
