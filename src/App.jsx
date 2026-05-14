@@ -279,24 +279,24 @@ function LoginPage({ onLogin }) {
   const LoginModal = () => (
     <>
       {/* Backdrop */}
-      <div onClick={() => setShowLogin(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", zIndex: 100, backdropFilter: "blur(4px)", animation: "fadeIn .2s ease" }} />
+      <div onClick={() => setShowLogin(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, backdropFilter: "blur(6px)", animation: "fadeIn .2s ease" }} />
       {/* Sheet */}
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "#FFFFFF", borderRadius: "24px 24px 0 0", zIndex: 101, padding: "28px 32px 40px", boxShadow: "0 -8px 48px rgba(15,23,42,0.18)", animation: "slideUp .3s cubic-bezier(.4,0,.2,1)" }}>
+      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 460, background: "#111116", border: "1px solid #ffffff10", borderBottom: "none", borderRadius: "20px 20px 0 0", zIndex: 101, padding: "24px 28px 36px", boxShadow: "0 -16px 60px rgba(0,0,0,0.5)", animation: "slideUp .3s cubic-bezier(.4,0,.2,1)" }}>
         {/* Handle */}
-        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#E2E8F0", margin: "0 auto 24px" }} />
+        <div style={{ width: 36, height: 3, borderRadius: 2, background: "#ffffff18", margin: "0 auto 22px" }} />
 
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create your account" : "Welcome back"}</div>
-        <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Join thehotspot and start automating your outreach" : "Sign in to access your outreach dashboard"}</div>
+        <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>{isSignup ? "Create your account" : "Welcome back"}</div>
+        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>{isSignup ? "Join thehotspot and start automating your outreach" : "Sign in to your outreach dashboard"}</div>
 
         {/* Google */}
         <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-          width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #E2E8F0",
-          background: "#F8FAFF", color: "#0F172A", fontSize: 14, fontWeight: 500,
+          width: "100%", padding: "11px", borderRadius: 10, border: "1px solid #ffffff12",
+          background: "#1a1a24", color: "#E2E8F0", fontSize: 14, fontWeight: 500,
           cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20, opacity: googleLoading ? 0.7 : 1,
+          gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 18, opacity: googleLoading ? 0.6 : 1,
         }}
-          onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#EEF5FF"; } }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.background = "#F8FAFF"; }}
+          onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F450"; e.currentTarget.style.background = "#1f2030"; } }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff12"; e.currentTarget.style.background = "#1a1a24"; }}
         >
           {googleLoading ? (
             <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
@@ -305,54 +305,55 @@ function LoginPage({ onLogin }) {
           )}
         </button>
 
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
-          <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-          <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+          <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
+          <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
+          <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
         </div>
 
         <form onSubmit={isSignup ? handleSignup : handleLogin}>
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
+          <div style={{ marginBottom: 12 }}>
+            <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Username</label>
             <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-              style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
+              style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
           </div>
           {isSignup && (
-            <div style={{ marginBottom: 14 }}>
-              <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
+            <div style={{ marginBottom: 12 }}>
+              <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Email</label>
               <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
+                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
             </div>
           )}
-          <div style={{ marginBottom: 20 }}>
-            <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
+          <div style={{ marginBottom: 18 }}>
+            <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Password</label>
             <div style={{ position: "relative" }}>
               <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
-              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4 }}>
+                style={{ width: "100%", padding: "10px 40px 10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
                 {showPass ? <I.EyeOff /> : <I.Eye />}
               </button>
             </div>
           </div>
-          {error && <div style={{ background: "#FEF2F2", border: "1px solid #EF444433", color: "#EF4444", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>{error}</div>}
+          {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, fontWeight: 500, marginBottom: 14, textAlign: "center" }}>{error}</div>}
           <button type="submit" disabled={loading || !username || !password} style={{
-            width: "100%", padding: "13px", borderRadius: 12, border: "none",
-            background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
-            color: (username && password) ? "#fff" : "#94A3B8",
+            width: "100%", padding: "12px", borderRadius: 10, border: "none",
+            background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
+            color: (username && password) ? "#fff" : "#475569",
             fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
             fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
             display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            boxShadow: (username && password) ? "0 0 24px #10b98130" : "none",
           }}>
             {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : isSignup ? "Create Account" : "Sign In"}
           </button>
         </form>
 
-        <div style={{ textAlign: "center", marginTop: 18 }}>
-          <span style={{ fontSize: 13, color: "#64748B" }}>{isSignup ? "Already have an account? " : "Don't have an account? "}</span>
-          <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+        <div style={{ textAlign: "center", marginTop: 16 }}>
+          <span style={{ fontSize: 12, color: "#475569" }}>{isSignup ? "Already have an account? " : "Don't have an account? "}</span>
+          <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
             {isSignup ? "Sign In" : "Sign Up"}
           </button>
         </div>
@@ -361,152 +362,186 @@ function LoginPage({ onLogin }) {
   );
 
   return (
-    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", display: "flex", flexDirection: "column", position: "relative" }}>
+    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", display: "flex", flexDirection: "column", position: "relative", minHeight: "100vh" }}>
 
       {/* Login modal */}
       {showLogin && <LoginModal />}
 
-      <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
-      <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e914,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
+      {/* Background glow orbs */}
+      <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,#10b98112,transparent 70%)", top: -200, left: -200, pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,#0ea5e90e,transparent 70%)", bottom: -150, right: -150, pointerEvents: "none", zIndex: 0 }} />
+      <div style={{ position: "fixed", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,#6366f10a,transparent 70%)", top: "40%", right: "20%", pointerEvents: "none", zIndex: 0 }} />
 
       {/* ── Top nav ── */}
-      <nav style={{ padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1, flexShrink: 0 }}>
+      <nav style={{ padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff0d", background: "#09090dcc", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Logo size={28} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
+          <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
         </div>
-        <button onClick={() => setShowLogin(true)} style={{ padding: "8px 20px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-          Sign In
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <span style={{ fontSize: 12, color: "#64748B" }}>by Ibra Digitals</span>
+          <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 20px #10b98130" }}>
+            Sign In
+          </button>
+        </div>
       </nav>
 
-      {/* ── Full-width marketing content ── */}
-      <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1, minHeight: 0 }}>
-        <div className="lp-hero" style={{ maxWidth: 960, margin: "0 auto", padding: "48px 32px 40px", display: "flex", flexDirection: "column", gap: 48 }}>
+      {/* ── Scrollable body ── */}
+      <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1 }}>
 
-          {/* Hero */}
-          <div>
-            <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#ECFDF5", border: "1px solid #10b98133", borderRadius: 20, padding: "5px 14px", marginBottom: 18 }}>
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
-              <span style={{ fontSize: 11, color: "#059669", fontWeight: 700, letterSpacing: .8, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
-            </div>
-            <h1 style={{ fontSize: "clamp(24px,3.2vw,36px)", fontWeight: 800, color: "#0F172A", letterSpacing: -1, marginBottom: 14, lineHeight: 1.18 }}>
-              Close more deals.<br />
-              <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the outreach.</span>
-            </h1>
-            <p style={{ fontSize: 14, color: "#64748B", lineHeight: 1.75, maxWidth: 480 }}>
-              thehotspot gives your business a full autonomous outbound engine — finding leads, writing personalised emails, sending campaigns, following up, and tracking results. All without lifting a finger.
-            </p>
+        {/* ── HERO ── */}
+        <div style={{ maxWidth: 800, margin: "0 auto", padding: "80px 32px 64px", textAlign: "center" }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#10b98112", border: "1px solid #10b98130", borderRadius: 20, padding: "5px 16px", marginBottom: 28 }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981" }} />
+            <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
           </div>
+          <h1 style={{ fontSize: "clamp(32px,5vw,56px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -2, marginBottom: 20, lineHeight: 1.08 }}>
+            Stop chasing clients.<br />
+            <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the work.</span>
+          </h1>
+          <p style={{ fontSize: 16, color: "#94A3B8", lineHeight: 1.8, maxWidth: 560, margin: "0 auto 36px" }}>
+            thehotspot is your always-on outbound engine. It finds leads, writes personalised emails, sends campaigns, follows up automatically, and tracks every open — while you focus on closing.
+          </p>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+            <button onClick={() => setShowLogin(true)} style={{ padding: "13px 32px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 32px #10b98140", letterSpacing: -0.2 }}>
+              Get Started Free
+            </button>
+            <button onClick={() => setShowLogin(true)} style={{ padding: "13px 28px", borderRadius: 24, background: "transparent", color: "#94A3B8", border: "1px solid #ffffff15", fontSize: 15, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+              Sign In
+            </button>
+          </div>
+        </div>
 
-          {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12 }}>
+        {/* ── Stats bar ── */}
+        <div style={{ maxWidth: 900, margin: "0 auto 72px", padding: "0 32px" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
             {[
-              { value: "5", label: "AI Agents" },
-              { value: "50+", label: "Emails / Day" },
-              { value: "3-Step", label: "Auto Follow-ups" },
-              { value: "Live", label: "Open Tracking" },
-            ].map(s => (
-              <div key={s.label} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px 14px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                <div style={{ fontSize: 20, fontWeight: 800, color: "#0F172A", letterSpacing: -0.5 }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "#64748B", marginTop: 3, fontWeight: 500 }}>{s.label}</div>
+              { value: "5", label: "AI Agents", color: "#10b981" },
+              { value: "50+", label: "Emails / Day", color: "#0ea5e9" },
+              { value: "3-Step", label: "Auto Follow-ups", color: "#6366f1" },
+              { value: "Live", label: "Open Tracking", color: "#f59e0b" },
+            ].map((s, i) => (
+              <div key={s.label} style={{ padding: "24px 20px", textAlign: "center", background: "#111116", borderRight: i < 3 ? "1px solid #ffffff0d" : "none" }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: s.color, letterSpacing: -1, marginBottom: 4 }}>{s.value}</div>
+                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{s.label}</div>
               </div>
             ))}
           </div>
-
-          {/* Features */}
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>What We Provide</div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-              {[
-                { icon: <LuUsers size={16} />, title: "Lead Generation", desc: "AI searches the web for qualified prospects in any industry or region — added to your contacts instantly.", accent: "#10b981" },
-                { icon: <LuMail size={16} />, title: "Cold Email Campaigns", desc: "Personalised emails written by AI for every contact. Each one unique, on-brand, and optimised to get replies.", accent: "#0ea5e9" },
-                { icon: <LuClock size={16} />, title: "Follow-up Sequences", desc: "3-step automated drip — Day 0, Day 3, Day 7. Stops automatically the moment a prospect replies.", accent: "#6366f1" },
-                { icon: <LuTrendingUp size={16} />, title: "Campaign Analytics", desc: "Real-time open rates and click tracking embedded in every email sent. Know exactly who's interested.", accent: "#f59e0b" },
-                { icon: <LuClipboardList size={16} />, title: "Contact Database", desc: "Manage hundreds of contacts across 5 categories: Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
-                { icon: <LuSend size={16} />, title: "Gmail Integration", desc: "Emails land in inboxes from your own Gmail — not a shared domain. Better deliverability, more trust.", accent: "#14b8a6" },
-              ].map(f => (
-                <div key={f.title} style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "16px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                  <div style={{ width: 32, height: 32, borderRadius: 8, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 10 }}>{f.icon}</div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#0F172A", marginBottom: 5 }}>{f.title}</div>
-                  <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{f.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* AI Agents */}
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Our AI Agents</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {[
-                { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria. Returns verified contact info.", color: "#10b981" },
-                { name: "Email Writer Agent", role: "Content Generation", desc: "Generates a unique, personalised cold email for every single contact — never sends the same email twice.", color: "#0ea5e9" },
-                { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects daily warm-up limits, paces sends to avoid spam flags, and reports results.", color: "#6366f1" },
-                { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies automatically, and sends follow-up emails only to contacts who haven't responded.", color: "#f59e0b" },
-                { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks open rates, click-throughs, reply rates, and campaign success — surfaces insights so you know what's working.", color: "#ec4899" },
-              ].map((a, i) => (
-                <div key={i} style={{ display: "flex", gap: 14, background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "14px 16px", alignItems: "flex-start", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: `${a.color}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <div style={{ width: 10, height: 10, borderRadius: "50%", background: a.color }} />
-                  </div>
-                  <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#0F172A" }}>{a.name}</span>
-                      <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}15`, padding: "2px 8px", borderRadius: 20 }}>{a.role}</span>
-                    </div>
-                    <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{a.desc}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* How it grows your business */}
-          <div style={{ background: "linear-gradient(135deg,#0F172A,#1e293b)", borderRadius: 18, padding: "28px 28px 24px" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 12 }}>How thehotspot Grows Your Business</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {[
-                { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily, so your pipeline never dries up — even when you're busy or offline." },
-                { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. Our follow-up agent handles every sequence automatically." },
-                { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a copy-paste blast. Higher reply rates, more conversions." },
-                { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns, subject lines, and angles get the best response." },
-              ].map((item, i) => (
-                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
-                  <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#10b98120", border: "1px solid #10b98140", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: 1 }}>
-                    <LuCheck size={11} color="#10b981" />
-                  </div>
-                  <div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{item.point}</div>
-                    <div style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.6 }}>{item.detail}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div style={{ fontSize: 11, color: "#94A3B8", textAlign: "center" }}>&copy; 2026 thehotspot · <a href="/privacy.html" style={{ color: "#64748B", textDecoration: "none" }}>Privacy</a> · <a href="/terms.html" style={{ color: "#64748B", textDecoration: "none" }}>Terms</a></div>
         </div>
 
-        {/* ── Bottom company bar (scrolls into view) ── */}
-        <div style={{ background: "#0F172A", borderTop: "1px solid #1e293b", padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Logo size={22} />
-              <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>thehotspot</span>
+        {/* ── Features ── */}
+        <div style={{ maxWidth: 960, margin: "0 auto 72px", padding: "0 32px" }}>
+          <div style={{ textAlign: "center", marginBottom: 36 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>What We Provide</div>
+            <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8 }}>Everything you need to scale outreach</div>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 14 }}>
+            {[
+              { icon: <LuUsers size={18} />, title: "Lead Generation", desc: "AI finds qualified prospects in any industry or region and adds them to your contacts instantly.", accent: "#10b981" },
+              { icon: <LuMail size={18} />, title: "Cold Email Campaigns", desc: "Unique, personalised emails for every contact — written by AI, never copy-paste.", accent: "#0ea5e9" },
+              { icon: <LuClock size={18} />, title: "Follow-up Sequences", desc: "3-step automated drip at Day 0, 3, and 7. Stops the moment a prospect replies.", accent: "#6366f1" },
+              { icon: <LuTrendingUp size={18} />, title: "Campaign Analytics", desc: "Real-time open and click tracking embedded in every email you send.", accent: "#f59e0b" },
+              { icon: <LuClipboardList size={18} />, title: "Contact Database", desc: "Organise hundreds of contacts across Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
+              { icon: <LuSend size={18} />, title: "Gmail Integration", desc: "Emails send from your own Gmail. Better deliverability, real sender trust.", accent: "#14b8a6" },
+            ].map(f => (
+              <div key={f.title} style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px 20px", transition: "border-color .2s" }}
+                onMouseEnter={e => e.currentTarget.style.borderColor = `${f.accent}40`}
+                onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff0d"}
+              >
+                <div style={{ width: 40, height: 40, borderRadius: 12, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 14 }}>{f.icon}</div>
+                <div style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{f.title}</div>
+                <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65 }}>{f.desc}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── AI Agents ── */}
+        <div style={{ maxWidth: 760, margin: "0 auto 72px", padding: "0 32px" }}>
+          <div style={{ textAlign: "center", marginBottom: 36 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>Meet the Team</div>
+            <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8 }}>5 AI agents working for you 24/7</div>
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 2, background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, overflow: "hidden" }}>
+            {[
+              { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria.", color: "#10b981", icon: <LuUsers size={15} /> },
+              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#0ea5e9", icon: <LuFilePen size={15} /> },
+              { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects warm-up limits, paces sends to avoid spam, and reports results.", color: "#6366f1", icon: <LuSend size={15} /> },
+              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#f59e0b", icon: <LuRadio size={15} /> },
+              { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks opens, clicks, reply rates, and campaign success — surfaces what's working so you can double down.", color: "#ec4899", icon: <LuChartBar size={15} /> },
+            ].map((a, i) => (
+              <div key={i} style={{ display: "flex", gap: 16, padding: "18px 22px", alignItems: "flex-start", borderBottom: i < 4 ? "1px solid #ffffff08" : "none", background: "#111116", transition: "background .15s" }}
+                onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
+                onMouseLeave={e => e.currentTarget.style.background = "#111116"}
+              >
+                <div style={{ width: 38, height: 38, borderRadius: 10, background: `${a.color}18`, border: `1px solid ${a.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: a.color, flexShrink: 0 }}>
+                  {a.icon}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 5 }}>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{a.name}</span>
+                    <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}18`, border: `1px solid ${a.color}30`, padding: "2px 8px", borderRadius: 20 }}>{a.role}</span>
+                  </div>
+                  <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6 }}>{a.desc}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ── How it grows your business ── */}
+        <div style={{ maxWidth: 960, margin: "0 auto 72px", padding: "0 32px" }}>
+          <div style={{ background: "linear-gradient(135deg,#0d1f14,#0d1827)", border: "1px solid #10b98120", borderRadius: 20, padding: "40px 40px 36px" }}>
+            <div style={{ textAlign: "center", marginBottom: 32 }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 10 }}>The Outcome</div>
+              <div style={{ fontSize: "clamp(18px,2.2vw,24px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.6 }}>How thehotspot grows your business</div>
             </div>
-            <span style={{ color: "#475569", fontSize: 12 }}>|</span>
-            <span style={{ fontSize: 12, color: "#64748B" }}>Ibra Digitals Branding Services LLC</span>
-            <span style={{ color: "#475569", fontSize: 12 }}>|</span>
-            <span style={{ fontSize: 12, color: "#64748B" }}>Singapore · UAE · UK · USA · India</span>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
+              {[
+                { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily so your pipeline never dries up — even when you're offline.", icon: <LuZap size={14} /> },
+                { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. The follow-up agent handles every sequence automatically.", icon: <LuCheck size={14} /> },
+                { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a blast. Higher reply rates, more conversions.", icon: <LuSparkles size={14} /> },
+                { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns and subject lines get the best response.", icon: <LuTrendingUp size={14} /> },
+              ].map((item, i) => (
+                <div key={i} style={{ display: "flex", gap: 14, alignItems: "flex-start" }}>
+                  <div style={{ width: 28, height: 28, borderRadius: 8, background: "#10b98120", border: "1px solid #10b98135", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0, marginTop: 1 }}>
+                    {item.icon}
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 4 }}>{item.point}</div>
+                    <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65 }}>{item.detail}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Final CTA ── */}
+        <div style={{ maxWidth: 600, margin: "0 auto 64px", padding: "0 32px", textAlign: "center" }}>
+          <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 12 }}>Ready to automate your outreach?</div>
+          <p style={{ fontSize: 14, color: "#64748B", marginBottom: 28 }}>Join businesses using AI to fill their pipeline on autopilot.</p>
+          <button onClick={() => setShowLogin(true)} style={{ padding: "14px 40px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 40px #10b98135" }}>
+            Start for Free
+          </button>
+        </div>
+
+        {/* ── Footer / company bar ── */}
+        <div style={{ borderTop: "1px solid #ffffff0d", padding: "20px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Logo size={20} />
+              <span style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8" }}>thehotspot</span>
+            </div>
+            <span style={{ color: "#334155", fontSize: 12 }}>·</span>
+            <span style={{ fontSize: 12, color: "#475569" }}>Ibra Digitals Branding Services LLC</span>
+            <span style={{ color: "#334155", fontSize: 12 }}>·</span>
+            <span style={{ fontSize: 12, color: "#475569" }}>Singapore · UAE · UK · USA · India</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-            <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy</a>
-            <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms</a>
-            <span style={{ fontSize: 12, color: "#475569" }}>&copy; 2026</span>
-            <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
-              Get Started
-            </button>
+            <a href="/privacy.html" style={{ fontSize: 12, color: "#475569", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#475569"}>Privacy</a>
+            <a href="/terms.html" style={{ fontSize: 12, color: "#475569", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#475569"}>Terms</a>
+            <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026</span>
           </div>
         </div>
       </div>
@@ -516,14 +551,14 @@ function LoginPage({ onLogin }) {
         @keyframes fadeIn { from{opacity:0} to{opacity:1} }
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         *{box-sizing:border-box;margin:0;padding:0}
-        input::placeholder{color:#CBD5E1}
-        .lp-root { height:100vh; overflow:hidden; }
-        .lp-body { flex:1; min-height:0; }
-        .lp-body::-webkit-scrollbar{width:4px} .lp-body::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:3px}
+        input::placeholder{color:#475569}
+        .lp-root { min-height:100vh; }
+        .lp-body::-webkit-scrollbar{width:4px} .lp-body::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
         @media (max-width:700px) {
-          .lp-root { height:auto; overflow-y:auto; }
-          .lp-body { min-height:auto; }
-          .lp-hero { padding:28px 20px 32px !important; }
+          .lp-hero { padding:48px 20px 40px !important; }
+        }
+        @media (max-width:600px) {
+          .lp-feat-grid { grid-template-columns:1fr !important; }
         }
       `}</style>
     </div>
