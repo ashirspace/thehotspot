@@ -487,27 +487,27 @@ function LoginPage({ onLogin }) {
 
           <div style={{ fontSize: 11, color: "#94A3B8", textAlign: "center" }}>&copy; 2026 thehotspot · <a href="/privacy.html" style={{ color: "#64748B", textDecoration: "none" }}>Privacy</a> · <a href="/terms.html" style={{ color: "#64748B", textDecoration: "none" }}>Terms</a></div>
         </div>
-      </div>
 
-      {/* ── Bottom company bar ── */}
-      <div style={{ background: "#0F172A", borderTop: "1px solid #1e293b", padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 1, position: "relative" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <Logo size={22} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>thehotspot</span>
+        {/* ── Bottom company bar (scrolls into view) ── */}
+        <div style={{ background: "#0F172A", borderTop: "1px solid #1e293b", padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Logo size={22} />
+              <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>thehotspot</span>
+            </div>
+            <span style={{ color: "#475569", fontSize: 12 }}>|</span>
+            <span style={{ fontSize: 12, color: "#64748B" }}>Ibra Digitals Branding Services LLC</span>
+            <span style={{ color: "#475569", fontSize: 12 }}>|</span>
+            <span style={{ fontSize: 12, color: "#64748B" }}>Singapore · UAE · UK · USA · India</span>
           </div>
-          <span style={{ color: "#475569", fontSize: 12 }}>|</span>
-          <span style={{ fontSize: 12, color: "#64748B" }}>Ibra Digitals Branding Services LLC</span>
-          <span style={{ color: "#475569", fontSize: 12 }}>|</span>
-          <span style={{ fontSize: 12, color: "#64748B" }}>Singapore · UAE · UK · USA · India</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-          <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy</a>
-          <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms</a>
-          <span style={{ fontSize: 12, color: "#475569" }}>&copy; 2026</span>
-          <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
-            Get Started
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy</a>
+            <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms</a>
+            <span style={{ fontSize: 12, color: "#475569" }}>&copy; 2026</span>
+            <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
+              Get Started
+            </button>
+          </div>
         </div>
       </div>
 
