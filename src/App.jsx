@@ -362,7 +362,7 @@ function LoginPage({ onLogin }) {
   );
 
   return (
-    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", display: "flex", flexDirection: "column", position: "relative", minHeight: "100vh" }}>
+    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", display: "flex", flexDirection: "column", position: "relative" }}>
 
       {/* Login modal */}
       {showLogin && <LoginModal />}
@@ -552,8 +552,12 @@ function LoginPage({ onLogin }) {
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         *{box-sizing:border-box;margin:0;padding:0}
         input::placeholder{color:#475569}
-        .lp-root { min-height:100vh; }
-        .lp-body::-webkit-scrollbar{width:4px} .lp-body::-webkit-scrollbar-thumb{background:#1e293b;border-radius:3px}
+        .lp-root { height:100vh; overflow:hidden; }
+        .lp-body { overflow-y:scroll; }
+        .lp-body::-webkit-scrollbar { width:7px; }
+        .lp-body::-webkit-scrollbar-track { background:#0d0d12; }
+        .lp-body::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
+        .lp-body::-webkit-scrollbar-thumb:hover { background:#475569; }
         @media (max-width:700px) {
           .lp-hero { padding:48px 20px 40px !important; }
         }
