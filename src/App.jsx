@@ -593,11 +593,16 @@ function LoginPage({ onLogin }) {
               {/* Services */}
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Services</div>
-                {["AI Automation", "Web Development", "AI Agents", "API Integration"].map(s => (
-                  <div key={s} style={{ fontSize: 13, color: "#64748B", marginBottom: 10, cursor: "pointer", transition: "color .15s" }}
+                {[
+                  ["AI Automation", "/ai-automation.html"],
+                  ["Web Development", "/web-development.html"],
+                  ["AI Agents", "/ai-agents.html"],
+                  ["API Integration", "/api-integration.html"],
+                ].map(([label, href]) => (
+                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
                     onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
                     onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
-                  >{s}</div>
+                  >{label}</a>
                 ))}
               </div>
 
