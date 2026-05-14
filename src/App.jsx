@@ -4580,74 +4580,70 @@ function Dashboard({ user, onLogout }) {
                 >Clear</button>
               </div>
 
-              {/* ── Messages ── */}
-              <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+              {/* ── Welcome cards — outside the message area ── */}
+              {messages.length === 1 && !loading && (
+                <div style={{ flex: 1, overflowY: "auto", padding: "20px 20px 0", display: "flex", flexDirection: "column", gap: 16, minHeight: 0 }}>
 
-                {/* Welcome screen — only when no conversation yet */}
-                {messages.length === 1 && !loading && (
-                  <div style={{ display: "flex", flexDirection: "column", height: "100%", gap: 20 }}>
-
-                    {/* Compact header */}
-                    <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-                      <div style={{ width: 52, height: 52, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 32px #10b98135, 0 0 56px #0ea5e918" }}>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#fff"/></svg>
-                      </div>
-                      <div>
-                        <div style={{ fontSize: 18, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>What can I help you with?</div>
-                        <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.5 }}>Send campaigns, find leads, check replies, or manage your pipeline.</div>
-                      </div>
+                  {/* Header */}
+                  <div style={{ display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+                    <div style={{ width: 46, height: 46, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 28px #10b98130" }}>
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#fff"/></svg>
                     </div>
-
-                    {/* Two columns of 3 cards each */}
-                    <div style={{ display: "flex", gap: 12, flex: 1 }}>
-
-                      {/* Left column */}
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-                        {[
-                          { icon: <LuMail size={22} />,   label: "Send Emails",     desc: "Blast a personalized AI campaign to your entire contact list or a specific category.",       cmd: "Send emails to all contacts",                 color: "#10b981" },
-                          { icon: <LuUsers size={22} />,  label: "Find Leads",      desc: "Discover new prospects in any industry or region and add them to your contacts instantly.",   cmd: "Find 10 affiliate networks in Dubai",          color: "#0ea5e9" },
-                          { icon: <LuRadio size={22} />,  label: "Campaign Status", desc: "Check what campaigns are running, how many emails were sent, and what's still in progress.",  cmd: "Campaign status",                             color: "#8b5cf6" },
-                        ].map(card => (
-                          <button key={card.cmd} onClick={() => handleSend(card.cmd)} style={{
-                            flex: 1, background: "#111116", border: "1px solid #ffffff08", borderRadius: 16, padding: "22px",
-                            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", display: "flex", flexDirection: "column",
-                          }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 28px ${card.color}14`; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
-                          >
-                            <div style={{ width: 48, height: 48, borderRadius: 13, background: `${card.color}18`, border: `1px solid ${card.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: card.color, marginBottom: 14 }}>{card.icon}</div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 7, letterSpacing: -0.2 }}>{card.label}</div>
-                            <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65, flex: 1 }}>{card.desc}</div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: card.color, marginTop: 14 }}>Try it <LuChevronRight size={12} /></div>
-                          </button>
-                        ))}
-                      </div>
-
-                      {/* Right column */}
-                      <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
-                        {[
-                          { icon: <LuChartBar size={22} />,      label: "View Stats",      desc: "See your outreach performance — total contacts, emails sent, success rates, and campaign history.", cmd: "Show my stats",                                color: "#f59e0b" },
-                          { icon: <LuClipboardList size={22} />, label: "Manage Contacts", desc: "Browse, add, or remove contacts. Filter by category — Network, CPS, CPL, CPA, or Mobile.",          cmd: "View contacts",                                color: "#f97316" },
-                          { icon: <LuSend size={22} />,          label: "Send Follow-ups", desc: "Automatically re-engage contacts who haven't replied. Sends a fresh angle to non-responders.",       cmd: "Send follow-ups to contacts from 3 days ago",  color: "#ec4899" },
-                        ].map(card => (
-                          <button key={card.cmd} onClick={() => handleSend(card.cmd)} style={{
-                            flex: 1, background: "#111116", border: "1px solid #ffffff08", borderRadius: 16, padding: "22px",
-                            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", display: "flex", flexDirection: "column",
-                          }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 28px ${card.color}14`; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
-                          >
-                            <div style={{ width: 48, height: 48, borderRadius: 13, background: `${card.color}18`, border: `1px solid ${card.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: card.color, marginBottom: 14 }}>{card.icon}</div>
-                            <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 7, letterSpacing: -0.2 }}>{card.label}</div>
-                            <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65, flex: 1 }}>{card.desc}</div>
-                            <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: card.color, marginTop: 14 }}>Try it <LuChevronRight size={12} /></div>
-                          </button>
-                        ))}
-                      </div>
-
+                    <div>
+                      <div style={{ fontSize: 17, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.4, marginBottom: 2 }}>What can I help you with?</div>
+                      <div style={{ fontSize: 12, color: "#475569" }}>Send campaigns, find leads, check replies, or manage your pipeline.</div>
                     </div>
                   </div>
-                )}
+
+                  {/* Two columns */}
+                  <div style={{ display: "flex", gap: 12, flex: 1, minHeight: 0 }}>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+                      {[
+                        { icon: <LuMail size={22} />,   label: "Send Emails",     desc: "Blast a personalized AI campaign to your entire contact list or a specific category.",      cmd: "Send emails to all contacts",                 color: "#10b981" },
+                        { icon: <LuUsers size={22} />,  label: "Find Leads",      desc: "Discover new prospects in any industry or region and add them to your contacts instantly.",  cmd: "Find 10 affiliate networks in Dubai",          color: "#0ea5e9" },
+                        { icon: <LuRadio size={22} />,  label: "Campaign Status", desc: "Check what campaigns are running, how many emails were sent, and what's still in progress.", cmd: "Campaign status",                             color: "#8b5cf6" },
+                      ].map(card => (
+                        <button key={card.cmd} onClick={() => handleSend(card.cmd)} style={{
+                          flex: 1, background: "#111116", border: "1px solid #ffffff08", borderRadius: 16, padding: "22px",
+                          cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", display: "flex", flexDirection: "column",
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 28px ${card.color}14`; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
+                        >
+                          <div style={{ width: 48, height: 48, borderRadius: 13, background: `${card.color}18`, border: `1px solid ${card.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: card.color, marginBottom: 14 }}>{card.icon}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 7, letterSpacing: -0.2 }}>{card.label}</div>
+                          <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65, flex: 1 }}>{card.desc}</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: card.color, marginTop: 14 }}>Try it <LuChevronRight size={12} /></div>
+                        </button>
+                      ))}
+                    </div>
+                    <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: 12 }}>
+                      {[
+                        { icon: <LuChartBar size={22} />,      label: "View Stats",      desc: "See your outreach performance — total contacts, emails sent, success rates, and campaign history.", cmd: "Show my stats",                                color: "#f59e0b" },
+                        { icon: <LuClipboardList size={22} />, label: "Manage Contacts", desc: "Browse, add, or remove contacts. Filter by category — Network, CPS, CPL, CPA, or Mobile.",          cmd: "View contacts",                                color: "#f97316" },
+                        { icon: <LuSend size={22} />,          label: "Send Follow-ups", desc: "Automatically re-engage contacts who haven't replied. Sends a fresh angle to non-responders.",       cmd: "Send follow-ups to contacts from 3 days ago",  color: "#ec4899" },
+                      ].map(card => (
+                        <button key={card.cmd} onClick={() => handleSend(card.cmd)} style={{
+                          flex: 1, background: "#111116", border: "1px solid #ffffff08", borderRadius: 16, padding: "22px",
+                          cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", display: "flex", flexDirection: "column",
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 28px ${card.color}14`; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
+                        >
+                          <div style={{ width: 48, height: 48, borderRadius: 13, background: `${card.color}18`, border: `1px solid ${card.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: card.color, marginBottom: 14 }}>{card.icon}</div>
+                          <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 7, letterSpacing: -0.2 }}>{card.label}</div>
+                          <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.65, flex: 1 }}>{card.desc}</div>
+                          <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: card.color, marginTop: 14 }}>Try it <LuChevronRight size={12} /></div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Messages — shown once conversation starts ── */}
+              {(messages.length > 1 || loading) && (
+              <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
 
                 {/* Message bubbles */}
                 {messages.map((m, i) => (
@@ -4685,6 +4681,7 @@ function Dashboard({ user, onLogout }) {
 
                 <div ref={chatEnd} />
               </div>
+              )}
 
               {/* ── Input ── */}
               <div style={{ padding: "14px 20px 16px", borderTop: "1px solid #ffffff08", background: "#111116", flexShrink: 0 }}>
