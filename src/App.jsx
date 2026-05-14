@@ -215,13 +215,10 @@ function LoginPage({ onLogin }) {
       if (existing.length > 0) { setError("Username already taken"); setLoading(false); return; }
 
       // Create new user
-      const created = await airtableCreate({
-        username, user_email: email, password, method: "password", role: "user",
-        created_at: new Date().toISOString().split("T")[0],
-      });
+      const created = await airtableCreate({ username, user_email: email, password });
       const newRecordId = created?.records?.[0]?.id || "";
 
-      const userData = { username, email, method: "password", role: "user", airtableId: newRecordId, profileComplete: false };
+      const userData = { username, email, airtableId: newRecordId, profileComplete: false };
       localStorage.setItem("thehotspot_user", JSON.stringify(userData));
       onLogin(userData);
     } catch (err) {
@@ -278,10 +275,7 @@ function LoginPage({ onLogin }) {
           const existing = await airtableFetch(`{user_email}='${gEmail}'`);
           let airtableId = existing[0]?.id || "";
           if (existing.length === 0) {
-            const created = await airtableCreate({
-              username: gName, user_email: gEmail, password: "", method: "google", role: "user",
-              created_at: new Date().toISOString().split("T")[0],
-            });
+            const created = await airtableCreate({ username: gName, user_email: gEmail, password: "" });
             airtableId = created?.records?.[0]?.id || "";
           }
 
@@ -1677,7 +1671,7 @@ function OnboardingModal({ user, onComplete }) {
       company:          updated.company,
       phone:            updated.phone,
       role_title:       updated.role_title,
-      website:          updated.website,
+      website:          updated.website || "",
       profile_complete: true,
     });
     setSaving(false);
