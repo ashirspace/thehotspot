@@ -2798,14 +2798,15 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
       </Card>
 
       <Card title="Integrations">
-        <Row label="Gmail" sub="Used to send outreach emails">
-          <button onClick={connectGmail} style={{
-            padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none",
-            background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
-            color: gmailConnected ? "#059669" : "#ea580c",
-          }}>
-            {gmailConnected ? <><LuCheck size={12} /> Connected</> : "Connect"}
-          </button>
+        <Row label="Gmail" sub={gmailConnected ? (user?.email || "Connected via Google") : "Used to send outreach emails"}>
+          {gmailConnected
+            ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#0a2a1a", color: "#10b981", border: "1px solid #10b98133" }}>
+                <LuCheck size={12} /> Connected
+              </span>
+            : <button onClick={connectGmail} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none", background: "#FFF7ED", color: "#ea580c" }}>
+                Connect
+              </button>
+          }
         </Row>
         <Row label="Airtable" sub="Contact & campaign database">
           <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>Via env vars</span>
