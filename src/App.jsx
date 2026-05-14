@@ -4374,17 +4374,9 @@ function Dashboard({ user, onLogout }) {
           <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", width: "100%", position: "relative" }}>
             {/* Page transition loader */}
             {pageLoading && (
-              <div style={{ position: "absolute", inset: 0, background: "rgba(9,9,13,0.35)", backdropFilter: "blur(6px)", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 14 }}>
-                <svg width="52" height="52" viewBox="0 0 52 52" style={{ transform: "rotate(-90deg)" }}>
-                  <circle cx="26" cy="26" r="22" stroke="#ffffff0d" strokeWidth="3" fill="none" />
-                  <circle cx="26" cy="26" r="22" stroke="#10b981" strokeWidth="3" fill="none"
-                    strokeLinecap="round"
-                    strokeDasharray={`${2 * Math.PI * 22}`}
-                    strokeDashoffset={`${2 * Math.PI * 22}`}
-                    style={{ animation: "drawCircle 1s ease-in-out forwards" }}
-                  />
-                </svg>
-                <div style={{ fontSize: 12, color: "#64748B", fontWeight: 500, letterSpacing: 0.5 }}>Loading…</div>
+              <div style={{ position: "fixed", inset: 0, background: "#09090d", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, animation: "fadeIn .15s ease" }}>
+                <img src="/logo.png" alt="thehotspot" style={{ width: 72, height: 72, objectFit: "contain", animation: "splashFloat 1.4s ease-in-out infinite alternate" }} />
+                <div style={{ color: "#ffffff", fontFamily: "'DM Sans',sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.85, animation: "splashFadeIn 0.6s ease forwards" }}>thehotspot</div>
               </div>
             )}
             <div style={{ maxWidth: 960, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
@@ -4512,7 +4504,8 @@ function Dashboard({ user, onLogout }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
-        @keyframes drawCircle { from{stroke-dashoffset:138.23} to{stroke-dashoffset:0} }
+        @keyframes splashFloat { from{transform:translateY(0px) scale(1);opacity:0.8} to{transform:translateY(-8px) scale(1.06);opacity:1} }
+        @keyframes splashFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:0.85;transform:translateY(0)} }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
         ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
