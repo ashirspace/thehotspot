@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const {
-    company, contactName, category, website, offerContext,
+    company, contactName, email, category, website, offerContext,
     senderName, senderCompany, senderRole, valueProp,
     maxChars,
   } = req.body;
@@ -15,11 +15,24 @@ export default async function handler(req, res) {
   const senderCo    = senderCompany || "Ibra Digitals Branding Services LLC";
   const senderTitle = senderRole    || "";
 
-  // Use person name if it's different from company name, otherwise "there"
+  // Generic role prefixes that are NOT person names
+  const GENERIC = new Set(["info","contact","hello","hi","support","admin","team","partnerships","partner","affiliate","affiliates","marketing","sales","press","media","business","office","mail","help","noreply","no-reply","enquiries","enquiry","general","webmaster"]);
+
+  const nameFromEmail = (addr) => {
+    if (!addr || !addr.includes("@")) return "";
+    const local = addr.split("@")[0].toLowerCase().replace(/[._\-+]/g, " ").trim();
+    const words = local.split(" ").filter(Boolean);
+    if (!words.length || GENERIC.has(words[0])) return "";
+    return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+  };
+
+  // Priority: explicit contactName → email local part → "there"
   const rawName = (contactName || "").trim();
-  const greeting = rawName && rawName.toLowerCase() !== (company || "").toLowerCase()
-    ? rawName.split(" ")[0]
-    : "there";
+  const emailName = nameFromEmail(email);
+  const resolvedName = (rawName && rawName.toLowerCase() !== (company || "").toLowerCase())
+    ? rawName
+    : emailName;
+  const greeting = resolvedName ? resolvedName.split(" ")[0] : "there";
   const charLimit   = Math.min(Math.max(parseInt(maxChars) || 560, 100), 1200);
   // Map char limits to line targets for the prompt
   const lineTarget  = charLimit <= 400 ? "4–6 lines" : charLimit <= 650 ? "6–8 lines" : "10–12 lines";

@@ -2905,6 +2905,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
           body: JSON.stringify({
             company: contact.company || "the company",
             contactName: contact.name || "",
+            email: contact.email || "",
             category: contact.category,
             website: contact.website || "",
             offerContext,
@@ -3695,6 +3696,7 @@ function Dashboard({ user, onLogout }) {
       body: JSON.stringify({
         company: contact.company_name || contact.company || "the company",
         contactName: contact.name || "",
+        email: contact.email || "",
         category: contact.category || "Network",
         website: contact.website || "",
         offerContext,
