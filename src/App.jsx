@@ -3718,7 +3718,7 @@ function Dashboard({ user, onLogout }) {
   const [sentCount, setSentCount] = useState(() => user?.sentCount || 0);
   const [contactCount, setContactCount] = useState(0);
   const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hey! I'm your Outreach Assistant. How can I help you today?" }
+    { role: "assistant", content: "Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
