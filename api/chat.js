@@ -119,7 +119,19 @@ CONTACT CATEGORIES:
 - CPA: Cost-per-action partners (payment per specific user action)
 - Mobile: Mobile app marketing and advertising partners
 
-TOOLS: Use tools proactively. If someone asks to find leads — use find_leads. If they want to send emails — use send_emails. Don't just describe what you'd do, DO it.
+CRITICAL TOOL RULES — FOLLOW THESE EXACTLY:
+
+1. FIND_LEADS: Whenever the user mentions finding, searching, discovering, or listing any companies, startups, businesses, brands, agencies, networks, or prospects — ALWAYS call find_leads immediately. NEVER say "I can't provide real-time data." NEVER say "I don't have access to current information." The find_leads tool does the live search. You just call it. Examples that MUST trigger find_leads:
+   - "find me 10 fintech startups in Dubai" → find_leads({industry:"fintech startups", geo:"Dubai", count:10})
+   - "search for affiliate networks in the UK" → find_leads({industry:"affiliate networks", geo:"UK"})
+   - "give me 5 e-commerce brands" → find_leads({industry:"e-commerce brands", count:5})
+   - "find leads" → find_leads({industry:"affiliate marketing"})
+
+2. SEND_EMAILS: Whenever the user wants to send, blast, or reach out via email → call send_emails immediately.
+
+3. SCHEDULE_EMAILS: Whenever the user mentions scheduling a campaign for a future time → call schedule_emails.
+
+4. NEVER decline to use a tool. If the request is even slightly related to finding companies or sending emails, use the tool. Your job is to act, not to explain limitations.
 
 EMAIL LENGTH DETECTION:
 - "short" / "brief" / "chhota" → maxChars: 200
@@ -288,6 +300,34 @@ export default async function handler(req, res) {
       action: "none",
       params: {},
     });
+  }
+
+  // Detect lead-finding requests and handle them directly — don't let Claude refuse.
+  const lastUserMsg = valid.filter(m => m.role === "user").slice(-1)[0]?.content || "";
+  const lastLower = lastUserMsg.toLowerCase();
+  const LEAD_TRIGGERS = ["find", "search", "discover", "get me", "show me", "give me", "look for", "fetch", "locate", "dhundo", "list"];
+  const LEAD_TARGETS = ["startup", "startups", "company", "companies", "brand", "brands", "agency", "agencies", "network", "networks", "lead", "leads", "prospect", "prospects", "business", "businesses", "firm", "firms", "client", "clients"];
+  const isLeadRequest = LEAD_TRIGGERS.some(k => lastLower.includes(k)) && LEAD_TARGETS.some(k => lastLower.includes(k));
+
+  if (isLeadRequest) {
+    // Parse query directly — no Claude involved, guaranteed to execute
+    const geoMatch = lastLower.match(/\bin\s+([\w\s]+?)(?:\s+(?:and|or|for|from)|$)/i);
+    const countMatch = lastLower.match(/\b(\d+)\b/);
+    const geo = geoMatch?.[1]?.trim() || "";
+    const count = countMatch ? Math.min(parseInt(countMatch[1]), 20) : 10;
+    // Strip action words and geo to get industry
+    const industry = lastUserMsg
+      .replace(/find\s*me?|search\s*(for)?|get\s*me|show\s*me|give\s*me|look\s*for|fetch|locate|dhundo|list/gi, "")
+      .replace(/\b\d+\b/g, "")
+      .replace(/\bin\s+([\w\s]+?)(?:\s+(?:and|or|for|from)|$)/gi, "")
+      .replace(/\b(startup|startups|company|companies|brand|brands|agency|agencies|network|networks|lead|leads|prospect|prospects|business|businesses|firm|firms|client|clients)\b/gi, "")
+      .trim() || "businesses";
+
+    const leads = await findLeads({ industry, geo, count, category: "Network" });
+    const summary = leads.length > 0
+      ? `Found **${leads.length} leads** for "${industry}"${geo ? ` in ${geo}` : ""}. Adding them to your contacts now.`
+      : `Couldn't find leads for "${industry}"${geo ? ` in ${geo}` : ""} — try a different search.`;
+    return res.status(200).json({ message: summary, action: "find_leads", params: { leads, category: "Network" } });
   }
 
   try {

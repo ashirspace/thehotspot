@@ -3654,8 +3654,38 @@ function Dashboard({ user, onLogout }) {
         </div>
       </div>
 
-      {/* ═══════ MAIN CONTENT ═══════ */}
-      <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+      {/* ═══════ BODY: SIDEBAR + CONTENT ═══════ */}
+      <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
+
+        {/* LEFT SIDEBAR */}
+        <div style={{ width: 210, background: "#FFFFFF", borderRight: "1px solid #E2E8F0", display: "flex", flexDirection: "column", flexShrink: 0, padding: "8px 0" }}>
+          {[
+            { id: "dashboard",      label: "Dashboard",       icon: "🏠" },
+            { id: "totalContacts",  label: "Total Contacts",  icon: "👥" },
+            { id: "emailTemplates", label: "Email Templates", icon: "✍️" },
+            { id: "contacts",       label: "Contacts DB",     icon: "📋" },
+            { id: "profile",        label: "Settings",        icon: "⚙️" },
+          ].map(item => (
+            <button key={item.id} onClick={() => setPage(item.id)} style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "10px 14px", margin: "2px 8px", borderRadius: 10,
+              background: page === item.id ? "#EEF2FF" : "transparent",
+              color: page === item.id ? "#4F46E5" : "#64748B",
+              fontWeight: page === item.id ? 600 : 400,
+              border: "none", cursor: "pointer", textAlign: "left",
+              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+            }}
+              onMouseEnter={e => { if (page !== item.id) e.currentTarget.style.background = "#F8FAFC"; }}
+              onMouseLeave={e => { if (page !== item.id) e.currentTarget.style.background = "transparent"; }}
+            >
+              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              {item.label}
+            </button>
+          ))}
+        </div>
+
+        {/* RIGHT PANEL */}
+        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
         {/* CHAT VIEW */}
         {page === null && (
@@ -3799,7 +3829,8 @@ function Dashboard({ user, onLogout }) {
             </div>
           </div>
         )}
-      </div>
+        </div>{/* end right panel */}
+      </div>{/* end body */}
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
