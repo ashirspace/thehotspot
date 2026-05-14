@@ -39,12 +39,20 @@ async function airtableCreate(fields) {
 }
 
 async function airtableUpdateUser(recordId, fields) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !recordId) return;
-  await fetch(`${AIRTABLE_URL}/${recordId}`, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ fields }),
-  });
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) { console.warn("[Airtable] Missing API key or base ID"); return; }
+  if (!recordId) { console.warn("[Airtable] No record ID — cannot update user"); return; }
+  try {
+    const res = await fetch(`${AIRTABLE_URL}/${recordId}`, {
+      method: "PATCH",
+      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ fields }),
+    });
+    const data = await res.json();
+    if (!res.ok) console.error("[Airtable] Update failed:", data);
+    else console.log("[Airtable] User profile updated:", data.id);
+  } catch (err) {
+    console.error("[Airtable] Update error:", err);
+  }
 }
 
 // Fetch all contacts from Airtable (with pagination)
@@ -1643,7 +1651,8 @@ function OnboardingModal({ user, onComplete }) {
       profileComplete: true,
     };
     localStorage.setItem("thehotspot_user", JSON.stringify(updated));
-    airtableUpdateUser(user?.airtableId, {
+    console.log("[Onboarding] Saving to Airtable, recordId:", user?.airtableId);
+    await airtableUpdateUser(user?.airtableId, {
       full_name:        updated.name,
       username:         updated.username,
       user_email:       updated.email,
