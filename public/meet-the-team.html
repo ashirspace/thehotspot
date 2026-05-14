@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Meet the Team — thehotspot</title>
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #09090d;
+      color: #c0c0d0;
+      line-height: 1.75;
+      min-height: 100vh;
+    }
+    a { color: #0ea5e9; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    header {
+      border-bottom: 1px solid #1a1a24;
+      padding: 18px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: sticky;
+      top: 0;
+      background: #09090d;
+      z-index: 100;
+    }
+    .logo { display: flex; align-items: center; flex-shrink: 0; }
+    .brand { font-size: 17px; font-weight: 700; color: #f0f0f5; }
+    .back {
+      margin-left: auto;
+      font-size: 13px; color: #6b6b80;
+      border: 1px solid #2a2a3a; border-radius: 8px;
+      padding: 6px 14px; cursor: pointer; transition: border-color .2s;
+    }
+    .back:hover { border-color: #0ea5e9; color: #0ea5e9; text-decoration: none; }
+
+    main {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 72px 40px 100px;
+    }
+
+    /* Hero */
+    .hero { text-align: center; margin-bottom: 80px; }
+    .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: #0a1a2a;
+      color: #0ea5e9;
+      font-size: 11px; font-weight: 600; letter-spacing: .8px;
+      text-transform: uppercase;
+      padding: 5px 14px; border-radius: 20px;
+      border: 1px solid #0ea5e933;
+      margin-bottom: 22px;
+    }
+    .hero h1 {
+      font-size: clamp(32px, 4.5vw, 58px);
+      font-weight: 700;
+      color: #f0f0f5;
+      letter-spacing: -2px;
+      margin-bottom: 18px;
+      line-height: 1.1;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 50%, #7dd3fc 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 17px; color: #8080a0; max-width: 600px;
+      margin: 0 auto 36px;
+    }
+    .hero-stats {
+      display: flex; justify-content: center; gap: 48px; flex-wrap: wrap;
+    }
+    .hero-stat { text-align: center; }
+    .hero-stat .num { font-size: 28px; font-weight: 700; color: #0ea5e9; }
+    .hero-stat .lbl { font-size: 12px; color: #6b6b80; margin-top: 2px; }
+
+    /* Agent cards */
+    .agents-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 96px;
+    }
+    @media (max-width: 760px) { .agents-grid { grid-template-columns: 1fr; } }
+
+    .agent-card {
+      background: #111116;
+      border: 1px solid #1e1e28;
+      border-radius: 16px;
+      padding: 32px;
+      transition: border-color .2s, transform .2s;
+    }
+    .agent-card:hover { border-color: #0ea5e966; transform: translateY(-2px); }
+    .agent-card.wide { grid-column: 1 / -1; }
+
+    .agent-header {
+      display: flex; align-items: flex-start; gap: 18px;
+      margin-bottom: 20px;
+    }
+    .agent-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .agent-info h2 { font-size: 20px; font-weight: 700; color: #e0e0f0; margin-bottom: 4px; }
+    .agent-info .role { font-size: 12px; font-weight: 600; letter-spacing: .6px; text-transform: uppercase; }
+
+    .agent-desc { font-size: 14px; color: #8080a0; margin-bottom: 22px; line-height: 1.65; }
+
+    .cap-list { list-style: none; margin-bottom: 22px; }
+    .cap-list li {
+      font-size: 14px; color: #a0a0b8;
+      padding: 7px 0;
+      border-bottom: 1px solid #1a1a24;
+      display: flex; align-items: flex-start; gap: 10px;
+    }
+    .cap-list li:last-child { border-bottom: none; }
+    .cap-list li svg { flex-shrink: 0; margin-top: 2px; }
+
+    .tech-pills { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tech-pill {
+      font-size: 11px; font-weight: 600; letter-spacing: .3px;
+      padding: 3px 10px; border-radius: 20px;
+      border: 1px solid;
+    }
+
+    /* How they work together */
+    .collab-section { margin-bottom: 96px; }
+    .section-label {
+      font-size: 11px; font-weight: 600; letter-spacing: .8px;
+      text-transform: uppercase; color: #0ea5e9;
+      margin-bottom: 12px;
+    }
+    .section-title { font-size: clamp(22px, 3vw, 36px); font-weight: 700; color: #e0e0f0; letter-spacing: -1px; margin-bottom: 12px; }
+    .section-sub { font-size: 15px; color: #7070a0; max-width: 560px; margin-bottom: 48px; }
+
+    .flow-steps {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      position: relative;
+    }
+    @media (max-width: 900px) { .flow-steps { grid-template-columns: 1fr 1fr; gap: 20px; } }
+
+    .flow-step {
+      display: flex; flex-direction: column; align-items: center; text-align: center;
+      position: relative;
+      padding: 0 8px;
+    }
+    .flow-step:not(:last-child)::after {
+      content: "";
+      position: absolute;
+      top: 26px;
+      right: -24px;
+      width: 48px; height: 1px;
+      background: linear-gradient(90deg, #1e1e28, #0ea5e940, #1e1e28);
+    }
+    @media (max-width: 900px) { .flow-step::after { display: none; } }
+
+    .flow-dot {
+      width: 52px; height: 52px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      flex-shrink: 0;
+    }
+    .flow-step h3 { font-size: 13px; font-weight: 700; color: #d0d0e0; margin-bottom: 6px; }
+    .flow-step p { font-size: 12px; color: #60607a; line-height: 1.55; }
+
+    /* Specs comparison */
+    .specs-section { margin-bottom: 96px; }
+    .specs-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+    }
+    @media (max-width: 760px) { .specs-grid { grid-template-columns: 1fr; } }
+
+    .spec-card {
+      background: #111116; border: 1px solid #1e1e28;
+      border-radius: 14px; padding: 26px;
+    }
+    .spec-card h3 { font-size: 14px; font-weight: 700; color: #e0e0f0; margin-bottom: 16px; }
+    .spec-row {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 0; border-bottom: 1px solid #1a1a24;
+      font-size: 13px;
+    }
+    .spec-row:last-child { border-bottom: none; }
+    .spec-row .sk { color: #6b6b80; }
+    .spec-row .sv { color: #e0e0f0; font-weight: 600; }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, #0a1a2a 0%, #111116 100%);
+      border: 1px solid #0ea5e933;
+      border-radius: 20px;
+      padding: 56px;
+      text-align: center;
+    }
+    .cta-box h2 { font-size: clamp(22px, 3vw, 34px); font-weight: 700; color: #f0f0f5; letter-spacing: -1px; margin-bottom: 12px; }
+    .cta-box p { font-size: 15px; color: #7070a0; max-width: 480px; margin: 0 auto 32px; }
+    .cta-btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: #0ea5e9; color: #fff;
+      font-size: 15px; font-weight: 700;
+      padding: 14px 32px; border-radius: 12px;
+      text-decoration: none; transition: opacity .2s, transform .2s;
+    }
+    .cta-btn:hover { opacity: .88; transform: translateY(-1px); text-decoration: none; }
+
+    footer {
+      border-top: 1px solid #1a1a24;
+      padding: 28px 24px;
+      text-align: center;
+      font-size: 12px;
+      color: #4a4a5a;
+    }
+    footer a { color: #6b6b80; }
+    footer a:hover { color: #0ea5e9; }
+  </style>
+</head>
+<body>
+
+  <!-- Splash -->
+  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
+    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
+    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+  </div>
+  <style>
+    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
+    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
+  </style>
+  <script>
+    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
+    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
+  </script>
+
+  <!-- Scroll reveal -->
+  <style>
+    .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.65s ease, transform 0.65s ease; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+  </style>
+  <script>
+    document.addEventListener('DOMContentLoaded', function(){
+      var els = document.querySelectorAll('.reveal');
+      var obs = new IntersectionObserver(function(entries){
+        entries.forEach(function(e){
+          if(e.isIntersecting){ e.target.classList.add('visible'); obs.unobserve(e.target); }
+        });
+      }, { threshold: 0.1 });
+      els.forEach(function(el){ obs.observe(el); });
+    });
+  </script>
+
+<header>
+  <div class="logo"><img src="/logo.png" width="28" height="28" alt="thehotspot logo" style="object-fit:contain;" /></div>
+  <span class="brand">thehotspot</span>
+  <a href="/" class="back">← Back to app</a>
+</header>
+
+<main>
+
+  <!-- Hero -->
+  <div class="hero reveal">
+    <div class="tag">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg>
+      Meet the Team
+    </div>
+    <h1>Five AI agents.<br/><span>Working while you sleep.</span></h1>
+    <p>Each agent handles a specialized piece of the outreach pipeline — so nothing slips through the cracks and every contact gets the right message at the right time.</p>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="num">5</div><div class="lbl">Specialized agents</div></div>
+      <div class="hero-stat"><div class="num">24/7</div><div class="lbl">Always running</div></div>
+      <div class="hero-stat"><div class="num">0</div><div class="lbl">Manual follow-ups needed</div></div>
+    </div>
+  </div>
+
+  <!-- Agent Cards -->
+  <div class="agents-grid">
+
+    <!-- Lead Agent -->
+    <div class="agent-card reveal" style="--delay:0.05s; transition-delay: var(--delay);">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:#0a1a2a; border:1px solid #0ea5e933;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <div class="agent-info">
+          <h2>Lead Scout</h2>
+          <div class="role" style="color:#0ea5e9;">Discovery Agent</div>
+        </div>
+      </div>
+      <p class="agent-desc">Combs the web and your connected data sources to surface qualified leads that match your ideal customer profile. No manual hunting, no stale lists.</p>
+      <ul class="cap-list">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Scrapes websites, directories, and social profiles</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Filters by category, region, and engagement signals</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Deduplicates against your existing contact database</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Enriches leads with company size, website, and contact info</li>
+      </ul>
+      <div class="tech-pills">
+        <span class="tech-pill" style="color:#0ea5e9;border-color:#0ea5e933;background:#0a1a2a;">Web Scraping</span>
+        <span class="tech-pill" style="color:#0ea5e9;border-color:#0ea5e933;background:#0a1a2a;">Data Enrichment</span>
+        <span class="tech-pill" style="color:#0ea5e9;border-color:#0ea5e933;background:#0a1a2a;">Deduplication</span>
+      </div>
+    </div>
+
+    <!-- Email Writer Agent -->
+    <div class="agent-card reveal" style="transition-delay: 0.13s;">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:#0a2a1a; border:1px solid #10b98133;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <div class="agent-info">
+          <h2>Email Writer</h2>
+          <div class="role" style="color:#10b981;">Copywriting Agent</div>
+        </div>
+      </div>
+      <p class="agent-desc">Crafts personalized cold emails for every contact based on their industry, website, and what your service can do for them — never generic, always on-brand.</p>
+      <ul class="cap-list">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Reads contact category and tailors the angle accordingly</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Generates subject lines optimized for open rates</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Uses your tone, voice, and proven templates</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Queues drafts for review before sending</li>
+      </ul>
+      <div class="tech-pills">
+        <span class="tech-pill" style="color:#10b981;border-color:#10b98133;background:#0a2a1a;">Personalization</span>
+        <span class="tech-pill" style="color:#10b981;border-color:#10b98133;background:#0a2a1a;">Template Engine</span>
+        <span class="tech-pill" style="color:#10b981;border-color:#10b98133;background:#0a2a1a;">A/B Testing</span>
+      </div>
+    </div>
+
+    <!-- Outreach Agent -->
+    <div class="agent-card reveal" style="transition-delay: 0.21s;">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:#1a0a2a; border:1px solid #8b5cf633;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <div class="agent-info">
+          <h2>Outreach Sender</h2>
+          <div class="role" style="color:#8b5cf6;">Delivery Agent</div>
+        </div>
+      </div>
+      <p class="agent-desc">Sends emails through Gmail on your behalf, respecting daily send limits and timing windows to maximize deliverability and avoid spam filters.</p>
+      <ul class="cap-list">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Sends via your actual Gmail account (not a third-party domain)</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Paces sends to stay within Gmail API limits</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Randomizes send times to mimic human behavior</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Logs every sent email to your contact's history</li>
+      </ul>
+      <div class="tech-pills">
+        <span class="tech-pill" style="color:#8b5cf6;border-color:#8b5cf633;background:#1a0a2a;">Gmail API</span>
+        <span class="tech-pill" style="color:#8b5cf6;border-color:#8b5cf633;background:#1a0a2a;">Rate Limiting</span>
+        <span class="tech-pill" style="color:#8b5cf6;border-color:#8b5cf633;background:#1a0a2a;">Send Scheduling</span>
+      </div>
+    </div>
+
+    <!-- Follow-up Agent -->
+    <div class="agent-card reveal" style="transition-delay: 0.29s;">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:#1a1400; border:1px solid #eab30833;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="agent-info">
+          <h2>Follow-up Keeper</h2>
+          <div class="role" style="color:#eab308;">Persistence Agent</div>
+        </div>
+      </div>
+      <p class="agent-desc">Automatically sends timed follow-up messages to contacts who haven't replied, then marks contacts as closed or escalates them based on response patterns.</p>
+      <ul class="cap-list">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Configurable follow-up delays (3 days, 7 days, 14 days)</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Stops automatically if a reply is detected</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Each follow-up has a distinct angle — not the same email twice</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Updates contact status to Followed Up / Closed automatically</li>
+      </ul>
+      <div class="tech-pills">
+        <span class="tech-pill" style="color:#eab308;border-color:#eab30833;background:#1a1400;">Drip Sequences</span>
+        <span class="tech-pill" style="color:#eab308;border-color:#eab30833;background:#1a1400;">Reply Detection</span>
+        <span class="tech-pill" style="color:#eab308;border-color:#eab30833;background:#1a1400;">Auto-close</span>
+      </div>
+    </div>
+
+    <!-- Analytics Agent — wide card -->
+    <div class="agent-card wide reveal" style="transition-delay: 0.37s;">
+      <div class="agent-header">
+        <div class="agent-icon" style="background:#1a0a0a; border:1px solid #f4373733;">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <div class="agent-info">
+          <h2>Analytics Tracker</h2>
+          <div class="role" style="color:#f43737;">Insights Agent</div>
+        </div>
+      </div>
+      <p class="agent-desc">Aggregates all outreach data into a live dashboard — tracks emails sent, reply rates by category, conversion trends over time, and surfaces which campaigns are working so you can double down on them.</p>
+      <ul class="cap-list" style="display:grid;grid-template-columns:1fr 1fr;gap:0 32px;">
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Daily, weekly, and monthly send summaries</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Reply rate by category and subject line</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Tracks which follow-up sequence performs best</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Spots patterns in successful deals</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Flags contacts that bounced or unsubscribed</li>
+        <li><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Exports reports in CSV or Google Sheets</li>
+      </ul>
+      <div class="tech-pills">
+        <span class="tech-pill" style="color:#f43737;border-color:#f4373733;background:#1a0a0a;">Live Dashboard</span>
+        <span class="tech-pill" style="color:#f43737;border-color:#f4373733;background:#1a0a0a;">Trend Detection</span>
+        <span class="tech-pill" style="color:#f43737;border-color:#f4373733;background:#1a0a0a;">CSV Export</span>
+        <span class="tech-pill" style="color:#f43737;border-color:#f4373733;background:#1a0a0a;">Google Sheets Sync</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- How they work together -->
+  <div class="collab-section reveal">
+    <div class="section-label">Coordination</div>
+    <h2 class="section-title">How the agents hand off to each other</h2>
+    <p class="section-sub">Every step in the pipeline is owned by one agent. When it finishes, it passes the baton — no gaps, no duplicated work.</p>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="flow-dot" style="background:#0a1a2a;border:1px solid #0ea5e944;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        </div>
+        <h3>Lead Scout<br/>finds contacts</h3>
+        <p>Discovers and enriches new leads matching your ICP</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot" style="background:#0a2a1a;border:1px solid #10b98144;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+        <h3>Email Writer<br/>drafts message</h3>
+        <p>Writes a personalized email for each new contact</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot" style="background:#1a0a2a;border:1px solid #8b5cf644;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+        <h3>Outreach Sender<br/>delivers it</h3>
+        <p>Sends through Gmail at the optimal time</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot" style="background:#1a1400;border:1px solid #eab30844;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#eab308" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <h3>Follow-up Keeper<br/>stays on it</h3>
+        <p>Sends timed follow-ups until a reply or close</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-dot" style="background:#1a0a0a;border:1px solid #f4373744;">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f43737" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        <h3>Analytics Tracker<br/>measures all of it</h3>
+        <p>Records outcomes and surfaces what's working</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Specs -->
+  <div class="specs-section reveal">
+    <div class="section-label">Performance</div>
+    <h2 class="section-title">Agent specs at a glance</h2>
+    <p class="section-sub">Built to run reliably at scale — not just impressive demos.</p>
+
+    <div class="specs-grid">
+      <div class="spec-card">
+        <h3 style="color:#0ea5e9;">Lead Scout</h3>
+        <div class="spec-row"><span class="sk">Leads / day</span><span class="sv">50–200</span></div>
+        <div class="spec-row"><span class="sk">Sources</span><span class="sv">Web + APIs</span></div>
+        <div class="spec-row"><span class="sk">Dedup</span><span class="sv">Auto</span></div>
+        <div class="spec-row"><span class="sk">Output</span><span class="sv">Enriched contact</span></div>
+      </div>
+      <div class="spec-card">
+        <h3 style="color:#10b981;">Email Writer</h3>
+        <div class="spec-row"><span class="sk">Emails / batch</span><span class="sv">Up to 500</span></div>
+        <div class="spec-row"><span class="sk">Personalization</span><span class="sv">Per-category</span></div>
+        <div class="spec-row"><span class="sk">Templates</span><span class="sv">Custom + default</span></div>
+        <div class="spec-row"><span class="sk">Review mode</span><span class="sv">Draft queue</span></div>
+      </div>
+      <div class="spec-card">
+        <h3 style="color:#8b5cf6;">Outreach Sender</h3>
+        <div class="spec-row"><span class="sk">Sends / day</span><span class="sv">Up to 500</span></div>
+        <div class="spec-row"><span class="sk">Provider</span><span class="sv">Gmail (OAuth)</span></div>
+        <div class="spec-row"><span class="sk">Throttling</span><span class="sv">Auto rate limit</span></div>
+        <div class="spec-row"><span class="sk">Logging</span><span class="sv">Full history</span></div>
+      </div>
+      <div class="spec-card">
+        <h3 style="color:#eab308;">Follow-up Keeper</h3>
+        <div class="spec-row"><span class="sk">Sequences</span><span class="sv">Up to 3 follow-ups</span></div>
+        <div class="spec-row"><span class="sk">Delay config</span><span class="sv">Custom intervals</span></div>
+        <div class="spec-row"><span class="sk">Reply detection</span><span class="sv">Auto-stop</span></div>
+        <div class="spec-row"><span class="sk">Status update</span><span class="sv">Auto</span></div>
+      </div>
+      <div class="spec-card" style="grid-column: span 2;">
+        <h3 style="color:#f43737;">Analytics Tracker</h3>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:0 24px;">
+          <div class="spec-row"><span class="sk">Metrics tracked</span><span class="sv">12+</span></div>
+          <div class="spec-row"><span class="sk">Refresh rate</span><span class="sv">Real-time</span></div>
+          <div class="spec-row"><span class="sk">History</span><span class="sv">Full lifetime</span></div>
+          <div class="spec-row"><span class="sk">Export</span><span class="sv">CSV / Sheets</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CTA -->
+  <div class="cta-box reveal">
+    <h2>Put the team to work for you</h2>
+    <p>Get all five agents running on your outreach pipeline — no engineers needed.</p>
+    <a href="/contact.html" class="cta-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 13a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.62 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+      Get Started
+    </a>
+  </div>
+
+</main>
+
+<footer>
+  <p>&copy; 2026 thehotspot. All rights reserved. &nbsp;·&nbsp; <a href="/privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html">Terms of Service</a></p>
+</footer>
+
+</body>
+</html>

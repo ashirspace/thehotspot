@@ -499,6 +499,7 @@ function LoginPage({ onLogin }) {
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>What We Provide</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>Everything you need to scale outreach</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Six modules working together so you never have to touch the pipeline manually.</div>
+            <a href="/what-we-provide.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>Explore all features →</a>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
             {[
@@ -532,6 +533,7 @@ function LoginPage({ onLogin }) {
             <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>5 AI agents working for you 24/7</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
+            <a href="/meet-the-team.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#0ea5e9", textDecoration: "none", borderBottom: "1px solid #0ea5e940", paddingBottom: 1 }}>Meet all agents →</a>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
             {[
@@ -572,6 +574,7 @@ function LoginPage({ onLogin }) {
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>The Outcome</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>How thehotspot grows your business</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Real results, not vanity metrics — what you'll see in your pipeline after week one.</div>
+            <a href="/the-outcome.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>See the full picture →</a>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
             {[
