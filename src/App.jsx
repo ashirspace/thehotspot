@@ -39,20 +39,16 @@ async function airtableCreate(fields) {
 }
 
 async function airtableUpdateUser(recordId, fields) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) { console.warn("[Airtable] Missing API key or base ID"); return; }
-  if (!recordId) { console.warn("[Airtable] No record ID — cannot update user"); return; }
-  try {
-    const res = await fetch(`${AIRTABLE_URL}/${recordId}`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ fields }),
-    });
-    const data = await res.json();
-    if (!res.ok) console.error("[Airtable] Update failed:", data);
-    else console.log("[Airtable] User profile updated:", data.id);
-  } catch (err) {
-    console.error("[Airtable] Update error:", err);
-  }
+  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) throw new Error("Missing Airtable API key or base ID");
+  if (!recordId) throw new Error("No Airtable record ID found for this user");
+  const res = await fetch(`${AIRTABLE_URL}/${recordId}`, {
+    method: "PATCH",
+    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ fields }),
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data?.error?.message || JSON.stringify(data));
+  return data;
 }
 
 // Fetch all contacts from Airtable (with pagination)
@@ -1626,6 +1622,7 @@ function OnboardingModal({ user, onComplete }) {
     website:   user?.website  || "",
   });
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
   const canSubmit = form.fullName.trim() && form.username.trim() && form.email.trim() && form.password.trim() && form.company.trim() && form.phone.trim();
@@ -1633,49 +1630,51 @@ function OnboardingModal({ user, onComplete }) {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
+    setSaveError("");
 
-    // Resolve Airtable record ID — may be missing for sessions created before this feature
-    let recordId = user?.airtableId;
-    if (!recordId) {
-      try {
+    try {
+      // Resolve Airtable record ID — may be missing for old sessions
+      let recordId = user?.airtableId;
+      if (!recordId) {
         const filter = user?.email
           ? `{user_email}='${user.email}'`
           : `{username}='${user.username}'`;
         const records = await airtableFetch(filter);
         recordId = records[0]?.id || "";
-        console.log("[Onboarding] Fetched recordId from Airtable:", recordId);
-      } catch (e) {
-        console.warn("[Onboarding] Could not fetch Airtable record ID:", e);
       }
-    }
 
-    const updated = {
-      ...user,
-      airtableId: recordId,
-      name:       form.fullName.trim(),
-      username:   form.username.trim(),
-      email:      form.email.trim(),
-      company:    form.company.trim(),
-      phone:      form.phone.trim(),
-      role_title: form.role.trim(),
-      website:    form.website.trim(),
-      profileComplete: true,
-    };
-    localStorage.setItem("thehotspot_user", JSON.stringify(updated));
-    console.log("[Onboarding] Saving to Airtable, recordId:", recordId);
-    await airtableUpdateUser(recordId, {
-      full_name:        updated.name,
-      username:         updated.username,
-      user_email:       updated.email,
-      password:         form.password.trim(),
-      company:          updated.company,
-      phone:            updated.phone,
-      role_title:       updated.role_title,
-      website:          updated.website || "",
-      profile_complete: true,
-    });
-    setSaving(false);
-    onComplete(updated);
+      const airtableFields = {
+        full_name:  form.fullName.trim(),
+        username:   form.username.trim(),
+        user_email: form.email.trim(),
+        password:   form.password.trim(),
+        company:    form.company.trim(),
+        phone:      form.phone.trim(),
+        role_title: form.role.trim(),
+        profile_complete: true,
+      };
+      if (form.website.trim()) airtableFields.website = form.website.trim();
+
+      await airtableUpdateUser(recordId, airtableFields);
+
+      const updated = {
+        ...user,
+        airtableId:  recordId,
+        name:        form.fullName.trim(),
+        username:    form.username.trim(),
+        email:       form.email.trim(),
+        company:     form.company.trim(),
+        phone:       form.phone.trim(),
+        role_title:  form.role.trim(),
+        website:     form.website.trim(),
+        profileComplete: true,
+      };
+      localStorage.setItem("thehotspot_user", JSON.stringify(updated));
+      onComplete(updated);
+    } catch (err) {
+      setSaveError(err.message || "Failed to save. Please try again.");
+      setSaving(false);
+    }
   };
 
   const inp = { width: "100%", background: "#0d0d12", border: "1px solid #ffffff15", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
@@ -1710,6 +1709,12 @@ function OnboardingModal({ user, onComplete }) {
             </div>
           ))}
         </div>
+
+        {saveError && (
+          <div style={{ background: "#2d1a1a", border: "1px solid #ef444440", borderRadius: 10, padding: "10px 14px", marginBottom: 14, color: "#f87171", fontSize: 13, fontFamily: "'DM Sans',sans-serif", wordBreak: "break-word" }}>
+            {saveError}
+          </div>
+        )}
 
         <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "none", background: canSubmit ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24", color: canSubmit ? "#fff" : "#475569", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", cursor: canSubmit ? "pointer" : "default", transition: "all .2s", boxShadow: canSubmit ? "0 4px 16px rgba(16,185,129,0.28)" : "none" }}>
           {saving ? "Saving…" : "Save & Continue →"}
