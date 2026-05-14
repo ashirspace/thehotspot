@@ -134,13 +134,13 @@ CRITICAL TOOL RULES — FOLLOW THESE EXACTLY:
 4. NEVER decline to use a tool. If the request is even slightly related to finding companies or sending emails, use the tool. Your job is to act, not to explain limitations.
 
 EMAIL LENGTH DETECTION:
-- "short" / "brief" / "chhota" → maxChars: 200
+- "short" / "brief" → maxChars: 200
 - "medium" / "normal" → maxChars: 400
-- "long" / "detailed" / "lamba" → maxChars: 800
+- "long" / "detailed" → maxChars: 800
 - specific count like "500 chars" → maxChars: 500
 - not mentioned → maxChars: null (uses default)
 
-LANGUAGE: Reply in whatever language the user writes in — English, Hinglish, Hindi, Urdu, Punjabi, anything.
+LANGUAGE: Always reply in English only, regardless of what language the user writes in.
 
 Today: ${new Date().toISOString()}`;
 
@@ -241,7 +241,7 @@ async function handleOpenAIFallback(res, messages, apiKey) {
 
 Actions: send_emails (params: category, emails, offerContext, maxChars), stop_campaign, schedule_emails (params: scheduledFor, category, offerContext), send_followup (params: offerContext, daysAgo), add_contact (params: email, company, name, category, website), remove_contact (params: email, category), show_history, show_page (params: page), none.
 
-Today: ${new Date().toISOString()}. Reply in the user's language.`;
+Today: ${new Date().toISOString()}. Always reply in English only.`;
 
   const clean = (messages || []).filter(m => m.role === "user" || m.role === "assistant");
   const start = clean.findIndex(m => m.role === "user");
@@ -305,7 +305,7 @@ export default async function handler(req, res) {
   // Detect lead-finding requests and handle them directly — don't let Claude refuse.
   const lastUserMsg = valid.filter(m => m.role === "user").slice(-1)[0]?.content || "";
   const lastLower = lastUserMsg.toLowerCase();
-  const LEAD_TRIGGERS = ["find", "search", "discover", "get me", "show me", "give me", "look for", "fetch", "locate", "dhundo", "list"];
+  const LEAD_TRIGGERS = ["find", "search", "discover", "get me", "show me", "give me", "look for", "fetch", "locate", "list"];
   const LEAD_TARGETS = ["startup", "startups", "company", "companies", "brand", "brands", "agency", "agencies", "network", "networks", "lead", "leads", "prospect", "prospects", "business", "businesses", "firm", "firms", "client", "clients"];
   const isLeadRequest = LEAD_TRIGGERS.some(k => lastLower.includes(k)) && LEAD_TARGETS.some(k => lastLower.includes(k));
 
