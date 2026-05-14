@@ -273,9 +273,7 @@ function LoginPage({ onLogin }) {
     setGoogleLoading(true);
     const client = window.google.accounts.oauth2.initTokenClient({
       client_id: GOOGLE_LOGIN_CLIENT_ID,
-      // Only request basic profile — no Gmail/Contacts scopes at login
-      // (avoids "unverified app" warning; request extra scopes later when needed)
-      scope: "email profile",
+      scope: "email profile https://www.googleapis.com/auth/gmail.readonly https://www.googleapis.com/auth/gmail.send",
       error_callback: (err) => {
         setGoogleLoading(false);
         if (err.type === "popup_closed") {
@@ -308,6 +306,16 @@ function LoginPage({ onLogin }) {
           const gName = gUser.name || gEmail.split("@")[0];
           const gPic = gUser.picture || "";
 
+          // Fetch sent count while we have the token
+          let sentCount = 0;
+          try {
+            const sentRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1", {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const sentData = await sentRes.json();
+            sentCount = sentData.resultSizeEstimate || 0;
+          } catch { /* non-fatal */ }
+
           // Save to Airtable
           const existing = await airtableFetch(`{user_email}='${gEmail}'`);
           let airtableId = existing[0]?.id || "";
@@ -322,6 +330,8 @@ function LoginPage({ onLogin }) {
             email:       gEmail,
             avatar:      gPic,
             accessToken: token,
+            gmailToken:  token,
+            sentCount,
             airtableId,
             name:        existingFields.full_name || gName,
             company:     existingFields.company || "",
