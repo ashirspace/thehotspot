@@ -4022,38 +4022,106 @@ function Dashboard({ user, onLogout }) {
             <div style={{ maxWidth: 960, margin: "0 auto" }}>
 
               {/* ── DASHBOARD HOME ── */}
-              {page === "dashboard" && (
-                <>
-                  {/* Stats row */}
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(190px,1fr))", gap: 14, marginBottom: 32 }}>
-                    <StatCard icon={<I.Users />} label="Total Contacts" value={contactCount || user?.contactsCount || 0} accent="#10b981" onClick={() => setPage("contacts")} />
-                    <StatCard icon={<I.Mail />} label="Emails Sent" value={(() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })()} accent="#6366f1" onClick={() => setPage("emailsSent")} />
-                    <StatCard icon={<I.Activity />} label="Categories" value={5} accent="#f97316" onClick={() => setPage("categories")} />
-                    <StatCard icon={<I.Check />} label="Success Rate" value={(() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "0%"; } catch { return "0%"; } })()} accent="#0ea5e9" onClick={() => setPage("successRate")} />
-                  </div>
+              {page === "dashboard" && (() => {
+                const emailsSent = (() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })();
+                const successRate = (() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; } catch { return "—"; } })();
+                const ToolBtn = ({ id, icon, label, desc, accent }) => (
+                  <button onClick={() => setPage(id)} style={{
+                    background: "#111116", border: "1px solid #ffffff0d", borderRadius: 12, padding: "16px",
+                    cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s", width: "100%",
+                  }}
+                    onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                    onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <div style={{ width: 36, height: 36, borderRadius: 9, background: `${accent}18`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, flexShrink: 0 }}>{icon}</div>
+                      <div>
+                        <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
+                        <div style={{ fontSize: 11, color: "#64748B" }}>{desc}</div>
+                      </div>
+                    </div>
+                  </button>
+                );
+                const SectionLabel = ({ children, color = "#64748B" }) => (
+                  <div style={{ fontSize: 10, fontWeight: 700, color, letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 10 }}>{children}</div>
+                );
+                return (
+                  <>
+                    {/* Greeting */}
+                    <div style={{ marginBottom: 28 }}>
+                      <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 4 }}>
+                        Good {new Date().getHours() < 12 ? "morning" : new Date().getHours() < 17 ? "afternoon" : "evening"}, {user?.username?.split(" ")[0] || "there"}.
+                      </div>
+                      <div style={{ fontSize: 13, color: "#64748B" }}>Here's your outreach hub. What do you want to do today?</div>
+                    </div>
 
-                  {/* All tools grid */}
-                  <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>All Tools</div>
-                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(200px,1fr))", gap: 12 }}>
-                    {navItems.map(item => (
-                      <button key={item.id} onClick={() => setPage(item.id)} style={{
-                        background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 18px 16px",
-                        cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
-                        boxShadow: "0 1px 4px rgba(0,0,0,0.25)", transition: "all .15s",
-                      }}
-                        onMouseEnter={e => { e.currentTarget.style.borderColor = item.accent; e.currentTarget.style.boxShadow = `0 6px 20px ${item.accent}20`; e.currentTarget.style.transform = "translateY(-2px)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.25)"; e.currentTarget.style.transform = "none"; }}
-                      >
-                        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${item.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: item.accent, marginBottom: 10 }}>
-                          {item.icon}
+                    {/* Stats */}
+                    <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 32 }}>
+                      {[
+                        { label: "Contacts", value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={15} /> },
+                        { label: "Emails Sent", value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={15} /> },
+                        { label: "Categories", value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={15} /> },
+                        { label: "Success Rate", value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={15} /> },
+                      ].map(s => (
+                        <button key={s.label} onClick={() => setPage(s.page)} style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 12, padding: "16px 14px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s" }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = `${s.color}40`; e.currentTarget.style.background = "#16161e"; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
+                        >
+                          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10 }}>
+                            <div style={{ width: 28, height: 28, borderRadius: 7, background: `${s.color}18`, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>{s.icon}</div>
+                          </div>
+                          <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 2 }}>{s.value}</div>
+                          <div style={{ fontSize: 11, color: "#64748B", fontWeight: 500 }}>{s.label}</div>
+                        </button>
+                      ))}
+                    </div>
+
+                    {/* Grouped tools */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 20, alignItems: "start" }}>
+
+                      {/* Outreach */}
+                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
+                        <SectionLabel color="#10b981">Outreach</SectionLabel>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          <ToolBtn id="emailSender" icon={<LuSend size={16} />} label="Email Sender" desc="Draft & send campaigns" accent="#10b981" />
+                          <ToolBtn id="emailTemplates" icon={<LuFilePen size={16} />} label="Email Templates" desc="Pick template & generate" accent="#6366f1" />
                         </div>
-                        <div style={{ fontSize: 14, fontWeight: 600, color: "#F1F5F9", marginBottom: 3 }}>{item.label}</div>
-                        <div style={{ fontSize: 12, color: "#94A3B8" }}>{item.desc}</div>
+                      </div>
+
+                      {/* Contacts & Data */}
+                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
+                        <SectionLabel color="#f97316">Contacts & Data</SectionLabel>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          <ToolBtn id="contacts" icon={<LuClipboardList size={16} />} label="Contacts DB" desc="Manage your contacts" accent="#f97316" />
+                          <ToolBtn id="totalContacts" icon={<LuUsers size={16} />} label="Total Contacts" desc="All contacts overview" accent="#8b5cf6" />
+                          <ToolBtn id="categories" icon={<LuFolder size={16} />} label="Categories" desc="Network, CPS, CPL…" accent="#14b8a6" />
+                        </div>
+                      </div>
+
+                      {/* Analytics */}
+                      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px" }}>
+                        <SectionLabel color="#0ea5e9">Analytics</SectionLabel>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                          <ToolBtn id="campaignStatus" icon={<LuRadio size={16} />} label="Campaign Status" desc="Track active campaigns" accent="#0ea5e9" />
+                          <ToolBtn id="emailsSent" icon={<LuMail size={16} />} label="Emails Sent" desc="View sent email history" accent="#ec4899" />
+                          <ToolBtn id="successRate" icon={<LuTrendingUp size={16} />} label="Success Rate" desc="Campaign performance" accent="#f59e0b" />
+                        </div>
+                      </div>
+
+                    </div>
+
+                    {/* Settings link */}
+                    <div style={{ marginTop: 16, display: "flex", justifyContent: "flex-end" }}>
+                      <button onClick={() => setPage("settings")} style={{ background: "none", border: "none", color: "#475569", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 5, padding: "6px 0" }}
+                        onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
+                        onMouseLeave={e => e.currentTarget.style.color = "#475569"}
+                      >
+                        <LuSettings size={13} /> Settings & Account
                       </button>
-                    ))}
-                  </div>
-                </>
-              )}
+                    </div>
+                  </>
+                );
+              })()}
 
               {/* ── OTHER PAGES ── */}
               {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
