@@ -151,6 +151,7 @@ function LoginPage({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -275,35 +276,113 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
+  const LoginModal = () => (
+    <>
+      {/* Backdrop */}
+      <div onClick={() => setShowLogin(false)} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", zIndex: 100, backdropFilter: "blur(4px)", animation: "fadeIn .2s ease" }} />
+      {/* Sheet */}
+      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 480, background: "#FFFFFF", borderRadius: "24px 24px 0 0", zIndex: 101, padding: "28px 32px 40px", boxShadow: "0 -8px 48px rgba(15,23,42,0.18)", animation: "slideUp .3s cubic-bezier(.4,0,.2,1)" }}>
+        {/* Handle */}
+        <div style={{ width: 40, height: 4, borderRadius: 2, background: "#E2E8F0", margin: "0 auto 24px" }} />
+
+        <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create your account" : "Welcome back"}</div>
+        <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Join thehotspot and start automating your outreach" : "Sign in to access your outreach dashboard"}</div>
+
+        {/* Google */}
+        <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
+          width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #E2E8F0",
+          background: "#F8FAFF", color: "#0F172A", fontSize: 14, fontWeight: 500,
+          cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+          gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20, opacity: googleLoading ? 0.7 : 1,
+        }}
+          onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#EEF5FF"; } }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.background = "#F8FAFF"; }}
+        >
+          {googleLoading ? (
+            <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
+          ) : (
+            <><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</>
+          )}
+        </button>
+
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
+          <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
+          <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
+        </div>
+
+        <form onSubmit={isSignup ? handleSignup : handleLogin}>
+          <div style={{ marginBottom: 14 }}>
+            <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
+            <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
+              style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
+          </div>
+          {isSignup && (
+            <div style={{ marginBottom: 14 }}>
+              <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
+                style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
+            </div>
+          )}
+          <div style={{ marginBottom: 20 }}>
+            <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
+            <div style={{ position: "relative" }}>
+              <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
+                style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"} />
+              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4 }}>
+                {showPass ? <I.EyeOff /> : <I.Eye />}
+              </button>
+            </div>
+          </div>
+          {error && <div style={{ background: "#FEF2F2", border: "1px solid #EF444433", color: "#EF4444", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>{error}</div>}
+          <button type="submit" disabled={loading || !username || !password} style={{
+            width: "100%", padding: "13px", borderRadius: 12, border: "none",
+            background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
+            color: (username && password) ? "#fff" : "#94A3B8",
+            fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
+            fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+          }}>
+            {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : isSignup ? "Create Account" : "Sign In"}
+          </button>
+        </form>
+
+        <div style={{ textAlign: "center", marginTop: 18 }}>
+          <span style={{ fontSize: 13, color: "#64748B" }}>{isSignup ? "Already have an account? " : "Don't have an account? "}</span>
+          <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+            {isSignup ? "Sign In" : "Sign Up"}
+          </button>
+        </div>
+      </div>
+    </>
+  );
+
   return (
     <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", display: "flex", flexDirection: "column", position: "relative" }}>
+
+      {/* Login modal */}
+      {showLogin && <LoginModal />}
 
       <div style={{ position: "absolute", width: "500px", height: "500px", borderRadius: "50%", background: "radial-gradient(circle,#10b98118,transparent 70%)", top: "-150px", left: "-150px", pointerEvents: "none" }} />
       <div style={{ position: "absolute", width: "400px", height: "400px", borderRadius: "50%", background: "radial-gradient(circle,#0ea5e914,transparent 70%)", bottom: "-100px", right: "-100px", pointerEvents: "none" }} />
 
       {/* ── Top nav ── */}
-      <nav style={{ padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1 }}>
+      <nav style={{ padding: "16px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #E2E8F0", background: "#FFFFFF", position: "relative", zIndex: 1, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Logo size={28} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
-          <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #E2E8F0" }}
-            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
-            Privacy Policy
-          </a>
-          <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none", padding: "6px 12px", borderRadius: 6, border: "1px solid #E2E8F0" }}
-            onMouseEnter={e => e.currentTarget.style.color = "#10b981"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>
-            Terms of Service
-          </a>
-        </div>
+        <button onClick={() => setShowLogin(true)} style={{ padding: "8px 20px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+          Sign In
+        </button>
       </nav>
 
-      {/* ── Two-column body ── */}
-      <div className="lp-body" style={{ flex: 1, display: "flex", alignItems: "stretch", justifyContent: "center", position: "relative", zIndex: 1, gap: 0, minHeight: 0, overflow: "hidden" }}>
-
-        {/* Left: Marketing panel — scrollable */}
-        <div className="lp-hero" style={{ flex: 1, overflowY: "auto", padding: "40px 40px 60px 40px", display: "flex", flexDirection: "column", gap: 40 }}>
+      {/* ── Full-width marketing content ── */}
+      <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1, minHeight: 0 }}>
+        <div className="lp-hero" style={{ maxWidth: 960, margin: "0 auto", padding: "48px 32px 40px", display: "flex", flexDirection: "column", gap: 48 }}>
 
           {/* Hero */}
           <div>
@@ -408,121 +487,43 @@ function LoginPage({ onLogin }) {
 
           <div style={{ fontSize: 11, color: "#94A3B8", textAlign: "center" }}>&copy; 2026 thehotspot · <a href="/privacy.html" style={{ color: "#64748B", textDecoration: "none" }}>Privacy</a> · <a href="/terms.html" style={{ color: "#64748B", textDecoration: "none" }}>Terms</a></div>
         </div>
+      </div>
 
-        {/* Divider */}
-        <div style={{ width: 1, background: "#E2E8F0", flexShrink: 0 }} />
-
-        {/* Right: Login card — sticky */}
-        <div className="lp-card-wrap" style={{ width: 420, flexShrink: 0, overflowY: "auto", padding: "40px 32px", display: "flex", flexDirection: "column", justifyContent: "center", background: "#FFFFFF" }}>
-          <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 20, padding: "32px 28px", boxShadow: "0 8px 40px rgba(79,70,229,0.08)" }}>
-            <div style={{ fontSize: 18, fontWeight: 600, color: "#0F172A", marginBottom: 4 }}>{isSignup ? "Create account" : "Welcome back"}</div>
-            <div style={{ fontSize: 13, color: "#64748B", marginBottom: 24 }}>{isSignup ? "Sign up to start using thehotspot" : "Sign in to access your dashboard"}</div>
-
-            {/* Google Button */}
-            <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-              width: "100%", padding: "12px", borderRadius: 12, border: "1px solid #E2E8F0",
-              background: "#F8FAFF", color: "#0F172A", fontSize: 14, fontWeight: 500,
-              cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-              gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 20,
-              opacity: googleLoading ? 0.7 : 1,
-            }}
-              onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F4"; e.currentTarget.style.background = "#EEF5FF"; } }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.background = "#F8FAFF"; }}
-            >
-              {googleLoading ? (
-                <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
-              ) : (
-                <>
-                  <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z" /><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z" /><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z" /><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z" /></svg>
-                  Continue with Google
-                </>
-              )}
-            </button>
-
-            <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-              <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
-              <span style={{ fontSize: 11, color: "#94A3B8", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-              <div style={{ flex: 1, height: 1, background: "#E2E8F0" }} />
-            </div>
-
-            <form onSubmit={isSignup ? handleSignup : handleLogin}>
-              <div style={{ marginBottom: 14 }}>
-                <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Username</label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
-                />
-              </div>
-
-              {isSignup && (
-                <div style={{ marginBottom: 14 }}>
-                  <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Email</label>
-                  <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
-                    style={{ width: "100%", padding: "11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
-                  />
-                </div>
-              )}
-
-              <div style={{ marginBottom: 20 }}>
-                <label style={{ fontSize: 12, color: "#64748B", fontWeight: 500, display: "block", marginBottom: 6 }}>Password</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                    style={{ width: "100%", padding: "11px 42px 11px 14px", borderRadius: 10, border: "1px solid #E2E8F0", background: "#FFFFFF", color: "#0F172A", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#E2E8F0"}
-                  />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94A3B8", cursor: "pointer", padding: 4 }}>
-                    {showPass ? <I.EyeOff /> : <I.Eye />}
-                  </button>
-                </div>
-              </div>
-
-              {error && (
-                <div style={{ background: "#FEF2F2", border: "1px solid #EF444433", color: "#EF4444", padding: "10px 14px", borderRadius: 10, fontSize: 12, fontWeight: 500, marginBottom: 16, textAlign: "center" }}>
-                  {error}
-                </div>
-              )}
-
-              <button type="submit" disabled={loading || !username || !password} style={{
-                width: "100%", padding: "12px", borderRadius: 12, border: "none",
-                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#EFF1F8",
-                color: (username && password) ? "#fff" : "#94A3B8",
-                fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-                fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                {loading ? (
-                  <>{[0, 1, 2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}</>
-                ) : isSignup ? "Create Account" : "Sign In"}
-              </button>
-            </form>
-
-            {/* Toggle Login/Signup */}
-            <div style={{ textAlign: "center", marginTop: 18 }}>
-              <span style={{ fontSize: 13, color: "#64748B" }}>{isSignup ? "Already have an account?" : "Don't have an account?"} </span>
-              <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{
-                background: "none", border: "none", color: "#10b981", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-              }}>
-                {isSignup ? "Sign In" : "Sign Up"}
-              </button>
-            </div>
+      {/* ── Bottom company bar ── */}
+      <div style={{ background: "#0F172A", borderTop: "1px solid #1e293b", padding: "18px 32px", display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 1, position: "relative" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Logo size={22} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>thehotspot</span>
           </div>
-
+          <span style={{ color: "#475569", fontSize: 12 }}>|</span>
+          <span style={{ fontSize: 12, color: "#64748B" }}>Ibra Digitals Branding Services LLC</span>
+          <span style={{ color: "#475569", fontSize: 12 }}>|</span>
+          <span style={{ fontSize: 12, color: "#64748B" }}>Singapore · UAE · UK · USA · India</span>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy</a>
+          <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms</a>
+          <span style={{ fontSize: 12, color: "#475569" }}>&copy; 2026</span>
+          <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap" }}>
+            Get Started
+          </button>
         </div>
       </div>
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
         *{box-sizing:border-box;margin:0;padding:0}
         input::placeholder{color:#CBD5E1}
         .lp-root { height:100vh; overflow:hidden; }
-        .lp-body { flex:1; min-height:0; overflow:hidden; }
-        .lp-hero::-webkit-scrollbar{width:4px} .lp-hero::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:3px}
-        @media (max-width:780px) {
+        .lp-body { flex:1; min-height:0; }
+        .lp-body::-webkit-scrollbar{width:4px} .lp-body::-webkit-scrollbar-thumb{background:#E2E8F0;border-radius:3px}
+        @media (max-width:700px) {
           .lp-root { height:auto; overflow-y:auto; }
-          .lp-body { flex-direction:column; overflow:visible; }
-          .lp-hero { padding:28px 20px 32px; }
-          .lp-card-wrap { width:100% !important; padding:28px 20px 48px; border-top:1px solid #E2E8F0; }
+          .lp-body { min-height:auto; }
+          .lp-hero { padding:28px 20px 32px !important; }
         }
       `}</style>
     </div>
