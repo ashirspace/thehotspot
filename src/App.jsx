@@ -609,10 +609,17 @@ function LoginPage({ onLogin }) {
 
             {/* Bottom bar */}
             <div style={{ borderTop: "1px solid #ffffff08", paddingTop: 24, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <span style={{ fontSize: 12, color: "#334155" }}>&copy; 2026 thehotspot. All rights reserved.</span>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Logo size={18} />
+                  <span style={{ fontSize: 13, fontWeight: 700, color: "#CBD5E1" }}>thehotspot</span>
+                </div>
+                <span style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.5 }}>We build AI systems and web products that help businesses move faster and scale smarter.</span>
+                <span style={{ fontSize: 12, color: "#94A3B8", marginTop: 2 }}>&copy; 2026 thehotspot. All rights reserved.</span>
+              </div>
               <div style={{ display: "flex", gap: 20 }}>
-                <a href="/privacy.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Privacy Policy</a>
-                <a href="/terms.html" style={{ fontSize: 12, color: "#334155", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#334155"}>Terms of Service</a>
+                <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy Policy</a>
+                <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms of Service</a>
               </div>
             </div>
           </div>
