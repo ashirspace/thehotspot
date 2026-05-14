@@ -3228,17 +3228,22 @@ function Dashboard({ user, onLogout }) {
   };
 
   const [page, setPageRaw] = useState(() => pageFromPath());
+  const [pageLoading, setPageLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const setPage = (p) => {
-    setPageRaw(p);
     const path = PAGE_TO_PATH[p] ?? "/";
     if (window.location.pathname !== path) window.history.pushState({ page: p }, "", path);
+    setPageLoading(true);
+    setTimeout(() => { setPageRaw(p); setPageLoading(false); }, 2000);
   };
 
   // Handle browser back/forward
   useEffect(() => {
-    const onPop = () => setPageRaw(pageFromPath());
+    const onPop = () => {
+      setPageLoading(true);
+      setTimeout(() => { setPageRaw(pageFromPath()); setPageLoading(false); }, 2000);
+    };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
@@ -4149,8 +4154,15 @@ function Dashboard({ user, onLogout }) {
 
         {/* PAGE VIEW */}
         {page !== null && (
-          <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", width: "100%" }}>
-            <div style={{ maxWidth: 960, margin: "0 auto" }}>
+          <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", width: "100%", position: "relative" }}>
+            {/* Page transition loader */}
+            {pageLoading && (
+              <div style={{ position: "absolute", inset: 0, background: "#09090d", zIndex: 50, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
+                <div style={{ width: 44, height: 44, borderRadius: "50%", border: "3px solid #ffffff0d", borderTop: "3px solid #10b981", animation: "spin 0.8s linear infinite" }} />
+                <div style={{ fontSize: 13, color: "#475569", fontWeight: 500 }}>Loading…</div>
+              </div>
+            )}
+            <div style={{ maxWidth: 960, margin: "0 auto", visibility: pageLoading ? "hidden" : "visible" }}>
 
               {/* ── DASHBOARD HOME ── */}
               {page === "dashboard" && (() => {
@@ -4275,6 +4287,7 @@ function Dashboard({ user, onLogout }) {
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
+        @keyframes spin { to{transform:rotate(360deg)} }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
         ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
