@@ -23,7 +23,10 @@ export default async function handler(req, res) {
     const local = addr.split("@")[0].toLowerCase().replace(/[._\-+]/g, " ").trim();
     const words = local.split(" ").filter(Boolean);
     if (!words.length || GENERIC.has(words[0])) return "";
-    return words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    const extracted = words.map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(" ");
+    // Skip if it's just the company name in disguise
+    if (company && extracted.toLowerCase() === (company || "").toLowerCase()) return "";
+    return extracted;
   };
 
   // Priority: explicit contactName → email local part → "there"
@@ -202,6 +205,22 @@ Use \\n for line breaks. No HTML.`;
     const parsed = JSON.parse(data.choices?.[0]?.message?.content || "{}");
 
     let body = parsed.body || fallback.body;
+
+    // Force correct greeting regardless of what the model wrote.
+    // Strip any existing "Hi …," line (and the company line if it follows),
+    // then prepend "Hi <name>,\n<company>".
+    body = body.replace(/^[\s\S]*?(?=\n\n)/, (header) => {
+      // header is everything before the first blank line (the greeting block)
+      const lines = header.split("\n").map(l => l.trim()).filter(Boolean);
+      // Drop lines that look like a greeting or a bare company name
+      const bodyLines = lines.filter(l =>
+        !l.match(/^hi\b/i) &&
+        l.toLowerCase() !== company.toLowerCase()
+      );
+      const greetingBlock = [`Hi ${greeting},`, company, ...bodyLines].join("\n");
+      return greetingBlock;
+    });
+
     const hardLimit = charLimit + 80;
     if (body.length > hardLimit) {
       const cut = body.lastIndexOf("\n", charLimit);
