@@ -1207,7 +1207,7 @@ function TotalContactsPage({ onBack, user }) {
   );
 }
 
-function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
+function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
   const [tab, setTab] = useState("overview");
   const [expandedId, setExpandedId] = useState(null);
   const [openEmail, setOpenEmail] = useState(null);
@@ -1267,11 +1267,15 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
         </div>
       </div>
 
-      {!gmailConnected && (
-        <div style={{ background: "#1a140a", border: "1px solid #f59e0b30", borderRadius: 10, padding: "11px 14px", marginBottom: 18, fontSize: 12, color: "#f59e0b", display: "flex", alignItems: "center", gap: 8 }}>
-          <LuTriangleAlert size={14} style={{ flexShrink: 0 }} /> Connect Gmail to sync your live sent count.
-        </div>
-      )}
+      {gmailConnected
+        ? <div style={{ background: "#0a2a1a", border: "1px solid #10b98130", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, color: "#10b981", display: "flex", alignItems: "center", gap: 8 }}>
+            <LuCheck size={14} style={{ flexShrink: 0 }} />
+            <span>Sending from <strong style={{ color: "#34d399" }}>{user?.email || "your Gmail"}</strong></span>
+          </div>
+        : <div style={{ background: "#1a140a", border: "1px solid #f59e0b30", borderRadius: 10, padding: "11px 14px", marginBottom: 18, fontSize: 12, color: "#f59e0b", display: "flex", alignItems: "center", gap: 8 }}>
+            <LuTriangleAlert size={14} style={{ flexShrink: 0 }} /> Connect Gmail to sync your live sent count.
+          </div>
+      }
 
       {tab === "overview" && (
         <>
@@ -4569,7 +4573,7 @@ function Dashboard({ user, onLogout }) {
               {page === "contacts"       && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
               {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} />}
               {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
-              {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} />}
+              {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} user={user} />}
               {page === "categories"     && <CategoriesPage onBack={() => setPage("dashboard")} />}
               {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} />}
               {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
