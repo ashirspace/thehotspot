@@ -2902,6 +2902,7 @@ function Dashboard({ user, onLogout }) {
   };
 
   const [page, setPageRaw] = useState(() => pageFromPath());
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const setPage = (p) => {
     setPageRaw(p);
@@ -3592,8 +3593,14 @@ function Dashboard({ user, onLogout }) {
 
       {/* ═══════ TOP NAV BAR (always visible) ═══════ */}
       <div style={{ background: "#FFFFFF", borderBottom: "1px solid #E2E8F0", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
-        {/* Left: logo + back breadcrumb */}
+        {/* Left: hamburger + logo + breadcrumb */}
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", flexDirection: "column", gap: 4, borderRadius: 6 }}
+            title={sidebarOpen ? "Close menu" : "Open menu"}>
+            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(45deg) translate(4px,4px)" : "none" }} />
+            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", opacity: sidebarOpen ? 0 : 1 }} />
+            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }} />
+          </button>
           <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
             <Logo size={24} />
             <span style={{ fontSize: 15, fontWeight: 700, color: "#0F172A" }}>thehotspot</span>
@@ -3657,8 +3664,21 @@ function Dashboard({ user, onLogout }) {
       {/* ═══════ BODY: SIDEBAR + CONTENT ═══════ */}
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
 
-        {/* LEFT SIDEBAR */}
-        <div style={{ width: 210, background: "#FFFFFF", borderRight: "1px solid #E2E8F0", display: "flex", flexDirection: "column", flexShrink: 0, padding: "8px 0" }}>
+        {/* SIDEBAR BACKDROP */}
+        {sidebarOpen && (
+          <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(15,23,42,0.25)", backdropFilter: "blur(1px)" }} />
+        )}
+
+        {/* LEFT SIDEBAR — slides in/out */}
+        <div style={{
+          position: "fixed", top: 56, left: 0, bottom: 0, zIndex: 50,
+          width: 220, background: "#FFFFFF", borderRight: "1px solid #E2E8F0",
+          display: "flex", flexDirection: "column", flexShrink: 0, padding: "12px 0",
+          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
+          transition: "transform .22s cubic-bezier(.4,0,.2,1)",
+          boxShadow: sidebarOpen ? "4px 0 24px rgba(15,23,42,0.08)" : "none",
+        }}>
+          <div style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", padding: "4px 14px 10px" }}>Navigation</div>
           {[
             { id: "dashboard",      label: "Dashboard",       icon: "🏠" },
             { id: "totalContacts",  label: "Total Contacts",  icon: "👥" },
@@ -3666,7 +3686,7 @@ function Dashboard({ user, onLogout }) {
             { id: "contacts",       label: "Contacts DB",     icon: "📋" },
             { id: "profile",        label: "Settings",        icon: "⚙️" },
           ].map(item => (
-            <button key={item.id} onClick={() => setPage(item.id)} style={{
+            <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 14px", margin: "2px 8px", borderRadius: 10,
               background: page === item.id ? "#EEF2FF" : "transparent",
