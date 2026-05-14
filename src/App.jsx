@@ -1298,44 +1298,93 @@ function CategoriesPage({ onBack }) {
   }, []);
   const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const categories = [
-    { name: "Network", desc: "Affiliate network partners managing multiple programs", count: countBycat["Network"] || 0, color: CAT.Network },
-    { name: "CPS", desc: "Cost Per Sale — commission per successful sale", count: countBycat["CPS"] || 0, color: CAT.CPS },
-    { name: "CPL", desc: "Cost Per Lead — payment per qualified lead", count: countBycat["CPL"] || 0, color: CAT.CPL },
-    { name: "CPA", desc: "Cost Per Action — payment per specific user action", count: countBycat["CPA"] || 0, color: CAT.CPA },
-    { name: "Mobile", desc: "Mobile marketing and app-based advertising", count: countBycat["Mobile"] || 0, color: CAT.Mobile },
+    { name: "Network", desc: "Affiliate network partners managing multiple programs", count: countBycat["Network"] || 0, dot: "#10b981" },
+    { name: "CPS",     desc: "Cost Per Sale — commission per successful sale",        count: countBycat["CPS"]     || 0, dot: "#6366f1" },
+    { name: "CPL",     desc: "Cost Per Lead — payment per qualified lead",            count: countBycat["CPL"]     || 0, dot: "#f97316" },
+    { name: "CPA",     desc: "Cost Per Action — payment per specific user action",    count: countBycat["CPA"]     || 0, dot: "#d946ef" },
+    { name: "Mobile",  desc: "Mobile marketing and app-based advertising",            count: countBycat["Mobile"]  || 0, dot: "#0ea5e9" },
   ];
+  const total = contacts.length;
 
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#f9731618", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><I.Activity /></div>
+
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <div style={{ fontSize: 24, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace" }}>5</div>
-          <div style={{ fontSize: 12, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Active Categories</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Contact Categories</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>{total} total contacts across 5 categories</div>
+        </div>
+        <div style={{ background: "#f9731618", border: "1px solid #f9731630", borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
+          <div style={{ fontSize: 26, fontWeight: 900, color: "#f97316", letterSpacing: -1 }}>5</div>
+          <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Categories</div>
         </div>
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {categories.map(c => (
-          <div key={c.name} style={{ background: c.color.bg, border: `1px solid ${c.color.dot}44`, borderRadius: 14, padding: "20px 22px", transition: "all .2s", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,0.04)" }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateX(4px)"; e.currentTarget.style.boxShadow = `0 4px 12px ${c.color.dot}25`; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateX(0)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.04)"; }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-                  <span style={{ width: 10, height: 10, borderRadius: "50%", background: c.color.dot, display: "inline-block" }} />
-                  <span style={{ fontSize: 16, fontWeight: 700, color: c.color.text }}>{c.name}</span>
+
+      {/* Distribution bar */}
+      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 16 }}>
+        <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Contact Distribution</div>
+        {total === 0 ? (
+          <div style={{ height: 10, background: "#ffffff08", borderRadius: 5 }} />
+        ) : (
+          <div style={{ display: "flex", height: 10, borderRadius: 5, overflow: "hidden", gap: 2 }}>
+            {categories.map(c => (
+              c.count > 0 && (
+                <div key={c.name} title={`${c.name}: ${c.count}`} style={{ flex: c.count, background: c.dot, borderRadius: 3, transition: "flex .6s ease" }} />
+              )
+            ))}
+          </div>
+        )}
+        {/* Legend */}
+        <div style={{ display: "flex", gap: 14, marginTop: 12, flexWrap: "wrap" }}>
+          {categories.map(c => (
+            <div key={c.name} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 2, background: c.dot, flexShrink: 0 }} />
+              <span style={{ fontSize: 11, color: "#64748B" }}>{c.name}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Category cards */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+        {categories.map((c, i) => {
+          const pct = total > 0 ? Math.round(c.count / total * 100) : 0;
+          return (
+            <div key={c.name} style={{ background: "#111116", border: `1px solid ${c.dot}20`, borderRadius: 14, padding: "16px 18px", transition: "all .15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = `${c.dot}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateX(3px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = `${c.dot}20`; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+                {/* Rank */}
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: `${c.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <span style={{ fontSize: 12, fontWeight: 800, color: c.dot }}>#{i + 1}</span>
                 </div>
-                <div style={{ fontSize: 12, color: "#64748B", marginLeft: 18 }}>{c.desc}</div>
-              </div>
-              <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 24, fontWeight: 700, color: c.color.text, fontFamily: "'JetBrains Mono',monospace" }}>{c.count}</div>
-                <div style={{ fontSize: 10, color: "#94A3B8", textTransform: "uppercase" }}>contacts</div>
+
+                {/* Info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block", boxShadow: `0 0 6px ${c.dot}80` }} />
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>{c.name}</span>
+                    <span style={{ fontSize: 10, color: c.dot, background: `${c.dot}18`, border: `1px solid ${c.dot}30`, padding: "1px 7px", borderRadius: 10, fontWeight: 600 }}>{pct}%</span>
+                  </div>
+                  <div style={{ fontSize: 11, color: "#64748B", marginBottom: 8 }}>{c.desc}</div>
+                  {/* Bar */}
+                  <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                    <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 2, transition: "width .6s ease", opacity: 0.8 }} />
+                  </div>
+                </div>
+
+                {/* Count */}
+                <div style={{ textAlign: "right", flexShrink: 0 }}>
+                  <div style={{ fontSize: 22, fontWeight: 900, color: c.dot, letterSpacing: -0.8 }}>{c.count}</div>
+                  <div style={{ fontSize: 10, color: "#64748B" }}>contacts</div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
