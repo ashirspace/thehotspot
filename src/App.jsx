@@ -1885,19 +1885,17 @@ function DashboardPage({ user, contactCount, setPage }) {
 
   const ToolBtn = ({ id, icon, label, desc, accent }) => (
     <button onClick={() => setPage(id)} style={{
-      background: "#0d0d12", border: "1px solid #ffffff08", borderRadius: 10, padding: "14px 16px",
-      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s", width: "100%",
+      background: "#0d0d12", border: "1px solid #ffffff08", borderRadius: 14, padding: "22px 20px",
+      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", width: "100%",
     }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}44`; e.currentTarget.style.background = "#13131a"; e.currentTarget.style.transform = "translateX(3px)"; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.transform = "none"; }}
+      onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}50`; e.currentTarget.style.background = "#13131a"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 24px ${accent}14`; }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
     >
-      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${accent}18`, border: `1px solid ${accent}25`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, flexShrink: 0 }}>{icon}</div>
-        <div style={{ flex: 1, minWidth: 0 }}>
-          <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
-          <div style={{ fontSize: 11, color: "#64748B", lineHeight: 1.4 }}>{desc}</div>
-        </div>
-        <LuChevronRight size={14} style={{ color: "#334155", flexShrink: 0 }} />
+      <div style={{ width: 48, height: 48, borderRadius: 13, background: `${accent}18`, border: `1px solid ${accent}30`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>{icon}</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6, letterSpacing: -0.2 }}>{label}</div>
+      <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6, marginBottom: 14 }}>{desc}</div>
+      <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: accent }}>
+        Open <LuChevronRight size={12} />
       </div>
     </button>
   );
@@ -1949,43 +1947,43 @@ function DashboardPage({ user, contactCount, setPage }) {
       <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
 
         {/* Outreach */}
-        <div ref={col1Ref} style={{ ...revealStyle(col1Visible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #10b981" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><LuSend size={15} /></div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#10b981", letterSpacing: 0.8, textTransform: "uppercase" }}>Outreach</div>
+        <div ref={col1Ref} style={{ ...revealStyle(col1Visible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #10b981" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", border: "1px solid #10b98130", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><LuSend size={17} /></div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#10b981", letterSpacing: 0.8, textTransform: "uppercase" }}>Outreach</div>
           </div>
-          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Write and send personalized cold emails to your contact list.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <ToolBtn id="emailSender" icon={<LuSend size={16} />} label="Email Sender" desc="Bulk send AI-generated campaigns" accent="#10b981" />
-            <ToolBtn id="emailTemplates" icon={<LuFilePen size={16} />} label="Email Templates" desc="Generate single targeted emails" accent="#6366f1" />
+          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Write and send personalized cold emails to your contact list at scale.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <ToolBtn id="emailSender" icon={<LuSend size={20} />} label="Email Sender" desc="Bulk send AI-generated campaigns to your entire contact list or a specific category." accent="#10b981" />
+            <ToolBtn id="emailTemplates" icon={<LuFilePen size={20} />} label="Email Templates" desc="Pick a category template, enter a company, and generate a targeted single email." accent="#6366f1" />
           </div>
         </div>
 
         {/* Contacts & Data */}
-        <div ref={col2Ref} style={{ ...revealStyle(col2Visible, 0.1), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #f97316" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#f9731618", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><LuClipboardList size={15} /></div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#f97316", letterSpacing: 0.8, textTransform: "uppercase" }}>Contacts & Data</div>
+        <div ref={col2Ref} style={{ ...revealStyle(col2Visible, 0.1), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #f97316" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f9731618", border: "1px solid #f9731630", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><LuClipboardList size={17} /></div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#f97316", letterSpacing: 0.8, textTransform: "uppercase" }}>Contacts & Data</div>
           </div>
-          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Manage your prospect database across all categories.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <ToolBtn id="contacts" icon={<LuClipboardList size={16} />} label="Contacts DB" desc="Add, edit and manage contacts" accent="#f97316" />
-            <ToolBtn id="totalContacts" icon={<LuUsers size={16} />} label="Total Contacts" desc="Full contacts overview" accent="#8b5cf6" />
-            <ToolBtn id="categories" icon={<LuFolder size={16} />} label="Categories" desc="Network, CPS, CPL, CPA, Mobile" accent="#14b8a6" />
+          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Manage your prospect database across all five outreach categories.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <ToolBtn id="contacts" icon={<LuClipboardList size={20} />} label="Contacts DB" desc="Add, edit, import and manage all your outreach contacts in one place." accent="#f97316" />
+            <ToolBtn id="totalContacts" icon={<LuUsers size={20} />} label="Total Contacts" desc="See a full overview of every contact across all categories and statuses." accent="#8b5cf6" />
+            <ToolBtn id="categories" icon={<LuFolder size={20} />} label="Categories" desc="Browse contacts by Network, CPS, CPL, CPA, and Mobile groups." accent="#14b8a6" />
           </div>
         </div>
 
         {/* Analytics */}
-        <div ref={col3Ref} style={{ ...revealStyle(col3Visible, 0.2), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "22px", borderTop: "2px solid #0ea5e9" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-            <div style={{ width: 30, height: 30, borderRadius: 8, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><LuTrendingUp size={15} /></div>
-            <div style={{ fontSize: 12, fontWeight: 700, color: "#0ea5e9", letterSpacing: 0.8, textTransform: "uppercase" }}>Analytics</div>
+        <div ref={col3Ref} style={{ ...revealStyle(col3Visible, 0.2), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #0ea5e9" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0ea5e918", border: "1px solid #0ea5e930", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><LuTrendingUp size={17} /></div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#0ea5e9", letterSpacing: 0.8, textTransform: "uppercase" }}>Analytics</div>
           </div>
-          <div style={{ fontSize: 11, color: "#475569", marginBottom: 16, lineHeight: 1.5 }}>Track campaign performance and measure reply rates.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            <ToolBtn id="campaignStatus" icon={<LuRadio size={16} />} label="Campaign Status" desc="Monitor active campaigns live" accent="#0ea5e9" />
-            <ToolBtn id="emailsSent" icon={<LuMail size={16} />} label="Emails Sent" desc="Full history and delivery stats" accent="#ec4899" />
-            <ToolBtn id="successRate" icon={<LuTrendingUp size={16} />} label="Success Rate" desc="Open rates and performance" accent="#f59e0b" />
+          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Track campaign performance, reply rates, and delivery results over time.</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <ToolBtn id="campaignStatus" icon={<LuRadio size={20} />} label="Campaign Status" desc="Monitor active and completed campaigns in real time with live progress." accent="#0ea5e9" />
+            <ToolBtn id="emailsSent" icon={<LuMail size={20} />} label="Emails Sent" desc="View the full history of every email sent, including delivery stats and dates." accent="#ec4899" />
+            <ToolBtn id="successRate" icon={<LuTrendingUp size={20} />} label="Success Rate" desc="Measure open rates, click-through, and overall campaign performance scores." accent="#f59e0b" />
           </div>
         </div>
 
