@@ -3219,7 +3219,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         }
         throw new Error(sendData.error.message);
       }
-      showToast(`✅ Sent to ${toEmail}`);
+      showToast(`Sent to ${toEmail}`);
       setStep("pick");
       setTemplate(null);
       setForm({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "560" });
@@ -3528,7 +3528,7 @@ function Dashboard({ user, onLogout }) {
         if (due.length > 0) {
           localStorage.setItem("thehotspot_scheduled", JSON.stringify(remaining));
           due.forEach(s => {
-            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled campaign is starting now...` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled campaign is starting now...` }]);
             runEmailCampaign(s.category || "all", null, s.offerContext || "");
           });
         }
@@ -3716,26 +3716,26 @@ function Dashboard({ user, onLogout }) {
     const todaySent  = getTodaySentCount();
     const remaining  = dailyLimit - todaySent;
     if (remaining <= 0) {
-      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Daily limit reached (${dailyLimit}/day). This protects your Gmail account from spam flags. Resets at midnight — you have **${dailyLimit} sends** again tomorrow.` }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `Daily limit reached (${dailyLimit}/day). This protects your Gmail account from spam flags. Resets at midnight — you have **${dailyLimit} sends** again tomorrow.` }]);
       setLoading(false);
       return;
     }
     if (targets.length > remaining) {
-      setMessages(prev => [...prev, { role: "assistant", content: `⚠️ Only **${remaining} sends** left today (daily limit: ${dailyLimit}). Sending to the first ${remaining} contacts.` }]);
+      setMessages(prev => [...prev, { role: "assistant", content: `Only **${remaining} sends** left today (daily limit: ${dailyLimit}). Sending to the first ${remaining} contacts.` }]);
       targets = targets.slice(0, remaining);
     }
 
     cancelCampaign.current = false;
     setCampaignRunning(true);
     const progressId = Date.now();
-    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `⏳ Generating email...` }]);
+    setMessages(prev => [...prev, { role: "assistant", id: progressId, content: `Generating email...` }]);
 
     let sent = 0, failed = 0;
     const sentLog = [];
 
     for (let i = 0; i < targets.length; i++) {
       if (cancelCampaign.current) {
-        const cancelMsg = `⛔ Campaign cancelled.\n\n• **${sent} sent** before stopping${failed > 0 ? `\n• ${failed} failed` : ""}`;
+        const cancelMsg = `Campaign cancelled.\n\n• **${sent} sent** before stopping${failed > 0 ? `\n• ${failed} failed` : ""}`;
         setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: cancelMsg } : m));
         saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
         setCampaignRunning(false);
@@ -3762,12 +3762,12 @@ function Dashboard({ user, onLogout }) {
         if (targets.length === 1) {
           setMessages(prev => prev.map(m => m.id === progressId ? {
             ...m,
-            content: `📤 Sending to **${contact.email}**:\n\n**Subject:** ${subject}\n\n${body}\n\n_Sending..._`,
+            content: `Sending to **${contact.email}**:\n\n**Subject:** ${subject}\n\n${body}\n\n_Sending..._`,
           } : m));
         } else {
           setMessages(prev => prev.map(m => m.id === progressId ? {
             ...m,
-            content: `📤 **${i + 1}/${targets.length}** — Sending to **${contact.email}**\nSubject: "${subject}"${failed > 0 ? ` · ❌ ${failed} failed` : ""} · say "stop" to cancel`,
+            content: `**${i + 1}/${targets.length}** — Sending to **${contact.email}**\nSubject: "${subject}"${failed > 0 ? ` · ${failed} failed` : ""} · say "stop" to cancel`,
           } : m));
         }
 
@@ -3783,12 +3783,12 @@ function Dashboard({ user, onLogout }) {
         if (targets.length === 1) {
           setMessages(prev => prev.map(m => m.id === progressId ? {
             ...m,
-            content: `✅ Sent to **${contact.email}**\n\n**Subject:** ${subject}\n\n${body}`,
+            content: `Sent to **${contact.email}**\n\n**Subject:** ${subject}\n\n${body}`,
           } : m));
         }
       } catch (err) {
         if (err.message === "TOKEN_EXPIRED") {
-          const expiredMsg = `⚠️ Gmail token expired.\n\n${sent > 0 ? `${sent} sent before expiry.\n\n` : ""}Reconnecting Gmail...`;
+          const expiredMsg = `Gmail token expired.\n\n${sent > 0 ? `${sent} sent before expiry.\n\n` : ""}Reconnecting Gmail...`;
           setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: expiredMsg } : m));
           saveCampaignHistory({ category, offerContext, sent, failed, cancelled: true, contacts: sentLog });
           setCampaignRunning(false);
@@ -3801,7 +3801,7 @@ function Dashboard({ user, onLogout }) {
 
       // Bulk progress after each email
       if (targets.length > 1 && i === targets.length - 1) {
-        const summary = `✅ Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed**` : ""}`;
+        const summary = `Done!\n\n• **${sent} email${sent !== 1 ? "s" : ""} sent** successfully${failed > 0 ? `\n• **${failed} failed**` : ""}`;
         setMessages(prev => prev.map(m => m.id === progressId ? { ...m, content: summary } : m));
       }
     }
@@ -3838,7 +3838,7 @@ function Dashboard({ user, onLogout }) {
       contacts.push(newContact);
       localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
       setContactCount(contacts.length);
-      return `✅ Added **${newContact.company}** (${email}) to **${newContact.category}** contacts.`;
+      return `Added **${newContact.company}** (${email}) to **${newContact.category}** contacts.`;
     } catch {
       return "Failed to save contact — try again.";
     }
@@ -3858,7 +3858,7 @@ function Dashboard({ user, onLogout }) {
       if (removed === 0) return `No contacts found matching that criteria.`;
       localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
       setContactCount(contacts.length);
-      return `🗑️ Removed **${removed} contact${removed !== 1 ? "s" : ""}**.`;
+      return `Removed **${removed} contact${removed !== 1 ? "s" : ""}**.`;
     } catch {
       return "Failed to remove contact — try again.";
     }
@@ -3871,11 +3871,11 @@ function Dashboard({ user, onLogout }) {
       if (history.length === 0) return "No campaigns sent yet. Start your first outreach by saying **\"send emails\"**.";
       const lines = history.slice(0, 5).map((h, i) => {
         const date = new Date(h.date).toLocaleString();
-        const status = h.cancelled ? "⛔ Cancelled" : "✅ Completed";
+        const status = h.cancelled ? "Cancelled" : "Completed";
         const cat = h.category && h.category !== "all" ? ` · ${h.category.toUpperCase()}` : "";
         return `**${i + 1}. ${date}**${cat}\n${status} · ${h.sent} sent${h.failed > 0 ? ` · ${h.failed} failed` : ""}${h.offerContext ? `\n_"${h.offerContext.slice(0, 60)}${h.offerContext.length > 60 ? "..." : ""}"_` : ""}`;
       });
-      return `📋 **Campaign History** (last ${history.slice(0, 5).length} campaigns)\n\n${lines.join("\n\n")}`;
+      return `**Campaign History** (last ${history.slice(0, 5).length} campaigns)\n\n${lines.join("\n\n")}`;
     } catch {
       return "Could not load campaign history.";
     }
@@ -3969,13 +3969,13 @@ function Dashboard({ user, onLogout }) {
           });
           const data = await r.json();
           if (data.success) {
-            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled for **${timeStr}**. The daily cron will send these at 9 AM — no need to keep the tab open.` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled for **${timeStr}**. The daily cron will send these at 9 AM — no need to keep the tab open.` }]);
           } else {
             // Fallback to localStorage if Airtable not configured
             const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
             scheduled.push({ scheduledFor: params.scheduledFor, category: params.category || "all", offerContext: params.offerContext || "" });
             localStorage.setItem("thehotspot_scheduled", JSON.stringify(scheduled));
-            setMessages(prev => [...prev, { role: "assistant", content: `⏰ Scheduled for **${timeStr}** (browser-only — keep the tab open). Set up Airtable to enable server-side scheduling.` }]);
+            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled for **${timeStr}** (browser-only — keep the tab open). Set up Airtable to enable server-side scheduling.` }]);
           }
         } catch {
           setMessages(prev => [...prev, { role: "assistant", content: "Couldn't schedule — try again." }]);
@@ -4031,7 +4031,7 @@ function Dashboard({ user, onLogout }) {
             setContactCount(prev => prev + newLeads.length);
           }
           const suffix = newLeads.length > 0
-            ? `\n\n✅ **${newLeads.length} new leads added** to your contacts. Say "send emails to ${leadCat}" to reach out.`
+            ? `\n\n**${newLeads.length} new leads added** to your contacts. Say "send emails to ${leadCat}" to reach out.`
             : leads.length > 0 ? `\n\n_(All ${leads.length} were already in your contacts.)_` : "";
           setMessages(prev => [...prev, { role: "assistant", content: message + suffix }]);
         } catch {
