@@ -528,15 +528,9 @@ function LoginPage({ onLogin }) {
 
         {/* ── Footer / company bar ── */}
         <div style={{ borderTop: "1px solid #ffffff0d", padding: "20px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <Logo size={20} />
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8" }}>thehotspot</span>
-            </div>
-            <span style={{ color: "#334155", fontSize: 12 }}>·</span>
-            <span style={{ fontSize: 12, color: "#475569" }}>Ibra Digitals Branding Services LLC</span>
-            <span style={{ color: "#334155", fontSize: 12 }}>·</span>
-            <span style={{ fontSize: 12, color: "#475569" }}>Singapore · UAE · UK · USA · India</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <Logo size={20} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#94A3B8" }}>thehotspot</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
             <a href="/privacy.html" style={{ fontSize: 12, color: "#475569", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#475569"}>Privacy</a>
