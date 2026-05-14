@@ -3620,7 +3620,7 @@ function Dashboard({ user, onLogout }) {
             </>
           )}
         </div>
-        {/* Right: chat button + Gmail + user + logout */}
+        {/* Right: Chat / Dashboard toggle only */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {page !== null && (
             <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
@@ -3632,32 +3632,6 @@ function Dashboard({ user, onLogout }) {
               📊 Dashboard
             </button>
           )}
-          {/* Gmail connect button — always visible, shows status */}
-          <button onClick={connectGmail} style={{
-            display: "flex", alignItems: "center", gap: 6, borderRadius: 20, padding: "6px 14px",
-            fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-            background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
-            border: gmailConnected ? "1px solid #10b98140" : "1px solid #f9731640",
-            color: gmailConnected ? "#059669" : "#ea580c",
-            transition: "all .15s",
-          }}>
-            <span style={{ width: 7, height: 7, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", display: "inline-block" }} />
-            {gmailConnected ? "Gmail ✓" : "Connect Gmail"}
-          </button>
-          <button onClick={() => setPage("profile")} style={{ display: "flex", alignItems: "center", gap: 6, background: "none", border: "1px solid #E2E8F0", borderRadius: 20, padding: "4px 12px 4px 4px", cursor: "pointer", transition: "all .2s", fontFamily: "'DM Sans',sans-serif" }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
-          >
-            <div style={{ width: 26, height: 26, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 700, color: "#fff" }}>
-              {user?.username?.[0]?.toUpperCase() || "U"}
-            </div>
-            <span style={{ fontSize: 12, color: "#64748B" }}>{user?.username}</span>
-          </button>
-          <button onClick={onLogout} title="Logout" style={{ background: "none", border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 8px", color: "#64748B", cursor: "pointer", display: "flex", alignItems: "center", transition: "all .15s" }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = "#EF4444"; e.currentTarget.style.color = "#EF4444"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.color = "#64748B"; }}>
-            <I.Logout />
-          </button>
         </div>
       </div>
 
@@ -3684,7 +3658,6 @@ function Dashboard({ user, onLogout }) {
             { id: "totalContacts",  label: "Total Contacts",  icon: "👥" },
             { id: "emailTemplates", label: "Email Templates", icon: "✍️" },
             { id: "contacts",       label: "Contacts DB",     icon: "📋" },
-            { id: "profile",        label: "Settings",        icon: "⚙️" },
           ].map(item => (
             <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 10,
@@ -3702,6 +3675,49 @@ function Dashboard({ user, onLogout }) {
               {item.label}
             </button>
           ))}
+
+          {/* Bottom: Gmail status + Profile + Logout */}
+          <div style={{ marginTop: "auto", borderTop: "1px solid #E2E8F0", padding: "12px 8px 8px" }}>
+            {/* Gmail connect */}
+            <button onClick={() => { connectGmail(); setSidebarOpen(false); }} style={{
+              display: "flex", alignItems: "center", gap: 8, width: "100%",
+              padding: "9px 14px", borderRadius: 10, marginBottom: 4,
+              background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
+              border: gmailConnected ? "1px solid #10b98130" : "1px solid #f9731630",
+              color: gmailConnected ? "#059669" : "#ea580c",
+              fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+            }}>
+              <span style={{ width: 8, height: 8, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
+              {gmailConnected ? "Gmail connected" : "Connect Gmail"}
+            </button>
+            {/* Profile row */}
+            <button onClick={() => { setPage("profile"); setSidebarOpen(false); }} style={{
+              display: "flex", alignItems: "center", gap: 10, width: "100%",
+              padding: "9px 14px", borderRadius: 10, marginBottom: 4,
+              background: "transparent", border: "none", cursor: "pointer",
+              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = "#F8FAFC"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+                {user?.username?.[0]?.toUpperCase() || "U"}
+              </div>
+              <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 500 }}>{user?.username}</span>
+            </button>
+            {/* Logout */}
+            <button onClick={onLogout} style={{
+              display: "flex", alignItems: "center", gap: 10, width: "100%",
+              padding: "9px 14px", borderRadius: 10,
+              background: "transparent", border: "none", cursor: "pointer",
+              fontSize: 13, color: "#EF4444", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = "#FEF2F2"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <I.Logout /> Logout
+            </button>
+          </div>
         </div>
 
         {/* RIGHT PANEL */}
