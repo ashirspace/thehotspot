@@ -5,7 +5,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(200).end();
 
   const {
-    company, category, website, offerContext,
+    company, contactName, category, website, offerContext,
     senderName, senderCompany, senderRole, valueProp,
     maxChars,
   } = req.body;
@@ -14,6 +14,12 @@ export default async function handler(req, res) {
   const sender      = senderName    || "Ashir Ayaan";
   const senderCo    = senderCompany || "Ibra Digitals Branding Services LLC";
   const senderTitle = senderRole    || "";
+
+  // Use person name if it's different from company name, otherwise "there"
+  const rawName = (contactName || "").trim();
+  const greeting = rawName && rawName.toLowerCase() !== (company || "").toLowerCase()
+    ? rawName.split(" ")[0]
+    : "there";
   const charLimit   = Math.min(Math.max(parseInt(maxChars) || 560, 100), 1200);
   // Map char limits to line targets for the prompt
   const lineTarget  = charLimit <= 400 ? "4–6 lines" : charLimit <= 650 ? "6–8 lines" : "10–12 lines";
@@ -25,7 +31,7 @@ export default async function handler(req, res) {
 
   const fallback = {
     subject: `Quick question for ${company}`,
-    body: `Hi ${company},\n\n${offerContext || valueProp || "I think there's a natural fit between what we do and what you've built."}\n\n${senderCo} — ${offerContext || "we'd love to explore if there's a way to work together."}\n\nOpen to a quick chat?\n\nBest,\n${sender}${senderTitle ? `\n${senderTitle}` : ""}\n${senderCo}`,
+    body: `Hi ${greeting},\n${company}\n\n${offerContext || valueProp || "I think there's a natural fit between what we do and what you've built."}\n\n${senderCo} — ${offerContext || "we'd love to explore if there's a way to work together."}\n\nOpen to a quick chat?\n\nBest,\n${sender}${senderTitle ? `\n${senderTitle}` : ""}\n${senderCo}`,
   };
 
   if (!API_KEY) return res.status(200).json(fallback);
@@ -56,6 +62,7 @@ export default async function handler(req, res) {
 - Angle/Offer: ${offerContext || valueProp || angle}
 
 ## RECIPIENT INFO:
+- Contact Person: ${greeting}
 - Company: ${company}
 - Website: ${website || "unknown"}
 - Category/Industry: ${category || "Business"}
@@ -67,7 +74,8 @@ export default async function handler(req, res) {
 ### Example 1 — Affiliate / Network:
 Subject: Your Network + Our Traffic — Good Fit?
 
-Hi AdCombo,
+Hi Marcus,
+AdCombo
 
 AdCombo's CPA network covers exactly the geos our media buying team targets — UAE, UK, and India daily.
 
@@ -84,7 +92,8 @@ Ibra Digitals Branding Services LLC
 ### Example 2 — SaaS / Integration:
 Subject: Our Users Keep Asking for This
 
-Hi Notion,
+Hi there,
+Notion
 
 Notion's workspace flexibility is exactly what our power users want — we keep getting requests for a native integration.
 
@@ -101,7 +110,8 @@ Head of Partnerships, Acme SaaS
 ### Example 3 — Agency / Collaboration:
 Subject: Client Result You Might Find Interesting
 
-Hi Ogilvy,
+Hi James,
+Ogilvy
 
 Ogilvy's recent work on the Nike campaign showed exactly the kind of data-driven creative we specialise in amplifying.
 
@@ -121,7 +131,9 @@ Follow this structure line by line:
 
 **SUBJECT:** Under 8 words. Specific to ${company} or their niche. No "Partnership Opportunity". No emojis. No ALL CAPS.
 
-**LINE 1 — HOOK:** Start with "Hi ${company}," then ONE sentence referencing something specific about ${company} based on their website/industry/niche. Make it clear you know who they are.
+**GREETING:** First line: "Hi ${greeting}," — Second line (no blank line between): "${company}" — Then a blank line before the body begins.
+
+**LINE 1 — HOOK:** ONE sentence referencing something specific about ${company} based on their website/industry/niche. Make it clear you know who they are.
 
 **LINES 2-3 — BRIDGE:** ONE sentence describing what ${senderCo} is/does (max). ONE sentence connecting ${senderCo}'s offer to ${company}'s world. Use this: ${offerContext || valueProp || angle}
 

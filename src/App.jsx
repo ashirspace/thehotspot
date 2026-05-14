@@ -2903,7 +2903,8 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            company: contact.company || contact.name || "the company",
+            company: contact.company || "the company",
+            contactName: contact.name || "",
             category: contact.category,
             website: contact.website || "",
             offerContext,
@@ -3233,6 +3234,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           company: form.recipientCompany,
+          contactName: form.contactName || "",
           category: template.id,
           website: form.website,
           offerContext: form.angle || pickAngle(template.id),
@@ -3691,7 +3693,8 @@ function Dashboard({ user, onLogout }) {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        company: contact.company_name || contact.company || contact.name || "the company",
+        company: contact.company_name || contact.company || "the company",
+        contactName: contact.name || "",
         category: contact.category || "Network",
         website: contact.website || "",
         offerContext,
