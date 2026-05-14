@@ -1,4 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import {
+  LuLayoutDashboard, LuUsers, LuFilePen, LuClipboardList, LuSettings,
+  LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuMessageSquare,
+  LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
+  LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
+} from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
@@ -655,7 +661,7 @@ function EmailPreviewModal({ email: e, onClose }) {
             {e.category && e.category !== "all" && (
               <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 20 }}>{e.category}</span>
             )}
-            <span style={{ fontSize: 11, background: "#ECFDF5", color: "#059669", padding: "2px 8px", borderRadius: 20, fontWeight: 600 }}>✓ Sent</span>
+            <span style={{ fontSize: 11, background: "#ECFDF5", color: "#059669", padding: "2px 8px", borderRadius: 20, fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><LuCheck size={11} /> Sent</span>
           </div>
         </div>
 
@@ -814,7 +820,7 @@ function TotalContactsPage({ onBack, user }) {
       {/* Contact list */}
       {filtered.length === 0 ? (
         <div style={{ textAlign: "center", padding: "48px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
-          <div style={{ fontSize: 32, marginBottom: 12 }}>👥</div>
+          <LuUsers size={32} style={{ marginBottom: 12, color: "#CBD5E1" }} />
           <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
           <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20 }}>{contacts.length === 0 ? "Add your first contact to get started." : "Try a different search or filter."}</div>
           {contacts.length === 0 && <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Add Contact</button>}
@@ -1014,7 +1020,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
 
       {!gmailConnected && (
         <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#92400E", display: "flex", alignItems: "center", gap: 8 }}>
-          <span>⚠️</span> Connect Gmail from the top bar to sync your total sent count.
+          <LuTriangleAlert size={16} style={{ flexShrink: 0 }} /> Connect Gmail from the top bar to sync your total sent count.
         </div>
       )}
 
@@ -1097,7 +1103,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
 
           {history.length === 0 && (
             <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📭</div>
+              <LuMailbox size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
               <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No emails sent yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
             </div>
@@ -1109,7 +1115,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {history.length === 0 ? (
             <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0" }}>
-              <div style={{ fontSize: 32, marginBottom: 10 }}>📭</div>
+              <LuMailbox size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
               <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No campaigns yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Your sent campaigns will appear here.</div>
             </div>
@@ -1123,8 +1129,8 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
                   width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
                   background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textAlign: "left",
                 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9, background: cat.bg || `${cat.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span style={{ fontSize: 16 }}>📧</span>
+                  <div style={{ width: 36, height: 36, borderRadius: 9, background: cat.bg || `${cat.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: cat.dot || "#94A3B8" }}>
+                    <LuMail size={16} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
@@ -1155,7 +1161,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
                             onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(99,102,241,0.1)"; }}
                             onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "none"; }}
                           >
-                            <span style={{ fontSize: 16 }}>✅</span>
+                            <LuCheck size={16} style={{ color: "#10b981", flexShrink: 0 }} />
                             <div style={{ flex: 1, minWidth: 0 }}>
                               <div style={{ fontSize: 12, fontWeight: 600, color: "#0F172A" }}>{c.company || c.email}</div>
                               {c.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {c.subject}</div>}
@@ -1282,7 +1288,7 @@ function SuccessRatePage({ onBack }) {
 
       {totalCampaigns === 0 ? (
         <div style={{ textAlign: "center", padding: "28px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 20 }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>📊</div>
+          <LuChartBar size={28} style={{ marginBottom: 8, color: "#CBD5E1" }} />
           <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No data yet</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign from the chat to see real success rates.</div>
         </div>
@@ -1327,7 +1333,7 @@ class AppErrorBoundary extends React.Component {
       return (
         <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#F0F4FF", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ background: "#fff", borderRadius: 16, padding: 32, maxWidth: 500, width: "100%", boxShadow: "0 4px 24px rgba(0,0,0,0.08)", border: "1px solid #E2E8F0" }}>
-            <div style={{ fontSize: 32, marginBottom: 12 }}>⚠️</div>
+            <LuTriangleAlert size={32} style={{ marginBottom: 12, color: "#F59E0B" }} />
             <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Something went wrong</div>
             <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20, background: "#F8FAFF", borderRadius: 8, padding: "12px 14px", fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
               {this.state.error?.message || String(this.state.error)}
@@ -1554,7 +1560,7 @@ function SpreadsheetEditor({ db, databases, saveDbs, onBack, showToast, T }) {
                     style={{ padding: "8px 12px", cursor: "pointer", display: "flex", alignItems: "center", gap: 6, userSelect: "none" }}
                     onMouseEnter={e => e.currentTarget.style.background = T.hv} onMouseLeave={e => e.currentTarget.style.background = "transparent"}>
                     <span style={{ fontSize: 11, color: T.tx3 }}>
-                      {col.type === "email" ? "✉" : col.type === "url" ? "🔗" : col.type === "number" ? "#" : col.type === "select" ? "☰" : "Aa"}
+                      {col.type === "email" ? "✉" : col.type === "url" ? <LuLink size={11} /> : col.type === "number" ? "#" : col.type === "select" ? "☰" : "Aa"}
                     </span>
                     <span style={{ fontSize: 12, fontWeight: 600, color: T.tx2, flex: 1 }}>{col.name}</span>
                     <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={T.tx3} strokeWidth="2.5"><polyline points="6 9 12 15 18 9" /></svg>
@@ -2058,7 +2064,7 @@ function CampaignStatusPage({ onBack }) {
 
       {emails24.length === 0 ? (
         <div style={{ textAlign: "center", padding: "40px 24px", background: "#FFFFFF", borderRadius: 14, border: "1px dashed #E2E8F0", marginBottom: 20 }}>
-          <div style={{ fontSize: 32, marginBottom: 10 }}>📡</div>
+          <LuRadio size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
           <div style={{ fontSize: 15, fontWeight: 600, color: "#0F172A", marginBottom: 6 }}>No emails sent in the last 24 hours</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
         </div>
@@ -2270,14 +2276,14 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
             background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
             color: gmailConnected ? "#059669" : "#ea580c",
           }}>
-            {gmailConnected ? "✓ Connected" : "Connect"}
+            {gmailConnected ? <><LuCheck size={12} /> Connected</> : "Connect"}
           </button>
         </Row>
         <Row label="Airtable" sub="Contact & campaign database">
           <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>Via env vars</span>
         </Row>
         <Row label="AI Agent" sub="Claude claude-sonnet-4-6 via Anthropic API">
-          <span style={{ fontSize: 12, fontWeight: 600, color: "#10b981" }}>✓ Active</span>
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#10b981", display: "inline-flex", alignItems: "center", gap: 4 }}><LuCheck size={12} /> Active</span>
         </Row>
       </Card>
     </div>
@@ -2490,7 +2496,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
 
       {!gmailToken && (
         <div style={{ ...card, background: "#FFF7ED", border: "1px solid #FED7AA", display: "flex", alignItems: "center", gap: 14, marginBottom: 20 }}>
-          <span style={{ fontSize: 24 }}>📧</span>
+          <LuMail size={24} style={{ color: "#9A3412", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#9A3412" }}>Gmail not connected</div>
             <div style={{ fontSize: 12, color: "#C2410C" }}>You need to connect Gmail to send emails</div>
@@ -2503,7 +2509,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         onClick={generateDrafts}
         style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#E2E8F0", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 4px 16px rgba(16,185,129,0.3)" : "none", transition: "all .2s" }}
       >
-        ✨ Generate {selectedIds.size} Draft{selectedIds.size !== 1 ? "s" : ""} with AI
+        <LuSparkles size={16} /> Generate {selectedIds.size} Draft{selectedIds.size !== 1 ? "s" : ""} with AI
       </button>
     </div>
   );
@@ -2511,8 +2517,8 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   /* ── GENERATING ── */
   if (step === "generating") return (
     <div style={card}>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center" }}>
-        ✨ Generating personalized drafts...
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+        <LuSparkles size={16} /> Generating personalized drafts...
       </div>
       <div style={{ background: "#F1F5FF", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#10b981,#0ea5e9)", width: `${genProgress.total ? (genProgress.current / genProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
@@ -2522,7 +2528,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
           {drafts.map((d, i) => (
             <div key={i} style={{ background: "#F8FAFF", border: "1px solid #E2E8F0", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ fontSize: 16 }}>✅</span>
+              <LuCheck size={16} style={{ color: "#10b981", flexShrink: 0 }} />
               <div>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{d.contact.company || d.contact.name}</div>
                 <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.subject}</div>
@@ -2577,7 +2583,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
           disabled={approvedCount === 0}
           style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "linear-gradient(135deg,#4F46E5,#0ea5e9)" : "#E2E8F0", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 4px 16px rgba(79,70,229,0.3)" : "none", transition: "all .2s" }}
         >
-          📤 Send {approvedCount} Email{approvedCount !== 1 ? "s" : ""}
+          <LuSend size={15} /> Send {approvedCount} Email{approvedCount !== 1 ? "s" : ""}
         </button>
       </div>
     );
@@ -2586,7 +2592,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   /* ── SENDING ── */
   if (step === "sending") return (
     <div style={card}>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center" }}>📤 Sending emails...</div>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "#0F172A", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><LuSend size={16} /> Sending emails...</div>
       <div style={{ background: "#F1F5FF", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#4F46E5,#0ea5e9)", width: `${sendProgress.total ? (sendProgress.current / sendProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
       </div>
@@ -2594,7 +2600,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
       <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
         {sendProgress.results.map((r, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: r.status === "sent" ? "#ECFDF5" : "#FEF2F2", borderRadius: 8 }}>
-            <span>{r.status === "sent" ? "✅" : "❌"}</span>
+            {r.status === "sent" ? <LuCheck size={16} style={{ color: "#10b981" }} /> : <LuX size={16} style={{ color: "#EF4444" }} />}
             <span style={{ fontSize: 13, color: "#0F172A", fontWeight: 500 }}>{r.contact.company || r.contact.name}</span>
             {r.error && <span style={{ fontSize: 11, color: "#EF4444", marginLeft: "auto" }}>{r.error}</span>}
           </div>
@@ -2606,7 +2612,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   /* ── DONE ── */
   return (
     <div style={{ ...card, textAlign: "center" }}>
-      <div style={{ fontSize: 48, marginBottom: 12 }}>🎉</div>
+      <LuPartyPopper size={48} style={{ marginBottom: 12, color: "#10b981" }} />
       <div style={{ fontSize: 18, fontWeight: 700, color: "#0F172A", marginBottom: 8 }}>Campaign Complete!</div>
       <div style={{ fontSize: 14, color: "#64748B", marginBottom: 24 }}>
         <span style={{ color: "#059669", fontWeight: 700 }}>{sentCount} sent</span>
@@ -2665,11 +2671,11 @@ const pickAngle = (id) => {
 };
 
 const TEMPLATES = [
-  { id: "Partnership", icon: "🤝", label: "Partnership", desc: "Natural fit between both companies",     color: "#6366f1", fields: ["recipientCompany", "contactName", "website", "angle"] },
-  { id: "Revenue",     icon: "💰", label: "Revenue",     desc: "Drive traffic, leads, or sales to them", color: "#10b981", fields: ["recipientCompany", "contactName", "website", "angle"] },
-  { id: "Integration", icon: "🔗", label: "Integration", desc: "Our users want their product",           color: "#0ea5e9", fields: ["recipientCompany", "contactName", "website", "angle"] },
-  { id: "Agency",      icon: "🏢", label: "Agency",      desc: "Client results & case study angle",      color: "#f97316", fields: ["recipientCompany", "contactName", "website", "angle"] },
-  { id: "Startup",     icon: "🚀", label: "Startup",     desc: "Growth & distribution angle",            color: "#ec4899", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Partnership", icon: <LuTarget size={22} />,      label: "Partnership", desc: "Natural fit between both companies",     color: "#6366f1", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Revenue",     icon: <LuDollarSign size={22} />,  label: "Revenue",     desc: "Drive traffic, leads, or sales to them", color: "#10b981", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Integration", icon: <LuLink size={22} />,        label: "Integration", desc: "Our users want their product",           color: "#0ea5e9", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Agency",      icon: <LuGlobe size={22} />,       label: "Agency",      desc: "Client results & case study angle",      color: "#f97316", fields: ["recipientCompany", "contactName", "website", "angle"] },
+  { id: "Startup",     icon: <LuZap size={22} />,         label: "Startup",     desc: "Growth & distribution angle",            color: "#ec4899", fields: ["recipientCompany", "contactName", "website", "angle"] },
 ];
 
 function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user }) {
@@ -2765,7 +2771,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
             onMouseEnter={e => { e.currentTarget.style.borderColor = t.color; e.currentTarget.style.boxShadow = `0 6px 24px ${t.color}22`; e.currentTarget.style.transform = "translateY(-2px)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
           >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, marginBottom: 14 }}>{t.icon}</div>
+            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: t.color, marginBottom: 14 }}>{t.icon}</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: T.tx, marginBottom: 5 }}>{t.label}</div>
             <div style={{ fontSize: 13, color: T.tx2, lineHeight: 1.5, marginBottom: 14 }}>{t.desc}</div>
             <div style={{ fontSize: 12, color: t.color, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
@@ -2785,7 +2791,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
       </button>
       {/* Template badge */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${template.color}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>{template.icon}</div>
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${template.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: template.color }}>{template.icon}</div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.tx }}>{template.label} Email</div>
           <div style={{ fontSize: 13, color: T.tx2 }}>{template.desc}</div>
@@ -2882,7 +2888,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         }}>
           {generating ? (
             <>{[0,1,2].map(d => <span key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite`, display: "inline-block" }} />)}</>
-          ) : "✨ Generate Email"}
+          ) : <><LuSparkles size={15} /> Generate Email</>}
         </button>
       </div>
     </div>
@@ -2913,7 +2919,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
             onFocus={e => { e.target.style.borderColor = template.color; e.target.style.boxShadow = `0 0 0 3px ${template.color}15`; }}
             onBlur={e => { e.target.style.borderColor = "#E2E8F0"; e.target.style.boxShadow = "none"; }} />
           <div style={{ fontSize: 11, color: email.subject.length > 50 ? "#ef4444" : T.tx3, marginTop: 4 }}>
-            {email.subject.length} / 50 chars {email.subject.length > 50 ? "⚠️ too long" : "✓"}
+            {email.subject.length} / 50 chars {email.subject.length > 50 ? <><LuTriangleAlert size={11} /> too long</> : <LuCheck size={11} />}
           </div>
         </div>
         {/* Divider */}
@@ -2932,7 +2938,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
       {/* Recipient email input if not provided */}
       {!form.recipientEmail && (
         <div style={{ background: "#FFF7ED", border: "1px solid #fed7aa", borderRadius: 12, padding: "14px 18px", marginBottom: 16, display: "flex", alignItems: "center", gap: 12 }}>
-          <span style={{ fontSize: 16 }}>⚠️</span>
+          <LuTriangleAlert size={16} style={{ color: "#92400e", flexShrink: 0 }} />
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: 13, fontWeight: 600, color: "#92400e", marginBottom: 6 }}>Add recipient email to send</div>
             <input style={{ ...inp, width: "100%", background: "#fff", fontSize: 13 }} placeholder="partner@company.com"
@@ -2952,7 +2958,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
           boxShadow: `0 4px 14px ${template.color}40`, transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
-          {sending ? "Sending..." : "📤 Send Email"}
+          {sending ? "Sending..." : <><LuSend size={15} /> Send Email</>}
         </button>
         <button onClick={() => { navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`); showToast("Copied to clipboard"); }} style={{
           padding: "13px 18px", borderRadius: 12, border: "1px solid #E2E8F0", background: "#F8FAFF",
@@ -3655,15 +3661,15 @@ function Dashboard({ user, onLogout }) {
 
   // All nav items shown as dashboard cards
   const navItems = [
-    { id: "emailSender",    label: "Email Sender",      icon: "📤", desc: "Draft & send outreach",      accent: "#10b981" },
-    { id: "emailTemplates", label: "Email Templates",   icon: "✍️", desc: "Pick template & generate",   accent: "#6366f1" },
-    { id: "contacts",       label: "Contacts DB",       icon: "📋", desc: "Manage your contacts",       accent: "#f97316" },
-    { id: "campaignStatus", label: "Campaign Status",   icon: "📡", desc: "Track active campaigns",     accent: "#0ea5e9" },
-    { id: "totalContacts",  label: "Total Contacts",    icon: "👥", desc: "All contacts overview",      accent: "#8b5cf6" },
-    { id: "emailsSent",     label: "Emails Sent",       icon: "📧", desc: "View sent emails",           accent: "#ec4899" },
-    { id: "categories",     label: "Categories",        icon: "📁", desc: "Network, CPS, CPL…",         accent: "#14b8a6" },
-    { id: "successRate",    label: "Success Rate",      icon: "✅", desc: "Campaign performance",       accent: "#f59e0b" },
-    { id: "profile",        label: "Settings",          icon: "⚙️", desc: "Account & preferences",     accent: "#64748B" },
+    { id: "emailSender",    label: "Email Sender",      icon: <LuSend size={18} />,            desc: "Draft & send outreach",      accent: "#10b981" },
+    { id: "emailTemplates", label: "Email Templates",   icon: <LuFilePen size={18} />,        desc: "Pick template & generate",   accent: "#6366f1" },
+    { id: "contacts",       label: "Contacts DB",       icon: <LuClipboardList size={18} />,   desc: "Manage your contacts",       accent: "#f97316" },
+    { id: "campaignStatus", label: "Campaign Status",   icon: <LuRadio size={18} />,           desc: "Track active campaigns",     accent: "#0ea5e9" },
+    { id: "totalContacts",  label: "Total Contacts",    icon: <LuUsers size={18} />,           desc: "All contacts overview",      accent: "#8b5cf6" },
+    { id: "emailsSent",     label: "Emails Sent",       icon: <LuMail size={18} />,            desc: "View sent emails",           accent: "#ec4899" },
+    { id: "categories",     label: "Categories",        icon: <LuFolder size={18} />,          desc: "Network, CPS, CPL…",         accent: "#14b8a6" },
+    { id: "successRate",    label: "Success Rate",      icon: <LuTrendingUp size={18} />,      desc: "Campaign performance",       accent: "#f59e0b" },
+    { id: "profile",        label: "Settings",          icon: <LuSettings size={18} />,        desc: "Account & preferences",     accent: "#64748B" },
   ];
 
   const pageLabel = navItems.find(n => n.id === page)?.label || "Page";
@@ -3698,7 +3704,7 @@ function Dashboard({ user, onLogout }) {
               <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
               <button onClick={() => setPage("dashboard")} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", padding: 0, fontFamily: "'DM Sans',sans-serif" }}>Dashboard</button>
               <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{pageIcon} {pageLabel}</span>
+              <span style={{ fontSize: 13, fontWeight: 600, color: "#0F172A", display: "flex", alignItems: "center", gap: 6 }}>{pageIcon}{pageLabel}</span>
             </>
           )}
           {page === "dashboard" && (
@@ -3712,7 +3718,7 @@ function Dashboard({ user, onLogout }) {
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {page !== null && (
             <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              💬 Chat
+              <LuMessageSquare size={14} /> Chat
             </button>
           )}
           <button onClick={() => setPage("profile")} title="Profile" style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", border: "2px solid #E2E8F0", cursor: "pointer", transition: "border-color .15s", flexShrink: 0 }}
@@ -3743,11 +3749,11 @@ function Dashboard({ user, onLogout }) {
         }}>
           <div style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", padding: "4px 14px 10px" }}>Navigation</div>
           {[
-            { id: "dashboard",      label: "Dashboard",       icon: "🏠" },
-            { id: "totalContacts",  label: "Total Contacts",  icon: "👥" },
-            { id: "emailTemplates", label: "Email Templates", icon: "✍️" },
-            { id: "contacts",       label: "Contacts DB",     icon: "📋" },
-            { id: "settings",       label: "Settings",        icon: "⚙️" },
+            { id: "dashboard",      label: "Dashboard",       icon: <LuLayoutDashboard size={16} /> },
+            { id: "totalContacts",  label: "Total Contacts",  icon: <LuUsers size={16} /> },
+            { id: "emailTemplates", label: "Email Templates", icon: <LuFilePen size={16} /> },
+            { id: "contacts",       label: "Contacts DB",     icon: <LuClipboardList size={16} /> },
+            { id: "settings",       label: "Settings",        icon: <LuSettings size={16} /> },
           ].map(item => (
             <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 10,
@@ -3761,7 +3767,7 @@ function Dashboard({ user, onLogout }) {
               onMouseEnter={e => { if (page !== item.id) e.currentTarget.style.background = "#F8FAFC"; }}
               onMouseLeave={e => { if (page !== item.id) e.currentTarget.style.background = "transparent"; }}
             >
-              <span style={{ fontSize: 16 }}>{item.icon}</span>
+              {item.icon}
               {item.label}
             </button>
           ))}
@@ -3846,15 +3852,21 @@ function Dashboard({ user, onLogout }) {
               ))}
               {messages.length === 1 && !loading && (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
-                  {["📊 Show my stats", "📋 View contacts", "📧 Send emails", "📡 Campaign status"].map(chip => (
-                    <button key={chip} onClick={() => handleSend(chip.replace(/^\S+\s*/, ""))} style={{
+                  {[
+                    { icon: <LuChartBar size={13} />, label: "Show my stats",     cmd: "Show my stats" },
+                    { icon: <LuClipboardList size={13} />, label: "View contacts", cmd: "View contacts" },
+                    { icon: <LuMail size={13} />,      label: "Send emails",        cmd: "Send emails" },
+                    { icon: <LuRadio size={13} />,     label: "Campaign status",    cmd: "Campaign status" },
+                  ].map(chip => (
+                    <button key={chip.cmd} onClick={() => handleSend(chip.cmd)} style={{
                       padding: "8px 16px", borderRadius: 20, border: "1px solid #E2E8F0", background: "#FFFFFF",
                       color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
                       transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.06)",
+                      display: "flex", alignItems: "center", gap: 6,
                     }}
                       onMouseEnter={e => { e.currentTarget.style.background = "#EEF2FF"; e.currentTarget.style.borderColor = "#4F46E5"; }}
                       onMouseLeave={e => { e.currentTarget.style.background = "#FFFFFF"; e.currentTarget.style.borderColor = "#E2E8F0"; }}
-                    >{chip}</button>
+                    >{chip.icon}{chip.label}</button>
                   ))}
                 </div>
               )}
@@ -3931,7 +3943,7 @@ function Dashboard({ user, onLogout }) {
                         onMouseEnter={e => { e.currentTarget.style.borderColor = item.accent; e.currentTarget.style.boxShadow = `0 6px 20px ${item.accent}20`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                         onMouseLeave={e => { e.currentTarget.style.borderColor = "#E2E8F0"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.05)"; e.currentTarget.style.transform = "none"; }}
                       >
-                        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${item.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 18, marginBottom: 10 }}>
+                        <div style={{ width: 38, height: 38, borderRadius: 10, background: `${item.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: item.accent, marginBottom: 10 }}>
                           {item.icon}
                         </div>
                         <div style={{ fontSize: 14, fontWeight: 600, color: "#0F172A", marginBottom: 3 }}>{item.label}</div>
