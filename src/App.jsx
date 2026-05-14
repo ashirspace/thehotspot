@@ -1041,238 +1041,236 @@ function TotalContactsPage({ onBack, user }) {
 }
 
 function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
-  const [tab, setTab] = useState("overview"); // "overview" | "history"
+  const [tab, setTab] = useState("overview");
   const [expandedId, setExpandedId] = useState(null);
   const [openEmail, setOpenEmail] = useState(null);
-  const [remoteLoaded, setRemoteLoaded] = useState(false);
 
   const [history, setHistory] = useState(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; }
   });
 
-  // Fetch from Airtable in the background and merge
   useEffect(() => {
     fetch("/api/campaigns/list")
       .then(r => r.json())
-      .then(data => {
-        if (data.configured && data.campaigns?.length > 0) {
-          setHistory(data.campaigns);
-          setRemoteLoaded(true);
-        }
-      })
+      .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
       .catch(() => {});
   }, []);
 
-  // Aggregate stats from local campaign history
-  const totalSentLocal = useMemo(() => history.reduce((s, h) => s + (h.sent || 0), 0), [history]);
-  const totalFailed    = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
+  const totalSent     = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
+  const totalFailed   = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
   const totalCancelled = useMemo(() => history.filter(h => h.cancelled).length, [history]);
-  const deliveryRate   = totalSentLocal + totalFailed > 0 ? Math.round(totalSentLocal / (totalSentLocal + totalFailed) * 100) : 0;
+  const deliveryRate  = totalSent + totalFailed > 0 ? Math.round(totalSent / (totalSent + totalFailed) * 100) : 0;
+  const rateColor     = deliveryRate >= 80 ? "#10b981" : deliveryRate >= 50 ? "#facc15" : deliveryRate > 0 ? "#f87171" : "#ffffff20";
 
-  // Last 7 days bar chart from history
   const last7 = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, i) => {
       const d = new Date(); d.setDate(d.getDate() - (6 - i));
       return { label: d.toLocaleDateString("en", { weekday: "short" }), date: d.toDateString(), sent: 0 };
     });
-    history.forEach(h => {
-      const hDate = new Date(h.date).toDateString();
-      const slot = days.find(d => d.date === hDate);
-      if (slot) slot.sent += h.sent || 0;
-    });
+    history.forEach(h => { const slot = days.find(d => d.date === new Date(h.date).toDateString()); if (slot) slot.sent += h.sent || 0; });
     return days;
   }, [history]);
   const maxBar = Math.max(...last7.map(d => d.sent), 1);
 
-  // Category breakdown
-  const byCat = useMemo(() => history.reduce((acc, h) => {
-    const k = h.category || "other";
-    if (!acc[k]) acc[k] = 0;
-    acc[k] += h.sent || 0;
-    return acc;
-  }, {}), [history]);
+  const byCat = useMemo(() => history.reduce((acc, h) => { const k = h.category || "Other"; acc[k] = (acc[k] || 0) + (h.sent || 0); return acc; }, {}), [history]);
 
-  const displayTotal = totalSentLocal;
-
-  const tabStyle = (active) => ({
-    padding: "8px 20px", borderRadius: 8, border: "none", cursor: "pointer",
+  const tabBtn = (id) => ({
+    padding: "7px 18px", borderRadius: 8, border: "none", cursor: "pointer",
     fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600, transition: "all .15s",
-    background: active ? "#6366f1" : "transparent",
-    color: active ? "#fff" : "#64748B",
+    background: tab === id ? "#6366f1" : "transparent", color: tab === id ? "#fff" : "#64748B",
   });
 
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ width: 44, height: 44, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><I.Mail /></div>
-          <div>
-            <div style={{ fontSize: 28, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace", lineHeight: 1 }}>{displayTotal.toLocaleString()}</div>
-            <div style={{ fontSize: 12, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5, marginTop: 2 }}>Emails Sent</div>
-          </div>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Emails Sent</div>
+          <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} · {totalSent + totalFailed} attempted</div>
         </div>
-        {/* Tab toggle */}
-        <div style={{ display: "flex", background: "#16161e", borderRadius: 10, padding: 3, gap: 2 }}>
-          <button style={tabStyle(tab === "overview")} onClick={() => setTab("overview")}>Overview</button>
-          <button style={tabStyle(tab === "history")} onClick={() => setTab("history")}>History</button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ background: "#6366f118", border: "1px solid #6366f130", borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
+            <div style={{ fontSize: 26, fontWeight: 900, color: "#6366f1", letterSpacing: -1 }}>{totalSent.toLocaleString()}</div>
+            <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Delivered</div>
+          </div>
+          <div style={{ display: "flex", background: "#16161e", borderRadius: 10, padding: 3, gap: 2 }}>
+            <button style={tabBtn("overview")} onClick={() => setTab("overview")}>Overview</button>
+            <button style={tabBtn("history")} onClick={() => setTab("history")}>History</button>
+          </div>
         </div>
       </div>
 
       {!gmailConnected && (
-        <div style={{ background: "#FFFBEB", border: "1px solid #FDE68A", borderRadius: 10, padding: "12px 16px", marginBottom: 18, fontSize: 13, color: "#92400E", display: "flex", alignItems: "center", gap: 8 }}>
-          <LuTriangleAlert size={16} style={{ flexShrink: 0 }} /> Connect Gmail from the top bar to sync your total sent count.
+        <div style={{ background: "#1a140a", border: "1px solid #f59e0b30", borderRadius: 10, padding: "11px 14px", marginBottom: 18, fontSize: 12, color: "#f59e0b", display: "flex", alignItems: "center", gap: 8 }}>
+          <LuTriangleAlert size={14} style={{ flexShrink: 0 }} /> Connect Gmail to sync your live sent count.
         </div>
       )}
 
       {tab === "overview" && (
         <>
-          {/* Stats row */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10, marginBottom: 20 }}>
+          {/* Stat cards */}
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10, marginBottom: 16 }}>
             {[
-              { label: "Sent", value: totalSentLocal, color: "#6366f1", bg: "#6366f110" },
-              { label: "Failed", value: totalFailed, color: "#EF4444", bg: "#EF444410" },
-              { label: "Campaigns", value: history.length, color: "#0ea5e9", bg: "#0ea5e910" },
+              { label: "Delivered", value: totalSent,       color: "#6366f1" },
+              { label: "Failed",    value: totalFailed,     color: "#f87171" },
+              { label: "Campaigns", value: history.length,  color: "#0ea5e9" },
+              { label: "Cancelled", value: totalCancelled,  color: "#facc15" },
             ].map(s => (
-              <div key={s.label} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px 16px", boxShadow: "0 1px 3px rgba(0,0,0,0.25)", textAlign: "center" }}>
-                <div style={{ fontSize: 22, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: .5, marginTop: 4 }}>{s.label}</div>
+              <div key={s.label} style={{ background: "#111116", border: `1px solid ${s.color}18`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
+                <div style={{ fontSize: 22, fontWeight: 900, color: s.color, letterSpacing: -0.8, marginBottom: 3 }}>{s.value}</div>
+                <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{s.label}</div>
               </div>
             ))}
           </div>
 
-          {/* Delivery rate bar */}
-          <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-              <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Delivery Rate</div>
-              <div style={{ fontSize: 18, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>{deliveryRate}%</div>
-            </div>
-            <div style={{ height: 8, background: "#ffffff10", borderRadius: 4, overflow: "hidden" }}>
-              <div style={{ width: `${deliveryRate}%`, height: "100%", background: "linear-gradient(90deg,#6366f1,#059669)", borderRadius: 4, transition: "width .6s ease" }} />
-            </div>
-            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8, fontSize: 11, color: "#94A3B8" }}>
-              <span>{totalSentLocal} delivered</span>
-              <span>{totalFailed} failed</span>
-            </div>
-          </div>
-
-          {/* 7-day bar chart */}
-          <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", marginBottom: 16, boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 16 }}>Last 7 Days</div>
-            <div style={{ display: "flex", alignItems: "flex-end", gap: 6, height: 100 }}>
-              {last7.map(d => {
-                const pct = d.sent / maxBar;
-                return (
-                  <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
-                    <span style={{ fontSize: 10, color: d.sent > 0 ? "#6366f1" : "#CBD5E1", fontWeight: 600, fontFamily: "'JetBrains Mono',monospace" }}>{d.sent || ""}</span>
-                    <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 60 }}>
-                      <div style={{ width: "100%", height: `${Math.max(pct * 60, d.sent > 0 ? 6 : 3)}px`, background: d.sent > 0 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "#ffffff10", borderRadius: "4px 4px 2px 2px", transition: "height .4s ease" }} />
-                    </div>
-                    <span style={{ fontSize: 10, color: "#94A3B8", fontWeight: 500 }}>{d.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* By category */}
-          {Object.keys(byCat).length > 0 && (
-            <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
-              <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 14 }}>By Category</div>
-              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                {Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([cat, count]) => {
-                  const c = CAT[cat] || { dot: "#94A3B8", text: "#64748B" };
-                  const pct = totalSentLocal > 0 ? Math.round(count / totalSentLocal * 100) : 0;
-                  return (
-                    <div key={cat}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 5 }}>
-                        <div style={{ display: "flex", alignItems: "center", gap: 7 }}>
-                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
-                          <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{cat}</span>
-                        </div>
-                        <span style={{ fontSize: 12, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
-                      </div>
-                      <div style={{ height: 5, background: "#ffffff10", borderRadius: 3, overflow: "hidden" }}>
-                        <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .5s ease" }} />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {history.length === 0 && (
-            <div style={{ textAlign: "center", padding: "40px 24px", background: "#111116", borderRadius: 14, border: "1px dashed #ffffff10" }}>
-              <LuMailbox size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>No emails sent yet</div>
+          {history.length === 0 ? (
+            <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
+              <LuMailbox size={32} style={{ marginBottom: 12, color: "#334155" }} />
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No emails sent yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
             </div>
+          ) : (
+            <>
+              {/* Delivery rate */}
+              <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Delivery Rate</span>
+                  <span style={{ fontSize: 18, fontWeight: 800, color: rateColor }}>{deliveryRate}%</span>
+                </div>
+                <div style={{ height: 8, background: "#ffffff08", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
+                  <div style={{ width: `${deliveryRate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${rateColor})`, borderRadius: 4, transition: "width .6s ease" }} />
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748B" }}>
+                  <span style={{ color: "#10b981" }}>✓ {totalSent} delivered</span>
+                  <span style={{ color: "#f87171" }}>✗ {totalFailed} failed</span>
+                </div>
+              </div>
+
+              {/* 7-day chart */}
+              <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
+                <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 18 }}>Last 7 Days</div>
+                <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 90 }}>
+                  {last7.map(d => {
+                    const h = Math.max((d.sent / maxBar) * 64, d.sent > 0 ? 8 : 3);
+                    const isToday = d.date === new Date().toDateString();
+                    return (
+                      <div key={d.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+                        {d.sent > 0 && <span style={{ fontSize: 10, fontWeight: 700, color: "#6366f1" }}>{d.sent}</span>}
+                        <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 64 }}>
+                          <div style={{
+                            width: "100%", height: `${h}px`,
+                            background: d.sent > 0 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "#ffffff08",
+                            borderRadius: "4px 4px 2px 2px", transition: "height .4s ease",
+                            boxShadow: d.sent > 0 ? "0 0 10px #6366f130" : "none",
+                          }} />
+                        </div>
+                        <span style={{ fontSize: 10, color: isToday ? "#6366f1" : "#475569", fontWeight: isToday ? 700 : 400 }}>{d.label}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* By category */}
+              {Object.keys(byCat).length > 0 && (
+                <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, overflow: "hidden" }}>
+                  <div style={{ padding: "14px 18px", borderBottom: "1px solid #ffffff08", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>By Category</div>
+                  {Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([cat, count], i, arr) => {
+                    const c = CAT[cat] || { dot: "#94A3B8" };
+                    const pct = totalSent > 0 ? Math.round(count / totalSent * 100) : 0;
+                    return (
+                      <div key={cat} style={{ padding: "12px 18px", borderBottom: i < arr.length - 1 ? "1px solid #ffffff08" : "none" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
+                          <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, flexShrink: 0, boxShadow: `0 0 5px ${c.dot}80` }} />
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", flex: 1 }}>{cat}</span>
+                          <span style={{ fontSize: 11, color: c.dot, fontWeight: 700 }}>{count}</span>
+                          <span style={{ fontSize: 10, color: "#64748B", background: `${c.dot}15`, padding: "1px 7px", borderRadius: 10 }}>{pct}%</span>
+                        </div>
+                        <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                          <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 2, transition: "width .5s ease" }} />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </>
           )}
         </>
       )}
 
       {tab === "history" && (
-        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "40px 24px", background: "#111116", borderRadius: 14, border: "1px dashed #ffffff10" }}>
-              <LuMailbox size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>No campaigns yet</div>
+            <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
+              <LuMailbox size={32} style={{ marginBottom: 12, color: "#334155" }} />
+              <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No campaigns yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Your sent campaigns will appear here.</div>
             </div>
-          ) : history.map(h => {
+          ) : [...history].reverse().map(h => {
             const isOpen = expandedId === h.id;
-            const cat = CAT[h.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
-            const dateStr = new Date(h.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+            const c = CAT[h.category] || { dot: "#94A3B8" };
+            const total = (h.sent || 0) + (h.failed || 0);
+            const pct = total > 0 ? Math.round((h.sent || 0) / total * 100) : 0;
+            const pctColor = pct >= 80 ? "#10b981" : pct >= 50 ? "#facc15" : "#f87171";
+            const dateStr = new Date(h.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" });
             return (
-              <div key={h.id} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
+              <div key={h.id} style={{ background: "#111116", border: `1px solid ${isOpen ? c.dot + "30" : "#ffffff0d"}`, borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
                 <button onClick={() => setExpandedId(isOpen ? null : h.id)} style={{
                   width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
                   background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textAlign: "left",
                 }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 9, background: cat.bg || `${cat.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: cat.dot || "#94A3B8" }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: c.dot }}>
                     <LuMail size={16} />
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 2 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{h.category || "Campaign"}</span>
-                      {h.cancelled && <span style={{ fontSize: 10, fontWeight: 600, color: "#f59e0b", background: "#FEF3C7", padding: "1px 7px", borderRadius: 20 }}>Cancelled</span>}
+                      {h.cancelled && <span style={{ fontSize: 10, fontWeight: 600, color: "#facc15", background: "#facc1518", border: "1px solid #facc1530", padding: "1px 7px", borderRadius: 10 }}>Cancelled</span>}
                     </div>
-                    <div style={{ fontSize: 11, color: "#94A3B8" }}>{dateStr}</div>
+                    <div style={{ fontSize: 11, color: "#475569" }}>{dateStr}</div>
                   </div>
-                  <div style={{ display: "flex", gap: 12, flexShrink: 0, alignItems: "center" }}>
-                    <span style={{ fontSize: 13, fontWeight: 700, color: "#059669", fontFamily: "'JetBrains Mono',monospace" }}>{h.sent} sent</span>
-                    {h.failed > 0 && <span style={{ fontSize: 12, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{h.failed} failed</span>}
-                    <span style={{ color: "#94A3B8", fontSize: 14, transform: isOpen ? "rotate(90deg)" : "rotate(0)", transition: "transform .2s", display: "inline-block" }}>›</span>
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 4, flexShrink: 0 }}>
+                    <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>{h.sent || 0} sent</span>
+                      {(h.failed || 0) > 0 && <span style={{ fontSize: 12, color: "#f87171" }}>{h.failed} failed</span>}
+                      <span style={{ color: "#334155", fontSize: 13, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .2s", display: "inline-block" }}>›</span>
+                    </div>
+                    <div style={{ width: 80, height: 3, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                      <div style={{ width: `${pct}%`, height: "100%", background: pctColor, borderRadius: 2 }} />
+                    </div>
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div style={{ borderTop: "1px solid #ffffff08", padding: "12px 16px", background: "#0d0d12" }}>
+                  <div style={{ borderTop: "1px solid #ffffff08", padding: "14px 16px", background: "#0d0d12" }}>
                     {h.offerContext && (
-                      <div style={{ fontSize: 12, color: "#64748B", marginBottom: 10, padding: "8px 12px", background: "#111116", borderRadius: 8, border: "1px solid #ffffff10", lineHeight: 1.6 }}>
-                        <strong style={{ color: "#F1F5F9" }}>Offer:</strong> {h.offerContext}
+                      <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, padding: "10px 12px", background: "#111116", borderRadius: 8, border: "1px solid #ffffff0d", lineHeight: 1.6 }}>
+                        <span style={{ color: "#64748B", fontWeight: 600 }}>Offer context: </span>{h.offerContext}
                       </div>
                     )}
                     {h.contacts && h.contacts.length > 0 ? (
-                      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-                        <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Recipients</div>
-                        {h.contacts.map((c, i) => (
-                          <div key={i} onClick={() => setOpenEmail({ ...c, category: h.category })} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 10px", background: "#111116", borderRadius: 8, border: "1px solid #ffffff10", cursor: "pointer", transition: "all .15s" }}
-                            onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 2px 8px rgba(99,102,241,0.1)"; }}
-                            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "none"; }}
-                          >
-                            <LuCheck size={16} style={{ color: "#10b981", flexShrink: 0 }} />
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                              <div style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9" }}>{c.company || c.email}</div>
-                              {c.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {c.subject}</div>}
+                      <>
+                        <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", textTransform: "uppercase", letterSpacing: 1, marginBottom: 8 }}>Recipients ({h.contacts.length})</div>
+                        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                          {h.contacts.map((ct, i) => (
+                            <div key={i} onClick={() => setOpenEmail({ ...ct, category: h.category })}
+                              style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "#111116", borderRadius: 10, border: "1px solid #ffffff0d", cursor: "pointer", transition: "all .15s" }}
+                              onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f150"; e.currentTarget.style.background = "#16161e"; }}
+                              onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
+                            >
+                              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
+                              <div style={{ flex: 1, minWidth: 0 }}>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9" }}>{ct.company || ct.email}</div>
+                                {ct.subject && <div style={{ fontSize: 11, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ct.subject}</div>}
+                              </div>
+                              <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, flexShrink: 0 }}>View →</span>
                             </div>
-                            <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 500, flexShrink: 0 }}>View →</span>
-                          </div>
-                        ))}
-                      </div>
+                          ))}
+                        </div>
+                      </>
                     ) : (
-                      <div style={{ fontSize: 12, color: "#94A3B8" }}>No recipient details recorded.</div>
+                      <div style={{ fontSize: 12, color: "#475569" }}>No recipient details recorded.</div>
                     )}
                   </div>
                 )}
@@ -1282,7 +1280,6 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected }) {
         </div>
       )}
 
-      {/* Email preview modal */}
       {openEmail && <EmailPreviewModal email={openEmail} onClose={() => setOpenEmail(null)} />}
     </div>
   );
