@@ -2197,6 +2197,93 @@ function ProfilePage({ user, onBack, onLogout }) {
   );
 }
 
+/* ───────── SETTINGS ───────── */
+function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
+  const [defaultChars, setDefaultChars] = useState(() => parseInt(localStorage.getItem("thehotspot_default_chars") || "400"));
+  const [sendDelay, setSendDelay] = useState(() => parseInt(localStorage.getItem("thehotspot_send_delay") || "2500"));
+
+  const save = (key, val) => localStorage.setItem(key, String(val));
+
+  const Row = ({ label, sub, children }) => (
+    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #F1F5F9" }}>
+      <div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "#0F172A" }}>{label}</div>
+        {sub && <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{sub}</div>}
+      </div>
+      {children}
+    </div>
+  );
+
+  const Card = ({ title, children }) => (
+    <div style={{ background: "#FFFFFF", border: "1px solid #E2E8F0", borderRadius: 14, padding: "4px 20px 12px", boxShadow: "0 1px 4px rgba(0,0,0,0.04)", marginBottom: 16 }}>
+      <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 700, padding: "16px 0 4px" }}>{title}</div>
+      {children}
+    </div>
+  );
+
+  const weekNumber = () => {
+    const created = parseInt(localStorage.getItem("thehotspot_account_created") || Date.now());
+    return Math.min(4, Math.floor((Date.now() - created) / 604800000) + 1);
+  };
+  const dailyLimits = [10, 20, 35, 50];
+  const week = weekNumber();
+
+  return (
+    <div>
+      <BackButton onClick={onBack} />
+      <div style={{ fontSize: 20, fontWeight: 700, color: "#0F172A", marginBottom: 24 }}>Settings</div>
+
+      <Card title="Email Preferences">
+        <Row label="Default email length" sub="Characters per email body">
+          <select value={defaultChars} onChange={e => { setDefaultChars(+e.target.value); save("thehotspot_default_chars", e.target.value); }}
+            style={{ border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "#0F172A", background: "#F8FAFC", cursor: "pointer" }}>
+            <option value={200}>Short (200)</option>
+            <option value={400}>Medium (400)</option>
+            <option value={800}>Long (800)</option>
+          </select>
+        </Row>
+        <Row label="Delay between sends" sub="Prevents spam flags — min 1s">
+          <select value={sendDelay} onChange={e => { setSendDelay(+e.target.value); save("thehotspot_send_delay", e.target.value); }}
+            style={{ border: "1px solid #E2E8F0", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "#0F172A", background: "#F8FAFC", cursor: "pointer" }}>
+            <option value={1000}>1 second</option>
+            <option value={2500}>2.5 seconds</option>
+            <option value={5000}>5 seconds</option>
+          </select>
+        </Row>
+      </Card>
+
+      <Card title="Send Limits (Warm-Up)">
+        <Row label="Current week" sub="Account warm-up schedule">
+          <span style={{ fontSize: 13, fontWeight: 700, color: "#4F46E5" }}>Week {week}</span>
+        </Row>
+        {dailyLimits.map((limit, i) => (
+          <Row key={i} label={`Week ${i + 1}`} sub={i + 1 === week ? "Current" : i + 1 < week ? "Completed" : "Upcoming"}>
+            <span style={{ fontSize: 13, fontWeight: 600, color: i + 1 === week ? "#10b981" : i + 1 < week ? "#94A3B8" : "#CBD5E1" }}>{limit} emails/day</span>
+          </Row>
+        ))}
+      </Card>
+
+      <Card title="Integrations">
+        <Row label="Gmail" sub="Used to send outreach emails">
+          <button onClick={connectGmail} style={{
+            padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none",
+            background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
+            color: gmailConnected ? "#059669" : "#ea580c",
+          }}>
+            {gmailConnected ? "✓ Connected" : "Connect"}
+          </button>
+        </Row>
+        <Row label="Airtable" sub="Contact & campaign database">
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>Via env vars</span>
+        </Row>
+        <Row label="AI Agent" sub="Claude claude-sonnet-4-6 via Anthropic API">
+          <span style={{ fontSize: 12, fontWeight: 600, color: "#10b981" }}>✓ Active</span>
+        </Row>
+      </Card>
+    </div>
+  );
+}
+
 /* ───────── EMAIL SENDER ───────── */
 function makeGmailMessage({ to, subject, body, html = false }) {
   const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
@@ -2893,6 +2980,7 @@ function Dashboard({ user, onLogout }) {
     categories:     "/categories",
     successRate:    "/success-rate",
     profile:        "/profile",
+    settings:       "/settings",
   };
   const PATH_TO_PAGE = Object.fromEntries(Object.entries(PAGE_TO_PATH).map(([k, v]) => [v, k === "null" ? null : k]));
 
@@ -3620,18 +3708,19 @@ function Dashboard({ user, onLogout }) {
             </>
           )}
         </div>
-        {/* Right: Chat / Dashboard toggle only */}
+        {/* Right: Chat toggle + profile avatar */}
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           {page !== null && (
             <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
               💬 Chat
             </button>
           )}
-          {page === null && (
-            <button onClick={() => setPage("dashboard")} style={{ display: "flex", alignItems: "center", gap: 6, background: "#EEF2FF", border: "none", borderRadius: 20, padding: "6px 14px", color: "#4F46E5", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              📊 Dashboard
-            </button>
-          )}
+          <button onClick={() => setPage("profile")} title="Profile" style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", border: "2px solid #E2E8F0", cursor: "pointer", transition: "border-color .15s", flexShrink: 0 }}
+            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
+            onMouseLeave={e => e.currentTarget.style.borderColor = "#E2E8F0"}
+          >
+            {user?.username?.[0]?.toUpperCase() || "U"}
+          </button>
         </div>
       </div>
 
@@ -3658,6 +3747,7 @@ function Dashboard({ user, onLogout }) {
             { id: "totalContacts",  label: "Total Contacts",  icon: "👥" },
             { id: "emailTemplates", label: "Email Templates", icon: "✍️" },
             { id: "contacts",       label: "Contacts DB",     icon: "📋" },
+            { id: "settings",       label: "Settings",        icon: "⚙️" },
           ].map(item => (
             <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 10,
@@ -3862,6 +3952,7 @@ function Dashboard({ user, onLogout }) {
               {page === "categories"     && <CategoriesPage onBack={() => setPage("dashboard")} />}
               {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} />}
               {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
+              {page === "settings"       && <SettingsPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
             </div>
           </div>
         )}
