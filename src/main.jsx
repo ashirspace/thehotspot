@@ -8,3 +8,11 @@ createRoot(document.getElementById('root')).render(
     <App />
   </StrictMode>,
 )
+
+const splash = document.getElementById('splash')
+if (splash) {
+  setTimeout(() => {
+    splash.style.opacity = '0'
+    setTimeout(() => splash.remove(), 500)
+  }, 900)
+}
