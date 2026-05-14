@@ -4525,100 +4525,168 @@ function Dashboard({ user, onLogout }) {
         <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
         {/* CHAT VIEW */}
-        {page === null && (
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#09090d" }}>
-            {/* Chat assistant header */}
-            <div style={{ padding: "10px 20px", borderBottom: "1px solid #ffffff10", display: "flex", alignItems: "center", gap: 10, background: "#111116" }}>
-              <div style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <I.Bot />
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Outreach Assistant</div>
-                <div style={{ fontSize: 11, color: "#10b981", display: "flex", alignItems: "center", gap: 4 }}>
-                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} /> Online
+        {page === null && (() => {
+          const renderMsg = (text) => {
+            const lines = text.split("\n");
+            return lines.map((line, li) => {
+              const parts = line.split(/(\*\*[^*]+\*\*)/g);
+              return (
+                <div key={li} style={{ minHeight: li < lines.length - 1 ? "1.7em" : undefined }}>
+                  {parts.map((p, pi) =>
+                    p.startsWith("**") && p.endsWith("**")
+                      ? <strong key={pi} style={{ color: "#f1f5f9", fontWeight: 700 }}>{p.slice(2, -2)}</strong>
+                      : p
+                  )}
                 </div>
-              </div>
-            </div>
+              );
+            });
+          };
 
-            {/* Messages */}
-            <div style={{ flex: 1, overflowY: "auto", padding: "20px 16px", display: "flex", flexDirection: "column", gap: 12, maxWidth: 760, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
-              {messages.map((m, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-                  <div style={{
-                    maxWidth: "80%", padding: "12px 16px", fontSize: 14, lineHeight: 1.65, whiteSpace: "pre-wrap",
-                    borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#111116",
-                    color: m.role === "user" ? "#fff" : "#F1F5F9",
-                    fontWeight: m.role === "user" ? 500 : 400,
-                    border: m.role === "user" ? "none" : "1px solid #ffffff10",
-                    boxShadow: m.role === "user" ? "0 4px 12px rgba(16,185,129,0.25)" : "0 2px 8px rgba(0,0,0,0.25)",
-                  }}>{m.content}</div>
-                </div>
-              ))}
-              {messages.length === 1 && !loading && (
-                <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
-                  {[
-                    { icon: <LuChartBar size={13} />, label: "Show my stats",     cmd: "Show my stats" },
-                    { icon: <LuClipboardList size={13} />, label: "View contacts", cmd: "View contacts" },
-                    { icon: <LuMail size={13} />,      label: "Send emails",        cmd: "Send emails" },
-                    { icon: <LuRadio size={13} />,     label: "Campaign status",    cmd: "Campaign status" },
-                  ].map(chip => (
-                    <button key={chip.cmd} onClick={() => handleSend(chip.cmd)} style={{
-                      padding: "8px 16px", borderRadius: 20, border: "1px solid #ffffff10", background: "#111116",
-                      color: "#818cf8", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-                      transition: "all .15s", boxShadow: "0 1px 4px rgba(0,0,0,0.25)",
-                      display: "flex", alignItems: "center", gap: 6,
-                    }}
-                      onMouseEnter={e => { e.currentTarget.style.background = "#6366f120"; e.currentTarget.style.borderColor = "#6366f1"; }}
-                      onMouseLeave={e => { e.currentTarget.style.background = "#111116"; e.currentTarget.style.borderColor = "#ffffff10"; }}
-                    >{chip.icon}{chip.label}</button>
-                  ))}
-                </div>
-              )}
-              {loading && (
-                <div style={{ display: "flex", justifyContent: "flex-start" }}>
-                  <div style={{ padding: "12px 18px", borderRadius: "18px 18px 18px 4px", background: "#111116", border: "1px solid #ffffff10", display: "flex", alignItems: "center", gap: 6, boxShadow: "0 2px 8px rgba(0,0,0,0.25)" }}>
-                    {[0, 1, 2].map(d => <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: "#10b981", animation: `pulse 1.2s ease-in-out ${d * .2}s infinite` }} />)}
+          const quickCards = [
+            { icon: <LuMail size={18} />,          label: "Send Emails",       desc: "Blast a campaign to contacts",         cmd: "Send emails to all contacts",                    color: "#10b981" },
+            { icon: <LuUsers size={18} />,          label: "Find Leads",        desc: "Discover new prospects online",        cmd: "Find 10 affiliate networks in Dubai",             color: "#0ea5e9" },
+            { icon: <LuRadio size={18} />,          label: "Campaign Status",   desc: "Check what's running right now",       cmd: "Campaign status",                                color: "#8b5cf6" },
+            { icon: <LuChartBar size={18} />,       label: "View Stats",        desc: "See your outreach performance",        cmd: "Show my stats",                                  color: "#f59e0b" },
+            { icon: <LuClipboardList size={18} />,  label: "Manage Contacts",   desc: "Browse or add contacts",               cmd: "View contacts",                                  color: "#f97316" },
+            { icon: <LuSend size={18} />,           label: "Send Follow-ups",   desc: "Re-engage non-replies automatically",  cmd: "Send follow-ups to contacts from 3 days ago",    color: "#ec4899" },
+          ];
+
+          return (
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#09090d" }}>
+
+              {/* ── Header ── */}
+              <div style={{ padding: "13px 20px", borderBottom: "1px solid #ffffff08", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111116", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ position: "relative" }}>
+                    <div style={{ width: 40, height: 40, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 18px #10b98135" }}>
+                      <I.Bot />
+                    </div>
+                    <div style={{ position: "absolute", bottom: 1, right: 1, width: 10, height: 10, borderRadius: "50%", background: "#10b981", border: "2px solid #111116", animation: "pulse 2s ease-in-out infinite" }} />
+                  </div>
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 2 }}>
+                      <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>Outreach Assistant</span>
+                      <span style={{ fontSize: 9, fontWeight: 700, letterSpacing: .8, textTransform: "uppercase", padding: "2px 7px", borderRadius: 20, background: "#10b98118", color: "#10b981", border: "1px solid #10b98130" }}>AI</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: "#475569" }}>Powered by Claude · Always ready</div>
                   </div>
                 </div>
-              )}
-              <div ref={chatEnd} />
-            </div>
-
-            {/* Chat Input */}
-            <div style={{ padding: "14px 16px", borderTop: "1px solid #ffffff10", background: "#111116" }}>
-              <div style={{ maxWidth: 760, margin: "0 auto", display: "flex", gap: 8, alignItems: "center" }}>
-                <button onClick={toggleVoice} style={{
-                  width: 44, height: 44, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-                  background: listening ? "#ECFDF5" : "#0d0d12",
-                  border: listening ? "2px solid #10b981" : "1px solid #ffffff10",
-                  color: listening ? "#10b981" : "#64748B",
-                  boxShadow: listening ? "0 0 0 4px #10b98122" : "none",
-                  animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
-                  transition: "all .2s",
-                }}>
-                  {listening ? <I.MicOff /> : <I.Mic />}
-                </button>
-                <input type="text" value={input} onChange={e => setInput(e.target.value)}
-                  onKeyDown={e => e.key === "Enter" && handleSend()}
-                  placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
-                  style={{ flex: 1, background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 24, padding: "11px 20px", color: "#E2E8F0", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", boxShadow: "inset 0 1px 3px rgba(0,0,0,0.25)" }}
-                  onFocus={e => { e.target.style.borderColor = "#10b981"; e.target.style.boxShadow = "0 0 0 3px #10b98115"; }}
-                  onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "inset 0 1px 3px rgba(0,0,0,0.25)"; }}
-                />
-                <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-                  width: 44, height: 44, borderRadius: "50%", border: "none", flexShrink: 0, cursor: input.trim() ? "pointer" : "default",
-                  background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#16161e",
-                  color: input.trim() ? "#fff" : "#94A3B8", display: "flex", alignItems: "center", justifyContent: "center",
-                  boxShadow: input.trim() ? "0 4px 12px rgba(16,185,129,0.3)" : "none",
-                  transition: "all .2s",
-                }}>
-                  <I.Send />
-                </button>
+                <button onClick={() => setMessages(prev => [prev[0]])} title="Clear chat" style={{
+                  background: "none", border: "1px solid #ffffff08", borderRadius: 8, padding: "5px 11px",
+                  fontSize: 11, fontWeight: 600, color: "#475569", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.borderColor = "#f4373744"; e.currentTarget.style.color = "#f43737"; }}
+                  onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.color = "#475569"; }}
+                >Clear</button>
               </div>
+
+              {/* ── Messages ── */}
+              <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 18, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
+
+                {/* Welcome screen — only when no conversation yet */}
+                {messages.length === 1 && !loading && (
+                  <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: 8 }}>
+                    {/* Glowing avatar */}
+                    <div style={{ width: 72, height: 72, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 48px #10b98130, 0 0 80px #0ea5e920", marginBottom: 18 }}>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1" fill="#fff"/></svg>
+                    </div>
+                    <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 6, textAlign: "center" }}>What can I help you with?</div>
+                    <div style={{ fontSize: 13, color: "#64748B", marginBottom: 28, textAlign: "center", maxWidth: 340, lineHeight: 1.6 }}>Send campaigns, find leads, check replies, or manage your pipeline — just ask.</div>
+
+                    {/* 6-card suggestion grid */}
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, width: "100%" }}>
+                      {quickCards.map(card => (
+                        <button key={card.cmd} onClick={() => handleSend(card.cmd)} style={{
+                          background: "#111116", border: "1px solid #ffffff08", borderRadius: 14, padding: "16px",
+                          cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+                        }}
+                          onMouseEnter={e => { e.currentTarget.style.borderColor = `${card.color}44`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; }}
+                        >
+                          <div style={{ width: 36, height: 36, borderRadius: 10, background: `${card.color}18`, border: `1px solid ${card.color}25`, display: "flex", alignItems: "center", justifyContent: "center", color: card.color, marginBottom: 10 }}>{card.icon}</div>
+                          <div style={{ fontSize: 13, fontWeight: 700, color: "#E2E8F0", marginBottom: 3 }}>{card.label}</div>
+                          <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.5 }}>{card.desc}</div>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Message bubbles */}
+                {messages.map((m, i) => (
+                  <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", gap: 10, alignItems: "flex-end" }}>
+                    {m.role === "assistant" && (
+                      <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2, boxShadow: "0 0 10px #10b98125" }}>
+                        <I.Bot />
+                      </div>
+                    )}
+                    <div style={{
+                      maxWidth: "78%", padding: "13px 17px", fontSize: 13.5, lineHeight: 1.75,
+                      borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
+                      background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#111116",
+                      color: m.role === "user" ? "#fff" : "#CBD5E1",
+                      fontWeight: m.role === "user" ? 500 : 400,
+                      border: m.role === "user" ? "none" : "1px solid #ffffff0d",
+                      boxShadow: m.role === "user" ? "0 4px 16px #10b98128" : "0 2px 12px rgba(0,0,0,0.3)",
+                    }}>{renderMsg(m.content)}</div>
+                  </div>
+                ))}
+
+                {/* Typing indicator */}
+                {loading && (
+                  <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
+                    <div style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 10px #10b98125" }}>
+                      <I.Bot />
+                    </div>
+                    <div style={{ padding: "14px 18px", borderRadius: "4px 18px 18px 18px", background: "#111116", border: "1px solid #ffffff0d", display: "flex", alignItems: "center", gap: 5, boxShadow: "0 2px 12px rgba(0,0,0,0.3)" }}>
+                      {[0, 1, 2].map(d => (
+                        <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: `hsl(${152 + d * 12},70%,50%)`, animation: `pulse 1.1s ease-in-out ${d * 0.18}s infinite` }} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <div ref={chatEnd} />
+              </div>
+
+              {/* ── Input ── */}
+              <div style={{ padding: "14px 20px 16px", borderTop: "1px solid #ffffff08", background: "#111116", flexShrink: 0 }}>
+                <div style={{ maxWidth: 800, margin: "0 auto" }}>
+                  <div style={{ display: "flex", gap: 8, alignItems: "center", background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 28, padding: "6px 6px 6px 16px", transition: "border-color .2s, box-shadow .2s" }}
+                    onFocus={() => {}} // handled on input
+                  >
+                    <button onClick={toggleVoice} style={{
+                      width: 34, height: 34, borderRadius: "50%", flexShrink: 0, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+                      background: listening ? "#10b98120" : "transparent", border: listening ? "1px solid #10b98150" : "1px solid transparent",
+                      color: listening ? "#10b981" : "#475569", transition: "all .2s",
+                      animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
+                    }}>
+                      {listening ? <I.MicOff /> : <I.Mic />}
+                    </button>
+                    <input type="text" value={input} onChange={e => setInput(e.target.value)}
+                      onKeyDown={e => e.key === "Enter" && handleSend()}
+                      placeholder={listening ? "Listening..." : "Ask anything or give a command..."}
+                      style={{ flex: 1, background: "transparent", border: "none", color: "#E2E8F0", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", padding: "6px 0" }}
+                    />
+                    <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
+                      width: 38, height: 38, borderRadius: "50%", border: "none", flexShrink: 0,
+                      cursor: input.trim() ? "pointer" : "default",
+                      background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1e1e28",
+                      color: input.trim() ? "#fff" : "#475569",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      boxShadow: input.trim() ? "0 4px 14px #10b98135" : "none",
+                      transition: "all .2s",
+                    }}>
+                      <I.Send />
+                    </button>
+                  </div>
+                  <div style={{ fontSize: 10, color: "#334155", textAlign: "center", marginTop: 7 }}>Press Enter to send · Powered by Claude</div>
+                </div>
+              </div>
+
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* PAGE VIEW */}
         {page !== null && (
