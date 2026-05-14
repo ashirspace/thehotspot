@@ -1639,8 +1639,25 @@ function OnboardingModal({ user, onComplete }) {
   const handleSubmit = async () => {
     if (!canSubmit) return;
     setSaving(true);
+
+    // Resolve Airtable record ID — may be missing for sessions created before this feature
+    let recordId = user?.airtableId;
+    if (!recordId) {
+      try {
+        const filter = user?.email
+          ? `{user_email}='${user.email}'`
+          : `{username}='${user.username}'`;
+        const records = await airtableFetch(filter);
+        recordId = records[0]?.id || "";
+        console.log("[Onboarding] Fetched recordId from Airtable:", recordId);
+      } catch (e) {
+        console.warn("[Onboarding] Could not fetch Airtable record ID:", e);
+      }
+    }
+
     const updated = {
       ...user,
+      airtableId: recordId,
       name:       form.fullName.trim(),
       username:   form.username.trim(),
       email:      form.email.trim(),
@@ -1651,8 +1668,8 @@ function OnboardingModal({ user, onComplete }) {
       profileComplete: true,
     };
     localStorage.setItem("thehotspot_user", JSON.stringify(updated));
-    console.log("[Onboarding] Saving to Airtable, recordId:", user?.airtableId);
-    await airtableUpdateUser(user?.airtableId, {
+    console.log("[Onboarding] Saving to Airtable, recordId:", recordId);
+    await airtableUpdateUser(recordId, {
       full_name:        updated.name,
       username:         updated.username,
       user_email:       updated.email,
