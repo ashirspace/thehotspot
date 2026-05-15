@@ -1777,7 +1777,7 @@ function OnboardingModal({ user, onComplete }) {
     setSaveError("");
 
     try {
-      // Resolve Airtable record ID — may be missing for old sessions
+      // Resolve Airtable record ID — may be missing for old/Google sessions
       let recordId = user?.airtableId;
       if (!recordId) {
         const filter = user?.email
@@ -1798,6 +1798,13 @@ function OnboardingModal({ user, onComplete }) {
         profile_complete: true,
       };
       if (form.website.trim()) airtableFields.website = form.website.trim();
+
+      // If still no record (e.g. Google login where Airtable create silently failed),
+      // create the record now with all the filled-in fields.
+      if (!recordId) {
+        const created = await airtableCreate(airtableFields);
+        recordId = created?.records?.[0]?.id || "";
+      }
 
       await airtableUpdateUser(recordId, airtableFields);
 
