@@ -267,8 +267,6 @@ Today: ${new Date().toISOString()}. Always reply in English only.`;
   return res.status(200).json({ message: parsed.message || "Got it!", action: parsed.action || "none", params: parsed.params || {} });
 }
 
-export const maxDuration = 10;
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");

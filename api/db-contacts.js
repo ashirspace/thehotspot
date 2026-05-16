@@ -1,7 +1,5 @@
 import { getDb, initDb } from "./_db.js";
 
-export const maxDuration = 10;
-
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
