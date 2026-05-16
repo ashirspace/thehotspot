@@ -19,7 +19,9 @@ async function dbUsers(body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Database request failed");
+  return data;
 }
 
 async function dbContacts(body) {
@@ -28,7 +30,9 @@ async function dbContacts(body) {
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ entity: "contact", ...body }),
   });
-  return res.json();
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || "Database request failed");
+  return data;
 }
 
 // Legacy-compatible wrappers used throughout the app
@@ -1807,7 +1811,7 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
         dbId = created.id || null;
       }
 
-      if (!dbId) throw new Error("Could not create or find your account. Please try again.");
+      if (!dbId) throw new Error("Account not found. Make sure DATABASE_URL is set in Vercel environment variables.");
 
       await dbUsers({ action: "update", id: dbId, fields });
 
