@@ -1754,7 +1754,7 @@ class AppErrorBoundary extends React.Component {
 }
 
 /* ───────── ONBOARDING MODAL ───────── */
-function OnboardingModal({ user, onComplete }) {
+function OnboardingModal({ user, onComplete, onDismiss }) {
   const [form, setForm] = useState({
     fullName:  user?.name     || "",
     username:  user?.username || "",
@@ -1844,8 +1844,14 @@ function OnboardingModal({ user, onComplete }) {
   ];
 
   return (
-    <div style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div style={{ background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
+    <div onClick={onDismiss} style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: "relative", background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
+        {onDismiss && (
+          <button onClick={onDismiss} style={{ position: "absolute", top: 16, right: 16, width: 32, height: 32, borderRadius: "50%", background: "#ffffff0d", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", fontSize: 18, lineHeight: 1, fontFamily: "sans-serif", transition: "all .15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#ffffff1a"; e.currentTarget.style.color = "#F1F5F9"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#ffffff0d"; e.currentTarget.style.color = "#64748B"; }}
+          >×</button>
+        )}
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <img src="/logo.png" alt="logo" style={{ width: 52, height: 52, objectFit: "contain", marginBottom: 14 }} />
           <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", marginBottom: 6 }}>Welcome to thehotspot!</div>
@@ -2057,7 +2063,7 @@ export default function App() {
   return (
     <AppErrorBoundary>
       <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />
-      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} />}
+      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} onDismiss={() => setShowOnboarding(false)} />}
     </AppErrorBoundary>
   );
 }
