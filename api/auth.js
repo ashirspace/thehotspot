@@ -1,3 +1,5 @@
+import { getDb } from "./_db.js";
+
 const CLIENT_ID = process.env.GMAIL_CLIENT_ID || "1033289222732-c7c1kudmf0tuh1ustp2jme38ii8kqbm5.apps.googleusercontent.com";
 
 export async function getAccessToken(refreshToken) {
@@ -19,37 +21,23 @@ export async function getAccessToken(refreshToken) {
 }
 
 export async function getRefreshTokenForUser(userId) {
-  const KEY = process.env.VITE_AIRTABLE_API_KEY;
-  const BASE = process.env.VITE_AIRTABLE_BASE_ID;
-  if (!KEY || !BASE) throw new Error("Airtable not configured");
-  const r = await fetch(
-    `https://api.airtable.com/v0/${BASE}/Users?filterByFormula=${encodeURIComponent(`OR({Username}="${userId}",{Email}="${userId}")`)}`,
-    { headers: { Authorization: `Bearer ${KEY}` } }
-  );
-  const d = await r.json();
-  const token = d.records?.[0]?.fields?.GmailRefreshToken;
-  if (!token) throw new Error(`No refresh token for: ${userId}`);
-  return token;
+  const sql = getDb();
+  const rows = await sql`
+    SELECT gmail_refresh_token FROM users
+    WHERE username = ${userId} OR email = ${userId}
+    LIMIT 1
+  `;
+  if (!rows.length || !rows[0].gmail_refresh_token) throw new Error(`No refresh token for: ${userId}`);
+  return rows[0].gmail_refresh_token;
 }
 
 async function storeRefreshToken(userId, refreshToken) {
-  const KEY = process.env.VITE_AIRTABLE_API_KEY;
-  const BASE = process.env.VITE_AIRTABLE_BASE_ID;
-  if (!KEY || !BASE) return;
   try {
-    const r = await fetch(
-      `https://api.airtable.com/v0/${BASE}/Users?filterByFormula=${encodeURIComponent(`OR({Username}="${userId}",{Email}="${userId}")`)}`,
-      { headers: { Authorization: `Bearer ${KEY}` } }
-    );
-    const d = await r.json();
-    const rec = d.records?.[0];
-    if (rec) {
-      await fetch(`https://api.airtable.com/v0/${BASE}/Users/${rec.id}`, {
-        method: "PATCH",
-        headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({ fields: { GmailRefreshToken: refreshToken } }),
-      });
-    }
+    const sql = getDb();
+    await sql`
+      UPDATE users SET gmail_refresh_token = ${refreshToken}
+      WHERE username = ${userId} OR email = ${userId}
+    `;
   } catch { /* non-critical */ }
 }
 
@@ -59,7 +47,6 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
 
-  // GET /api/auth?userId=... → return a fresh access token for that user
   if (req.method === "GET") {
     const { userId } = req.query;
     if (!userId) return res.status(400).json({ error: "userId required" });
@@ -72,14 +59,10 @@ export default async function handler(req, res) {
     }
   }
 
-  // POST /api/auth → exchange authorization code for tokens (Gmail OAuth callback)
   if (req.method === "POST") {
     const { code, userId } = req.body || {};
     const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
-
-    if (!CLIENT_SECRET) {
-      return res.status(200).json({ error: "GOOGLE_CLIENT_SECRET not configured", backgroundEnabled: false });
-    }
+    if (!CLIENT_SECRET) return res.status(200).json({ error: "GOOGLE_CLIENT_SECRET not configured", backgroundEnabled: false });
     if (!code) return res.status(400).json({ error: "code required" });
 
     try {

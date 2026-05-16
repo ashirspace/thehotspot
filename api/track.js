@@ -1,14 +1,15 @@
+import { getDb } from "./_db.js";
+
 const PIXEL = Buffer.from("R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7", "base64");
 
-async function logEvent(fields) {
-  const KEY = process.env.VITE_AIRTABLE_API_KEY;
-  const BASE = process.env.VITE_AIRTABLE_BASE_ID;
-  if (!KEY || !BASE) return;
-  fetch(`https://api.airtable.com/v0/${BASE}/EmailEvents`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ records: [{ fields: { ...fields, Timestamp: new Date().toISOString() } }] }),
-  }).catch(() => {});
+async function logEvent(trackId, type, contactEmail, clickedUrl) {
+  try {
+    const sql = getDb();
+    await sql`
+      INSERT INTO email_events (track_id, type, contact_email, clicked_url)
+      VALUES (${trackId || ""}, ${type || ""}, ${contactEmail || ""}, ${clickedUrl || null})
+    `;
+  } catch { /* non-critical */ }
 }
 
 export default async function handler(req, res) {
@@ -20,7 +21,7 @@ export default async function handler(req, res) {
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
     res.status(200).send(PIXEL);
-    if (id) logEvent({ TrackId: id, Type: "open", ContactEmail: email || "" });
+    if (id) logEvent(id, "open", email, null);
     return;
   }
 
@@ -28,7 +29,7 @@ export default async function handler(req, res) {
     const destination = url ? decodeURIComponent(url) : "https://google.com";
     res.setHeader("Location", destination);
     res.status(302).end();
-    if (id) logEvent({ TrackId: id, Type: "click", ContactEmail: email || "", ClickedUrl: destination });
+    if (id) logEvent(id, "click", email, destination);
     return;
   }
 

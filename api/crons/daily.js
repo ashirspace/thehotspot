@@ -1,4 +1,5 @@
-import { getAccessToken, getRefreshTokenForUser } from "../auth.js";
+import { getAccessToken } from "../auth.js";
+import { getDb } from "../_db.js";
 
 function buildGmailMessage(to, subject, body) {
   const encodedSubject = `=?UTF-8?B?${Buffer.from(subject, "utf8").toString("base64")}?=`;
@@ -39,133 +40,95 @@ async function generateEmail(host, proto, company, category, offerContext, maxCh
 }
 
 export default async function handler(req, res) {
-  const AIRTABLE_API_KEY = process.env.VITE_AIRTABLE_API_KEY;
-  const AIRTABLE_BASE_ID = process.env.VITE_AIRTABLE_BASE_ID;
-
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) {
-    return res.status(200).json({ ok: false, reason: "Airtable not configured" });
+  let sql;
+  try {
+    sql = getDb();
+  } catch {
+    return res.status(200).json({ ok: false, reason: "Database not configured" });
   }
 
   const proto = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers.host;
   const results = { scheduled: 0, followups: 0, errors: [] };
 
-  // Get all users who have stored refresh tokens
+  // Get all users with stored refresh tokens
   let users = [];
   try {
-    const r = await fetch(
-      `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Users?filterByFormula=NOT({GmailRefreshToken}='')`,
-      { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } }
-    );
-    const d = await r.json();
-    users = d.records || [];
+    users = await sql`SELECT id, username, email, gmail_refresh_token FROM users WHERE gmail_refresh_token IS NOT NULL AND gmail_refresh_token != ''`;
   } catch (e) {
     return res.status(200).json({ ok: false, error: e.message });
   }
 
-  for (const userRecord of users) {
-    const refreshToken = userRecord.fields.GmailRefreshToken;
-    const userId = userRecord.fields.Username || userRecord.fields.Email || userRecord.id;
+  const now = new Date().toISOString();
+
+  for (const user of users) {
+    const userId = user.username || user.email || String(user.id);
 
     let accessToken;
     try {
-      accessToken = await getAccessToken(refreshToken);
+      accessToken = await getAccessToken(user.gmail_refresh_token);
     } catch (e) {
       results.errors.push(`Token refresh failed for ${userId}: ${e.message}`);
       continue;
     }
 
-    // ── Scheduled campaigns ──────────────────────────────────────────
+    // ── Scheduled campaigns ──────────────────────────────────────────────────
     try {
-      const now = new Date().toISOString();
-      const schedRes = await fetch(
-        `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/ScheduledCampaigns?filterByFormula=${encodeURIComponent(`AND({UserId}="${userId}",{Status}="pending",{ScheduledAt}<="${now}")`)}`,
-        { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } }
-      );
-      const schedData = await schedRes.json();
+      const scheduled = await sql`
+        SELECT * FROM scheduled_campaigns
+        WHERE user_id = ${userId} AND status = 'pending' AND scheduled_for <= ${now}
+      `;
 
-      for (const sched of schedData.records || []) {
-        const { Category: category, OfferContext: offerContext, MaxChars: maxChars } = sched.fields;
+      for (const sched of scheduled) {
+        const { category, offer_context: offerContext, max_chars: maxChars, id: schedId } = sched;
 
-        // Mark as running
-        await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/ScheduledCampaigns/${sched.id}`, {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ fields: { Status: "running" } }),
-        });
+        await sql`UPDATE scheduled_campaigns SET status = 'running' WHERE id = ${schedId}`;
 
-        // Fetch up to 10 contacts
-        const filter = category && category !== "all"
-          ? `AND({Category}="${category}",NOT({Email}=''))`
-          : "NOT({Email}='')";
-        const contactsRes = await fetch(
-          `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Contacts?filterByFormula=${encodeURIComponent(filter)}&maxRecords=10`,
-          { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } }
-        );
-        const contactsData = await contactsRes.json();
+        const contacts = category && category !== "all"
+          ? await sql`SELECT * FROM contacts WHERE category = ${category} AND email IS NOT NULL AND email != '' LIMIT 10`
+          : await sql`SELECT * FROM contacts WHERE email IS NOT NULL AND email != '' LIMIT 10`;
 
         let sent = 0, failed = 0;
-        for (const c of contactsData.records || []) {
-          const email = c.fields.Email || c.fields["Mail ID"];
-          if (!email) continue;
+        for (const c of contacts) {
           try {
-            const draft = await generateEmail(
-              host, proto,
-              c.fields["Company Name"] || c.fields.Name || email,
-              c.fields.Category || category || "Network",
-              offerContext, maxChars
-            );
-            await sendEmail(accessToken, email, draft.subject, draft.body);
+            const draft = await generateEmail(host, proto, c.company || c.name || c.email, c.category || category || "Network", offerContext, maxChars);
+            await sendEmail(accessToken, c.email, draft.subject, draft.body);
             sent++;
             results.scheduled++;
             await new Promise(r => setTimeout(r, 2500));
           } catch { failed++; }
         }
 
-        await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/ScheduledCampaigns/${sched.id}`, {
-          method: "PATCH",
-          headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({ fields: { Status: "completed", SentCount: sent, FailedCount: failed } }),
-        });
+        await sql`UPDATE scheduled_campaigns SET status = 'completed', sent_count = ${sent}, failed_count = ${failed} WHERE id = ${schedId}`;
       }
     } catch (e) { results.errors.push(`Scheduled campaigns for ${userId}: ${e.message}`); }
 
-    // ── Follow-up sequences ──────────────────────────────────────────
+    // ── Follow-up sequences ──────────────────────────────────────────────────
     try {
-      const now = new Date().toISOString();
-      const seqRes = await fetch(
-        `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Sequences?filterByFormula=${encodeURIComponent(`AND({Status}="active",{NextSendAt}<="${now}"`)}&maxRecords=10`,
-        { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } }
-      );
-      const seqData = await seqRes.json();
+      const sequences = await sql`
+        SELECT * FROM sequences
+        WHERE status = 'active' AND next_send_at <= ${now}
+        LIMIT 10
+      `;
 
-      for (const seq of seqData.records || []) {
-        const { ContactEmail: email, Company: company, ThreadId: threadId, Step: step = 1 } = seq.fields;
+      for (const seq of sequences) {
+        const { contact_email: email, company, thread_id: threadId, step = 1, id: seqId } = seq;
         if (!email) continue;
 
         try {
-          // Check for reply
           if (threadId) {
             const tr = await fetch(`https://gmail.googleapis.com/gmail/v1/users/me/threads/${threadId}`, {
               headers: { Authorization: `Bearer ${accessToken}` },
             });
             const td = await tr.json();
             if (td.messages?.length > 1) {
-              await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Sequences/${seq.id}`, {
-                method: "PATCH",
-                headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-                body: JSON.stringify({ fields: { Status: "replied", RepliedAt: new Date().toISOString() } }),
-              });
+              await sql`UPDATE sequences SET status = 'replied', replied_at = NOW() WHERE id = ${seqId}`;
               continue;
             }
           }
 
           if (step >= 3) {
-            await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Sequences/${seq.id}`, {
-              method: "PATCH",
-              headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-              body: JSON.stringify({ fields: { Status: "completed" } }),
-            });
+            await sql`UPDATE sequences SET status = 'completed' WHERE id = ${seqId}`;
             continue;
           }
 
@@ -178,14 +141,10 @@ export default async function handler(req, res) {
 
           const stepDays = [0, 4, 7];
           const nextSendAt = new Date(Date.now() + (stepDays[step] || 7) * 86400000).toISOString();
-          await fetch(`https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/Sequences/${seq.id}`, {
-            method: "PATCH",
-            headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-            body: JSON.stringify({ fields: { Step: step + 1, NextSendAt: nextSendAt, LastSentAt: new Date().toISOString() } }),
-          });
+          await sql`UPDATE sequences SET step = ${step + 1}, next_send_at = ${nextSendAt}, last_sent_at = NOW() WHERE id = ${seqId}`;
           results.followups++;
           await new Promise(r => setTimeout(r, 2500));
-        } catch (e) { results.errors.push(`Sequence ${seq.id}: ${e.message}`); }
+        } catch (e) { results.errors.push(`Sequence ${seqId}: ${e.message}`); }
       }
     } catch (e) { results.errors.push(`Follow-ups for ${userId}: ${e.message}`); }
   }
