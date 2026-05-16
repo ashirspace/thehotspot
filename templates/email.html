@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no,address=no,email=no,date=no,url=no">
+  <title>{{EMAIL_SUBJECT}}</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style>
+    /* Reset for clients that support <style> */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    /* Prevent blue links in iOS */
+    a[x-apple-data-detectors] { color: inherit !important; text-decoration: none !important; }
+    /* Gmail blue link fix */
+    u + #body a { color: inherit; text-decoration: none; font-size: inherit; font-family: inherit; font-weight: inherit; line-height: inherit; }
+    /* Mobile responsive */
+    @media only screen and (max-width: 620px) {
+      .wrapper { width: 100% !important; max-width: 100% !important; }
+      .container { width: 100% !important; max-width: 100% !important; padding: 0 16px !important; }
+      .hero-title { font-size: 22px !important; }
+      .body-text { font-size: 15px !important; }
+      .cta-btn { padding: 14px 28px !important; font-size: 15px !important; }
+      .padding-sides { padding-left: 24px !important; padding-right: 24px !important; }
+    }
+  </style>
+</head>
+<body id="body" style="margin:0;padding:0;background-color:#f0f4f4;font-family:'Trebuchet MS',Arial,sans-serif;-webkit-text-size-adjust:100%;-ms-text-size-adjust:100%;">
+
+<!-- Email Wrapper -->
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color:#f0f4f4;margin:0;padding:0;">
+  <tr>
+    <td align="center" style="padding:32px 16px;">
+
+      <!-- Outer container — max 600px -->
+      <table class="wrapper" role="presentation" cellspacing="0" cellpadding="0" border="0" width="600" style="max-width:600px;width:100%;">
+
+        <!-- ── HEADER ───────────────────────────────────────── -->
+        <tr>
+          <td style="border-radius:12px 12px 0 0;background-color:#0d9488;padding:28px 40px;text-align:center;">
+            <!-- Wordmark -->
+            <div style="font-family:'Trebuchet MS',Arial,sans-serif;font-size:28px;font-weight:700;letter-spacing:-0.5px;color:#ffffff;line-height:1;">
+              thehotspot
+            </div>
+            <div style="font-family:'Trebuchet MS',Arial,sans-serif;font-size:12px;font-weight:400;color:#99f6e4;letter-spacing:1.5px;text-transform:uppercase;margin-top:6px;">
+              Grow Connections Easily
+            </div>
+          </td>
+        </tr>
+
+        <!-- ── BODY ─────────────────────────────────────────── -->
+        <tr>
+          <td class="padding-sides" style="background-color:#ffffff;padding:40px 40px 32px 40px;">
+
+            <!-- Greeting -->
+            <p style="font-family:'Trebuchet MS',Arial,sans-serif;font-size:16px;color:#111827;margin:0 0 20px 0;line-height:1.6;">
+              Hi {{RECIPIENT_NAME}},<br>
+              <span style="font-size:14px;color:#6b7280;">{{RECIPIENT_COMPANY}}</span>
+            </p>
+
+            <!-- Main pitch -->
+            <p class="body-text" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#374151;margin:0 0 20px 0;line-height:1.75;">
+              {{EMAIL_BODY_LINE_1}}
+            </p>
+
+            <p class="body-text" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#374151;margin:0 0 20px 0;line-height:1.75;">
+              {{EMAIL_BODY_LINE_2}}
+            </p>
+
+            <p class="body-text" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#374151;margin:0 0 32px 0;line-height:1.75;">
+              {{EMAIL_BODY_LINE_3}}
+            </p>
+
+            <!-- CTA Button -->
+            <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 0 32px 0;">
+              <tr>
+                <td style="border-radius:8px;background-color:#0d9488;">
+                  <a class="cta-btn" href="{{CTA_URL}}" target="_blank" style="display:inline-block;font-family:'Trebuchet MS',Arial,sans-serif;font-size:15px;font-weight:600;color:#ffffff;text-decoration:none;padding:14px 32px;border-radius:8px;letter-spacing:0.2px;mso-padding-alt:14px 32px;">
+                    {{CTA_TEXT}}
+                  </a>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Closing -->
+            <p class="body-text" style="font-family:Arial,Helvetica,sans-serif;font-size:15px;color:#374151;margin:0 0 8px 0;line-height:1.75;">
+              {{CLOSING_LINE}}
+            </p>
+
+            <!-- Signature -->
+            <p style="font-family:Arial,Helvetica,sans-serif;font-size:14px;color:#6b7280;margin:24px 0 0 0;line-height:1.6;border-top:1px solid #f3f4f6;padding-top:20px;">
+              Best,<br>
+              <strong style="color:#111827;font-family:'Trebuchet MS',Arial,sans-serif;">{{SENDER_NAME}}</strong><br>
+              <span style="color:#0d9488;">{{SENDER_ROLE}}</span><br>
+              {{SENDER_COMPANY}}
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- ── DIVIDER ────────────────────────────────────────── -->
+        <tr>
+          <td style="background-color:#ffffff;padding:0 40px;">
+            <div style="border-top:1px solid #e5e7eb;"></div>
+          </td>
+        </tr>
+
+        <!-- ── FOOTER ────────────────────────────────────────── -->
+        <tr>
+          <td class="padding-sides" style="background-color:#ffffff;border-radius:0 0 12px 12px;padding:20px 40px 28px 40px;text-align:center;">
+
+            <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;margin:0 0 8px 0;line-height:1.5;">
+              You received this email as part of a business outreach from
+              <a href="https://www.thehotspot.in" style="color:#0d9488;text-decoration:none;">thehotspot.in</a>.
+            </p>
+
+            <p style="font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;margin:0 0 12px 0;line-height:1.5;">
+              To unsubscribe, reply <strong style="color:#6b7280;">STOP</strong> to this email.
+            </p>
+
+            <p style="font-family:Arial,Helvetica,sans-serif;font-size:11px;color:#d1d5db;margin:0;line-height:1.5;">
+              Powered by <a href="https://www.thehotspot.in" style="color:#0d9488;text-decoration:none;font-weight:600;">Ibra Digital</a>
+            </p>
+
+          </td>
+        </tr>
+
+        <!-- ── BOTTOM SPACER ─────────────────────────────────── -->
+        <tr>
+          <td style="height:24px;">&nbsp;</td>
+        </tr>
+
+      </table>
+      <!-- /Outer container -->
+
+      <!-- Tracking pixel (invisible) -->
+      <img src="https://www.thehotspot.in/api/track?type=open&id={{EMAIL_ID}}&e={{RECIPIENT_EMAIL}}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;margin:0;padding:0;" />
+
+    </td>
+  </tr>
+</table>
+<!-- /Email Wrapper -->
+
+</body>
+</html>
