@@ -268,8 +268,15 @@ function LoginPage({ onLogin }) {
           let dbId = findData.user?.id || null;
           let existingUser = findData.user || null;
           if (!dbId) {
-            const created = await dbUsers({ action: "signup", username: gName, email: gEmail, password: "" });
-            dbId = created.id || null;
+            // Try signup with Google display name as username
+            let signupResult = await dbUsers({ action: "signup", username: gName, email: gEmail, password: "" });
+            if (!signupResult.created) {
+              // Username taken — fall back to email-prefix username with random suffix
+              const base = gEmail.split("@")[0].replace(/[^a-z0-9_]/gi, "_");
+              const fallback = base + "_" + Math.random().toString(36).slice(2, 5);
+              signupResult = await dbUsers({ action: "signup", username: fallback, email: gEmail, password: "" });
+            }
+            dbId = signupResult.id || null;
           }
 
           const userData = {
@@ -1803,15 +1810,26 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
       // Resolve DB record ID
       let dbId = user?.dbId;
       if (!dbId) {
-        const found = await dbUsers({ action: "find", email: user?.email, username: user?.username });
+        const found = await dbUsers({ action: "find", email: user?.email });
         dbId = found.user?.id || null;
       }
       if (!dbId) {
-        const created = await dbUsers({ action: "create", fields });
-        dbId = created.id || null;
+        // Try signup first — handles fresh accounts correctly
+        const signupResult = await dbUsers({ action: "signup", username: fields.username, email: fields.user_email, password: fields.password });
+        dbId = signupResult.id || null;
+        if (!dbId) {
+          // Username taken — use create (upsert) as fallback
+          const created = await dbUsers({ action: "create", fields });
+          dbId = created.id || null;
+        }
+        if (!dbId) {
+          // Last resort: find by username in case upsert hit a conflict
+          const found2 = await dbUsers({ action: "find", username: fields.username });
+          dbId = found2.user?.id || null;
+        }
       }
 
-      if (!dbId) throw new Error("Account not found. Make sure DATABASE_URL is set in Vercel environment variables.");
+      if (!dbId) throw new Error("Could not save your profile. Please try a different username.");
 
       await dbUsers({ action: "update", id: dbId, fields });
 
