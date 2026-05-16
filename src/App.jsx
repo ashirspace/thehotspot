@@ -1225,7 +1225,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
   });
 
   useEffect(() => {
-    fetch("/api/campaigns/list")
+    fetch("/api/campaigns")
       .then(r => r.json())
       .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
       .catch(() => {});
@@ -2682,7 +2682,7 @@ function CampaignStatusPage({ onBack }) {
 
   // Pull live data from Airtable
   useEffect(() => {
-    fetch("/api/campaigns/list")
+    fetch("/api/campaigns")
       .then(r => r.json())
       .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
       .catch(() => {});
@@ -3860,7 +3860,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
       history.unshift(record);
       localStorage.setItem("thehotspot_campaigns", JSON.stringify(history.slice(0, 50)));
     } catch {}
-    fetch("/api/campaigns/create", {
+    fetch("/api/campaigns", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ userId: user?.username || user?.email || "unknown", ...record }),
