@@ -11,94 +11,51 @@ import {
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
 
-// Airtable Config (keys from .env / Vercel Environment Variables)
-const AIRTABLE_API_KEY = import.meta.env.VITE_AIRTABLE_API_KEY || "";
-const AIRTABLE_BASE_ID = import.meta.env.VITE_AIRTABLE_BASE_ID || "";
-const AIRTABLE_TABLE = import.meta.env.VITE_AIRTABLE_TABLE_NAME || "Users";
-const AIRTABLE_CONTACTS_TABLE = import.meta.env.VITE_AIRTABLE_CONTACTS_TABLE || "Contacts";
-const AIRTABLE_MANUAL_TABLE = "manually added";
-const AIRTABLE_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE}`;
-const AIRTABLE_CONTACTS_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_CONTACTS_TABLE)}`;
-const AIRTABLE_MANUAL_URL = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${encodeURIComponent(AIRTABLE_MANUAL_TABLE)}`;
+// ── Neon PostgreSQL helpers (all DB ops go through /api/db-users or /api/db-contacts) ──
 
-// Airtable helper functions
-async function airtableFetch(filterFormula) {
-  const res = await fetch(`${AIRTABLE_URL}?filterByFormula=${encodeURIComponent(filterFormula)}`, {
-    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` },
-  });
-  const data = await res.json();
-  return data.records || [];
-}
-
-async function airtableCreate(fields) {
-  const res = await fetch(AIRTABLE_URL, {
+async function dbUsers(body) {
+  const res = await fetch("/api/db-users", {
     method: "POST",
-    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ records: [{ fields }] }),
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
-  return await res.json();
+  return res.json();
 }
 
-async function airtableUpdateUser(recordId, fields) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) throw new Error("Missing Airtable API key or base ID");
-  if (!recordId) throw new Error("No Airtable record ID found for this user");
-  const res = await fetch(`${AIRTABLE_URL}/${recordId}`, {
-    method: "PATCH",
-    headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ fields }),
+async function dbContacts(body) {
+  const res = await fetch("/api/db-contacts", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
   });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data?.error?.message || JSON.stringify(data));
-  return data;
+  return res.json();
 }
 
-// Fetch all contacts from Airtable (with pagination)
+// Legacy-compatible wrappers used throughout the app
 async function fetchAllContacts() {
-  let allRecords = [];
-  let offset = null;
-  do {
-    const url = offset ? `${AIRTABLE_CONTACTS_URL}?offset=${offset}` : AIRTABLE_CONTACTS_URL;
-    const res = await fetch(url, { headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` } });
-    const data = await res.json();
-    allRecords = [...allRecords, ...(data.records || [])];
-    offset = data.offset || null;
-  } while (offset);
-  return allRecords;
+  const res = await fetch("/api/db-contacts");
+  const data = await res.json();
+  return (data.records || []).map(r => ({
+    id: r.id,
+    fields: { Name: r.name, Email: r.email, Company: r.company, Website: r.website, Category: r.category, Country: r.country, Notes: r.notes },
+  }));
 }
 
-// "manually added" table helpers
 async function manualContactCreate(fields) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID) return null;
   try {
-    const res = await fetch(AIRTABLE_MANUAL_URL, {
-      method: "POST",
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ records: [{ fields: { Name: fields.name || "", Email: fields.email || "", Company: fields.company || "", Website: fields.website || "", Category: fields.category || "", Country: fields.country || "", Notes: fields.notes || "" } }] }),
-    });
-    const data = await res.json();
-    return data.records?.[0]?.id || null;
+    const data = await dbContacts({ action: "create", fields });
+    return data.id || null;
   } catch { return null; }
 }
 
-async function manualContactUpdate(airtableId, fields) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !airtableId) return;
-  try {
-    await fetch(`${AIRTABLE_MANUAL_URL}/${airtableId}`, {
-      method: "PATCH",
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ fields: { Name: fields.name || "", Email: fields.email || "", Company: fields.company || "", Website: fields.website || "", Category: fields.category || "", Country: fields.country || "", Notes: fields.notes || "" } }),
-    });
-  } catch { /* silent */ }
+async function manualContactUpdate(id, fields) {
+  if (!id) return;
+  try { await dbContacts({ action: "update", id, fields }); } catch { /* silent */ }
 }
 
-async function manualContactDelete(airtableId) {
-  if (!AIRTABLE_API_KEY || !AIRTABLE_BASE_ID || !airtableId) return;
-  try {
-    await fetch(`${AIRTABLE_MANUAL_URL}/${airtableId}`, {
-      method: "DELETE",
-      headers: { Authorization: `Bearer ${AIRTABLE_API_KEY}` },
-    });
-  } catch { /* silent */ }
+async function manualContactDelete(id) {
+  if (!id) return;
+  try { await dbContacts({ action: "delete", id }); } catch { /* silent */ }
 }
 
 // Gmail OAuth Config — Replace with your Google Cloud Console credentials
@@ -197,7 +154,8 @@ function LoginPage({ onLogin }) {
   const [featRef, featVisible] = useReveal();
   const [agentsRef, agentsVisible] = useReveal();
   const [outcomeRef, outcomeVisible] = useReveal();
-  const [isSignup, setIsSignup] = useState(false);
+  // "landing" | "login" | "signup"
+  const [authMode, setAuthMode] = useState("landing");
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -206,6 +164,7 @@ function LoginPage({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const isSignup = authMode === "signup";
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -213,21 +172,10 @@ function LoginPage({ onLogin }) {
     setLoading(true);
 
     try {
-      const records = await airtableFetch(`AND({username}='${username}',{password}='${password}')`);
-      if (records.length > 0) {
-        const rec = records[0];
-        const user = rec.fields;
-        const userData = {
-          username:    user.username,
-          email:       user.user_email,
-          airtableId:  rec.id,
-          name:        user.full_name || "",
-          company:     user.company || "",
-          role_title:  user.role_title || "",
-          website:     user.website || "",
-          phone:       user.phone || "",
-          profileComplete: !!(user.profile_complete || (user.full_name && user.company)),
-        };
+      const data = await dbUsers({ action: "login", username, password });
+      if (data.found) {
+        const u = data.user;
+        const userData = { ...u, dbId: u.id, profileComplete: u.profileComplete };
         localStorage.setItem("thehotspot_user", JSON.stringify(userData));
         onLogin(userData);
       } else {
@@ -248,15 +196,9 @@ function LoginPage({ onLogin }) {
     setLoading(true);
 
     try {
-      // Check if username already exists
-      const existing = await airtableFetch(`{username}='${username}'`);
-      if (existing.length > 0) { setError("Username already taken"); setLoading(false); return; }
-
-      // Create new user
-      const created = await airtableCreate({ username, user_email: email, password });
-      const newRecordId = created?.records?.[0]?.id || "";
-
-      const userData = { username, email, airtableId: newRecordId, profileComplete: false };
+      const data = await dbUsers({ action: "signup", username, email, password });
+      if (!data.created) { setError(data.error || "Signup failed. Please try again."); setLoading(false); return; }
+      const userData = { username, email, dbId: data.id, profileComplete: false };
       localStorage.setItem("thehotspot_user", JSON.stringify(userData));
       onLogin(userData);
     } catch (err) {
@@ -317,29 +259,30 @@ function LoginPage({ onLogin }) {
             sentCount = sentData.resultSizeEstimate || 0;
           } catch { /* non-fatal */ }
 
-          // Save to Airtable
-          const existing = await airtableFetch(`{user_email}='${gEmail}'`);
-          let airtableId = existing[0]?.id || "";
-          if (existing.length === 0) {
-            const created = await airtableCreate({ username: gName, user_email: gEmail, password: "" });
-            airtableId = created?.records?.[0]?.id || "";
+          // Find or create user in Neon DB
+          let findData = await dbUsers({ action: "find", email: gEmail });
+          let dbId = findData.user?.id || null;
+          let existingUser = findData.user || null;
+          if (!dbId) {
+            const created = await dbUsers({ action: "signup", username: gName, email: gEmail, password: "" });
+            dbId = created.id || null;
           }
 
-          const existingFields = existing[0]?.fields || {};
           const userData = {
-            username:    existingFields.username || gName,
+            username:    existingUser?.username || gName,
             email:       gEmail,
+            gmailEmail:  gEmail,
             avatar:      gPic,
             accessToken: token,
             gmailToken:  token,
             sentCount,
-            airtableId,
-            name:        existingFields.full_name || gName,
-            company:     existingFields.company || "",
-            role_title:  existingFields.role_title || "",
-            website:     existingFields.website || "",
-            phone:       existingFields.phone || "",
-            profileComplete: !!(existingFields.profile_complete || (existingFields.full_name && existingFields.company)),
+            dbId,
+            name:        existingUser?.name || gName,
+            company:     existingUser?.company || "",
+            role_title:  existingUser?.role_title || "",
+            website:     existingUser?.website || "",
+            phone:       existingUser?.phone || "",
+            profileComplete: existingUser?.profileComplete || false,
           };
           localStorage.setItem("thehotspot_user", JSON.stringify(userData));
           // Clear loading state BEFORE calling onLogin so we don't set state on unmounted component
@@ -354,87 +297,151 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
+  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setError(""); setShowPass(false); };
+  const goBack = () => { setAuthMode("landing"); resetForm(); };
+
+  const GBtn = () => (
+    <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
+      width: "100%", padding: "11px", borderRadius: 10, border: "1px solid #ffffff12",
+      background: "#1a1a24", color: "#E2E8F0", fontSize: 14, fontWeight: 500,
+      cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
+      gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 18, opacity: googleLoading ? 0.6 : 1,
+    }}
+      onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F450"; e.currentTarget.style.background = "#1f2030"; } }}
+      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff12"; e.currentTarget.style.background = "#1a1a24"; }}
+    >
+      {googleLoading
+        ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
+        : <><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</>
+      }
+    </button>
+  );
+
+  const OR = () => (
+    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+      <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
+      <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
+      <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
+    </div>
+  );
+
+  const inpStyle = { width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const lblStyle = { fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 };
+
   const LoginModal = () => (
     <>
-      {/* Backdrop */}
-      <div onClick={() => setShowLogin(false)} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, backdropFilter: "blur(6px)", animation: "fadeIn .2s ease" }} />
-      {/* Sheet */}
+      <div onClick={() => { setShowLogin(false); goBack(); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, backdropFilter: "blur(6px)", animation: "fadeIn .2s ease" }} />
       <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 460, background: "#111116", border: "1px solid #ffffff10", borderBottom: "none", borderRadius: "20px 20px 0 0", zIndex: 101, padding: "24px 28px 36px", boxShadow: "0 -16px 60px rgba(0,0,0,0.5)", animation: "slideUp .3s cubic-bezier(.4,0,.2,1)" }}>
-        {/* Handle */}
         <div style={{ width: 36, height: 3, borderRadius: 2, background: "#ffffff18", margin: "0 auto 22px" }} />
 
-        <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>{isSignup ? "Create your account" : "Welcome back"}</div>
-        <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>{isSignup ? "Join thehotspot and start automating your outreach" : "Sign in to your outreach dashboard"}</div>
-
-        {/* Google */}
-        <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-          width: "100%", padding: "11px", borderRadius: 10, border: "1px solid #ffffff12",
-          background: "#1a1a24", color: "#E2E8F0", fontSize: 14, fontWeight: 500,
-          cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-          gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 18, opacity: googleLoading ? 0.6 : 1,
-        }}
-          onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F450"; e.currentTarget.style.background = "#1f2030"; } }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff12"; e.currentTarget.style.background = "#1a1a24"; }}
-        >
-          {googleLoading ? (
-            <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
-          ) : (
-            <><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>Continue with Google</>
-          )}
-        </button>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-          <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
-          <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>or</span>
-          <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
-        </div>
-
-        <form onSubmit={isSignup ? handleSignup : handleLogin}>
-          <div style={{ marginBottom: 12 }}>
-            <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Username</label>
-            <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username"
-              style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-          </div>
-          {isSignup && (
-            <div style={{ marginBottom: 12 }}>
-              <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Email</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter email"
-                style={{ width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+        {/* ── LANDING: choose Sign In or Get Started ── */}
+        {authMode === "landing" && (
+          <>
+            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>Welcome to thehotspot</div>
+            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>Your AI-powered outreach dashboard</div>
+            <GBtn />
+            <OR />
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+              <button onClick={() => { setAuthMode("login"); setError(""); }} style={{
+                padding: "13px", borderRadius: 10, border: "1px solid #ffffff14", background: "#0d0d12",
+                color: "#E2E8F0", fontSize: 14, fontWeight: 600, cursor: "pointer",
+                fontFamily: "'DM Sans',sans-serif", transition: "all .18s",
+              }}
+                onMouseEnter={e => { e.currentTarget.style.background = "#14141c"; e.currentTarget.style.borderColor = "#10b98130"; }}
+                onMouseLeave={e => { e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.borderColor = "#ffffff14"; }}
+              >Sign In</button>
+              <button onClick={() => { setAuthMode("signup"); setError(""); }} style={{
+                padding: "13px", borderRadius: 10, border: "none",
+                background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff",
+                fontSize: 14, fontWeight: 600, cursor: "pointer",
+                fontFamily: "'DM Sans',sans-serif", boxShadow: "0 4px 14px #10b98135",
+              }}>Get Started</button>
             </div>
-          )}
-          <div style={{ marginBottom: 18 }}>
-            <label style={{ fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 }}>Password</label>
-            <div style={{ position: "relative" }}>
-              <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
-                style={{ width: "100%", padding: "10px 40px 10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-              <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
-                {showPass ? <I.EyeOff /> : <I.Eye />}
+          </>
+        )}
+
+        {/* ── SIGN IN form ── */}
+        {authMode === "login" && (
+          <>
+            <button onClick={goBack} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 16, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>← Back</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>Welcome back</div>
+            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>Sign in to your outreach dashboard</div>
+            <GBtn /><OR />
+            <form onSubmit={handleLogin}>
+              <div style={{ marginBottom: 12 }}>
+                <label style={lblStyle}>Username</label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter username" style={inpStyle}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <label style={lblStyle}>Password</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter password"
+                    style={{ ...inpStyle, padding: "10px 40px 10px 12px" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
+                    {showPass ? <I.EyeOff /> : <I.Eye />}
+                  </button>
+                </div>
+              </div>
+              {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, marginBottom: 14, textAlign: "center" }}>{error}</div>}
+              <button type="submit" disabled={loading || !username || !password} style={{
+                width: "100%", padding: "12px", borderRadius: 10, border: "none",
+                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
+                color: (username && password) ? "#fff" : "#475569",
+                fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
+                fontFamily: "'DM Sans',sans-serif", boxShadow: (username && password) ? "0 0 24px #10b98130" : "none",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : "Sign In"}
               </button>
-            </div>
-          </div>
-          {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, fontWeight: 500, marginBottom: 14, textAlign: "center" }}>{error}</div>}
-          <button type="submit" disabled={loading || !username || !password} style={{
-            width: "100%", padding: "12px", borderRadius: 10, border: "none",
-            background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
-            color: (username && password) ? "#fff" : "#475569",
-            fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-            fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-            boxShadow: (username && password) ? "0 0 24px #10b98130" : "none",
-          }}>
-            {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : isSignup ? "Create Account" : "Sign In"}
-          </button>
-        </form>
+            </form>
+          </>
+        )}
 
-        <div style={{ textAlign: "center", marginTop: 16 }}>
-          <span style={{ fontSize: 12, color: "#475569" }}>{isSignup ? "Already have an account? " : "Don't have an account? "}</span>
-          <button onClick={() => { setIsSignup(!isSignup); setError(""); setUsername(""); setPassword(""); setEmail(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-            {isSignup ? "Sign In" : "Sign Up"}
-          </button>
-        </div>
+        {/* ── GET STARTED / SIGN UP form ── */}
+        {authMode === "signup" && (
+          <>
+            <button onClick={goBack} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 16, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>← Back</button>
+            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>Create your account</div>
+            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>Join thehotspot and start automating your outreach</div>
+            <GBtn /><OR />
+            <form onSubmit={handleSignup}>
+              <div style={{ marginBottom: 12 }}>
+                <label style={lblStyle}>Username</label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Choose a username" style={inpStyle}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              </div>
+              <div style={{ marginBottom: 12 }}>
+                <label style={lblStyle}>Email</label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="Enter your email" style={inpStyle}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              </div>
+              <div style={{ marginBottom: 18 }}>
+                <label style={lblStyle}>Password</label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 characters"
+                    style={{ ...inpStyle, padding: "10px 40px 10px 12px" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
+                    {showPass ? <I.EyeOff /> : <I.Eye />}
+                  </button>
+                </div>
+              </div>
+              {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, marginBottom: 14, textAlign: "center" }}>{error}</div>}
+              <button type="submit" disabled={loading || !username || !email || !password} style={{
+                width: "100%", padding: "12px", borderRadius: 10, border: "none",
+                background: (username && email && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
+                color: (username && email && password) ? "#fff" : "#475569",
+                fontSize: 14, fontWeight: 600, cursor: (username && email && password) ? "pointer" : "default",
+                fontFamily: "'DM Sans',sans-serif", boxShadow: (username && email && password) ? "0 0 24px #10b98130" : "none",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              }}>
+                {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : "Create Account"}
+              </button>
+            </form>
+          </>
+        )}
       </div>
     </>
   );
@@ -1777,40 +1784,36 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
     setSaveError("");
 
     try {
-      // Resolve Airtable record ID — may be missing for old/Google sessions
-      let recordId = user?.airtableId;
-      if (!recordId) {
-        const filter = user?.email
-          ? `{user_email}='${user.email}'`
-          : `{username}='${user.username}'`;
-        const records = await airtableFetch(filter);
-        recordId = records[0]?.id || "";
-      }
-
-      const airtableFields = {
-        full_name:  form.fullName.trim(),
-        username:   form.username.trim(),
-        user_email: form.email.trim(),
-        password:   form.password.trim(),
-        company:    form.company.trim(),
-        phone:      form.phone.trim(),
-        role_title: form.role.trim(),
+      const fields = {
+        full_name:       form.fullName.trim(),
+        username:        form.username.trim(),
+        user_email:      form.email.trim(),
+        password:        form.password.trim(),
+        company:         form.company.trim(),
+        phone:           form.phone.trim(),
+        role_title:      form.role.trim(),
         profile_complete: true,
+        ...(form.website.trim() ? { website: form.website.trim() } : {}),
       };
-      if (form.website.trim()) airtableFields.website = form.website.trim();
 
-      // If still no record (e.g. Google login where Airtable create silently failed),
-      // create the record now with all the filled-in fields.
-      if (!recordId) {
-        const created = await airtableCreate(airtableFields);
-        recordId = created?.records?.[0]?.id || "";
+      // Resolve DB record ID
+      let dbId = user?.dbId;
+      if (!dbId) {
+        const found = await dbUsers({ action: "find", email: user?.email, username: user?.username });
+        dbId = found.user?.id || null;
+      }
+      if (!dbId) {
+        const created = await dbUsers({ action: "create", fields });
+        dbId = created.id || null;
       }
 
-      await airtableUpdateUser(recordId, airtableFields);
+      if (!dbId) throw new Error("Could not create or find your account. Please try again.");
+
+      await dbUsers({ action: "update", id: dbId, fields });
 
       const updated = {
         ...user,
-        airtableId:  recordId,
+        dbId,
         name:        form.fullName.trim(),
         username:    form.username.trim(),
         email:       form.email.trim(),
@@ -2062,8 +2065,8 @@ export default function App() {
 
   return (
     <AppErrorBoundary>
-      <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} />
-      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} onDismiss={() => setShowOnboarding(false)} />}
+      <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} onUserUpdate={(updated) => { setUser(updated); localStorage.setItem("thehotspot_user", JSON.stringify(updated)); }} />
+      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} onDismiss={() => { localStorage.removeItem("thehotspot_user"); setUser(null); setShowOnboarding(false); }} />}
     </AppErrorBoundary>
   );
 }
@@ -2978,7 +2981,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
       </Card>
 
       <Card title="Integrations">
-        <Row label="Gmail" sub={gmailConnected ? (user?.email || "Connected via Google") : "Used to send outreach emails"}>
+        <Row label="Gmail" sub={gmailConnected ? (user?.gmailEmail || user?.email || "Connected via Google") : "Used to send outreach emails"}>
           {gmailConnected
             ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#0a2a1a", color: "#10b981", border: "1px solid #10b98133" }}>
                 <LuCheck size={12} /> Connected
@@ -3684,7 +3687,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
 }
 
 /* ───────── DASHBOARD ───────── */
-function Dashboard({ user, onLogout }) {
+function Dashboard({ user, onLogout, onUserUpdate }) {
   // URL ↔ page mapping
   const PAGE_TO_PATH = {
     null:           "/",
@@ -4333,15 +4336,22 @@ function Dashboard({ user, onLogout }) {
 
     const applyToken = async (token, label) => {
       try {
-        const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1", { headers: { Authorization: `Bearer ${token}` } });
-        const data = await res.json();
-        const count = data.resultSizeEstimate || 0;
+        const [sentRes, profileRes] = await Promise.all([
+          fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages?labelIds=SENT&maxResults=1", { headers: { Authorization: `Bearer ${token}` } }),
+          fetch("https://www.googleapis.com/oauth2/v2/userinfo", { headers: { Authorization: `Bearer ${token}` } }),
+        ]);
+        const sentData = await sentRes.json();
+        const profileData = await profileRes.json();
+        const count = sentData.resultSizeEstimate || 0;
+        const gmailEmail = profileData.email || "";
+        const updated = { ...user, gmailToken: token, sentCount: count, gmailEmail };
         setGmailConnected(true); setGmailToken(token); setSentCount(count);
-        localStorage.setItem("thehotspot_user", JSON.stringify({ ...user, gmailToken: token, sentCount: count }));
-        showToast(label || `Gmail connected — ${count.toLocaleString()} emails sent`);
+        onUserUpdate?.(updated);
+        showToast(label || `Gmail connected — ${gmailEmail || "account"}`);
       } catch {
+        const updated = { ...user, gmailToken: token };
         setGmailConnected(true); setGmailToken(token);
-        localStorage.setItem("thehotspot_user", JSON.stringify({ ...user, gmailToken: token }));
+        onUserUpdate?.(updated);
         showToast(label || "Gmail connected!");
       }
     };

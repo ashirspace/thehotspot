@@ -267,6 +267,8 @@ Today: ${new Date().toISOString()}. Always reply in English only.`;
   return res.status(200).json({ message: parsed.message || "Got it!", action: parsed.action || "none", params: parsed.params || {} });
 }
 
+export const maxDuration = 30;
+
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
@@ -283,11 +285,8 @@ export default async function handler(req, res) {
   }
 
   if (!ANTHROPIC_KEY) {
-    return res.status(200).json({
-      message: "Add ANTHROPIC_API_KEY in Vercel environment variables to enable the AI agent.",
-      action: "none",
-      params: {},
-    });
+    // No AI key — use keyword-based smart fallback
+    return smartFallback(res, messages);
   }
 
   const clean = (messages || []).filter(m => m.role === "user" || m.role === "assistant");
@@ -378,6 +377,30 @@ export default async function handler(req, res) {
     if (OPENAI_KEY) {
       try { return handleOpenAIFallback(res, messages, OPENAI_KEY); } catch {}
     }
-    return res.status(200).json({ message: "Something went wrong — try again!", action: "none", params: {} });
+    return smartFallback(res, messages);
   }
+}
+
+function smartFallback(res, messages) {
+  const last = (messages || []).filter(m => m.role === "user").slice(-1)[0]?.content?.toLowerCase() || "";
+  let action = "none"; let params = {};
+
+  if (/send|email|blast|outreach|campaign/i.test(last)) {
+    const cat = /network/i.test(last) ? "Network" : /cps/i.test(last) ? "CPS" : /cpl/i.test(last) ? "CPL" : /cpa/i.test(last) ? "CPA" : /mobile/i.test(last) ? "Mobile" : "all";
+    action = "send_emails"; params = { category: cat, offerContext: "" };
+    return res.status(200).json({ message: `Starting email campaign for **${cat}** contacts...`, action, params });
+  }
+  if (/add.*(contact|lead)/i.test(last)) return res.status(200).json({ message: "Sure! Tell me the email, company, and category for the new contact.", action: "none", params: {} });
+  if (/remove|delete.*(contact)/i.test(last)) return res.status(200).json({ message: "Which contact should I remove? Share their email address.", action: "none", params: {} });
+  if (/status|campaign|progress/i.test(last)) { action = "show_page"; params = { page: "campaignStatus" }; return res.status(200).json({ message: "Opening campaign status...", action, params }); }
+  if (/contact|database|leads/i.test(last)) { action = "show_page"; params = { page: "contacts" }; return res.status(200).json({ message: "Opening your contacts database...", action, params }); }
+  if (/follow.?up/i.test(last)) { action = "send_followup"; params = {}; return res.status(200).json({ message: "Sending follow-ups to recent contacts...", action, params }); }
+  if (/schedule/i.test(last)) return res.status(200).json({ message: "When should I send? Tell me a time like "tomorrow 9am" or a specific date.", action: "none", params: {} });
+  if (/pause|stop/i.test(last)) return res.status(200).json({ message: "Stopping the current campaign.", action: "stop_campaign", params: {} });
+  if (/stats|dashboard|overview/i.test(last)) { action = "show_page"; params = { page: "dashboard" }; return res.status(200).json({ message: "Opening dashboard...", action, params }); }
+
+  return res.status(200).json({
+    message: "I can send emails, manage contacts, check campaign status, or find leads. What would you like to do?\n\n• **Send emails** to a category\n• **Add** or **remove** contacts\n• **Check** campaign status\n• **Follow up** with recent outreach",
+    action: "none", params: {},
+  });
 }
