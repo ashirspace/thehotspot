@@ -11,10 +11,10 @@ import {
 /* ───────── CONFIG ───────── */
 const N8N_WEBHOOK_URL = "YOUR_N8N_WEBHOOK_URL_HERE";
 
-// ── Neon PostgreSQL helpers (all DB ops go through /api/db-users or /api/db-contacts) ──
+// ── Neon PostgreSQL helpers (all DB ops go through /api/db) ──
 
 async function dbUsers(body) {
-  const res = await fetch("/api/db-users", {
+  const res = await fetch("/api/db", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
@@ -23,17 +23,17 @@ async function dbUsers(body) {
 }
 
 async function dbContacts(body) {
-  const res = await fetch("/api/db-contacts", {
+  const res = await fetch("/api/db", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    body: JSON.stringify({ entity: "contact", ...body }),
   });
   return res.json();
 }
 
 // Legacy-compatible wrappers used throughout the app
 async function fetchAllContacts() {
-  const res = await fetch("/api/db-contacts");
+  const res = await fetch("/api/db?entity=contact");
   const data = await res.json();
   return (data.records || []).map(r => ({
     id: r.id,
@@ -3078,7 +3078,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
     for (let i = 0; i < toGenerate.length; i++) {
       const contact = toGenerate[i];
       try {
-        const res = await fetch("/api/generate-email", {
+        const res = await fetch("/api/generate", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -3409,7 +3409,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
     if (!form.recipientCompany.trim()) { showToast("Enter recipient company name"); return; }
     setGenerating(true);
     try {
-      const res = await fetch("/api/generate-email", {
+      const res = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -3554,10 +3554,10 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
               onClick={async () => {
                 setRegeneratingAngle(true);
                 try {
-                  const res = await fetch("/api/generate-angle", {
+                  const res = await fetch("/api/generate", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ category: template.id, current: form.angle }),
+                    body: JSON.stringify({ type: "angle", category: template.id, current: form.angle }),
                   });
                   const data = await res.json();
                   if (data.angle) setForm(f => ({ ...f, angle: data.angle }));
@@ -3869,7 +3869,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
   // Generate one email via API — returns { subject, body }
   const generateOneEmail = async (contact, offerContext, maxChars) => {
-    const res = await fetch("/api/generate-email", {
+    const res = await fetch("/api/generate", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

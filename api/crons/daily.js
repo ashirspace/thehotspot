@@ -30,7 +30,7 @@ async function sendEmail(accessToken, to, subject, body) {
 }
 
 async function generateEmail(host, proto, company, category, offerContext, maxChars) {
-  const r = await fetch(`${proto}://${host}/api/generate-email`, {
+  const r = await fetch(`${proto}://${host}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ company, category, offerContext, maxChars: maxChars || 400 }),
