@@ -1,6 +1,6 @@
 import { getDb, initDb } from "./_db.js";
 
-export const maxDuration = 15;
+export const maxDuration = 10;
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
