@@ -212,6 +212,7 @@ ${senderCo}
 - "Dear Sir/Madam"
 - [placeholder] / [Your Name] / [insert] — any unfilled brackets
 - More than ONE call-to-action
+- Em dashes (—) — use a hyphen (-) or rewrite the sentence naturally
 
 ## LENGTH: Write exactly ${lineTarget} of content in the body. ${lineDetail}
 
@@ -237,7 +238,7 @@ Use \\n for line breaks. No HTML.`;
     const data = await response.json();
     if (data.error) throw new Error(data.error.message);
     const parsed = JSON.parse(data.choices?.[0]?.message?.content || "{}");
-    let emailBody = parsed.body || fallback.body;
+    let emailBody = (parsed.body || fallback.body).replace(/—/g, "-");
 
     emailBody = emailBody.replace(/^[\s\S]*?(?=\n\n)/, (header) => {
       const lines = header.split("\n").map(l => l.trim()).filter(Boolean);

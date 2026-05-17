@@ -3025,31 +3025,32 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
 }
 
 /* ───────── EMAIL SENDER ───────── */
+function wrapEmailHtml(plainBody, pixelUrl = "") {
+  const clean = (plainBody || "").replace(/—/g, "-");
+  const paragraphs = clean
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => {
+      const escaped = p.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;">${escaped.replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("");
+  const pixel = pixelUrl
+    ? `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;" />`
+    : "";
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}<p style="margin:24px 0 0 0;padding-top:16px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;line-height:1.5;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr>${pixel ? `<tr><td>${pixel}</td></tr>` : ""}</table></td></tr></table></body></html>`;
+}
+
 function makeGmailMessage({ to, subject, body, html = false }) {
   const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(subject)))}?=`;
-  let content, contentType;
-  if (html) {
-    const escaped = body
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;");
-    // Re-apply <a> tags that were already injected (they got escaped above — undo)
-    const withLinks = escaped
-      .replace(/&lt;a href="([^"]+)"&gt;([^<]+)&lt;\/a&gt;/g, '<a href="$1">$2</a>')
-      .replace(/&lt;img ([^/]+)\/&gt;/g, '<img $1/>');
-    content = `<html><body style="font-family:Arial,sans-serif;font-size:14px;line-height:1.6;color:#1a1a1a;max-width:600px">${withLinks.replace(/\n/g, "<br>\n")}</body></html>`;
-    contentType = "text/html";
-  } else {
-    content = body;
-    contentType = "text/plain";
-  }
   const msg = [
     `To: ${to}`,
     `Subject: ${encodedSubject}`,
-    `Content-Type: ${contentType}; charset=utf-8`,
+    `Content-Type: ${html ? "text/html" : "text/plain"}; charset=utf-8`,
     `MIME-Version: 1.0`,
     "",
-    content,
+    body,
   ].join("\r\n");
   return btoa(unescape(encodeURIComponent(msg)))
     .replace(/\+/g, "-")
@@ -3144,7 +3145,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
       const email = draft.contact.email;
       if (!email) { results.push({ ...draft, status: "failed", error: "No email address" }); setSendProgress({ current: i + 1, total: toSend.length, results: [...results] }); continue; }
       try {
-        const raw = makeGmailMessage({ to: email, subject: draft.subject, body: draft.body });
+        const raw = makeGmailMessage({ to: email, subject: draft.subject, body: wrapEmailHtml(draft.body), html: true });
         const r = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
           method: "POST",
           headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
@@ -3461,9 +3462,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
     if (!toEmail) { showToast("Enter recipient email address first"); return; }
     setSending(true);
     try {
-      const encodedSubject = `=?UTF-8?B?${btoa(unescape(encodeURIComponent(email.subject)))}?=`;
-      const msg = [`To: ${toEmail}`, `Subject: ${encodedSubject}`, `Content-Type: text/plain; charset=utf-8`, `MIME-Version: 1.0`, "", email.body].join("\r\n");
-      const raw = btoa(unescape(encodeURIComponent(msg))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+      const raw = makeGmailMessage({ to: toEmail, subject: email.subject, body: wrapEmailHtml(email.body), html: true });
       const sendRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
         method: "POST",
         headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
@@ -3914,18 +3913,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
   const sendOneEmail = async (to, subject, body) => {
     const trackId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const origin = window.location.origin;
-
-    // Wrap bare URLs with click tracking
-    const trackedBody = body.replace(/https?:\/\/[^\s)>\]"]+/g, (url) =>
-      `<a href="${origin}/api/track?type=click&id=${trackId}&e=${encodeURIComponent(to)}&url=${encodeURIComponent(url)}">${url}</a>`
-    );
-
-    // Append unsubscribe footer + open-tracking pixel
-    const htmlBody = trackedBody
-      + `\n\n---\nTo unsubscribe, reply STOP.`
-      + `\n<img src="${origin}/api/track?type=open&id=${trackId}&e=${encodeURIComponent(to)}" width="1" height="1" style="display:none;width:1px;height:1px" alt="" />`;
-
-    const raw = makeGmailMessage({ to, subject, body: htmlBody, html: true });
+    const pixelUrl = `${origin}/api/track?type=open&id=${trackId}&e=${encodeURIComponent(to)}`;
+    const raw = makeGmailMessage({ to, subject, body: wrapEmailHtml(body, pixelUrl), html: true });
     const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
       method: "POST",
       headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },

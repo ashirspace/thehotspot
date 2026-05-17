@@ -1,15 +1,29 @@
 import { getAccessToken } from "../auth.js";
 import { getDb } from "../_db.js";
 
-function buildGmailMessage(to, subject, body) {
+function wrapEmailHtml(plainBody) {
+  const clean = (plainBody || "").replace(/—/g, "-");
+  const paragraphs = clean
+    .split(/\n{2,}/)
+    .map(p => p.trim())
+    .filter(Boolean)
+    .map(p => {
+      const escaped = p.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      return `<p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;">${escaped.replace(/\n/g, "<br>")}</p>`;
+    })
+    .join("");
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}<p style="margin:24px 0 0 0;padding-top:16px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr></table></td></tr></table></body></html>`;
+}
+
+function buildGmailMessage(to, subject, htmlBody) {
   const encodedSubject = `=?UTF-8?B?${Buffer.from(subject, "utf8").toString("base64")}?=`;
   const msg = [
     `To: ${to}`,
     `Subject: ${encodedSubject}`,
-    `Content-Type: text/plain; charset=utf-8`,
+    `Content-Type: text/html; charset=utf-8`,
     `MIME-Version: 1.0`,
     "",
-    body,
+    htmlBody,
   ].join("\r\n");
   return Buffer.from(msg, "utf8")
     .toString("base64")
@@ -19,7 +33,7 @@ function buildGmailMessage(to, subject, body) {
 }
 
 async function sendEmail(accessToken, to, subject, body) {
-  const raw = buildGmailMessage(to, subject, body + "\n\n---\nTo unsubscribe, reply STOP.");
+  const raw = buildGmailMessage(to, subject, wrapEmailHtml(body));
   const r = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
