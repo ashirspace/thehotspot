@@ -1,0 +1,14 @@
+/* Tailwind v4 — no preflight, so existing dashboard styles are not affected */
+@import "tailwindcss/theme";
+@import "tailwindcss/utilities";
+
+@theme {
+  --color-surface: #09090d;
+  --color-card: #111116;
+  --color-line: #1e1e26;
+  --color-accent: #10b981;
+  --color-sky: #0ea5e9;
+  --color-muted: #6b7280;
+  --color-foreground: #f1f5f9;
+  --font-sans: ui-sans-serif, system-ui, -apple-system, sans-serif;
+}
