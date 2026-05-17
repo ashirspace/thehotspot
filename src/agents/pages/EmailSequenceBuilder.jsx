@@ -25,7 +25,7 @@ async function runSequenceBuilder({ company, angle, steps, senderName, senderCom
 
 Target company: ${company}
 Our angle/offer: ${angle}
-Sender: ${senderName || "Ashir Ayaan"}, ${senderCompany || "Ibra Digitals Branding Services LLC"}
+Sender: ${senderName || "Ashir Ayaan"}, ${senderCompany || "thehotspot"}
 
 Email 1 = initial cold email. Subsequent emails = short follow-ups referencing the previous email.
 Space emails: Email 1 (Day 1), Email 2 (Day 4), Email 3 (Day 8), Email 4 (Day 14), Email 5 (Day 21).`;
@@ -38,7 +38,7 @@ export default function EmailSequenceBuilder() {
   const [angle, setAngle] = useState("");
   const [steps, setSteps] = useState("3");
   const [senderName, setSenderName] = useState("Ashir Ayaan");
-  const [senderCompany, setSenderCompany] = useState("Ibra Digitals Branding Services LLC");
+  const [senderCompany, setSenderCompany] = useState("");
   const { loading, result, error, run } = useAgent(runSequenceBuilder);
 
   return (
