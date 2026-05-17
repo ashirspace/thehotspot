@@ -168,16 +168,7 @@ function LoginPage({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
-  const [showAgentsDropdown, setShowAgentsDropdown] = useState(false);
-  const agentsDropdownRef = useRef(null);
   const isSignup = authMode === "signup";
-
-  useEffect(() => {
-    if (!showAgentsDropdown) return;
-    const close = (e) => { if (agentsDropdownRef.current && !agentsDropdownRef.current.contains(e.target)) setShowAgentsDropdown(false); };
-    document.addEventListener("mousedown", close);
-    return () => document.removeEventListener("mousedown", close);
-  }, [showAgentsDropdown]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -484,59 +475,6 @@ function LoginPage({ onLogin }) {
           <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          {/* Agents dropdown */}
-          <div ref={agentsDropdownRef} style={{ position: "relative" }}>
-            <button
-              onClick={() => setShowAgentsDropdown(d => !d)}
-              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, border: "1px solid #ffffff15", background: showAgentsDropdown ? "#1a1a24" : "transparent", color: "#CBD5E1", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s" }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#1a1a24"; e.currentTarget.style.borderColor = "#10b98140"; }}
-              onMouseLeave={e => { if (!showAgentsDropdown) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "#ffffff15"; } }}
-            >
-              <LuSparkles size={14} /> Agents
-              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: showAgentsDropdown ? "rotate(180deg)" : "none", transition: "transform .15s" }}><polyline points="6 9 12 15 18 9" /></svg>
-            </button>
-            {showAgentsDropdown && (
-              <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, width: 280, background: "#111116", border: "1px solid #ffffff12", borderRadius: 14, boxShadow: "0 16px 40px rgba(0,0,0,0.5)", zIndex: 200, overflow: "hidden", animation: "fadeIn .15s ease" }}>
-                <div style={{ padding: "10px 14px 6px", fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: 1.2, textTransform: "uppercase" }}>AI Agents</div>
-                {[
-                  { id: "lead-finder",            label: "Lead Finder",             icon: "🔍", desc: "Find B2B companies in any niche" },
-                  { id: "lead-scoring",           label: "Lead Scoring",            icon: "⭐", desc: "Score prospects 1-10 with AI" },
-                  { id: "landing-page-analyzer",  label: "Landing Page Analyzer",   icon: "🌐", desc: "CRO audit of any landing page" },
-                  { id: "email-sequence-builder", label: "Email Sequence Builder",  icon: "📧", desc: "Multi-step cold email sequences" },
-                  { id: "ab-email-tester",        label: "A/B Email Tester",        icon: "🧪", desc: "AI picks the winning variant" },
-                  { id: "reply-detector",         label: "Reply Detector",          icon: "↩️", desc: "Classify intent + draft responses" },
-                  { id: "blog-generator",         label: "Blog Generator",          icon: "📝", desc: "Full SEO blog posts on demand" },
-                  { id: "competitor-analyzer",    label: "Competitor Analyzer",     icon: "📊", desc: "SWOT analysis of any competitor" },
-                  { id: "backlink-outreach",      label: "Backlink Outreach",       icon: "🔗", desc: "Find link prospects + email draft" },
-                  { id: "campaign-dashboard",     label: "Campaign Dashboard",      icon: "📈", desc: "Opens, clicks, delivery charts" },
-                  { id: "crm-lite",               label: "CRM Lite",                icon: "🗄️", desc: "Browse & edit all contacts" },
-                  { id: "csv-import-export",      label: "CSV Import / Export",     icon: "📂", desc: "Import or download contact lists" },
-                ].map(agent => (
-                  <a
-                    key={agent.id}
-                    href={`/agents/${agent.id}.html`}
-                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", textDecoration: "none", transition: "background .1s" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
-                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-                  >
-                    <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{agent.icon}</span>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{agent.label}</div>
-                      <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.3 }}>{agent.desc}</div>
-                    </div>
-                  </a>
-                ))}
-                <div style={{ borderTop: "1px solid #ffffff0d", padding: 10 }}>
-                  <a href="/agents" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, background: "#10b98112", border: "1px solid #10b98130", color: "#10b981", fontSize: 12, fontWeight: 600, textDecoration: "none", transition: "background .15s" }}
-                    onMouseEnter={e => e.currentTarget.style.background = "#10b98120"}
-                    onMouseLeave={e => e.currentTarget.style.background = "#10b98112"}
-                  >
-                    Open Agent Platform →
-                  </a>
-                </div>
-              </div>
-            )}
-          </div>
           <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 20px #10b98130" }}>
             Sign In
           </button>
@@ -624,17 +562,18 @@ function LoginPage({ onLogin }) {
         <div ref={agentsRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: agentsVisible ? 1 : 0, transform: agentsVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
-            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>5 AI agents working for you 24/7</div>
+            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>12 AI agents working for you 24/7</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
             <a href="/meet-the-team.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#0ea5e9", textDecoration: "none", borderBottom: "1px solid #0ea5e940", paddingBottom: 1 }}>Meet all agents →</a>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
             {[
-              { name: "Lead Agent", role: "Prospect Discovery", desc: "Searches the web in real time to find companies, brands, and agencies that match your target criteria.", color: "#10b981", icon: <LuUsers size={16} /> },
-              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#0ea5e9", icon: <LuFilePen size={16} /> },
-              { name: "Outreach Agent", role: "Campaign Execution", desc: "Manages send schedules, respects warm-up limits, paces sends to avoid spam, and reports results.", color: "#6366f1", icon: <LuSend size={16} /> },
-              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#f59e0b", icon: <LuRadio size={16} /> },
-              { name: "Analytics Agent", role: "Performance Tracking", desc: "Tracks opens, clicks, reply rates, and campaign success — surfaces what's working so you can double down.", color: "#ec4899", icon: <LuChartBar size={16} /> },
+              { name: "Email Sequence Builder", role: "Email Automation", desc: "Generate a full 2-5 email cold outreach sequence with follow-up timing built in — ready to copy and send.", color: "#0ea5e9", icon: <LuMailbox size={16} /> },
+              { name: "Lead Finder", role: "Prospect Discovery", desc: "Search for qualified B2B companies by industry, location, and size. Returns a ready-to-outreach prospect table.", color: "#10b981", icon: <LuUsers size={16} /> },
+              { name: "Campaign Dashboard", role: "Analytics & Reporting", desc: "Live charts of opens, clicks, and delivery stats across all your email campaigns at a glance.", color: "#6366f1", icon: <LuChartBar size={16} /> },
+              { name: "CRM Lite", role: "Contact Management", desc: "Browse and inline-edit your entire contact database. Click any cell to update it in real time.", color: "#f59e0b", icon: <LuFolder size={16} /> },
+              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#14b8a6", icon: <LuFilePen size={16} /> },
+              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#ec4899", icon: <LuRadio size={16} /> },
             ].map((a, i) => (
               <div key={i} style={{
                 display: "flex", gap: 18, padding: "22px 26px", alignItems: "flex-start",
