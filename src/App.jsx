@@ -5,7 +5,7 @@ import {
   LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuMessageSquare,
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
-  LuClock, LuChevronRight,
+  LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
@@ -784,35 +784,35 @@ function getSmartResponse(text) {
 
   // Greetings
   if (/^(hi|hello|hey|yo|sup|hola|namaste|salaam)/i.test(lower)) {
-    return { text: "Hey there! 👋 I'm your thehotspot assistant. I can help you with:\n\n• Sending outreach emails (by category or all)\n• Checking campaign stats & status\n• Pausing or resuming workflows\n• Adding new contacts\n• Modifying email templates\n\nJust tell me what you need!", action: null };
+    return { text: "Hey there! I'm your thehotspot assistant. I can help you with:\n\n• Sending outreach emails (by category or all)\n• Checking campaign stats & status\n• Pausing or resuming workflows\n• Adding new contacts\n• Modifying email templates\n\nJust tell me what you need!", action: null };
   }
 
   // What can you do
   if (lower.includes("what") && (lower.includes("can you") || lower.includes("you do") || lower.includes("things"))) {
-    return { text: "Here's everything I can do for you:\n\n📧 **Email Management**\n• Send emails to all contacts or by category (Network, CPS, CPL, CPA, Mobile)\n• Check email delivery status\n\n📊 **Campaign Stats**\n• View total contacts, emails sent, success rate\n• Get category-wise breakdown\n\n⚙️ **Workflow Control**\n• Pause the outreach workflow\n• Resume the outreach workflow\n• Schedule campaigns\n\n👤 **Contact Management**\n• Add new contacts to the database\n• Remove contacts\n• Filter by category\n\n✏️ **Templates**\n• View current email templates\n• Modify templates by category\n\nJust type what you need in plain English!", action: null };
+    return { text: "Here's everything I can do for you:\n\n**Email Management**\n• Send emails to all contacts or by category (Network, CPS, CPL, CPA, Mobile)\n• Check email delivery status\n\n**Campaign Stats**\n• View total contacts, emails sent, success rate\n• Get category-wise breakdown\n\n**Workflow Control**\n• Pause the outreach workflow\n• Resume the outreach workflow\n• Schedule campaigns\n\n**Contact Management**\n• Add new contacts to the database\n• Remove contacts\n• Filter by category\n\n**Templates**\n• View current email templates\n• Modify templates by category\n\nJust type what you need in plain English!", action: null };
   }
 
   // Send emails
   if (lower.includes("send") && (lower.includes("email") || lower.includes("mail"))) {
     if (matchedCat) {
-      return { text: `Got it! Triggering outreach emails to all **${matchedCat.toUpperCase()}** companies now. 🚀\n\nThe workflow will:\n1. Fetch contacts from the ${matchedCat.toUpperCase()} category\n2. Generate personalized emails\n3. Send via Gmail\n\nI'll notify you once it's done!`, action: { type: "send_emails", category: matchedCat } };
+      return { text: `Got it! Triggering outreach emails to all **${matchedCat.toUpperCase()}** companies now.\n\nThe workflow will:\n1. Fetch contacts from the ${matchedCat.toUpperCase()} category\n2. Generate personalized emails\n3. Send via Gmail\n\nI'll notify you once it's done!`, action: { type: "send_emails", category: matchedCat } };
     }
-    return { text: "Sending outreach emails to **all categories** (Network, CPS, CPL, CPA, Mobile). 🚀\n\nThis will process all contacts in your database. I'll notify you when complete!", action: { type: "send_emails", category: "all" } };
+    return { text: "Sending outreach emails to **all categories** (Network, CPS, CPL, CPA, Mobile).\n\nThis will process all contacts in your database. I'll notify you when complete!", action: { type: "send_emails", category: "all" } };
   }
 
   // Status / Stats
   if (lower.includes("status") || lower.includes("stats") || lower.includes("report") || lower.includes("how") && lower.includes("going")) {
-    return { text: `Here's your current campaign overview:\n\n📊 **Campaign Dashboard**\n• Total Contacts: ${STATS_DATA.totalContacts}\n• Emails Sent: ${STATS_DATA.emailsSent}\n• Active Categories: ${STATS_DATA.categories}\n• Success Rate: ${STATS_DATA.successRate}%\n• Failed: ${STATS_DATA.totalContacts - STATS_DATA.emailsSent} pending/failed\n\nWant me to drill down into a specific category?`, action: { type: "show_stats" } };
+    return { text: `Here's your current campaign overview:\n\n**Campaign Dashboard**\n• Total Contacts: ${STATS_DATA.totalContacts}\n• Emails Sent: ${STATS_DATA.emailsSent}\n• Active Categories: ${STATS_DATA.categories}\n• Success Rate: ${STATS_DATA.successRate}%\n• Failed: ${STATS_DATA.totalContacts - STATS_DATA.emailsSent} pending/failed\n\nWant me to drill down into a specific category?`, action: { type: "show_stats" } };
   }
 
   // Pause
   if (lower.includes("pause") || lower.includes("stop") || lower.includes("hold")) {
-    return { text: "Pausing the outreach workflow now. ⏸️\n\nNo new emails will be sent until you resume. Any emails currently in queue will be held.\n\nSay **\"resume\"** when you're ready to continue.", action: { type: "pause_workflow" } };
+    return { text: "Pausing the outreach workflow now.\n\nNo new emails will be sent until you resume. Any emails currently in queue will be held.\n\nSay **\"resume\"** when you're ready to continue.", action: { type: "pause_workflow" } };
   }
 
   // Resume / Start
   if (lower.includes("resume") || lower.includes("start") || lower.includes("continue") || lower.includes("unpause")) {
-    return { text: "Resuming the outreach workflow! ▶️\n\nEmails will continue sending from where we left off. The queue is being processed now.\n\nI'll keep you updated on progress!", action: { type: "resume_workflow" } };
+    return { text: "Resuming the outreach workflow!\n\nEmails will continue sending from where we left off. The queue is being processed now.\n\nI'll keep you updated on progress!", action: { type: "resume_workflow" } };
   }
 
   // Add contact
@@ -827,17 +827,17 @@ function getSmartResponse(text) {
 
   // Schedule
   if (lower.includes("schedule") || lower.includes("later") || lower.includes("tomorrow") || lower.includes("time")) {
-    return { text: "I can help schedule your campaigns! Here are your options:\n\n⏰ **Scheduling Options:**\n• Send now\n• Schedule for a specific date & time\n• Set up recurring daily/weekly sends\n\nJust tell me when you'd like the emails to go out, e.g.:\n\"Schedule Network emails for tomorrow 10 AM\"", action: null };
+    return { text: "I can help schedule your campaigns! Here are your options:\n\n**Scheduling Options:**\n• Send now\n• Schedule for a specific date & time\n• Set up recurring daily/weekly sends\n\nJust tell me when you'd like the emails to go out, e.g.:\n\"Schedule Network emails for tomorrow 10 AM\"", action: null };
   }
 
   // Remove / Delete contact
   if (lower.includes("remove") || lower.includes("delete")) {
-    return { text: "To remove a contact, tell me the **company name** or **email address** you want to delete.\n\nFor example:\n\"Remove ByteForge AI\"\n\"Delete partner@adcombo.com\"\n\n⚠️ This action cannot be undone, so I'll ask for confirmation before deleting.", action: null };
+    return { text: "To remove a contact, tell me the **company name** or **email address** you want to delete.\n\nFor example:\n\"Remove ByteForge AI\"\n\"Delete partner@adcombo.com\"\n\nNote: This action cannot be undone, so I'll ask for confirmation before deleting.", action: null };
   }
 
   // Help
   if (lower.includes("help") || lower.includes("how do i") || lower.includes("guide")) {
-    return { text: "Here's a quick guide to using thehotspot:\n\n🚀 **Getting Started:**\n• \"Send emails to all companies\" — triggers full outreach\n• \"Send emails to CPA companies\" — category-specific\n\n📊 **Monitoring:**\n• \"Show me stats\" — campaign overview\n• \"Campaign status\" — delivery report\n\n⚙️ **Control:**\n• \"Pause workflow\" — stop sending\n• \"Resume workflow\" — continue sending\n\n👤 **Contacts:**\n• \"Add a contact\" — new entry\n• \"Remove a contact\" — delete entry\n\nJust type naturally — I understand plain English!", action: null };
+    return { text: "Here's a quick guide to using thehotspot:\n\n**Getting Started:**\n• \"Send emails to all companies\" — triggers full outreach\n• \"Send emails to CPA companies\" — category-specific\n\n**Monitoring:**\n• \"Show me stats\" — campaign overview\n• \"Campaign status\" — delivery report\n\n**Control:**\n• \"Pause workflow\" — stop sending\n• \"Resume workflow\" — continue sending\n\n**Contacts:**\n• \"Add a contact\" — new entry\n• \"Remove a contact\" — delete entry\n\nJust type naturally — I understand plain English!", action: null };
   }
 
   // Category info
@@ -2048,18 +2048,18 @@ function DashboardPage({ user, contactCount, setPage }) {
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
           {[
-            { id: "lead-finder",            label: "Lead Finder",            icon: "🔍", color: "#10b981" },
-            { id: "lead-scoring",           label: "Lead Scoring",           icon: "⭐", color: "#f59e0b" },
-            { id: "email-sequence-builder", label: "Email Sequences",        icon: "📧", color: "#0ea5e9" },
-            { id: "ab-email-tester",        label: "A/B Email Tester",       icon: "🧪", color: "#ec4899" },
-            { id: "reply-detector",         label: "Reply Detector",         icon: "↩️", color: "#14b8a6" },
-            { id: "blog-generator",         label: "Blog Generator",         icon: "📝", color: "#8b5cf6" },
-            { id: "competitor-analyzer",    label: "Competitor Analyzer",    icon: "📊", color: "#f97316" },
-            { id: "campaign-dashboard",     label: "Campaign Dashboard",     icon: "📈", color: "#6366f1" },
-            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  icon: "🌐", color: "#10b981" },
-            { id: "backlink-outreach",      label: "Backlink Outreach",      icon: "🔗", color: "#0ea5e9" },
-            { id: "crm-lite",               label: "CRM Lite",               icon: "🗄️", color: "#f59e0b" },
-            { id: "csv-import-export",      label: "CSV Import/Export",      icon: "📂", color: "#64748B" },
+            { id: "lead-finder",            label: "Lead Finder",            Icon: LuSearch,       color: "#10b981" },
+            { id: "lead-scoring",           label: "Lead Scoring",           Icon: LuTarget,       color: "#f59e0b" },
+            { id: "email-sequence-builder", label: "Email Sequences",        Icon: LuMailbox,      color: "#0ea5e9" },
+            { id: "ab-email-tester",        label: "A/B Email Tester",       Icon: LuFlaskConical, color: "#ec4899" },
+            { id: "reply-detector",         label: "Reply Detector",         Icon: LuRadio,        color: "#14b8a6" },
+            { id: "blog-generator",         label: "Blog Generator",         Icon: LuFilePen,      color: "#8b5cf6" },
+            { id: "competitor-analyzer",    label: "Competitor Analyzer",    Icon: LuChartBar,     color: "#f97316" },
+            { id: "campaign-dashboard",     label: "Campaign Dashboard",     Icon: LuTrendingUp,   color: "#6366f1" },
+            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  Icon: LuGlobe,        color: "#10b981" },
+            { id: "backlink-outreach",      label: "Backlink Outreach",      Icon: LuLink,         color: "#0ea5e9" },
+            { id: "crm-lite",               label: "CRM Lite",               Icon: LuDatabase,     color: "#f59e0b" },
+            { id: "csv-import-export",      label: "CSV Import/Export",      Icon: LuFolder,       color: "#64748B" },
           ].map(agent => (
             <a
               key={agent.id}
@@ -2068,7 +2068,7 @@ function DashboardPage({ user, contactCount, setPage }) {
               onMouseEnter={e => { e.currentTarget.style.borderColor = `${agent.color}40`; e.currentTarget.style.background = "#13131a"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; }}
             >
-              <span style={{ fontSize: 18, lineHeight: 1 }}>{agent.icon}</span>
+              <agent.Icon size={16} style={{ color: agent.color, flexShrink: 0 }} />
               <span style={{ fontSize: 12, fontWeight: 500, color: "#CBD5E1", lineHeight: 1.3 }}>{agent.label}</span>
             </a>
           ))}
@@ -4612,10 +4612,10 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           const isHero = messages.length === 1 && messages[0].role === "assistant";
 
           const suggestions = [
-            { icon: "📧", label: "Send emails", sub: "to all Network companies" },
-            { icon: "📊", label: "Campaign status", sub: "check active campaigns" },
-            { icon: "➕", label: "Add a contact", sub: "to any category" },
-            { icon: "🔁", label: "Send follow-ups", sub: "to recent outreach" },
+            { Icon: LuMail,       label: "Send emails",     sub: "to all Network companies" },
+            { Icon: LuChartBar,   label: "Campaign status", sub: "check active campaigns" },
+            { Icon: LuUsers,      label: "Add a contact",   sub: "to any category" },
+            { Icon: LuSend,       label: "Send follow-ups", sub: "to recent outreach" },
           ];
 
           const renderMsg = (text) => {
@@ -4652,7 +4652,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
                   {/* Greeting */}
                   <div style={{ textAlign: "center" }}>
                     <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>
-                      Hey, {user?.username || "there"} 👋
+                      Hey, {user?.username || "there"}
                     </div>
                     <div style={{ fontSize: 13.5, color: "#64748B", maxWidth: 340, lineHeight: 1.6 }}>
                       I can send emails, manage contacts, check campaign stats — just tell me what you need.
@@ -4671,7 +4671,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
                         onMouseEnter={e => { e.currentTarget.style.background = "#15151d"; e.currentTarget.style.borderColor = "#10b98128"; e.currentTarget.style.transform = "translateY(-1px)"; }}
                         onMouseLeave={e => { e.currentTarget.style.background = "#111116"; e.currentTarget.style.borderColor = "#ffffff0e"; e.currentTarget.style.transform = "translateY(0)"; }}
                       >
-                        <span style={{ fontSize: 20, lineHeight: 1 }}>{s.icon}</span>
+                        <s.Icon size={18} style={{ color: "#64748B" }} />
                         <span style={{ fontSize: 12.5, fontWeight: 600, color: "#CBD5E1" }}>{s.label}</span>
                         <span style={{ fontSize: 11.5, color: "#475569", lineHeight: 1.3 }}>{s.sub}</span>
                       </button>
