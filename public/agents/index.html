@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI Agents — thehotspot</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',-apple-system,sans-serif;background:#09090d;color:#F1F5F9;line-height:1.6}a{color:inherit}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid #ffffff0d;background:#09090dcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#10b981,#0ea5e9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+.nav-cta{padding:8px 22px;border-radius:20px;background:linear-gradient(135deg,#10b981,#0ea5e9);color:#fff;border:none;font-size:13px;font-weight:600;text-decoration:none}
+.hero{max-width:700px;margin:0 auto;padding:72px 40px 56px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#6366f112;border:1px solid #6366f130;border-radius:20px;padding:5px 16px;margin-bottom:24px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#818cf8;box-shadow:0 0 6px #818cf8}
+.badge-text{font-size:11px;color:#818cf8;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+h1{font-size:clamp(28px,4.5vw,48px);font-weight:900;letter-spacing:-2px;line-height:1.1;margin-bottom:16px}
+.gradient-text{background:linear-gradient(135deg,#10b981,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:16px;color:#94A3B8;max-width:520px;margin:0 auto 32px}
+.btn-primary{display:inline-flex;align-items:center;gap:6px;padding:12px 28px;border-radius:24px;background:linear-gradient(135deg,#10b981,#0ea5e9);color:#fff;border:none;font-size:14px;font-weight:700;text-decoration:none;box-shadow:0 0 28px #10b98135}
+.grid{max-width:1100px;margin:0 auto 80px;padding:0 40px;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.card{background:#111116;border:1px solid #ffffff0d;border-radius:18px;padding:24px;text-decoration:none;display:flex;align-items:flex-start;gap:16px;transition:all .18s}
+.card:hover{border-color:var(--c,#10b981);background:#16161e;transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.card-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.card-num{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.5;margin-bottom:4px}
+.card-title{font-size:15px;font-weight:700;color:#F1F5F9;margin-bottom:5px}
+.card-desc{font-size:12px;color:#64748B;line-height:1.6}
+.footer{border-top:1px solid #ffffff0d;padding:28px 40px;text-align:center;font-size:12px;color:#475569}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div class="logo">HS</div>
+    <span style="font-size:16px;font-weight:700">thehotspot</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="/" style="color:#94A3B8;text-decoration:none;font-size:13px;font-weight:500">← Dashboard</a>
+    <a href="/" class="nav-cta">Sign In</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge"><span class="badge-dot"></span><span class="badge-text">12 AI Agents</span></div>
+  <h1>Every agent you need to<br><span class="gradient-text">scale your outreach</span></h1>
+  <p class="subtitle">12 autonomous AI agents working together — from finding leads to closing replies, all inside thehotspot.</p>
+  <a href="/" class="btn-primary">Open Platform →</a>
+</div>
+
+<div class="grid">
+  <a href="/agents/lead-finder.html" class="card" style="--c:#10b981"><div class="card-icon" style="background:#10b98115">🔍</div><div><div class="card-num">Agent 01</div><div class="card-title">Lead Finder</div><div class="card-desc">Find B2B companies by industry, location, and size. Returns a ready-to-outreach prospect table.</div></div></a>
+  <a href="/agents/lead-scoring.html" class="card" style="--c:#f59e0b"><div class="card-icon" style="background:#f59e0b15">⭐</div><div><div class="card-num">Agent 02</div><div class="card-title">Lead Scoring</div><div class="card-desc">Score any lead 1-10 with AI reasoning. Know which prospects are worth your time before you reach out.</div></div></a>
+  <a href="/agents/landing-page-analyzer.html" class="card" style="--c:#0ea5e9"><div class="card-icon" style="background:#0ea5e915">🌐</div><div><div class="card-num">Agent 03</div><div class="card-title">Landing Page Analyzer</div><div class="card-desc">Full CRO audit of any URL — strengths, weaknesses, CTA assessment, and three quick wins.</div></div></a>
+  <a href="/agents/email-sequence-builder.html" class="card" style="--c:#0ea5e9"><div class="card-icon" style="background:#0ea5e915">📧</div><div><div class="card-num">Agent 04</div><div class="card-title">Email Sequence Builder</div><div class="card-desc">Generate a full 2-5 email cold outreach sequence with follow-up timing built in.</div></div></a>
+  <a href="/agents/ab-email-tester.html" class="card" style="--c:#ec4899"><div class="card-icon" style="background:#ec489915">🧪</div><div><div class="card-num">Agent 05</div><div class="card-title">A/B Email Tester</div><div class="card-desc">Paste two email variants. AI picks the winner with predicted open and reply rates.</div></div></a>
+  <a href="/agents/reply-detector.html" class="card" style="--c:#14b8a6"><div class="card-icon" style="background:#14b8a615">↩️</div><div><div class="card-num">Agent 06</div><div class="card-title">Reply Detector</div><div class="card-desc">Classify any email reply by intent and sentiment. Get a ready-to-send response drafted instantly.</div></div></a>
+  <a href="/agents/blog-generator.html" class="card" style="--c:#8b5cf6"><div class="card-icon" style="background:#8b5cf615">📝</div><div><div class="card-num">Agent 07</div><div class="card-title">Blog Generator</div><div class="card-desc">Full SEO blog posts on demand — structured, readable, and ready to publish in any CMS.</div></div></a>
+  <a href="/agents/competitor-analyzer.html" class="card" style="--c:#f97316"><div class="card-icon" style="background:#f9731615">📊</div><div><div class="card-num">Agent 08</div><div class="card-title">Competitor Analyzer</div><div class="card-desc">SWOT analysis of any competitor with a positioning insight for your outreach messaging.</div></div></a>
+  <a href="/agents/backlink-outreach.html" class="card" style="--c:#0ea5e9"><div class="card-icon" style="background:#0ea5e915">🔗</div><div><div class="card-num">Agent 09</div><div class="card-title">Backlink Outreach</div><div class="card-desc">Find link-building prospects in your niche and generate a personalized outreach email.</div></div></a>
+  <a href="/agents/campaign-dashboard.html" class="card" style="--c:#6366f1"><div class="card-icon" style="background:#6366f115">📈</div><div><div class="card-num">Agent 10</div><div class="card-title">Campaign Dashboard</div><div class="card-desc">Live charts of opens, clicks, and delivery stats across all your email campaigns.</div></div></a>
+  <a href="/agents/crm-lite.html" class="card" style="--c:#f59e0b"><div class="card-icon" style="background:#f59e0b15">🗄️</div><div><div class="card-num">Agent 11</div><div class="card-title">CRM Lite</div><div class="card-desc">Browse and inline-edit your entire contact database. Click any cell to update it.</div></div></a>
+  <a href="/agents/csv-import-export.html" class="card" style="--c:#64748B"><div class="card-icon" style="background:#64748B15">📂</div><div><div class="card-num">Agent 12</div><div class="card-title">CSV Import / Export</div><div class="card-desc">Upload a CSV to import contacts, or download your entire contact list with one click.</div></div></a>
+</div>
+
+<footer class="footer">
+  <div style="margin-bottom:8px"><a href="/" style="color:#475569;text-decoration:none;margin:0 12px">Dashboard</a><a href="/" style="color:#475569;text-decoration:none;margin:0 12px">Sign In</a></div>
+  © 2025 thehotspot · Ibra Digitals Branding Services LLC
+</footer>
+</body>
+</html>

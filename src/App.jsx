@@ -168,7 +168,16 @@ function LoginPage({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [showAgentsDropdown, setShowAgentsDropdown] = useState(false);
+  const agentsDropdownRef = useRef(null);
   const isSignup = authMode === "signup";
+
+  useEffect(() => {
+    if (!showAgentsDropdown) return;
+    const close = (e) => { if (agentsDropdownRef.current && !agentsDropdownRef.current.contains(e.target)) setShowAgentsDropdown(false); };
+    document.addEventListener("mousedown", close);
+    return () => document.removeEventListener("mousedown", close);
+  }, [showAgentsDropdown]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -474,9 +483,64 @@ function LoginPage({ onLogin }) {
           <Logo size={28} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
         </div>
-        <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 20px #10b98130" }}>
-          Sign In
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          {/* Agents dropdown */}
+          <div ref={agentsDropdownRef} style={{ position: "relative" }}>
+            <button
+              onClick={() => setShowAgentsDropdown(d => !d)}
+              style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 16px", borderRadius: 20, border: "1px solid #ffffff15", background: showAgentsDropdown ? "#1a1a24" : "transparent", color: "#CBD5E1", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s" }}
+              onMouseEnter={e => { e.currentTarget.style.background = "#1a1a24"; e.currentTarget.style.borderColor = "#10b98140"; }}
+              onMouseLeave={e => { if (!showAgentsDropdown) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.borderColor = "#ffffff15"; } }}
+            >
+              <LuSparkles size={14} /> Agents
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" style={{ transform: showAgentsDropdown ? "rotate(180deg)" : "none", transition: "transform .15s" }}><polyline points="6 9 12 15 18 9" /></svg>
+            </button>
+            {showAgentsDropdown && (
+              <div style={{ position: "absolute", top: "calc(100% + 10px)", right: 0, width: 280, background: "#111116", border: "1px solid #ffffff12", borderRadius: 14, boxShadow: "0 16px 40px rgba(0,0,0,0.5)", zIndex: 200, overflow: "hidden", animation: "fadeIn .15s ease" }}>
+                <div style={{ padding: "10px 14px 6px", fontSize: 10, fontWeight: 700, color: "#475569", letterSpacing: 1.2, textTransform: "uppercase" }}>AI Agents</div>
+                {[
+                  { id: "lead-finder",            label: "Lead Finder",             icon: "🔍", desc: "Find B2B companies in any niche" },
+                  { id: "lead-scoring",           label: "Lead Scoring",            icon: "⭐", desc: "Score prospects 1-10 with AI" },
+                  { id: "landing-page-analyzer",  label: "Landing Page Analyzer",   icon: "🌐", desc: "CRO audit of any landing page" },
+                  { id: "email-sequence-builder", label: "Email Sequence Builder",  icon: "📧", desc: "Multi-step cold email sequences" },
+                  { id: "ab-email-tester",        label: "A/B Email Tester",        icon: "🧪", desc: "AI picks the winning variant" },
+                  { id: "reply-detector",         label: "Reply Detector",          icon: "↩️", desc: "Classify intent + draft responses" },
+                  { id: "blog-generator",         label: "Blog Generator",          icon: "📝", desc: "Full SEO blog posts on demand" },
+                  { id: "competitor-analyzer",    label: "Competitor Analyzer",     icon: "📊", desc: "SWOT analysis of any competitor" },
+                  { id: "backlink-outreach",      label: "Backlink Outreach",       icon: "🔗", desc: "Find link prospects + email draft" },
+                  { id: "campaign-dashboard",     label: "Campaign Dashboard",      icon: "📈", desc: "Opens, clicks, delivery charts" },
+                  { id: "crm-lite",               label: "CRM Lite",                icon: "🗄️", desc: "Browse & edit all contacts" },
+                  { id: "csv-import-export",      label: "CSV Import / Export",     icon: "📂", desc: "Import or download contact lists" },
+                ].map(agent => (
+                  <a
+                    key={agent.id}
+                    href={`/agents/${agent.id}.html`}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 14px", textDecoration: "none", transition: "background .1s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
+                    onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+                  >
+                    <span style={{ fontSize: 16, lineHeight: 1, flexShrink: 0 }}>{agent.icon}</span>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{agent.label}</div>
+                      <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.3 }}>{agent.desc}</div>
+                    </div>
+                  </a>
+                ))}
+                <div style={{ borderTop: "1px solid #ffffff0d", padding: 10 }}>
+                  <a href="/agents" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "8px", borderRadius: 8, background: "#10b98112", border: "1px solid #10b98130", color: "#10b981", fontSize: 12, fontWeight: 600, textDecoration: "none", transition: "background .15s" }}
+                    onMouseEnter={e => e.currentTarget.style.background = "#10b98120"}
+                    onMouseLeave={e => e.currentTarget.style.background = "#10b98112"}
+                  >
+                    Open Agent Platform →
+                  </a>
+                </div>
+              </div>
+            )}
+          </div>
+          <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 20px #10b98130" }}>
+            Sign In
+          </button>
+        </div>
       </nav>
 
       {/* ── Scrollable body ── */}
@@ -509,7 +573,7 @@ function LoginPage({ onLogin }) {
         <div style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
             {[
-              { value: "5", label: "AI Agents", color: "#10b981" },
+              { value: "12", label: "AI Agents", color: "#10b981" },
               { value: "50+", label: "Emails / Day", color: "#0ea5e9" },
               { value: "3-Step", label: "Auto Follow-ups", color: "#6366f1" },
               { value: "Live", label: "Open Tracking", color: "#f59e0b" },
@@ -2026,6 +2090,50 @@ function DashboardPage({ user, contactCount, setPage }) {
           </div>
         </div>
 
+      </div>
+
+      {/* AI Agents */}
+      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "24px 28px", marginBottom: 20, borderTop: "2px solid #6366f1" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6366f118", border: "1px solid #6366f130", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><LuSparkles size={17} /></div>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</div>
+              <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>12 autonomous agents to grow your business</div>
+            </div>
+          </div>
+          <a href="/agents" style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 16px", borderRadius: 20, background: "#6366f115", border: "1px solid #6366f130", color: "#818cf8", fontSize: 12, fontWeight: 600, textDecoration: "none", transition: "all .15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#6366f125"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#6366f115"; }}
+          >Open Platform <LuChevronRight size={12} /></a>
+        </div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+          {[
+            { id: "lead-finder",            label: "Lead Finder",            icon: "🔍", color: "#10b981" },
+            { id: "lead-scoring",           label: "Lead Scoring",           icon: "⭐", color: "#f59e0b" },
+            { id: "email-sequence-builder", label: "Email Sequences",        icon: "📧", color: "#0ea5e9" },
+            { id: "ab-email-tester",        label: "A/B Email Tester",       icon: "🧪", color: "#ec4899" },
+            { id: "reply-detector",         label: "Reply Detector",         icon: "↩️", color: "#14b8a6" },
+            { id: "blog-generator",         label: "Blog Generator",         icon: "📝", color: "#8b5cf6" },
+            { id: "competitor-analyzer",    label: "Competitor Analyzer",    icon: "📊", color: "#f97316" },
+            { id: "campaign-dashboard",     label: "Campaign Dashboard",     icon: "📈", color: "#6366f1" },
+            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  icon: "🌐", color: "#10b981" },
+            { id: "backlink-outreach",      label: "Backlink Outreach",      icon: "🔗", color: "#0ea5e9" },
+            { id: "crm-lite",               label: "CRM Lite",               icon: "🗄️", color: "#f59e0b" },
+            { id: "csv-import-export",      label: "CSV Import/Export",      icon: "📂", color: "#64748B" },
+          ].map(agent => (
+            <a
+              key={agent.id}
+              href={`/agents/${agent.id}`}
+              style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10, background: "#0d0d12", border: "1px solid #ffffff08", textDecoration: "none", transition: "all .15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = `${agent.color}40`; e.currentTarget.style.background = "#13131a"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; }}
+            >
+              <span style={{ fontSize: 18, lineHeight: 1 }}>{agent.icon}</span>
+              <span style={{ fontSize: 12, fontWeight: 500, color: "#CBD5E1", lineHeight: 1.3 }}>{agent.label}</span>
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* Recent campaigns */}
@@ -4494,8 +4602,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             { id: "emailTemplates", label: "Email Templates", icon: <LuFilePen size={16} /> },
             { id: "contacts",       label: "Contacts DB",     icon: <LuClipboardList size={16} /> },
             { id: "settings",       label: "Settings",        icon: <LuSettings size={16} /> },
+            { id: "__agents__",     label: "AI Agents",       icon: <LuSparkles size={16} /> },
           ].map(item => (
-            <button key={item.id} onClick={() => { setPage(item.id); setSidebarOpen(false); }} style={{
+            <button key={item.id} onClick={() => { if (item.id === "__agents__") { window.location.href = "/agents"; return; } setPage(item.id); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 10,
               padding: "10px 14px", margin: "2px 8px", borderRadius: 10,
               background: page === item.id ? "#6366f120" : "transparent",

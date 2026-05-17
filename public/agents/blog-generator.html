@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Blog Generator Agent — thehotspot</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'DM Sans',-apple-system,sans-serif;background:#09090d;color:#F1F5F9;line-height:1.6}a{color:inherit}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid #ffffff0d;background:#09090dcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
+.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#10b981,#0ea5e9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
+.nav-cta{padding:8px 22px;border-radius:20px;background:linear-gradient(135deg,#10b981,#0ea5e9);color:#fff;border:none;font-size:13px;font-weight:600;text-decoration:none}
+.btn-primary{padding:13px 32px;border-radius:24px;background:linear-gradient(135deg,#8b5cf6,#6366f1);color:#fff;border:none;font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 0 32px #8b5cf640}
+.btn-ghost{padding:13px 28px;border-radius:24px;background:transparent;color:#94A3B8;border:1px solid #ffffff15;font-size:15px;font-weight:500;text-decoration:none}
+.hero{max-width:800px;margin:0 auto;padding:80px 40px 60px;text-align:center}
+.badge{display:inline-flex;align-items:center;gap:6px;background:#8b5cf612;border:1px solid #8b5cf630;border-radius:20px;padding:5px 16px;margin-bottom:24px}
+.badge-dot{width:6px;height:6px;border-radius:50%;background:#8b5cf6;box-shadow:0 0 6px #8b5cf6}
+.badge-text{font-size:11px;color:#8b5cf6;font-weight:700;letter-spacing:1px;text-transform:uppercase}
+h1{font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.08;margin-bottom:20px}
+.gradient-text{background:linear-gradient(135deg,#8b5cf6,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.subtitle{font-size:17px;color:#94A3B8;max-width:560px;margin:0 auto 40px}
+.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.section{max-width:1100px;margin:0 auto 80px;padding:0 40px}
+.section-label{font-size:11px;font-weight:700;color:#8b5cf6;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
+.section-title{font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-1px;margin-bottom:12px}
+.section-sub{font-size:14px;color:#64748B}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px}
+.card{background:#111116;border:1px solid #ffffff0d;border-radius:18px;padding:28px 24px;transition:border-color .2s}
+.card:hover{border-color:#8b5cf640}
+.card-icon{width:48px;height:48px;border-radius:14px;background:#8b5cf615;display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px}
+.card-title{font-size:15px;font-weight:700;margin-bottom:8px}
+.card-desc{font-size:13px;color:#64748B;line-height:1.7}
+.steps{display:flex;flex-direction:column;gap:20px;margin-top:40px}
+.step{display:flex;gap:20px;align-items:flex-start}
+.step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#6366f1);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
+.step-body{flex:1}
+.step-title{font-size:15px;font-weight:700;margin-bottom:4px}
+.step-desc{font-size:13px;color:#64748B;line-height:1.65}
+.cta-banner{background:linear-gradient(135deg,#8b5cf615,#6366f110);border:1px solid #8b5cf630;border-radius:20px;padding:48px 40px;text-align:center;max-width:1100px;margin:0 auto 80px}
+.cta-banner h2{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:12px}
+.cta-banner p{font-size:14px;color:#64748B;margin-bottom:28px}
+.footer{border-top:1px solid #ffffff0d;padding:32px 40px;text-align:center;font-size:12px;color:#475569}
+</style>
+</head>
+<body>
+<nav class="nav">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
+    <div class="logo">HS</div>
+    <span style="font-size:16px;font-weight:700">thehotspot</span>
+  </a>
+  <div style="display:flex;align-items:center;gap:10px">
+    <a href="/agents" style="color:#94A3B8;text-decoration:none;font-size:13px;font-weight:500">← All Agents</a>
+    <a href="/" class="nav-cta">Get Started</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="badge"><span class="badge-dot"></span><span class="badge-text">Agent 7 of 12</span></div>
+  <h1>Publish a full blog post<br><span class="gradient-text">in under a minute</span></h1>
+  <p class="subtitle">Give the Blog Generator a topic, target keywords, and a tone — and get a full 500-1500 word SEO-ready post with H2 sections, hooks, and CTAs.</p>
+  <div class="cta-row">
+    <a href="/agents/blog-generator" class="btn-primary">Generate a Post →</a>
+    <a href="/" class="btn-ghost">Sign In</a>
+  </div>
+</div>
+
+<div class="section">
+  <div style="text-align:center;margin-bottom:48px">
+    <div class="section-label">What it does</div>
+    <div class="section-title">Content that ranks and converts</div>
+    <div class="section-sub">Not filler content — structured, readable posts that follow best-practice SEO format and actually say something useful.</div>
+  </div>
+  <div class="cards">
+    <div class="card"><div class="card-icon">📐</div><div class="card-title">Proper Structure</div><div class="card-desc">Every post includes an H1 title, hook intro, 3-5 H2 sections with real content, and a conclusion with a clear CTA.</div></div>
+    <div class="card"><div class="card-icon">🔑</div><div class="card-title">Keyword Integration</div><div class="card-desc">Enter target keywords and the agent weaves them naturally throughout the post without awkward stuffing.</div></div>
+    <div class="card"><div class="card-icon">🎙️</div><div class="card-title">Tone Control</div><div class="card-desc">Choose Professional, Conversational, Authoritative, or Educational. The agent matches your brand voice throughout.</div></div>
+    <div class="card"><div class="card-icon">📏</div><div class="card-title">Length Options</div><div class="card-desc">Short (~500 words) for quick-hit posts, Medium (~900 words) for standard blog content, Long (~1500 words) for pillar content.</div></div></div>
+</div>
+
+<div class="section">
+  <div style="text-align:center;margin-bottom:48px">
+    <div class="section-label">How it works</div>
+    <div class="section-title">Simple as 1-2-3</div>
+  </div>
+  <div class="steps">
+    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Enter your topic</div><div class="step-desc">Be as specific as you want: 'How to write a cold email that gets replies' or 'Top 10 SaaS tools for marketing agencies'.</div></div></div>
+    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Add keywords and choose settings</div><div class="step-desc">Optionally add target keywords, pick your tone (professional / conversational / etc.), and choose post length.</div></div></div>
+    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Copy your blog post</div><div class="step-desc">The full post appears in a copy-ready text block. Paste it into your CMS, add images, and publish.</div></div></div></div>
+</div>
+
+<div class="cta-banner">
+  <h2>Never stare at a blank page again</h2>
+  <p>Full blog posts on demand. First draft in 30 seconds.</p>
+  <a href="/agents/blog-generator" class="btn-primary">Generate a Post →</a>
+</div>
+
+<footer class="footer">
+  <div style="margin-bottom:8px"><a href="/agents" style="color:#475569;text-decoration:none;margin:0 12px">All Agents</a><a href="/" style="color:#475569;text-decoration:none;margin:0 12px">Dashboard</a></div>
+  © 2025 thehotspot · Ibra Digitals Branding Services LLC
+</footer>
+</body>
+</html>
