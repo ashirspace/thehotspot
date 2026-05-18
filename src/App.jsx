@@ -2179,6 +2179,9 @@ const _D = '#1A1A1A';     // dark square eyes
 const _F = '#BF360C';     // feet (darker orange)
 const _M = '#B71C1C';     // mouth red
 const _H = '#FFAB91';     // highlight
+const _S = '#90A4AE';     // laptop silver
+const _K = '#546E7A';     // keyboard keys
+const _G = '#00BCD4';     // screen glow cyan
 
 const PP_SC = 6; // scale: 6px per pixel → 10×10 grid = 60×60px
 
@@ -2216,6 +2219,18 @@ const PP_LEGS_B = [   // right foot forward
 const PP_LEGS_JUMP = [
   [_X,_B,_X,_X,_X,_X,_X,_X,_B,_X],
   [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
+];
+// Laptop animation sprites (replaces legs rows when typing)
+const PP_EYES_GLOW  = [
+  [_B,_B,_G,_G,_B,_B,_G,_G,_B,_B],
+  [_B,_B,_G,_G,_B,_B,_G,_G,_B,_B],
+];
+const PP_PAWS_UP    = [_B,_X,_B,_X,_X,_X,_X,_B,_X,_B]; // arms raised before typing
+const PP_PAWS_TAP_A = [_X,_B,_B,_X,_X,_X,_X,_B,_B,_X]; // tap frame A
+const PP_PAWS_TAP_B = [_X,_B,_X,_B,_X,_X,_B,_X,_B,_X]; // tap frame B
+const PP_LAPTOP_BASE = [
+  [_S,_S,_S,_S,_S,_S,_S,_S,_S,_S], // laptop base (silver)
+  [_X,_K,_K,_K,_K,_K,_K,_K,_K,_X], // keyboard row
 ];
 
 function ppDraw(ctx, rows, yOff, flipX, canvasW) {
@@ -2258,7 +2273,7 @@ function PixelPet() {
     y: window.innerHeight - 80,
     vy: 0,
     groundY: window.innerHeight - 80,
-    state: 'idle',    // idle | happy
+    state: 'idle',    // idle | happy | typing
     time: 0,
     lastTs: 0,
     blinking: false,
@@ -2269,6 +2284,9 @@ function PixelPet() {
     breathPhase: 0,
     facingLeft: false,
     sparkles: [],
+    nextTyping: 15000 + Math.random() * 5000, // 15-20s until laptop appears
+    typingTimer: 0,
+    typingDuration: 2000, // set fresh each time
   });
 
   const CW = 10 * PP_SC; // 60px
@@ -2288,6 +2306,19 @@ function PixelPet() {
     if (p.blinking) { head[3] = PP_EYE_CLOSED[0]; head[4] = PP_EYE_CLOSED[1]; }
     if (p.state === 'happy') head[6] = PP_MOUTH_HAPPY;
 
+    // typing: glowing eyes + paws on keyboard
+    const isTyping = p.state === 'typing';
+    if (isTyping && !p.blinking) {
+      head[3] = PP_EYES_GLOW[0];
+      head[4] = PP_EYES_GLOW[1];
+      head[6] = PP_MOUTH_HAPPY;
+      const OPEN_MS = 250;
+      const activeTyping = p.typingTimer > OPEN_MS && p.typingTimer < p.typingDuration - OPEN_MS;
+      head[7] = activeTyping
+        ? (Math.floor(p.time / 120) % 2 === 0 ? PP_PAWS_TAP_A : PP_PAWS_TAP_B)
+        : PP_PAWS_UP;
+    }
+
     const breathY = Math.round(Math.sin(p.breathPhase) * 1);
     ppDraw(ctx, head, breathY, fl, CW);
 
@@ -2296,10 +2327,14 @@ function PixelPet() {
       ppDraw(ctx, [PP_BLUSH_R], 4 * PP_SC + breathY, fl, CW);
     }
 
-    let legs;
-    if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
-    else legs = PP_LEGS_STAND;
-    ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
+    if (isTyping) {
+      ppDraw(ctx, PP_LAPTOP_BASE, 8 * PP_SC + breathY, fl, CW);
+    } else {
+      let legs;
+      if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
+      else legs = PP_LEGS_STAND;
+      ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
+    }
 
     p.sparkles.forEach(sp => {
       const alpha = Math.max(0, 1 - sp.age / 40);
@@ -2327,12 +2362,24 @@ function PixelPet() {
 
     p.sparkles = p.sparkles.map(s => ({ ...s, age: s.age + 1 })).filter(s => s.age < 40);
 
-    if (p.state === 'happy') {
+    if (p.state === 'idle') {
+      // trigger laptop after 15-20s of inactivity (not while chat is open)
+      p.nextTyping -= dt;
+      if (p.nextTyping <= 0 && !openRef.current) {
+        p.state = 'typing';
+        p.typingTimer = 0;
+        p.typingDuration = 1800 + Math.random() * 800; // 1.8–2.6 s
+        p.nextTyping = 15000 + Math.random() * 5000;
+      }
+    } else if (p.state === 'happy') {
       p.happyTimer -= dt;
       p.y = p.groundY + Math.sin(p.time * 0.016) * 8;
       p.legFrame = Math.floor(p.time / 130) % 2;
       if (Math.random() < 0.18) p.sparkles.push({ x: Math.random() * CW, y: Math.random() * CH * 0.7, age: 0 });
       if (p.happyTimer <= 0) { p.y = p.groundY; p.state = 'idle'; }
+    } else if (p.state === 'typing') {
+      p.typingTimer += dt;
+      if (p.typingTimer >= p.typingDuration) p.state = 'idle';
     }
 
     const ctr = containerRef.current;
@@ -2372,7 +2419,7 @@ function PixelPet() {
           const nextOpen = !openRef.current;
           openRef.current = nextOpen;
           setOpen(nextOpen);
-          if (nextOpen) { p.groundY = p.y; p.state = 'happy'; p.happyTimer = 1200; p.facingLeft = false; }
+          if (nextOpen) { p.groundY = p.y; p.state = 'happy'; p.happyTimer = 1200; p.facingLeft = false; p.nextTyping = 15000 + Math.random() * 5000; }
         }
       }
       // update panel side based on final x position
