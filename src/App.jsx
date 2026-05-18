@@ -1820,135 +1820,9 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
   );
 }
 
-/* ───────── HOME PAGE ───────── */
-const AGENT_LIST = [
-  { id: "lead-finder",            label: "Lead Finder",            desc: "Discover new prospects",       accent: "#10b981" },
-  { id: "lead-scoring",           label: "Lead Scoring",           desc: "Rank leads by fit",            accent: "#0ea5e9" },
-  { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  desc: "Audit any landing page",       accent: "#8b5cf6" },
-  { id: "email-sequence-builder", label: "Email Sequence",         desc: "Build multi-step sequences",   accent: "#f59e0b" },
-  { id: "ab-email-tester",        label: "A/B Email Tester",       desc: "Compare email variants",       accent: "#ec4899" },
-  { id: "reply-detector",         label: "Reply Detector",         desc: "Detect & classify replies",    accent: "#6366f1" },
-  { id: "blog-generator",         label: "Blog Generator",         desc: "Draft SEO-ready posts",        accent: "#14b8a6" },
-  { id: "competitor-analyzer",    label: "Competitor Analyzer",    desc: "Analyze competitor strategy",  accent: "#f97316" },
-  { id: "backlink-outreach",      label: "Backlink Outreach",      desc: "Find link-building targets",   accent: "#0ea5e9" },
-  { id: "campaign-dashboard",     label: "Campaign Dashboard",     desc: "Track campaign performance",   accent: "#10b981" },
-  { id: "crm-lite",               label: "CRM Lite",               desc: "Lightweight contact CRM",      accent: "#8b5cf6" },
-  { id: "csv-import-export",      label: "CSV Import/Export",      desc: "Bulk import or export data",   accent: "#64748b" },
-];
-
-function HomePage({ user, contactCount, sentCount, setPage, gmailConnected }) {
-  const now = new Date();
-  const hour = now.getHours();
-  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
-  const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
-
-  const successRate = (() => {
-    try {
-      const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-      const s = h.reduce((a, x) => a + (x.sent || 0), 0);
-      const f = h.reduce((a, x) => a + (x.failed || 0), 0);
-      return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—";
-    } catch { return "—"; }
-  })();
-
-  const campaignCount = (() => {
-    try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]").length; } catch { return 0; }
-  })();
-
-  const recentActivity = (() => {
-    try {
-      const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-      return h.slice(-8).reverse().map(c => ({
-        label: `Campaign "${c.category || "all"}" — ${c.sent || 0} sent`,
-        ts: c.ranAt ? new Date(c.ranAt) : null,
-      }));
-    } catch { return []; }
-  })();
-
-  function relativeTime(date) {
-    if (!date) return "";
-    const diff = Date.now() - date.getTime();
-    const mins = Math.floor(diff / 60000);
-    const hrs = Math.floor(mins / 60);
-    const days = Math.floor(hrs / 24);
-    if (days > 0) return days === 1 ? "Yesterday" : `${days}d ago`;
-    if (hrs > 0) return `${hrs}h ago`;
-    if (mins > 0) return `${mins}m ago`;
-    return "Just now";
-  }
-
-  const [agentHover, setAgentHover] = useState(null);
-
-  return (
-    <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
-      {/* Greeting row */}
-      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.5 }}>{greeting}, {firstName}</div>
-          <div style={{ fontSize: 13, color: "#475569", marginTop: 3 }}>{dateLabel}</div>
-        </div>
-        <div style={{ fontSize: 12, color: "#334155", fontWeight: 500 }}>thehotspot</div>
-      </div>
-
-      {/* Stat cards */}
-      <div style={{ display: "flex", gap: 14, marginBottom: 28 }}>
-        <StatCard icon={<LuUsers size={18} />} label="Contacts" value={contactCount} accent="#10b981" onClick={() => setPage("totalContacts")} />
-        <StatCard icon={<LuMail size={18} />} label="Emails Sent" value={sentCount || 0} accent="#0ea5e9" onClick={() => setPage("emailsSent")} />
-        <StatCard icon={<LuTrendingUp size={18} />} label="Success Rate" value={successRate} accent="#8b5cf6" onClick={() => setPage("successRate")} />
-        <StatCard icon={<LuRadio size={18} />} label="Campaigns" value={campaignCount} accent="#f59e0b" onClick={() => setPage("campaignStatus")} />
-      </div>
-
-      {/* 2-col content */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20 }}>
-
-        {/* Recent Activity */}
-        <div style={{ background: "#111116", border: "1px solid #ffffff08", borderRadius: 14, padding: "20px 0", overflow: "hidden" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px", marginBottom: 16 }}>
-            <LuClock size={14} color="#475569" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#64748B", letterSpacing: 0.8, textTransform: "uppercase" }}>Recent Activity</span>
-          </div>
-          {recentActivity.length === 0 ? (
-            <div style={{ padding: "12px 20px", fontSize: 13, color: "#334155" }}>No recent activity yet</div>
-          ) : recentActivity.map((item, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: i > 0 ? "1px solid #ffffff06" : "none" }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
-                <span style={{ fontSize: 13, color: "#94A3B8", fontWeight: 400 }}>{item.label}</span>
-              </div>
-              <span style={{ fontSize: 11, color: "#334155", whiteSpace: "nowrap", marginLeft: 12 }}>{relativeTime(item.ts)}</span>
-            </div>
-          ))}
-        </div>
-
-        {/* AI Agents grid */}
-        <div style={{ background: "#111116", border: "1px solid #ffffff08", borderRadius: 14, padding: 20 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
-            <LuSparkles size={14} color="#475569" />
-            <span style={{ fontSize: 12, fontWeight: 600, color: "#64748B", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</span>
-          </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-            {AGENT_LIST.map(agent => (
-              <a
-                key={agent.id}
-                href={`/agents/${agent.id}`}
-                onMouseEnter={() => setAgentHover(agent.id)}
-                onMouseLeave={() => setAgentHover(null)}
-                style={{ display: "block", background: agentHover === agent.id ? "#1a1a22" : "#0f0f14", border: `1px solid ${agentHover === agent.id ? agent.accent + "40" : "#ffffff08"}`, borderRadius: 10, padding: "12px 14px", textDecoration: "none", transition: "all .18s ease", transform: agentHover === agent.id ? "translateY(-1px)" : "none", boxShadow: agentHover === agent.id ? `0 4px 16px ${agent.accent}14` : "none" }}
-              >
-                <div style={{ width: 28, height: 28, borderRadius: 8, background: agent.accent + "18", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
-                  <LuZap size={13} color={agent.accent} />
-                </div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1", marginBottom: 3, lineHeight: 1.3 }}>{agent.label}</div>
-                <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.4 }}>{agent.desc}</div>
-              </a>
-            ))}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
+/* ───────── HOME PAGE (alias — renders DashboardPage) ───────── */
+function HomePage({ user, contactCount, setPage }) {
+  return <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />;
 }
 
 /* ───────── DASHBOARD PAGE ───────── */
@@ -4350,7 +4224,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           <div style={{ maxWidth: 1000, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
 
             {/* ── HOME ── */}
-            {page === null && <HomePage user={user} contactCount={contactCount} sentCount={sentCount} setPage={setPage} gmailConnected={gmailConnected} />}
+            {page === null && <HomePage user={user} contactCount={contactCount} setPage={setPage} />}
 
             {/* ── DASHBOARD ── */}
             {page === "dashboard" && <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />}
