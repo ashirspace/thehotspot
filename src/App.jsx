@@ -2241,34 +2241,39 @@ function PixelPet({ page }) {
   const rafRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+  // drag refs
+  const isDraggingRef = useRef(false);
+  const dragOffsetRef = useRef({ x: 0, y: 0 });
+  const dragMovedRef = useRef(0);
+
   // chat state
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([PET_SEED[1]]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  // 'right' = pet on right half → panel floats to the left; 'left' = panel floats to the right
+  const [panelSide, setPanelSide] = useState('right');
 
   const pet = useRef({
     x: window.innerWidth - 90,
     y: window.innerHeight - 80,
-    vx: 0, vy: 0,
+    vy: 0,
     groundY: window.innerHeight - 80,
-    state: 'idle',    // idle | walking | jumping | happy | flyup | falling
+    state: 'idle',    // idle | happy | flyup | falling
     time: 0,
     lastTs: 0,
     blinking: false,
     blinkStart: 0,
     nextBlink: 4000,
-    walkTarget: 0,
     legFrame: 0,
-    nextAction: 3000 + Math.random() * 2000,
     happyTimer: 0,
     breathPhase: 0,
     facingLeft: false,
-    sparkles: [],     // {x,y,age} for happy sparkle particles
+    sparkles: [],
   });
 
-  const CW = 10 * PP_SC; // canvas width  = 60
-  const CH = 10 * PP_SC; // canvas height = 60
+  const CW = 10 * PP_SC; // 60px
+  const CH = 10 * PP_SC; // 60px
   const openRef = useRef(false);
 
   // ── draw ──────────────────────────────────────────────────
@@ -2280,40 +2285,24 @@ function PixelPet({ page }) {
     ctx.clearRect(0, 0, CW, CH);
     const fl = p.facingLeft;
 
-    // head / body (copy rows to mutate)
     const head = PP_HEAD.map(r => r.slice());
-
-    // blink
-    if (p.blinking) {
-      head[3] = PP_EYE_CLOSED[0];
-      head[4] = PP_EYE_CLOSED[1];
-    }
-    // happy mouth + blush
-    if (p.state === 'happy') {
-      head[6] = PP_MOUTH_HAPPY;
-    }
+    if (p.blinking) { head[3] = PP_EYE_CLOSED[0]; head[4] = PP_EYE_CLOSED[1]; }
+    if (p.state === 'happy') head[6] = PP_MOUTH_HAPPY;
 
     const breathY = Math.round(Math.sin(p.breathPhase) * 1);
     ppDraw(ctx, head, breathY, fl, CW);
 
-    // blush cheeks on happy
     if (p.state === 'happy') {
       ppDraw(ctx, [PP_BLUSH_L], 4 * PP_SC + breathY, fl, CW);
       ppDraw(ctx, [PP_BLUSH_R], 4 * PP_SC + breathY, fl, CW);
     }
 
-    // legs
     let legs;
-    if (p.state === 'jumping' || p.state === 'flyup' || p.state === 'falling') {
-      legs = PP_LEGS_JUMP;
-    } else if (p.state === 'walking' || p.state === 'happy') {
-      legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
-    } else {
-      legs = PP_LEGS_STAND;
-    }
+    if (p.state === 'flyup' || p.state === 'falling') legs = PP_LEGS_JUMP;
+    else if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
+    else legs = PP_LEGS_STAND;
     ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
 
-    // sparkle particles
     p.sparkles.forEach(sp => {
       const alpha = Math.max(0, 1 - sp.age / 40);
       ctx.globalAlpha = alpha;
@@ -2331,7 +2320,6 @@ function PixelPet({ page }) {
     p.time += dt;
     p.breathPhase += dt * 0.0018;
 
-    // blink
     if (!p.blinking && p.time > p.nextBlink) {
       p.blinking = true;
       p.blinkStart = p.time;
@@ -2339,94 +2327,22 @@ function PixelPet({ page }) {
     }
     if (p.blinking && p.time - p.blinkStart > 150) p.blinking = false;
 
-    // sparkle age
     p.sparkles = p.sparkles.map(s => ({ ...s, age: s.age + 1 })).filter(s => s.age < 40);
 
-    // freeze pet while chat is open
-    if (openRef.current) {
-      p.state = 'idle';
-      p.vx = 0;
-    }
-
-    // state machine
-    if (p.state === 'idle') {
-      p.nextAction -= dt;
-      if (p.nextAction <= 0) {
-        if (Math.random() < 0.38) {
-          // jump
-          p.groundY = p.y;
-          p.state = 'jumping';
-          p.vy = -9 - Math.random() * 4;
-          p.vx = (Math.random() - 0.5) * 4;
-        } else {
-          // walk to random x
-          const tx = 40 + Math.random() * (window.innerWidth - 120);
-          p.walkTarget = tx;
-          p.facingLeft = tx < p.x;
-          p.vx = (p.facingLeft ? -1 : 1) * (1.2 + Math.random() * 2);
-          p.state = 'walking';
-        }
-      }
-
-    } else if (p.state === 'walking') {
-      p.x += p.vx;
-      p.legFrame = Math.floor(p.time / 160) % 2;
-      const done = p.vx > 0 ? p.x >= p.walkTarget : p.x <= p.walkTarget;
-      if (done) {
-        p.x = p.walkTarget;
-        p.vx = 0;
-        p.state = 'idle';
-        p.nextAction = 2000 + Math.random() * 4000;
-      }
-
-    } else if (p.state === 'jumping') {
-      p.x += p.vx;
-      p.y += p.vy;
-      p.vy += 0.42; // gravity
-      if (p.y >= p.groundY) {
-        p.y = p.groundY;
-        p.vy = 0; p.vx = 0;
-        p.state = 'idle';
-        p.nextAction = 1500 + Math.random() * 3000;
-      }
-
-    } else if (p.state === 'happy') {
+    if (p.state === 'happy') {
       p.happyTimer -= dt;
-      p.y = p.groundY + Math.sin(p.time * 0.016) * 11;
+      p.y = p.groundY + Math.sin(p.time * 0.016) * 8;
       p.legFrame = Math.floor(p.time / 130) % 2;
-      // spawn sparkles
-      if (Math.random() < 0.18) {
-        p.sparkles.push({ x: Math.random() * CW, y: Math.random() * CH * 0.7, age: 0 });
-      }
-      if (p.happyTimer <= 0) {
-        p.y = p.groundY;
-        p.state = 'idle';
-        p.nextAction = 2000;
-      }
-
+      if (Math.random() < 0.18) p.sparkles.push({ x: Math.random() * CW, y: Math.random() * CH * 0.7, age: 0 });
+      if (p.happyTimer <= 0) { p.y = p.groundY; p.state = 'idle'; }
     } else if (p.state === 'flyup') {
       p.y -= 15;
-      p.facingLeft = false;
-      // handled by timeout in effect
-
     } else if (p.state === 'falling') {
       p.y += p.vy;
       p.vy = Math.min(p.vy + 1.2, 22);
-      if (p.y >= p.groundY) {
-        p.y = p.groundY;
-        p.vy = 0;
-        // small bounce
-        p.state = 'jumping';
-        p.groundY = p.y;
-        p.vy = -4;
-        p.nextAction = 1200;
-      }
+      if (p.y >= p.groundY) { p.y = p.groundY; p.vy = 0; p.state = 'idle'; }
     }
 
-    // clamp x
-    p.x = Math.max(8, Math.min(window.innerWidth - CW - 8, p.x));
-
-    // move container
     const ctr = containerRef.current;
     if (ctr) {
       ctr.style.left = Math.round(p.x) + 'px';
@@ -2436,13 +2352,44 @@ function PixelPet({ page }) {
 
   // ── RAF loop ──────────────────────────────────────────────
   useEffect(() => {
-    const loop = (ts) => {
-      update(ts);
-      draw();
-      rafRef.current = requestAnimationFrame(loop);
-    };
+    const loop = (ts) => { update(ts); draw(); rafRef.current = requestAnimationFrame(loop); };
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── drag (window-level so mouse can move freely) ──────────
+  useEffect(() => {
+    const onMouseMove = (e) => {
+      if (!isDraggingRef.current) return;
+      dragMovedRef.current += Math.hypot(e.movementX, e.movementY);
+      const p = pet.current;
+      p.x = Math.max(8, Math.min(window.innerWidth - CW - 8, e.clientX - dragOffsetRef.current.x));
+      p.y = Math.max(8, Math.min(window.innerHeight - CH - 8, e.clientY - dragOffsetRef.current.y));
+      p.groundY = p.y;
+      const ctr = containerRef.current;
+      if (ctr) { ctr.style.left = Math.round(p.x) + 'px'; ctr.style.top = Math.round(p.y) + 'px'; }
+    };
+
+    const onMouseUp = () => {
+      if (!isDraggingRef.current) return;
+      isDraggingRef.current = false;
+      if (dragMovedRef.current < 5) {
+        // treat as click → toggle chat
+        const p = pet.current;
+        if (p.state !== 'flyup' && p.state !== 'falling') {
+          const nextOpen = !openRef.current;
+          openRef.current = nextOpen;
+          setOpen(nextOpen);
+          if (nextOpen) { p.groundY = p.y; p.state = 'happy'; p.happyTimer = 1200; p.facingLeft = false; }
+        }
+      }
+      // update panel side based on final x position
+      setPanelSide(pet.current.x > window.innerWidth / 2 ? 'right' : 'left');
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => { window.removeEventListener('mousemove', onMouseMove); window.removeEventListener('mouseup', onMouseUp); };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── auto-scroll chat to bottom ───────────────────────────
@@ -2450,20 +2397,23 @@ function PixelPet({ page }) {
     if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // ── page change → fly up then fall down ──────────────────
+  // ── page change → fly up, land back bottom-right ─────────
   useEffect(() => {
     if (page === prevPage.current) return;
     prevPage.current = page;
     const p = pet.current;
     if (p.state === 'flyup' || p.state === 'falling') return;
+    openRef.current = false;
+    setOpen(false);
     p.state = 'flyup';
     setTimeout(() => {
       const pp = pet.current;
-      pp.x = 60 + Math.random() * (window.innerWidth - 220);
+      pp.x = window.innerWidth - 90;
       pp.y = -CH - 20;
       pp.vy = 6;
       pp.groundY = window.innerHeight - 80;
       pp.state = 'falling';
+      setPanelSide('right');
     }, 650);
   }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -2491,40 +2441,19 @@ function PixelPet({ page }) {
     }
   };
 
-  // ── click → toggle chat + happy ───────────────────────────
-  const handleClick = () => {
-    const p = pet.current;
-    if (p.state === 'flyup' || p.state === 'falling') return;
-    const nextOpen = !openRef.current;
-    openRef.current = nextOpen;
-    setOpen(nextOpen);
-    if (nextOpen) {
-      p.groundY = p.y;
-      p.state = 'happy';
-      p.happyTimer = 1200;
-      p.facingLeft = false;
-    }
-  };
+  const panelPos = panelSide === 'right' ? { right: 0 } : { left: 0 };
 
   return (
     <div
       ref={containerRef}
-      style={{
-        position: 'fixed',
-        left: pet.current.x,
-        top: pet.current.y,
-        zIndex: 9500,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'flex-end',
-      }}
+      style={{ position: 'fixed', left: pet.current.x, top: pet.current.y, zIndex: 9500 }}
     >
-      {/* chat panel — floats above the pet */}
+      {/* chat panel — above pet, left or right anchored based on screen position */}
       {open && (
         <div style={{
           position: 'absolute',
           bottom: CH + 10,
-          right: 0,
+          ...panelPos,
           width: 300,
           background: '#0d0d12',
           border: '1px solid #ffffff15',
@@ -2536,11 +2465,7 @@ function PixelPet({ page }) {
           animation: 'chatSlide .18s ease',
         }}>
           {/* header */}
-          <div style={{
-            display: 'flex', alignItems: 'center', gap: 8,
-            padding: '10px 14px', borderBottom: '1px solid #ffffff0d',
-            background: '#111116',
-          }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid #ffffff0d', background: '#111116' }}>
             <canvas
               width={CW} height={CH}
               style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0 }}
@@ -2548,37 +2473,21 @@ function PixelPet({ page }) {
             />
             <span style={{ flex: 1, fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, color: '#f1f5f9' }}>Spot</span>
             <span style={{ fontSize: 11, color: '#10b981', background: '#10b98118', borderRadius: 20, padding: '2px 8px', fontFamily: "'DM Sans',sans-serif" }}>online</span>
-            <button
-              onClick={(e) => { e.stopPropagation(); openRef.current = false; setOpen(false); }}
-              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
-            >
+            <button onClick={(e) => { e.stopPropagation(); openRef.current = false; setOpen(false); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}>
               <LuX size={14} />
             </button>
           </div>
 
           {/* messages */}
-          <div style={{
-            padding: '12px 12px 8px',
-            overflowY: 'auto',
-            maxHeight: 260,
-            display: 'flex',
-            flexDirection: 'column',
-            gap: 8,
-          }}>
+          <div style={{ padding: '12px 12px 8px', overflowY: 'auto', maxHeight: 260, display: 'flex', flexDirection: 'column', gap: 8 }}>
             {messages.map((m, i) => (
-              <div key={i} style={{
-                display: 'flex',
-                justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
-              }}>
+              <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 <div style={{
-                  maxWidth: '82%',
-                  padding: '7px 11px',
+                  maxWidth: '82%', padding: '7px 11px',
                   borderRadius: m.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
                   background: m.role === 'user' ? '#10b981' : '#1a1a24',
                   color: m.role === 'user' ? '#fff' : '#cbd5e1',
-                  fontSize: 12.5,
-                  lineHeight: 1.5,
-                  fontFamily: "'DM Sans',sans-serif",
+                  fontSize: 12.5, lineHeight: 1.5, fontFamily: "'DM Sans',sans-serif",
                 }}>
                   {m.content}
                 </div>
@@ -2586,39 +2495,22 @@ function PixelPet({ page }) {
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: '#1a1a24', color: '#64748b', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>
-                  ...
-                </div>
+                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: '#1a1a24', color: '#64748b', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>...</div>
               </div>
             )}
             <div ref={messagesEndRef} />
           </div>
 
           {/* input */}
-          <div style={{
-            display: 'flex', gap: 6, padding: '8px 10px 10px',
-            borderTop: '1px solid #ffffff0d', background: '#111116',
-          }}>
+          <div style={{ display: 'flex', gap: 6, padding: '8px 10px 10px', borderTop: '1px solid #ffffff0d', background: '#111116' }}>
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               placeholder="Ask Spot anything..."
-              style={{
-                flex: 1, background: '#0d0d12', border: '1px solid #ffffff10',
-                borderRadius: 10, padding: '7px 11px', color: '#f1f5f9',
-                fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none',
-              }}
+              style={{ flex: 1, background: '#0d0d12', border: '1px solid #ffffff10', borderRadius: 10, padding: '7px 11px', color: '#f1f5f9', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none' }}
             />
-            <button
-              onClick={sendMessage}
-              disabled={!input.trim() || loading}
-              style={{
-                background: '#10b981', border: 'none', borderRadius: 10,
-                padding: '7px 10px', cursor: 'pointer', display: 'flex',
-                alignItems: 'center', opacity: (!input.trim() || loading) ? 0.4 : 1,
-              }}
-            >
+            <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ background: '#10b981', border: 'none', borderRadius: 10, padding: '7px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: (!input.trim() || loading) ? 0.4 : 1 }}>
               <LuSend size={13} color="#fff" />
             </button>
           </div>
@@ -2630,14 +2522,14 @@ function PixelPet({ page }) {
         ref={canvasRef}
         width={CW}
         height={CH}
-        onClick={handleClick}
-        title="Click to chat with Spot"
-        style={{
-          cursor: 'pointer',
-          imageRendering: 'pixelated',
-          filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))',
-          display: 'block',
+        onMouseDown={(e) => {
+          e.preventDefault();
+          isDraggingRef.current = true;
+          dragMovedRef.current = 0;
+          dragOffsetRef.current = { x: e.clientX - pet.current.x, y: e.clientY - pet.current.y };
         }}
+        title="Drag to move · Click to chat"
+        style={{ cursor: 'grab', imageRendering: 'pixelated', filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))', display: 'block', userSelect: 'none' }}
       />
     </div>
   );
