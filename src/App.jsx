@@ -2170,6 +2170,284 @@ function DashboardPage({ user, contactCount, setPage }) {
   );
 }
 
+/* ───────── PET ASSISTANT ───────── */
+const PET_SEED = [
+  { role: "user", content: "You are Spot — a friendly AI pet who lives on the thehotspot dashboard. Keep your answers short (2-3 sentences), warm, and casual. Help the user understand and use this outreach platform." },
+  { role: "assistant", content: "Hey! I'm Spot. Ask me anything about thehotspot — campaigns, contacts, agents, you name it." },
+];
+
+function PetAssistant({ user }) {
+  const [open, setOpen] = useState(false);
+  const [msgs, setMsgs] = useState([]);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [mood, setMood] = useState("idle");
+  const [petPos, setPetPos] = useState(() => ({ x: window.innerWidth - 100, y: window.innerHeight - 100 }));
+  const [eyeOff, setEyeOff] = useState({ x: 0, y: 0 });
+  const [hearts, setHearts] = useState([]);
+  const [hovered, setHovered] = useState(false);
+
+  const isDragging = useRef(false);
+  const dragOffset = useRef({ x: 0, y: 0 });
+  const petRef = useRef(null);
+  const chatEndRef = useRef(null);
+  const petVelRef = useRef({ x: 0, y: 0, t: 0, count: 0 });
+  const moodTimer = useRef(null);
+  const blinkTimer = useRef(null);
+
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  // Blink every 4-6s
+  useEffect(() => {
+    const doBlink = () => {
+      setMood(m => m === "idle" ? "blinking" : m);
+      setTimeout(() => setMood(m => m === "blinking" ? "idle" : m), 160);
+      blinkTimer.current = setTimeout(doBlink, 4000 + Math.random() * 2000);
+    };
+    blinkTimer.current = setTimeout(doBlink, 3000);
+    return () => clearTimeout(blinkTimer.current);
+  }, []);
+
+  // Mouse tracking: eye offset + petting + drag
+  useEffect(() => {
+    const onMove = (e) => {
+      if (isDragging.current) {
+        setPetPos({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y });
+        return;
+      }
+      const petEl = petRef.current;
+      if (!petEl) return;
+      const rect = petEl.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist < 150) {
+        setEyeOff({ x: clamp(dx / 60, -3, 3), y: clamp(dy / 60, -3, 3) });
+      }
+      // Petting detection
+      if (dist < 48) {
+        const now = Date.now();
+        const vel = petVelRef.current;
+        const moveDist = Math.sqrt((e.clientX - vel.x) ** 2 + (e.clientY - vel.y) ** 2);
+        if (moveDist > 18 && now - vel.t < 500) {
+          vel.count += 1;
+          if (vel.count >= 3) {
+            vel.count = 0;
+            triggerHappy();
+          }
+        } else if (now - vel.t > 500) {
+          vel.count = 1;
+        }
+        vel.x = e.clientX; vel.y = e.clientY; vel.t = now;
+      }
+    };
+    const onUp = () => { isDragging.current = false; };
+    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mouseup", onUp);
+    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
+  }, []);
+
+  // Scroll chat to bottom
+  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
+
+  const triggerHappy = () => {
+    setMood("happy");
+    const id = Date.now();
+    setHearts(h => [...h, id]);
+    setTimeout(() => setHearts(h => h.filter(x => x !== id)), 900);
+    clearTimeout(moodTimer.current);
+    moodTimer.current = setTimeout(() => setMood("idle"), 1200);
+  };
+
+  const onPetMouseDown = (e) => {
+    if (e.button !== 0) return;
+    const rect = petRef.current.getBoundingClientRect();
+    dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    isDragging.current = true;
+    e.preventDefault();
+  };
+
+  const onPetClick = (e) => {
+    if (Math.abs(e.clientX - (petPos.x + dragOffset.current.x)) > 4) return;
+    setOpen(o => !o);
+  };
+
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    const next = [...msgs, { role: "user", content: text }];
+    setMsgs(next);
+    setInput("");
+    setLoading(true);
+    setMood("talking");
+    try {
+      const res = await fetch("/api/chat", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: [...PET_SEED, ...next] }),
+      });
+      const data = await res.json();
+      setMsgs(m => [...m, { role: "assistant", content: data.message || "Hmm, I'm not sure about that one." }]);
+      triggerHappy();
+    } catch {
+      setMsgs(m => [...m, { role: "assistant", content: "Oops, something went wrong. Try again?" }]);
+    } finally {
+      setLoading(false);
+      setMood("idle");
+    }
+  };
+
+  const petAnim = mood === "happy" ? "petHappy .5s ease" : "petFloat 3s ease-in-out infinite";
+
+  // SVG pet face
+  const eyeL = { cx: 22, cy: 30 };
+  const eyeR = { cx: 42, cy: 30 };
+  const isBlinking = mood === "blinking";
+  const isHappy = mood === "happy";
+
+  const panelBottom = window.innerHeight - petPos.y + 12;
+  const panelRight = window.innerWidth - petPos.x - 64;
+
+  return (
+    <>
+      {/* Floating hearts */}
+      {hearts.map(id => (
+        <div key={id} style={{ position: "fixed", left: petPos.x + 24, top: petPos.y - 8, pointerEvents: "none", zIndex: 9600, animation: "heartFloat .9s ease forwards", fontSize: 16, color: "#ec4899" }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><path d="M12 21C12 21 3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 13-9 13z"/></svg>
+        </div>
+      ))}
+
+      {/* Chat panel */}
+      {open && (
+        <div style={{ position: "fixed", bottom: panelBottom, right: panelRight, width: 300, maxHeight: 380, background: "#111116", border: "1px solid #ffffff12", borderRadius: 16, display: "flex", flexDirection: "column", zIndex: 9501, boxShadow: "0 16px 48px rgba(0,0,0,0.6)", animation: "chatSlide .2s ease" }}>
+          {/* Header */}
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderBottom: "1px solid #ffffff08", flexShrink: 0 }}>
+            <svg width="24" height="24" viewBox="0 0 64 64" style={{ flexShrink: 0 }}>
+              <circle cx="32" cy="36" r="22" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
+              <polygon points="14,20 20,8 26,20" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
+              <polygon points="38,20 44,8 50,20" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
+              <ellipse cx="22" cy="34" rx="5" ry="3.5" fill="#F1F5F9"/>
+              <ellipse cx="42" cy="34" rx="5" ry="3.5" fill="#F1F5F9"/>
+              <circle cx="23" cy="34" r="2" fill="#09090d"/>
+              <circle cx="43" cy="34" r="2" fill="#09090d"/>
+              <circle cx="24" cy="33" r="0.8" fill="white"/>
+              <circle cx="44" cy="33" r="0.8" fill="white"/>
+              <circle cx="32" cy="41" r="2" fill="#ec4899"/>
+              <path d="M27,45 Q32,49 37,45" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
+            </svg>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>Spot</div>
+              <div style={{ fontSize: 10, color: "#10b981" }}>AI assistant</div>
+            </div>
+            <button onClick={() => setOpen(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 4 }}>
+              <LuX size={14} />
+            </button>
+          </div>
+
+          {/* Messages */}
+          <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
+            {msgs.length === 0 && (
+              <div style={{ fontSize: 12, color: "#475569", textAlign: "center", marginTop: 20 }}>
+                Hey {user?.username?.split(" ")[0] || "there"}! Ask me anything about thehotspot.
+              </div>
+            )}
+            {msgs.map((m, i) => (
+              <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
+                <div style={{ maxWidth: "82%", padding: "8px 11px", borderRadius: m.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px", background: m.role === "user" ? "#10b981" : "#1e1e2e", color: m.role === "user" ? "#fff" : "#CBD5E1", fontSize: 12, lineHeight: 1.55 }}>
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div style={{ display: "flex", gap: 4, padding: "8px 11px", background: "#1e1e2e", borderRadius: "12px 12px 12px 3px", width: "fit-content" }}>
+                {[0, 1, 2].map(i => (
+                  <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#475569", animation: `pulse 1.2s ease ${i * 0.2}s infinite` }} />
+                ))}
+              </div>
+            )}
+            <div ref={chatEndRef} />
+          </div>
+
+          {/* Input */}
+          <div style={{ display: "flex", gap: 6, padding: "10px 14px", borderTop: "1px solid #ffffff08", flexShrink: 0 }}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => e.key === "Enter" && sendMessage()}
+              placeholder="Ask Spot anything..."
+              style={{ flex: 1, background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 8, padding: "7px 10px", color: "#F1F5F9", fontSize: 12, outline: "none", fontFamily: "'DM Sans',sans-serif" }}
+            />
+            <button onClick={sendMessage} disabled={loading} style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "7px 10px", color: "#fff", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center" }}>
+              <LuSend size={13} />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Pet body */}
+      <div
+        ref={petRef}
+        onMouseDown={onPetMouseDown}
+        onClick={onPetClick}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        style={{ position: "fixed", left: petPos.x, top: petPos.y, width: 64, height: 64, cursor: isDragging.current ? "grabbing" : "grab", zIndex: 9500, userSelect: "none", animation: petAnim, transition: "filter .2s", filter: hovered ? "drop-shadow(0 0 10px #10b98155)" : "none" }}
+      >
+        <svg width="64" height="64" viewBox="0 0 64 64" style={{ overflow: "visible" }}>
+          {/* Ears */}
+          <polygon points="10,24 16,8 24,22" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
+          <polygon points="40,22 48,8 54,24" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
+          <polygon points="13,23 17,12 22,22" fill="#10b98122"/>
+          <polygon points="42,22 47,12 52,23" fill="#10b98122"/>
+          {/* Body */}
+          <circle cx="32" cy="36" r="26" fill="#1a1a2e" stroke={open ? "#10b981" : hovered ? "#10b98188" : "#10b98144"} strokeWidth="1.5"/>
+          {/* Blush (happy) */}
+          {isHappy && <>
+            <ellipse cx="16" cy="40" rx="6" ry="3.5" fill="#ec489930" />
+            <ellipse cx="48" cy="40" rx="6" ry="3.5" fill="#ec489930" />
+          </>}
+          {/* Eyes */}
+          {isBlinking ? <>
+            <rect x={eyeL.cx - 5} y={eyeL.cy - 0.5} width="10" height="1.5" rx="0.75" fill="#F1F5F9"/>
+            <rect x={eyeR.cx - 5} y={eyeR.cy - 0.5} width="10" height="1.5" rx="0.75" fill="#F1F5F9"/>
+          </> : isHappy ? <>
+            <path d={`M${eyeL.cx-5},${eyeL.cy+1} Q${eyeL.cx},${eyeL.cy-4} ${eyeL.cx+5},${eyeL.cy+1}`} fill="none" stroke="#F1F5F9" strokeWidth="2.5" strokeLinecap="round"/>
+            <path d={`M${eyeR.cx-5},${eyeR.cy+1} Q${eyeR.cx},${eyeR.cy-4} ${eyeR.cx+5},${eyeR.cy+1}`} fill="none" stroke="#F1F5F9" strokeWidth="2.5" strokeLinecap="round"/>
+          </> : <>
+            <ellipse cx={eyeL.cx} cy={eyeL.cy} rx="5.5" ry="5" fill="#F1F5F9"/>
+            <ellipse cx={eyeR.cx} cy={eyeR.cy} rx="5.5" ry="5" fill="#F1F5F9"/>
+            <circle cx={eyeL.cx + eyeOff.x} cy={eyeL.cy + eyeOff.y} r="2.5" fill="#09090d"/>
+            <circle cx={eyeR.cx + eyeOff.x} cy={eyeR.cy + eyeOff.y} r="2.5" fill="#09090d"/>
+            <circle cx={eyeL.cx + eyeOff.x + 1} cy={eyeL.cy + eyeOff.y - 1} r="0.9" fill="white"/>
+            <circle cx={eyeR.cx + eyeOff.x + 1} cy={eyeR.cy + eyeOff.y - 1} r="0.9" fill="white"/>
+          </>}
+          {/* Nose */}
+          <polygon points="32,44 29,48 35,48" fill="#ec4899"/>
+          {/* Mouth */}
+          {mood === "talking"
+            ? <path d="M27,51 Q32,56 37,51" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
+            : isHappy
+              ? <path d="M26,51 Q32,57 38,51" fill="none" stroke="#ec4899" strokeWidth="2" strokeLinecap="round"/>
+              : <path d="M28,51 Q32,54 36,51" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
+          }
+          {/* Talking dots */}
+          {loading && [0, 1, 2].map(i => (
+            <circle key={i} cx={26 + i * 6} cy={58} r="1.8" fill="#475569" style={{ animation: `pulse 1.2s ease ${i * 0.2}s infinite` }}/>
+          ))}
+        </svg>
+        {/* Hover tooltip */}
+        {hovered && !open && (
+          <div style={{ position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)", background: "#1e1e2e", border: "1px solid #ffffff10", borderRadius: 8, padding: "5px 10px", fontSize: 11, color: "#94A3B8", whiteSpace: "nowrap", pointerEvents: "none" }}>
+            Click to chat with Spot
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
 /* ───────── MAIN APP ───────── */
 export default function App() {
   const [user, setUser] = useState(() => {
@@ -4208,6 +4486,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         </div>
       )}
 
+      <PetAssistant user={user} />
+
       {/* ═══════ TOP NAV BAR ═══════ */}
       <div style={{ background: "#0d0d12", borderBottom: "1px solid #ffffff08", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
         {/* Left: hamburger + logo + breadcrumb */}
@@ -4391,6 +4671,10 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
         @keyframes splashFloat { from{transform:translateY(0px) scale(1);opacity:0.8} to{transform:translateY(-8px) scale(1.06);opacity:1} }
         @keyframes splashFadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:0.85;transform:translateY(0)} }
+        @keyframes petFloat   { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        @keyframes petHappy   { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
+        @keyframes heartFloat { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-44px);opacity:0} }
+        @keyframes chatSlide  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
         ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
