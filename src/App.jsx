@@ -1820,9 +1820,148 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
   );
 }
 
-/* ───────── HOME PAGE (alias — renders DashboardPage) ───────── */
+/* ───────── HOME PAGE ───────── */
 function HomePage({ user, contactCount, setPage }) {
-  return <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />;
+  const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
+
+  const Badge = ({ type }) => {
+    const cfg = {
+      live:  { bg: "#10b98118", color: "#10b981", label: "Live" },
+      soon:  { bg: "#ffffff08", color: "#475569", label: "Soon" },
+    }[type];
+    return (
+      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: cfg.bg, color: cfg.color, letterSpacing: 0.3, flexShrink: 0 }}>
+        {cfg.label}
+      </span>
+    );
+  };
+
+  const Feature = ({ label, status, href }) => (
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #ffffff06" }}>
+      <span style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.4 }}>{label}</span>
+      {href
+        ? <a href={href} style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: "#6366f118", color: "#818cf8", textDecoration: "none", flexShrink: 0, letterSpacing: 0.3 }}>Agent</a>
+        : <Badge type={status} />
+      }
+    </div>
+  );
+
+  const PillarCard = ({ icon, title, desc, accent, features, ctaLabel, ctaAction }) => {
+    const [hov, setHov] = useState(false);
+    return (
+      <div
+        onMouseEnter={() => setHov(true)}
+        onMouseLeave={() => setHov(false)}
+        style={{ background: "#111116", border: `1px solid ${hov ? accent + "35" : "#ffffff08"}`, borderTop: `2px solid ${accent}`, borderRadius: 16, padding: "24px", display: "flex", flexDirection: "column", transition: "border-color .18s" }}
+      >
+        <div style={{ width: 44, height: 44, borderRadius: 12, background: accent + "18", border: `1px solid ${accent}25`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>
+          {icon}
+        </div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6, letterSpacing: -0.2 }}>{title}</div>
+        <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.65, marginBottom: 16 }}>{desc}</div>
+        <div style={{ flex: 1 }}>
+          {features.map((f, i) => <Feature key={i} label={f.label} status={f.status} href={f.href} />)}
+        </div>
+        <button
+          onClick={ctaAction}
+          style={{ marginTop: 18, width: "100%", padding: "9px 0", borderRadius: 10, background: accent + "18", border: `1px solid ${accent}30`, color: accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "background .15s" }}
+          onMouseEnter={e => { e.currentTarget.style.background = accent + "28"; }}
+          onMouseLeave={e => { e.currentTarget.style.background = accent + "18"; }}
+        >{ctaLabel}</button>
+      </div>
+    );
+  };
+
+  return (
+    <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
+      {/* Header */}
+      <div style={{ marginBottom: 32 }}>
+        <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 6 }}>
+          Welcome back, {firstName}
+        </div>
+        <div style={{ fontSize: 13, color: "#475569" }}>
+          Your B2B outreach platform — find leads, write emails, run campaigns, and detect replies at scale.
+        </div>
+      </div>
+
+      {/* Top row: 3 pillars */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
+        <PillarCard
+          icon={<LuDatabase size={20} />}
+          title="Lead Input"
+          desc="Import leads from spreadsheets, connect CRM tools, or add contacts manually."
+          accent="#10b981"
+          features={[
+            { label: "CSV / Spreadsheet upload",    href: "/agents/csv-import-export" },
+            { label: "CRM integration (Apollo.io)", href: "/agents/lead-finder" },
+            { label: "CRM integration (HubSpot)",   status: "soon" },
+            { label: "Manual entry",                status: "live" },
+          ]}
+          ctaLabel="Manage Contacts"
+          ctaAction={() => setPage("contacts")}
+        />
+        <PillarCard
+          icon={<LuSparkles size={20} />}
+          title="AI Engine"
+          desc="GPT-4o-mini writes personalized outreach using templates and contact variables."
+          accent="#6366f1"
+          features={[
+            { label: "LLM (GPT-4o-mini)",              status: "live" },
+            { label: "Prompt templates per category",   status: "live" },
+            { label: "Personalization variables",       status: "live" },
+            { label: "Email sequence builder",          href: "/agents/email-sequence-builder" },
+          ]}
+          ctaLabel="Open Templates"
+          ctaAction={() => setPage("emailTemplates")}
+        />
+        <PillarCard
+          icon={<LuSend size={20} />}
+          title="Outreach Channels"
+          desc="Send emails via Gmail today. LinkedIn, WhatsApp, and SMS are on the roadmap."
+          accent="#0ea5e9"
+          features={[
+            { label: "Email (Gmail API / SMTP)",  status: "live" },
+            { label: "LinkedIn (Phantombuster)",  status: "soon" },
+            { label: "WhatsApp (Twilio)",         status: "soon" },
+            { label: "SMS (Twilio)",              status: "soon" },
+          ]}
+          ctaLabel="Send Emails"
+          ctaAction={() => setPage("emailSender")}
+        />
+      </div>
+
+      {/* Bottom row: 2 pillars */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <PillarCard
+          icon={<LuRadio size={20} />}
+          title="Sequence / Campaign Manager"
+          desc="Multi-step follow-up sequences that stop automatically when a reply is detected."
+          accent="#f59e0b"
+          features={[
+            { label: "Multi-step follow-up (Day 1 → 3 → 7)", status: "live" },
+            { label: "Stop sequence on reply",               status: "live" },
+            { label: "Campaign scheduling",                  status: "live" },
+            { label: "Sequence builder agent",               href: "/agents/email-sequence-builder" },
+          ]}
+          ctaLabel="View Campaigns"
+          ctaAction={() => setPage("campaignStatus")}
+        />
+        <PillarCard
+          icon={<LuMailbox size={20} />}
+          title="Reply Detection & Inbox"
+          desc="Detect and classify replies as interested, not interested, or out of office — automatically."
+          accent="#ec4899"
+          features={[
+            { label: "Gmail reply polling",              status: "live" },
+            { label: "Webhook reply detection",          status: "soon" },
+            { label: "Classify: Interested / OOO / No", href: "/agents/reply-detector" },
+          ]}
+          ctaLabel="Check Replies"
+          ctaAction={() => setPage("campaignStatus")}
+        />
+      </div>
+    </div>
+  );
 }
 
 /* ───────── DASHBOARD PAGE ───────── */
@@ -4132,6 +4271,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           <div style={{ flex: 1, padding: "4px 8px" }}>
             {[
               { id: null,              label: "Home",        icon: <LuHouse size={15} /> },
+              { id: "dashboard",       label: "Dashboard",   icon: <LuLayoutDashboard size={15} /> },
               { id: "contacts",        label: "Contacts",    icon: <LuUsers size={15} /> },
               { id: "campaignStatus",  label: "Campaigns",   icon: <LuRadio size={15} /> },
               { id: "emailTemplates",  label: "Templates",   icon: <LuFilePen size={15} /> },
