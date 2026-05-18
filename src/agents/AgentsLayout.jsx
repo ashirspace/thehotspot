@@ -1,11 +1,11 @@
 import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
-import { useParams, useNavigate, NavLink } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import {
   Search, Target, Globe, Mail, FlaskConical, Inbox, FileText,
   Swords, Link2, BarChart3, Users, ArrowUpDown,
   LayoutDashboard, House, Radio, FilePen, Settings,
-  Sparkles,
+  Sparkles, Menu, X, ChevronLeft,
 } from "lucide-react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
@@ -95,15 +95,23 @@ function SplashScreen({ cfg, onDone }) {
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
-function Sidebar({ currentAgentId }) {
+function Sidebar({ currentAgentId, open, onClose }) {
   const navigate = useNavigate();
 
+  const handleAgentClick = (id) => {
+    navigate(`/agents/${id}`);
+    onClose();
+  };
+
   return (
-    <aside style={{
-      width: 224, flexShrink: 0, display: "flex", flexDirection: "column",
-      background: "#0d0d12", borderRight: "1px solid #1e1e26",
-      height: "100vh", position: "sticky", top: 0, overflowY: "auto",
-    }}>
+    <aside
+      className={open ? "al-sidebar al-sidebar--open" : "al-sidebar"}
+      style={{
+        width: 224, flexShrink: 0, display: "flex", flexDirection: "column",
+        background: "#0d0d12", borderRight: "1px solid #1e1e26",
+        height: "100vh", position: "sticky", top: 0, overflowY: "auto",
+      }}
+    >
       {/* Brand */}
       <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid #1e1e26" }}>
         <div style={{ fontSize: 15, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.3px" }}>thehotspot</div>
@@ -147,7 +155,7 @@ function Sidebar({ currentAgentId }) {
           return (
             <button
               key={id}
-              onClick={() => navigate(`/agents/${id}`)}
+              onClick={() => handleAgentClick(id)}
               style={{
                 display: "flex", alignItems: "center", gap: 8, width: "100%",
                 padding: "7px 10px", marginBottom: 1, borderRadius: 7,
@@ -183,12 +191,14 @@ export default function AgentsLayout() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const [splashDone, setSplashDone] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const cfg = AGENT_MAP[agentId];
 
   // New splash on every agent switch
   useEffect(() => {
     setSplashDone(false);
+    setSidebarOpen(false);
   }, [agentId]);
 
   if (!cfg) {
@@ -202,17 +212,51 @@ export default function AgentsLayout() {
     );
   }
 
+  const { Icon: AgentIcon, accent } = cfg;
+
   return (
-    <div style={{ display: "flex", height: "100vh", background: "#09090d", color: "#f1f5f9", fontFamily: "ui-sans-serif, system-ui, sans-serif", overflow: "hidden" }}>
+    <div className="al-root" style={{ display: "flex", height: "100vh", background: "#09090d", color: "#f1f5f9", fontFamily: "ui-sans-serif, system-ui, sans-serif", overflow: "hidden" }}>
       {/* Splash */}
       {!splashDone && <SplashScreen cfg={cfg} onDone={() => setSplashDone(true)} />}
 
+      {/* Mobile overlay backdrop */}
+      {sidebarOpen && (
+        <div
+          className="al-overlay"
+          onClick={() => setSidebarOpen(false)}
+          style={{ position: "fixed", inset: 0, zIndex: 9600, background: "rgba(0,0,0,0.6)" }}
+        />
+      )}
+
       {/* Sidebar */}
-      <Sidebar currentAgentId={agentId} />
+      <Sidebar currentAgentId={agentId} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
       {/* Main content */}
-      <div style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease" }}>
-        <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px" }}>
+      <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
+        {/* Mobile top bar */}
+        <div
+          className="al-topbar"
+          style={{ display: "none", alignItems: "center", gap: 10, padding: "0 14px", height: 52, borderBottom: "1px solid #1e1e26", background: "#0d0d12", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}
+        >
+          <button
+            onClick={() => setSidebarOpen(v => !v)}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: 8, background: "#ffffff08", border: "1px solid #ffffff10", color: "#94a3b8", cursor: "pointer", flexShrink: 0 }}
+          >
+            {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
+          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: `${accent}18`, border: `1px solid ${accent}30`, flexShrink: 0 }}>
+              <AgentIcon size={13} style={{ color: accent }} />
+            </div>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "#f1f5f9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cfg.label}</span>
+          </div>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#475569", textDecoration: "none", flexShrink: 0 }}>
+            <ChevronLeft size={14} />
+            <span>Dashboard</span>
+          </a>
+        </div>
+
+        <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px", width: "100%" }}>
           <LazyPage name={cfg.page} />
         </main>
       </div>
@@ -222,6 +266,49 @@ export default function AgentsLayout() {
         @keyframes splashIcon { from { transform: scale(0.5) translateY(10px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
         @keyframes splashText { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes splashDot  { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-6px); opacity: 1; } }
+
+        /* Tablet: 768–1024px — sidebar slightly narrower, content padding reduced */
+        @media (max-width: 1024px) {
+          .al-sidebar {
+            width: 200px !important;
+          }
+          .al-content main {
+            padding: 24px 20px 60px !important;
+          }
+        }
+
+        /* Mobile: 320–767px — overlay sidebar, top bar visible */
+        @media (max-width: 767px) {
+          .al-sidebar {
+            position: fixed !important;
+            left: 0 !important;
+            top: 0 !important;
+            bottom: 0 !important;
+            height: 100dvh !important;
+            width: 260px !important;
+            z-index: 9700 !important;
+            transform: translateX(-100%) !important;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
+          }
+          .al-sidebar--open {
+            transform: translateX(0) !important;
+          }
+          .al-topbar {
+            display: flex !important;
+          }
+          .al-content main {
+            padding: 16px 14px 80px !important;
+            max-width: 100% !important;
+          }
+        }
+
+        /* Mobile small: 320–480px */
+        @media (max-width: 480px) {
+          .al-content main {
+            padding: 12px 10px 80px !important;
+          }
+        }
       `}</style>
     </div>
   );

@@ -469,7 +469,7 @@ function LoginPage({ onLogin }) {
       <div style={{ position: "fixed", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,#6366f10a,transparent 70%)", top: "40%", right: "20%", pointerEvents: "none", zIndex: 0 }} />
 
       {/* ── Top nav ── */}
-      <nav style={{ padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff0d", background: "#09090dcc", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
+      <nav className="rsp-lp-nav" style={{ padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff0d", background: "#09090dcc", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <Logo size={28} />
           <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
@@ -509,7 +509,7 @@ function LoginPage({ onLogin }) {
 
         {/* ── Stats bar ── */}
         <div style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
+          <div className="rsp-stats-bar" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
             {[
               { value: "12", label: "AI Agents", color: "#10b981" },
               { value: "50+", label: "Emails / Day", color: "#0ea5e9" },
@@ -532,7 +532,7 @@ function LoginPage({ onLogin }) {
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Six modules working together so you never have to touch the pipeline manually.</div>
             <a href="/what-we-provide.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>Explore all features →</a>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
+          <div className="rsp-features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
             {[
               { icon: <LuUsers size={20} />, title: "Lead Generation", desc: "AI finds qualified prospects in any industry or region and adds them to your contacts instantly.", accent: "#10b981" },
               { icon: <LuMail size={20} />, title: "Cold Email Campaigns", desc: "Unique, personalised emails for every contact — written by AI, never copy-paste.", accent: "#0ea5e9" },
@@ -1885,7 +1885,7 @@ function HomePage({ user, contactCount, setPage }) {
       </div>
 
       {/* Top row: 3 pillars */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
+      <div className="rsp-pillars-top" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
         <PillarCard
           icon={<LuDatabase size={20} />}
           title="Lead Input"
@@ -1931,7 +1931,7 @@ function HomePage({ user, contactCount, setPage }) {
       </div>
 
       {/* Bottom row: 2 pillars */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+      <div className="rsp-pillars-bot" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         <PillarCard
           icon={<LuRadio size={20} />}
           title="Sequence / Campaign Manager"
@@ -2014,7 +2014,7 @@ function DashboardPage({ user, contactCount, setPage }) {
       </div>
 
       {/* Stat cards */}
-      <div ref={statsRef} style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      <div ref={statsRef} className="rsp-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
           { label: "Contacts", value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={16} />, sub: "in database" },
           { label: "Emails Sent", value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={16} />, sub: "total delivered" },
@@ -2041,7 +2041,7 @@ function DashboardPage({ user, contactCount, setPage }) {
       </div>
 
       {/* Three tool groups */}
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
+      <div className="rsp-tool-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
 
         {/* Outreach */}
         <div ref={col1Ref} style={{ ...revealStyle(col1Visible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #10b981" }}>
@@ -2095,7 +2095,7 @@ function DashboardPage({ user, contactCount, setPage }) {
             <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>12 autonomous agents — each with one job, done perfectly</div>
           </div>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+        <div className="rsp-agent-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {[
             { id: "lead-finder",            label: "Lead Finder",            tagline: "Discover B2B companies at scale",        Icon: LuSearch,       color: "#10b981" },
             { id: "lead-scoring",           label: "Lead Scoring",           tagline: "Qualify every prospect with AI",         Icon: LuTarget,       color: "#f59e0b" },
@@ -2544,7 +2544,7 @@ function PixelPet() {
     >
       {/* chat panel — above pet, left or right anchored based on screen position */}
       {open && (
-        <div style={{
+        <div className="rsp-pet-panel" style={{
           position: 'absolute',
           bottom: CH + 10,
           ...panelPos,
@@ -3101,7 +3101,7 @@ function ContactsPage({ onBack, showToast, user }) {
         <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>Contacts Database</div>
         <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
+      <div className="rsp-contacts-hub" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
         <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}
           onClick={() => setView("connect_sheets")}
           onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(16,185,129,0.12)"; }}
@@ -3222,7 +3222,7 @@ function ContactsPage({ onBack, showToast, user }) {
           <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #EF444433", background: "#FEF2F2", color: "#EF4444", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
         </div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
+      <div className="rsp-contact-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
         {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
           <div key={s.l} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
@@ -4702,15 +4702,15 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.2 }}>thehotspot</span>
           </button>
           {page !== null && (
-            <>
+            <span className="rsp-breadcrumb" style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ color: "#1e293b", fontSize: 14 }}>/</span>
               <span style={{ fontSize: 13, fontWeight: 500, color: "#94A3B8" }}>{pageLabel}</span>
-            </>
+            </span>
           )}
         </div>
         {/* Right: Gmail status + profile avatar */}
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 8, background: gmailConnected ? "#10b98110" : "#f9731610", border: gmailConnected ? "1px solid #10b98120" : "1px solid #f9731620" }}>
+          <div className="rsp-gmail-badge" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 8, background: gmailConnected ? "#10b98110" : "#f9731610", border: gmailConnected ? "1px solid #10b98120" : "1px solid #f9731620" }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
             <span style={{ fontSize: 11, fontWeight: 500, color: gmailConnected ? "#10b981" : "#f97316" }}>{gmailConnected ? "Gmail" : "Connect"}</span>
           </div>
@@ -4836,7 +4836,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         )}
 
         {/* MAIN CONTENT */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "28px 28px", width: "100%", position: "relative" }}>
+        <div className="rsp-main-content" style={{ flex: 1, overflowY: "auto", padding: "28px 28px", width: "100%", position: "relative" }}>
           <div style={{ maxWidth: 1000, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
 
             {/* ── HOME ── */}
@@ -4877,6 +4877,59 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
         input::placeholder{color:#ffffff30}
         select{color-scheme:dark}
+
+        /* ── RESPONSIVE ─────────────────────────────────────── */
+
+        /* Tablet: 768–1024px */
+        @media (max-width:1024px) {
+          .rsp-main-content { padding: 20px 16px !important; }
+          .rsp-stat-grid    { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-tool-grid    { grid-template-columns: 1fr !important; }
+          .rsp-agent-grid   { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-pillars-top  { grid-template-columns: 1fr 1fr !important; }
+          .rsp-pillars-bot  { grid-template-columns: 1fr !important; }
+          .rsp-features-grid{ grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-contacts-hub { grid-template-columns: 1fr !important; }
+          .rsp-lp-nav       { padding: 14px 20px !important; }
+        }
+
+        /* Mobile large: 481–767px */
+        @media (max-width:767px) {
+          .rsp-main-content   { padding: 16px 14px !important; }
+          .rsp-stat-grid      { grid-template-columns: repeat(2,1fr) !important; gap: 10px !important; }
+          .rsp-tool-grid      { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .rsp-agent-grid     { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+          .rsp-pillars-top    { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .rsp-pillars-bot    { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .rsp-features-grid  { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .rsp-stats-bar      { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-contact-stats  { grid-template-columns: repeat(3,1fr) !important; }
+          .rsp-contacts-hub   { grid-template-columns: 1fr !important; }
+          .rsp-breadcrumb     { display: none !important; }
+          .rsp-lp-nav         { padding: 12px 16px !important; }
+          /* Pet chat: full-width on mobile */
+          .rsp-pet-panel      { position: fixed !important; left: 8px !important; right: 8px !important;
+                                bottom: 80px !important; width: auto !important; }
+        }
+
+        /* Mobile small: 320–480px */
+        @media (max-width:480px) {
+          .rsp-main-content   { padding: 12px 10px !important; }
+          .rsp-stat-grid      { grid-template-columns: repeat(2,1fr) !important; gap: 8px !important; }
+          .rsp-agent-grid     { grid-template-columns: 1fr !important; gap: 8px !important; }
+          .rsp-gmail-badge    { display: none !important; }
+          .rsp-contact-stats  { grid-template-columns: 1fr !important; }
+          .rsp-tool-grid      { gap: 10px !important; }
+        }
+
+        /* Landing page sections responsive */
+        @media (max-width:767px) {
+          .lp-body [style*="maxWidth: 1280"] { padding: 0 16px !important; }
+        }
+        @media (max-width:480px) {
+          .lp-body [style*="maxWidth: 1280"] { padding: 0 12px !important; }
+        }
       `}</style>
     </div>
   );
