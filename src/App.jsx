@@ -2234,10 +2234,9 @@ const PET_SEED = [
   { role: "assistant", content: "Hi, I'm Spot. Ask me anything about thehotspot — campaigns, contacts, agents, you name it." },
 ];
 
-function PixelPet({ page }) {
+function PixelPet() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
-  const prevPage = useRef(page);
   const rafRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -2259,7 +2258,7 @@ function PixelPet({ page }) {
     y: window.innerHeight - 80,
     vy: 0,
     groundY: window.innerHeight - 80,
-    state: 'idle',    // idle | happy | flyup | falling
+    state: 'idle',    // idle | happy
     time: 0,
     lastTs: 0,
     blinking: false,
@@ -2298,8 +2297,7 @@ function PixelPet({ page }) {
     }
 
     let legs;
-    if (p.state === 'flyup' || p.state === 'falling') legs = PP_LEGS_JUMP;
-    else if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
+    if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
     else legs = PP_LEGS_STAND;
     ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
 
@@ -2335,12 +2333,6 @@ function PixelPet({ page }) {
       p.legFrame = Math.floor(p.time / 130) % 2;
       if (Math.random() < 0.18) p.sparkles.push({ x: Math.random() * CW, y: Math.random() * CH * 0.7, age: 0 });
       if (p.happyTimer <= 0) { p.y = p.groundY; p.state = 'idle'; }
-    } else if (p.state === 'flyup') {
-      p.y -= 15;
-    } else if (p.state === 'falling') {
-      p.y += p.vy;
-      p.vy = Math.min(p.vy + 1.2, 22);
-      if (p.y >= p.groundY) { p.y = p.groundY; p.vy = 0; p.state = 'idle'; }
     }
 
     const ctr = containerRef.current;
@@ -2396,26 +2388,6 @@ function PixelPet({ page }) {
   useEffect(() => {
     if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
-
-  // ── page change → fly up, land back bottom-right ─────────
-  useEffect(() => {
-    if (page === prevPage.current) return;
-    prevPage.current = page;
-    const p = pet.current;
-    if (p.state === 'flyup' || p.state === 'falling') return;
-    openRef.current = false;
-    setOpen(false);
-    p.state = 'flyup';
-    setTimeout(() => {
-      const pp = pet.current;
-      pp.x = window.innerWidth - 90;
-      pp.y = -CH - 20;
-      pp.vy = 6;
-      pp.groundY = window.innerHeight - 80;
-      pp.state = 'falling';
-      setPanelSide('right');
-    }, 650);
-  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── send message ──────────────────────────────────────────
   const sendMessage = async () => {
@@ -4573,7 +4545,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         </div>
       )}
 
-      <PixelPet page={page} />
+      <PixelPet />
 
       {/* ═══════ TOP NAV BAR ═══════ */}
       <div style={{ background: "#0d0d12", borderBottom: "1px solid #ffffff08", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
