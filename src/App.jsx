@@ -2088,43 +2088,42 @@ function DashboardPage({ user, contactCount, setPage }) {
 
       {/* AI Agents */}
       <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "24px 28px", marginBottom: 20, borderTop: "2px solid #6366f1" }}>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6366f118", border: "1px solid #6366f130", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><LuSparkles size={17} /></div>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</div>
-              <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>12 autonomous agents to grow your business</div>
-            </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6366f118", border: "1px solid #6366f130", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><LuSparkles size={17} /></div>
+          <div>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</div>
+            <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>12 autonomous agents — each with one job, done perfectly</div>
           </div>
-          <a href="/agents" style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 16px", borderRadius: 20, background: "#6366f115", border: "1px solid #6366f130", color: "#818cf8", fontSize: 12, fontWeight: 600, textDecoration: "none", transition: "all .15s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#6366f125"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#6366f115"; }}
-          >Open Platform <LuChevronRight size={12} /></a>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {[
-            { id: "lead-finder",            label: "Lead Finder",            Icon: LuSearch,       color: "#10b981" },
-            { id: "lead-scoring",           label: "Lead Scoring",           Icon: LuTarget,       color: "#f59e0b" },
-            { id: "email-sequence-builder", label: "Email Sequences",        Icon: LuMailbox,      color: "#0ea5e9" },
-            { id: "ab-email-tester",        label: "A/B Email Tester",       Icon: LuFlaskConical, color: "#ec4899" },
-            { id: "reply-detector",         label: "Reply Detector",         Icon: LuRadio,        color: "#14b8a6" },
-            { id: "blog-generator",         label: "Blog Generator",         Icon: LuFilePen,      color: "#8b5cf6" },
-            { id: "competitor-analyzer",    label: "Competitor Analyzer",    Icon: LuChartBar,     color: "#f97316" },
-            { id: "campaign-dashboard",     label: "Campaign Dashboard",     Icon: LuTrendingUp,   color: "#6366f1" },
-            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  Icon: LuGlobe,        color: "#10b981" },
-            { id: "backlink-outreach",      label: "Backlink Outreach",      Icon: LuLink,         color: "#0ea5e9" },
-            { id: "crm-lite",               label: "CRM Lite",               Icon: LuDatabase,     color: "#f59e0b" },
-            { id: "csv-import-export",      label: "CSV Import/Export",      Icon: LuFolder,       color: "#64748B" },
+            { id: "lead-finder",            label: "Lead Finder",            tagline: "Discover B2B companies at scale",        Icon: LuSearch,       color: "#10b981" },
+            { id: "lead-scoring",           label: "Lead Scoring",           tagline: "Qualify every prospect with AI",         Icon: LuTarget,       color: "#f59e0b" },
+            { id: "email-sequence-builder", label: "Email Sequence Builder", tagline: "Multi-step outreach, crafted by AI",     Icon: LuMailbox,      color: "#0ea5e9" },
+            { id: "ab-email-tester",        label: "A/B Email Tester",       tagline: "Pick the winner before you send",        Icon: LuFlaskConical, color: "#ec4899" },
+            { id: "reply-detector",         label: "Reply Detector",         tagline: "Classify intent. Respond instantly.",    Icon: LuRadio,        color: "#14b8a6" },
+            { id: "blog-generator",         label: "Blog Generator",         tagline: "SEO-ready content, on demand",           Icon: LuFilePen,      color: "#8b5cf6" },
+            { id: "competitor-analyzer",    label: "Competitor Analyzer",    tagline: "Full SWOT. Clear positioning.",          Icon: LuChartBar,     color: "#f97316" },
+            { id: "campaign-dashboard",     label: "Campaign Dashboard",     tagline: "Live metrics for every send",            Icon: LuTrendingUp,   color: "#6366f1" },
+            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  tagline: "CRO audits in seconds",                 Icon: LuGlobe,        color: "#10b981" },
+            { id: "backlink-outreach",      label: "Backlink Outreach",      tagline: "Find prospects. Write the email.",       Icon: LuLink,         color: "#0ea5e9" },
+            { id: "crm-lite",               label: "CRM Lite",               tagline: "Your contacts, always in reach",         Icon: LuDatabase,     color: "#f59e0b" },
+            { id: "csv-import-export",      label: "CSV Import / Export",    tagline: "Bulk contacts in, data out",             Icon: LuFolder,       color: "#64748B" },
           ].map(agent => (
             <a
               key={agent.id}
               href={`/agents/${agent.id}`}
-              style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 12px", borderRadius: 10, background: "#0d0d12", border: "1px solid #ffffff08", textDecoration: "none", transition: "all .15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = `${agent.color}40`; e.currentTarget.style.background = "#13131a"; }}
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, background: "#0d0d12", border: "1px solid #ffffff08", textDecoration: "none", transition: "all .15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = `${agent.color}35`; e.currentTarget.style.background = "#13131a"; }}
               onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; }}
             >
-              <agent.Icon size={16} style={{ color: agent.color, flexShrink: 0 }} />
-              <span style={{ fontSize: 12, fontWeight: 500, color: "#CBD5E1", lineHeight: 1.3 }}>{agent.label}</span>
+              <div style={{ width: 34, height: 34, borderRadius: 9, background: `${agent.color}14`, border: `1px solid ${agent.color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <agent.Icon size={16} style={{ color: agent.color }} />
+              </div>
+              <div style={{ minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1", lineHeight: 1.3 }}>{agent.label}</div>
+                <div style={{ fontSize: 10, color: "#475569", marginTop: 2, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.tagline}</div>
+              </div>
             </a>
           ))}
         </div>
@@ -4755,13 +4754,11 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
               { id: "contacts",        label: "Contacts",    icon: <LuUsers size={15} /> },
               { id: "campaignStatus",  label: "Campaigns",   icon: <LuRadio size={15} /> },
               { id: "emailTemplates",  label: "Templates",   icon: <LuFilePen size={15} /> },
-              { id: "__agents__",      label: "AI Agents",   icon: <LuSparkles size={15} /> },
               { id: "settings",        label: "Settings",    icon: <LuSettings size={15} /> },
             ].map(item => {
               const isActive = page === item.id;
               return (
                 <button key={String(item.id)} onClick={() => {
-                  if (item.id === "__agents__") { window.location.href = "/agents"; return; }
                   setPage(item.id); setSidebarOpen(false);
                 }} style={{
                   display: "flex", alignItems: "center", gap: 9, width: "100%",
@@ -4778,7 +4775,6 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
                 >
                   <span style={{ color: isActive ? "#10b981" : "inherit", display: "flex" }}>{item.icon}</span>
                   {item.label}
-                  {item.id === "__agents__" && <span style={{ marginLeft: "auto", fontSize: 9, color: "#475569", letterSpacing: 0.5 }}>↗</span>}
                 </button>
               );
             })}
