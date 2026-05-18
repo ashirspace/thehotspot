@@ -2261,12 +2261,14 @@ function PixelPet() {
   const isDraggingRef = useRef(false);
   const dragOffsetRef = useRef({ x: 0, y: 0 });
   const dragMovedRef = useRef(0);
+  const landPetRef = useRef(null); // stable land callback called from RAF
 
-  // chat state
+  // chat + smoke state
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([PET_SEED[1]]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [smoke, setSmoke] = useState(null); // { x, y } landing puff position
   // 'right' = pet on right half → panel floats to the left; 'left' = panel floats to the right
   const [panelSide, setPanelSide] = useState('right');
 
@@ -2275,7 +2277,7 @@ function PixelPet() {
     y: window.innerHeight - 80,
     vy: 0,
     groundY: window.innerHeight - 80,
-    state: 'idle',    // idle | happy | typing
+    state: 'idle',    // idle | happy | typing | falling
     time: 0,
     lastTs: 0,
     blinking: false,
@@ -2289,6 +2291,7 @@ function PixelPet() {
     nextTyping: 15000 + Math.random() * 5000, // 15-20s until laptop appears
     typingTimer: 0,
     typingDuration: 2000, // set fresh each time
+    lastDrag: 0,           // Date.now() of last drag — for 10s return-home
   });
 
   const CW = 10 * PP_SC; // 60px
@@ -2333,7 +2336,8 @@ function PixelPet() {
       ppDraw(ctx, PP_LAPTOP_SIDE, 8 * PP_SC + breathY, fl, CW);
     } else {
       let legs;
-      if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
+      if (p.state === 'falling') legs = PP_LEGS_JUMP;
+      else if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
       else legs = PP_LEGS_STAND;
       ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
     }
@@ -2365,14 +2369,32 @@ function PixelPet() {
     p.sparkles = p.sparkles.map(s => ({ ...s, age: s.age + 1 })).filter(s => s.age < 40);
 
     if (p.state === 'idle') {
-      // trigger laptop after 15-20s of inactivity (not while chat is open)
+      // laptop trigger
       p.nextTyping -= dt;
       if (p.nextTyping <= 0 && !openRef.current) {
         p.state = 'typing';
         p.typingTimer = 0;
-        p.typingDuration = 1800 + Math.random() * 800; // 1.8–2.6 s
+        p.typingDuration = 1800 + Math.random() * 800;
         p.nextTyping = 15000 + Math.random() * 5000;
-        p.facingLeft = false; // always face right so screen is on left, keyboard on right
+        p.facingLeft = false;
+      }
+      // return to bottom-right after 10s of no drag
+      if (!isDraggingRef.current && !openRef.current && p.lastDrag > 0) {
+        const away = Date.now() - p.lastDrag;
+        if (away > 10000) {
+          const tx = window.innerWidth - 90;
+          const ty = window.innerHeight - 80;
+          const dx = tx - p.x;
+          const dy = ty - p.y;
+          if (Math.hypot(dx, dy) > 2) {
+            p.x += dx * 0.04;
+            p.y += dy * 0.04;
+            p.groundY = p.y;
+          } else {
+            p.x = tx; p.y = ty; p.groundY = ty;
+            p.lastDrag = 0;
+          }
+        }
       }
     } else if (p.state === 'happy') {
       p.happyTimer -= dt;
@@ -2383,6 +2405,39 @@ function PixelPet() {
     } else if (p.state === 'typing') {
       p.typingTimer += dt;
       if (p.typingTimer >= p.typingDuration) p.state = 'idle';
+    } else if (p.state === 'falling') {
+      p.vy = Math.min(p.vy + 0.9, 22); // gravity
+      p.y += p.vy;
+      const feetY = p.y + CH;
+      const cx = p.x + CW / 2;
+      let landed = false;
+      // check viewport floor
+      if (feetY >= window.innerHeight - 4) {
+        p.y = window.innerHeight - CH - 4;
+        landed = true;
+      } else {
+        // check DOM surfaces below feet
+        try {
+          const hits = document.elementsFromPoint(cx, feetY + 4);
+          const surface = hits.find(el =>
+            containerRef.current && !containerRef.current.contains(el) &&
+            el.tagName !== 'HTML' && el.tagName !== 'BODY'
+          );
+          if (surface) {
+            const r = surface.getBoundingClientRect();
+            if (r.top <= feetY + 4 && feetY > r.top - 10) {
+              p.y = r.top - CH;
+              landed = true;
+            }
+          }
+        } catch (_) { /* elementsFromPoint unavailable */ }
+      }
+      if (landed) {
+        p.vy = 0;
+        p.groundY = p.y;
+        p.state = 'idle';
+        if (landPetRef.current) landPetRef.current(cx, p.y + CH);
+      }
     }
 
     const ctr = containerRef.current;
@@ -2391,6 +2446,16 @@ function PixelPet() {
       ctr.style.top = Math.round(p.y) + 'px';
     }
   }
+
+  // keep landPetRef current every render so the RAF closure always calls the latest version
+  landPetRef.current = (x, y) => {
+    setSmoke({ x, y });
+    setTimeout(() => setSmoke(null), 900);
+    const p = pet.current;
+    p.state = 'happy';
+    p.happyTimer = 500;
+    p.groundY = p.y;
+  };
 
   // ── RAF loop ──────────────────────────────────────────────
   useEffect(() => {
@@ -2415,18 +2480,23 @@ function PixelPet() {
     const onMouseUp = () => {
       if (!isDraggingRef.current) return;
       isDraggingRef.current = false;
+      const p = pet.current;
+      p.lastDrag = Date.now();
+
       if (dragMovedRef.current < 5) {
         // treat as click → toggle chat
-        const p = pet.current;
-        if (p.state !== 'flyup' && p.state !== 'falling') {
+        if (p.state !== 'falling') {
           const nextOpen = !openRef.current;
           openRef.current = nextOpen;
           setOpen(nextOpen);
           if (nextOpen) { p.groundY = p.y; p.state = 'happy'; p.happyTimer = 1200; p.facingLeft = false; p.nextTyping = 15000 + Math.random() * 5000; }
         }
+      } else {
+        // drag release → fall with gravity onto whatever is below
+        p.vy = 0;
+        p.state = 'falling';
       }
-      // update panel side based on final x position
-      setPanelSide(pet.current.x > window.innerWidth / 2 ? 'right' : 'left');
+      setPanelSide(p.x > window.innerWidth / 2 ? 'right' : 'left');
     };
 
     window.addEventListener('mousemove', onMouseMove);
@@ -2553,6 +2623,24 @@ function PixelPet() {
         title="Drag to move · Click to chat"
         style={{ cursor: 'grab', imageRendering: 'pixelated', filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))', display: 'block', userSelect: 'none' }}
       />
+
+      {/* smoke landing puff — fixed relative to screen, not container */}
+      {smoke && (
+        <div style={{ position: 'fixed', left: smoke.x, top: smoke.y, transform: 'translate(-50%,-100%)', zIndex: 9499, pointerEvents: 'none' }}>
+          {[0,1,2,3,4].map(i => (
+            <div key={i} style={{
+              position: 'absolute',
+              width: 10 + i,
+              height: 10 + i,
+              borderRadius: '50%',
+              background: `rgba(190,190,190,${0.65 - i * 0.08})`,
+              left: (i - 2) * 13,
+              top: 0,
+              animation: `smokeCloud 0.85s ease-out ${i * 50}ms forwards`,
+            }} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -4784,6 +4872,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         @keyframes petHappy   { 0%{transform:scale(1)} 40%{transform:scale(1.18)} 100%{transform:scale(1)} }
         @keyframes heartFloat { 0%{transform:translateY(0);opacity:1} 100%{transform:translateY(-44px);opacity:0} }
         @keyframes chatSlide  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+        @keyframes smokeCloud { 0%{transform:scale(.25) translateY(0);opacity:.75} 100%{transform:scale(3) translateY(-30px);opacity:0} }
         *{box-sizing:border-box;margin:0;padding:0}
         html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
         ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
