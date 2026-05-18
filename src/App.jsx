@@ -2416,7 +2416,8 @@ function PixelPet() {
         p.y = window.innerHeight - CH - 4;
         landed = true;
       } else {
-        // check DOM surfaces below feet
+        // check DOM surfaces below feet — only land on elements whose top
+        // is genuinely below the pet (avoids full-page containers starting at y=0)
         try {
           const hits = document.elementsFromPoint(cx, feetY + 4);
           const surface = hits.find(el =>
@@ -2425,7 +2426,9 @@ function PixelPet() {
           );
           if (surface) {
             const r = surface.getBoundingClientRect();
-            if (r.top <= feetY + 4 && feetY > r.top - 10) {
+            // r.top must be below the pet's current top (genuine surface, not background)
+            // and feet must have reached or passed that top edge
+            if (r.top > p.y + CH * 0.5 && r.top <= feetY + 4) {
               p.y = r.top - CH;
               landed = true;
             }
