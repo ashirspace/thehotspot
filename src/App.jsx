@@ -485,7 +485,7 @@ function LoginPage({ onLogin }) {
       <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1 }}>
 
         {/* ── HERO ── */}
-        <div style={{ maxWidth: 960, margin: "0 auto", padding: "96px 40px 72px", textAlign: "center" }}>
+        <div className="lp-hero" style={{ maxWidth: 960, margin: "0 auto", padding: "96px 40px 72px", textAlign: "center" }}>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#10b98112", border: "1px solid #10b98130", borderRadius: 20, padding: "5px 16px", marginBottom: 28 }}>
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981" }} />
             <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
@@ -508,7 +508,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Stats bar ── */}
-        <div style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
+        <div className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
           <div className="rsp-stats-bar" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
             {[
               { value: "12", label: "AI Agents", color: "#10b981" },
@@ -525,7 +525,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Features ── */}
-        <div ref={featRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
+        <div ref={featRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: featVisible ? 1 : 0, transform: featVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>What We Provide</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>Everything you need to scale outreach</div>
@@ -559,14 +559,14 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── AI Agents ── */}
-        <div ref={agentsRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
+        <div ref={agentsRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: agentsVisible ? 1 : 0, transform: agentsVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>12 AI agents working for you 24/7</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
             <a href="/meet-the-team.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#0ea5e9", textDecoration: "none", borderBottom: "1px solid #0ea5e940", paddingBottom: 1 }}>Meet all agents →</a>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
+          <div className="lp-agents-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
             {[
               { name: "Email Sequence Builder", role: "Email Automation", desc: "Generate a full 2-5 email cold outreach sequence with follow-up timing built in — ready to copy and send.", color: "#0ea5e9", icon: <LuMailbox size={16} /> },
               { name: "Lead Finder", role: "Prospect Discovery", desc: "Search for qualified B2B companies by industry, location, and size. Returns a ready-to-outreach prospect table.", color: "#10b981", icon: <LuUsers size={16} /> },
@@ -601,14 +601,14 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── How it grows your business ── */}
-        <div ref={outcomeRef} style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
+        <div ref={outcomeRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
           <div style={{ textAlign: "center", marginBottom: 48, opacity: outcomeVisible ? 1 : 0, transform: outcomeVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
             <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>The Outcome</div>
             <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>How thehotspot grows your business</div>
             <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Real results, not vanity metrics — what you'll see in your pipeline after week one.</div>
             <a href="/the-outcome.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>See the full picture →</a>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
+          <div className="lp-outcomes-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
             {[
               { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily so your pipeline never dries up — even when you're offline.", icon: <LuZap size={16} />, accent: "#10b981" },
               { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. The follow-up agent handles every sequence automatically.", icon: <LuCheck size={16} />, accent: "#0ea5e9" },
@@ -638,7 +638,7 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Final CTA ── */}
-        <div style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 40px", textAlign: "center" }}>
+        <div className="lp-section lp-cta" style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 40px", textAlign: "center" }}>
           <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 12 }}>Ready to automate your outreach?</div>
           <p style={{ fontSize: 14, color: "#64748B", marginBottom: 28 }}>Join businesses using AI to fill their pipeline on autopilot.</p>
           <button onClick={() => setShowLogin(true)} style={{ padding: "14px 40px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 40px #10b98135" }}>
@@ -647,11 +647,11 @@ function LoginPage({ onLogin }) {
         </div>
 
         {/* ── Footer ── */}
-        <footer style={{ borderTop: "1px solid #ffffff0d", padding: "56px 40px 32px", marginTop: 16 }}>
+        <footer className="lp-footer" style={{ borderTop: "1px solid #ffffff0d", padding: "56px 40px 32px", marginTop: 16 }}>
           <div style={{ maxWidth: 1280, margin: "0 auto" }}>
 
             {/* Top row — brand + columns */}
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
+            <div className="lp-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
 
               {/* Brand */}
               <div>
@@ -732,17 +732,34 @@ function LoginPage({ onLogin }) {
         .lp-body::-webkit-scrollbar-track { background:#0d0d12; }
         .lp-body::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
         .lp-body::-webkit-scrollbar-thumb:hover { background:#475569; }
-        @media (max-width:700px) {
-          .lp-hero { padding:48px 20px 40px !important; }
+
+        /* Tablet: 768–1024px */
+        @media (max-width:1024px) {
+          .lp-hero        { padding: 72px 28px 52px !important; }
+          .lp-section     { padding: 0 28px !important; }
+          .lp-footer      { padding: 44px 28px 28px !important; }
+          .lp-footer-grid { gap: 28px !important; }
+          .rsp-lp-nav     { padding: 14px 20px !important; }
         }
-        @media (max-width:600px) {
-          .lp-feat-grid { grid-template-columns:1fr !important; }
+
+        /* Mobile large: 481–767px */
+        @media (max-width:767px) {
+          .lp-hero          { padding: 52px 18px 40px !important; }
+          .lp-section       { padding: 0 16px !important; }
+          .lp-agents-grid   { grid-template-columns: 1fr !important; gap: 10px !important; }
+          .lp-outcomes-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .lp-footer-grid   { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
+          .lp-footer        { padding: 36px 16px 24px !important; }
+          .rsp-lp-nav       { padding: 12px 16px !important; }
         }
-        @media (max-width:760px) {
-          .lp-footer-grid { grid-template-columns:1fr 1fr !important; }
-        }
+
+        /* Mobile small: 320–480px */
         @media (max-width:480px) {
-          .lp-footer-grid { grid-template-columns:1fr !important; }
+          .lp-hero          { padding: 40px 14px 32px !important; }
+          .lp-section       { padding: 0 12px !important; }
+          .lp-footer-grid   { grid-template-columns: 1fr !important; }
+          .lp-footer        { padding: 28px 12px 20px !important; }
+          .rsp-lp-nav       { padding: 10px 14px !important; }
         }
       `}</style>
     </div>
