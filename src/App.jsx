@@ -935,6 +935,32 @@ function TotalContactsPage({ onBack, user }) {
   const [form, setForm] = useState(emptyForm);
   const [formError, setFormError] = useState("");
 
+  // Sync with server on mount — contacts are stored in PostgreSQL across devices
+  useEffect(() => {
+    fetch("/api/db?entity=contact&limit=2000")
+      .then(r => r.json())
+      .then(data => {
+        const rows = data.records || [];
+        if (rows.length === 0) return;
+        const serverContacts = rows.map(r => ({
+          id: String(r.id),
+          airtableId: String(r.id),
+          name: r.name || "",
+          email: r.email || "",
+          company: r.company || "",
+          website: r.website || "",
+          category: r.category || "Network",
+          country: r.country || "",
+          notes: r.notes || "",
+          status: "Pending",
+          createdAt: r.created_at,
+        }));
+        setContacts(serverContacts);
+        localStorage.setItem("thehotspot_manual_contacts", JSON.stringify(serverContacts));
+      })
+      .catch(() => {});
+  }, []);
+
   const save = (list) => { setContacts(list); localStorage.setItem("thehotspot_manual_contacts", JSON.stringify(list)); };
 
   const filtered = useMemo(() => contacts.filter(c => {
@@ -1413,12 +1439,18 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
 }
 
 function CategoriesPage({ onBack }) {
-  const contacts = useMemo(() => {
+  const [contacts, setContacts] = useState(() => {
     try {
       const sheet = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
       const manual = JSON.parse(localStorage.getItem("thehotspot_manual_contacts") || "[]");
       return [...sheet, ...manual];
     } catch { return []; }
+  });
+  useEffect(() => {
+    fetch("/api/db?entity=contact&limit=2000").then(r => r.json()).then(data => {
+      const rows = data.records || [];
+      if (rows.length > 0) setContacts(rows.map(r => ({ ...r, category: r.category || "Network" })));
+    }).catch(() => {});
   }, []);
   const countBycat = useMemo(() => contacts.reduce((acc, c) => { const k = c.category || "Other"; acc[k] = (acc[k] || 0) + 1; return acc; }, {}), [contacts]);
   const categories = [
@@ -1515,7 +1547,10 @@ function CategoriesPage({ onBack }) {
 }
 
 function SuccessRatePage({ onBack }) {
-  const history = useMemo(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } }, []);
+  const [history, setHistory] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
+  useEffect(() => {
+    fetch("/api/campaigns").then(r => r.json()).then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); }).catch(() => {});
+  }, []);
   const totalSent      = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
   const totalFailed    = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
   const totalCampaigns = history.length;
@@ -1989,9 +2024,23 @@ function HomePage({ user, contactCount, setPage }) {
 
 /* ───────── DASHBOARD PAGE ───────── */
 function DashboardPage({ user, contactCount, setPage }) {
-  const emailsSent = (() => { try { return (JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]")).reduce((s, h) => s + (h.sent || 0), 0); } catch { return 0; } })();
-  const successRate = (() => { try { const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); const s = h.reduce((a, x) => a + (x.sent || 0), 0); const f = h.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; } catch { return "—"; } })();
-  const recentCampaigns = (() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]").slice(-3).reverse(); } catch { return []; } })();
+  const [campaigns, setCampaigns] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
+
+  useEffect(() => {
+    fetch("/api/campaigns")
+      .then(r => r.json())
+      .then(data => {
+        if (data.configured && data.campaigns?.length > 0) {
+          setCampaigns(data.campaigns);
+          localStorage.setItem("thehotspot_campaigns", JSON.stringify(data.campaigns));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  const emailsSent = campaigns.reduce((s, h) => s + (h.sent || 0), 0);
+  const successRate = (() => { const s = campaigns.reduce((a, x) => a + (x.sent || 0), 0); const f = campaigns.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; })();
+  const recentCampaigns = campaigns.slice(-3).reverse();
 
   const [statsRef, statsVisible] = useReveal(0.1);
   const [col1Ref, col1Visible] = useReveal(0.1);
@@ -4363,14 +4412,11 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
   const cancelCampaign = useRef(false);
   const [campaignRunning, setCampaignRunning] = useState(false);
 
-  // Fetch contact count once on mount only
+  // Fetch contact count from server on mount — always use server for cross-device accuracy
   useEffect(() => {
-    const cached = localStorage.getItem("thehotspot_contacts");
-    if (cached) {
-      try { setContactCount(JSON.parse(cached).length); } catch (e) { }
-    } else {
-      fetchAllContacts().then(records => setContactCount(records.length)).catch(() => { });
-    }
+    fetchAllContacts().then(records => setContactCount(records.length)).catch(() => {
+      try { const cached = localStorage.getItem("thehotspot_manual_contacts"); if (cached) setContactCount(JSON.parse(cached).length); } catch {}
+    });
   }, []);
 
   // Check for scheduled campaigns every minute
