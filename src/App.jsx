@@ -992,7 +992,7 @@ function TotalContactsPage({ onBack, user }) {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+      <div className="rsp-tc-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>Total Contacts</div>
           <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{contacts.length} contact{contacts.length !== 1 ? "s" : ""} total</div>
@@ -1055,7 +1055,7 @@ function TotalContactsPage({ onBack, user }) {
           {filtered.map(c => {
             const cat = CAT[c.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
             return (
-              <div key={c.id} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.25)", transition: "box-shadow .15s" }}
+              <div key={c.id} className="rsp-tc-card" style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.25)", transition: "box-shadow .15s" }}
                 onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)"}
                 onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.25)"}
               >
@@ -1093,7 +1093,7 @@ function TotalContactsPage({ onBack, user }) {
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rsp-tc-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={lbl}>Company</label>
                   <input style={inp} placeholder="AdCombo Ltd" value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
@@ -1109,7 +1109,7 @@ function TotalContactsPage({ onBack, user }) {
                 <input style={inp} placeholder="partner@company.com" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
               </div>
 
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+              <div className="rsp-tc-form-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                 <div>
                   <label style={lbl}>Website</label>
                   <input style={inp} placeholder="company.com" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))} onFocus={focusStyle} onBlur={blurStyle} />
@@ -1206,7 +1206,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
   return (
     <div>
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+      <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Emails Sent</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} · {totalSent + totalFailed} attempted</div>
@@ -1435,7 +1435,7 @@ function CategoriesPage({ onBack }) {
       <BackButton onClick={onBack} />
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+      <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Contact Categories</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{total} total contacts across 5 categories</div>
@@ -1545,7 +1545,7 @@ function SuccessRatePage({ onBack }) {
       <BackButton onClick={onBack} />
 
       {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
+      <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
           <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Campaign Pipeline</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{totalCampaigns} campaign{totalCampaigns !== 1 ? "s" : ""} · {totalAttempted} emails attempted</div>
@@ -1896,7 +1896,7 @@ function HomePage({ user, contactCount, setPage }) {
   };
 
   return (
-    <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="rsp-hp-wrap" style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
       {/* Header */}
       <div style={{ marginBottom: 32 }}>
         <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 6 }}>
@@ -3189,7 +3189,7 @@ function ContactsPage({ onBack, showToast, user }) {
             </div>
             <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500, border: "1px solid #10b98133" }}>Available</span>
           </div>
-          <div style={{ display: "flex", gap: 10 }}>
+          <div className="rsp-sheet-row" style={{ display: "flex", gap: 10 }}>
             <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
               style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
@@ -3228,7 +3228,7 @@ function ContactsPage({ onBack, showToast, user }) {
   return (
     <div>
       <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 20 }}>← Back to Data Sources</div>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
+      <div className="rsp-sheet-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
@@ -3362,7 +3362,7 @@ function CampaignStatusPage({ onBack }) {
       </div>
 
       {/* 24h stat cards */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
+      <div className="rsp-camp-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
         {[
           { label: "Sent (24h)",     value: sent24,         color: "#6366f1",  bg: "#6366f108" },
           { label: "Failed (24h)",   value: failed24,       color: "#EF4444",  bg: "#EF444408" },
@@ -3546,7 +3546,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   const save = (key, val) => localStorage.setItem(key, String(val));
 
   const Row = ({ label, sub, children }) => (
-    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #ffffff08" }}>
+    <div className="rsp-settings-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #ffffff08" }}>
       <div>
         <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{label}</div>
         {sub && <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{sub}</div>}
@@ -4915,6 +4915,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
           .rsp-contacts-hub { grid-template-columns: 1fr !important; }
           .rsp-lp-nav       { padding: 14px 20px !important; }
+          .rsp-hp-wrap      { padding: 20px 20px !important; }
+          .rsp-camp-stats   { grid-template-columns: repeat(2,1fr) !important; }
         }
 
         /* Mobile large: 481–767px */
@@ -4934,6 +4936,16 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           /* Pet chat: full-width on mobile */
           .rsp-pet-panel      { position: fixed !important; left: 8px !important; right: 8px !important;
                                 bottom: 80px !important; width: auto !important; }
+          .rsp-hp-wrap        { padding: 16px 14px !important; }
+          .rsp-camp-stats     { grid-template-columns: 1fr !important; }
+          .rsp-tc-header      { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+          .rsp-tc-card        { flex-wrap: wrap !important; }
+          .rsp-tc-form-grid   { grid-template-columns: 1fr !important; }
+          .rsp-sheet-row      { flex-direction: column !important; }
+          .rsp-sheet-row input{ width: 100% !important; }
+          .rsp-sheet-header   { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
+          .rsp-settings-row   { flex-wrap: wrap !important; gap: 8px !important; }
+          .rsp-page-header    { flex-direction: column !important; align-items: flex-start !important; gap: 10px !important; }
         }
 
         /* Mobile small: 320–480px */
@@ -4944,6 +4956,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           .rsp-gmail-badge    { display: none !important; }
           .rsp-contact-stats  { grid-template-columns: 1fr !important; }
           .rsp-tool-grid      { gap: 10px !important; }
+          .rsp-hp-wrap        { padding: 12px 10px !important; }
         }
 
         /* Landing page sections responsive */
