@@ -490,7 +490,7 @@ function LoginPage({ onLogin }) {
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981" }} />
             <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
           </div>
-          <h1 style={{ fontSize: "clamp(36px,5.5vw,68px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -3, marginBottom: 20, lineHeight: 1.06 }}>
+          <h1 className="lp-h1" style={{ fontSize: "clamp(36px,5.5vw,68px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -3, marginBottom: 20, lineHeight: 1.06 }}>
             Stop chasing clients.<br />
             <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the work.</span>
           </h1>
@@ -733,33 +733,39 @@ function LoginPage({ onLogin }) {
         .lp-body::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
         .lp-body::-webkit-scrollbar-thumb:hover { background:#475569; }
 
-        /* Tablet: 768–1024px */
+        /* ── Tablet: 768–1024px ── */
         @media (max-width:1024px) {
-          .lp-hero        { padding: 72px 28px 52px !important; }
-          .lp-section     { padding: 0 28px !important; }
-          .lp-footer      { padding: 44px 28px 28px !important; }
-          .lp-footer-grid { gap: 28px !important; }
-          .rsp-lp-nav     { padding: 14px 20px !important; }
+          .rsp-lp-nav       { padding: 14px 24px !important; }
+          .lp-hero          { padding: 72px 32px 56px !important; }
+          .lp-section       { padding: 0 32px !important; }
+          .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-features-grid{ grid-template-columns: repeat(2,1fr) !important; gap:14px !important; }
+          .lp-footer-grid   { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
+          .lp-footer        { padding: 48px 32px 28px !important; }
         }
 
-        /* Mobile large: 481–767px */
+        /* ── Mobile: ≤767px ── */
         @media (max-width:767px) {
-          .lp-hero          { padding: 52px 18px 40px !important; }
-          .lp-section       { padding: 0 16px !important; }
-          .lp-agents-grid   { grid-template-columns: 1fr !important; gap: 10px !important; }
-          .lp-outcomes-grid { grid-template-columns: 1fr !important; gap: 12px !important; }
+          .lp-root          { height:100dvh !important; }
+          .rsp-lp-nav       { padding: 12px 16px !important; }
+          .lp-hero          { padding: 48px 16px 36px !important; }
+          .lp-h1            { letter-spacing: -1px !important; font-size: clamp(30px,8vw,48px) !important; line-height: 1.12 !important; }
+          .lp-section       { padding: 0 16px !important; margin-bottom: 72px !important; }
+          .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
+          .rsp-features-grid{ grid-template-columns: 1fr !important; gap:10px !important; }
+          .lp-agents-grid   { grid-template-columns: 1fr !important; gap:10px !important; }
+          .lp-outcomes-grid { grid-template-columns: 1fr !important; gap:10px !important; }
           .lp-footer-grid   { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
           .lp-footer        { padding: 36px 16px 24px !important; }
-          .rsp-lp-nav       { padding: 12px 16px !important; }
         }
 
-        /* Mobile small: 320–480px */
+        /* ── Mobile small: ≤480px ── */
         @media (max-width:480px) {
-          .lp-hero          { padding: 40px 14px 32px !important; }
-          .lp-section       { padding: 0 12px !important; }
+          .rsp-lp-nav       { padding: 10px 14px !important; }
+          .lp-hero          { padding: 36px 14px 28px !important; }
+          .lp-section       { padding: 0 12px !important; margin-bottom: 56px !important; }
           .lp-footer-grid   { grid-template-columns: 1fr !important; }
           .lp-footer        { padding: 28px 12px 20px !important; }
-          .rsp-lp-nav       { padding: 10px 14px !important; }
         }
       `}</style>
     </div>
