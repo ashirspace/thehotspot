@@ -2225,12 +2225,14 @@ const PP_EYES_GLOW  = [
   [_B,_B,_G,_G,_B,_B,_G,_G,_B,_B],
   [_B,_B,_G,_G,_B,_B,_G,_G,_B,_B],
 ];
-const PP_PAWS_UP    = [_B,_X,_B,_X,_X,_X,_X,_B,_X,_B]; // arms raised before typing
-const PP_PAWS_TAP_A = [_X,_B,_B,_X,_X,_X,_X,_B,_B,_X]; // tap frame A
-const PP_PAWS_TAP_B = [_X,_B,_X,_B,_X,_X,_B,_X,_B,_X]; // tap frame B
-const PP_LAPTOP_BASE = [
-  [_S,_S,_S,_S,_S,_S,_S,_S,_S,_S], // laptop base (silver)
-  [_X,_K,_K,_K,_K,_K,_K,_K,_K,_X], // keyboard row
+const PP_PAWS_UP    = [_B,_X,_B,_X,_X,_X,_X,_B,_X,_B]; // arms raised
+const PP_PAWS_TAP_A = [_X,_X,_X,_B,_B,_B,_X,_B,_X,_X]; // paws toward keyboard area
+const PP_PAWS_TAP_B = [_X,_X,_B,_B,_B,_X,_B,_B,_X,_X]; // alternate tap frame
+// Sideways laptop: screen (2×2 block, cols 0-1) | gap | keyboard (5-wide, cols 4-8)
+// Looks like an open laptop rotated 90° — screen and keyboard are separate visible faces
+const PP_LAPTOP_SIDE = [
+  [_S,_G,_X,_X,_S,_S,_S,_S,_S,_X], // screen frame+glow | gap | keyboard top
+  [_S,_S,_X,_X,_S,_K,_K,_K,_S,_X], // screen base       | gap | keys
 ];
 
 function ppDraw(ctx, rows, yOff, flipX, canvasW) {
@@ -2328,7 +2330,7 @@ function PixelPet() {
     }
 
     if (isTyping) {
-      ppDraw(ctx, PP_LAPTOP_BASE, 8 * PP_SC + breathY, fl, CW);
+      ppDraw(ctx, PP_LAPTOP_SIDE, 8 * PP_SC + breathY, fl, CW);
     } else {
       let legs;
       if (p.state === 'happy') legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
@@ -2370,6 +2372,7 @@ function PixelPet() {
         p.typingTimer = 0;
         p.typingDuration = 1800 + Math.random() * 800; // 1.8–2.6 s
         p.nextTyping = 15000 + Math.random() * 5000;
+        p.facingLeft = false; // always face right so screen is on left, keyboard on right
       }
     } else if (p.state === 'happy') {
       p.happyTimer -= dt;
