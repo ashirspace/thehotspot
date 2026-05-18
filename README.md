@@ -8,9 +8,10 @@ B2B outreach automation platform — find leads, write emails, run campaigns, an
 
 ## What It Is
 
-thehotspot has two surfaces:
+thehotspot has three surfaces:
 
-- **Dashboard (`/`)** — contacts, campaigns, stats, and an AI chat assistant (Claude) that can send emails, find leads, and pause campaigns
+- **Home (`/`)** — platform overview showing the 5 core components: Lead Input, AI Engine, Outreach Channels, Sequence Manager, and Reply Detection — with Live / Soon / Agent status per feature
+- **Dashboard (`/dashboard`)** — real-time control center: stat cards, outreach tool groups, AI agent grid, and recent campaign activity
 - **AI Agents (`/agents/*`)** — 12 specialized agents, each with one job (lead finder, email writer, reply detector, competitor analyzer, etc.)
 
 See [`docs/what-are-we-building.md`](docs/what-are-we-building.md) for the full product overview.
@@ -24,7 +25,7 @@ See [`docs/what-are-we-building.md`](docs/what-are-we-building.md) for the full 
 | Frontend | React 19 + Vite |
 | Routing | React Router 7 |
 | Styling | Inline JS objects (dashboard) / Tailwind CSS 4 (agents) |
-| Icons | Inline SVG (dashboard) / lucide-react (agents) |
+| Icons | lucide-react (dashboard + agents) |
 | Charts | Recharts |
 | Backend | Vercel Serverless Functions (Node.js) |
 | Database | Neon (PostgreSQL serverless) |
@@ -68,7 +69,7 @@ npm run preview   # Preview production build locally
 
 | Variable | Purpose |
 |----------|---------|
-| `ANTHROPIC_API_KEY` | Claude API (chat + agents) |
+| `ANTHROPIC_API_KEY` | Claude API (agents) |
 | `OPENAI_API_KEY` | Email/angle generation |
 | `DATABASE_URL` | Neon PostgreSQL |
 | `VITE_AIRTABLE_API_KEY` | Legacy user auth |
@@ -81,7 +82,7 @@ npm run preview   # Preview production build locally
 
 | File | Contents |
 |------|----------|
-| [`docs/what-are-we-building.md`](docs/what-are-we-building.md) | Product overview, agents, current state |
+| [`docs/what-are-we-building.md`](docs/what-are-we-building.md) | Product overview, surfaces, agents, current state |
 | [`docs/how-are-we-building.md`](docs/how-are-we-building.md) | Tech stack, architecture decisions, data flow |
 | [`docs/source-of-truth.md`](docs/source-of-truth.md) | Routing, API endpoints, DB schema, env vars, style rules |
 | [`docs/context.md`](docs/context.md) | Why it exists, decisions made, what's next |

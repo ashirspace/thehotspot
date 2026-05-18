@@ -7,16 +7,27 @@
 Sales professionals, growth marketers, and founders who run cold email outreach campaigns and need to automate research, writing, and follow-up at scale.
 
 ## Core Value Proposition
-One platform to find leads, write emails, run campaigns, and analyze results — powered by AI at every step.
+One platform to find leads, write emails, run campaigns, and detect replies — powered by AI at every step.
 
-## The Two Surfaces
+## The Three Surfaces
 
-### Dashboard (`/`)
-A unified control center for the full outreach lifecycle:
-- Contacts table with search, filter, and bulk actions
-- Campaign management (create, schedule, track)
-- Real-time stats: contacts, emails sent, success rate, category breakdown
-- AI chat assistant (Claude) that can take actions: send emails, find leads, pause campaigns
+### Home (`/`)
+A platform overview page showing the 5 core components of the outreach system. Each component is displayed as a pillar card with a feature list and status per item (Live, Soon, or Agent-powered):
+
+| Pillar | What it covers |
+|--------|---------------|
+| Lead Input | CSV upload, Apollo CRM, HubSpot (soon), manual entry |
+| AI Engine | GPT-4o-mini, prompt templates, personalization variables, email sequences |
+| Outreach Channels | Gmail (live), LinkedIn / WhatsApp / SMS (roadmap) |
+| Sequence / Campaign Manager | Multi-step follow-ups, stop on reply, scheduling |
+| Reply Detection & Inbox | Gmail polling, webhook detection (soon), reply classification |
+
+### Dashboard (`/dashboard` via sidebar)
+A real-time control center for the full outreach lifecycle:
+- Stat cards: contacts, emails sent, success rate, campaign count
+- Three tool groups: Outreach, Contacts & Data, Analytics — each linking to the relevant inner page
+- AI agents grid: all 12 agents in a compact 4-column layout
+- Recent campaigns: last 3 campaign runs with status and delivery stats
 
 ### AI Agents (`/agents/*`)
 12 autonomous agents, each with one job:
@@ -37,7 +48,8 @@ A unified control center for the full outreach lifecycle:
 | 12 | CSV Import/Export | Bulk import contacts and export the full database |
 
 ## Current State
-- Dashboard is live and fully functional at [thehotspot.in](https://www.thehotspot.in)
-- All 12 agent pages are live at `/agents/[agent-id].html` and `/agents/*` (React routes)
-- Static HTML preview pages exist for every agent under `/public/agents/`
+- Platform is live at [thehotspot.in](https://www.thehotspot.in)
+- All 12 agent pages are live at `/agents/*` (React routes) and `/public/agents/*.html` (static previews)
 - Authentication is active (email/password + Google OAuth)
+- Gmail integration is live for sending and reply detection
+- LinkedIn, WhatsApp, and SMS channels are on the roadmap

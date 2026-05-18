@@ -12,32 +12,42 @@ The platform was built by Ashir Ayaan as an integrated outreach system for agenc
 - Contact management with categories, search, and bulk actions
 - Campaign creation, scheduling, and send tracking
 - Email open/click tracking via pixel
-- Claude-powered chat assistant with tool use (can send emails, find leads, pause campaigns)
 - OpenAI-powered email and angle generation
+- Gmail integration for sending and reply polling
 - 12 AI agent pages — all live and functional
 - Static HTML preview pages for all 12 agents (with splash loading screen)
 - Agent showcase page at `/meet-the-team.html`
 - Vercel deployment with daily cron job
+- Platform overview homepage with 5 pillars (Lead Input, AI Engine, Outreach Channels, Sequence Manager, Reply Detection)
+- Modern SaaS UI redesign: dark dense layout, redesigned header and sidebar
+- Dashboard page with stat cards, tool groups, AI agents grid, and recent campaigns
 
 ## Key Decisions Made
 
 **React Router instead of separate pages** — Agents are React routes under `/agents/:agentId` rather than separate HTML builds, enabling shared state and a consistent sidebar layout.
 
-**Vercel Hobby plan constraint** — Capped at 12 serverless functions. Currently at 11. All future agent features must reuse existing endpoints.
+**Vercel Hobby plan constraint** — Capped at 12 serverless functions. Currently at 11. All future features must reuse existing endpoints.
 
 **Airtable as legacy user DB** — Early user auth was Airtable-based. The system is partially migrated to PostgreSQL (Neon) but Airtable is still read in `App.jsx` for some auth flows.
 
-**App.jsx as a monolith** — The dashboard is intentionally kept in one file (~4800 lines). Splitting it into smaller components is a future refactor, not a current priority.
+**App.jsx as a monolith** — The dashboard is intentionally kept in one file. Splitting it into smaller components is a future refactor, not a current priority.
 
 **No new env vars needed for agents** — All agents reuse `ANTHROPIC_API_KEY`, `DATABASE_URL`, and `OPENAI_API_KEY` already set in Vercel.
+
+**Chatbot removed** — The Claude-powered chat assistant was removed to simplify the UI and reduce scope. The email campaign runner (`runEmailCampaign`) still works internally; scheduled campaigns now surface via toast notifications instead of chat messages. Navigation is now fully sidebar-driven.
+
+**Home vs Dashboard split** — The default route (`/`) now shows a platform overview (what the product does and what's live vs. coming soon). The operational dashboard (stat cards, tools, campaigns) is accessible from the sidebar as "Dashboard". This makes the product immediately legible to new users.
 
 ## What's Pending / Next
 
 - Complete migration from Airtable to PostgreSQL for user auth
+- LinkedIn outreach channel (Phantombuster or official API)
+- WhatsApp outreach channel (Twilio)
+- SMS outreach channel (Twilio)
+- HubSpot CRM integration for lead import
+- Webhook-based reply detection (currently polling only)
 - Refactor `App.jsx` into smaller components (non-urgent)
-- Add more Claude tool use actions for the chat assistant
 - Potentially upgrade Vercel plan if more serverless functions are needed
-- Build out the email sequences feature end-to-end (currently partially implemented)
 
 ## Repository
 
@@ -51,3 +61,4 @@ The platform was built by Ashir Ayaan as an integrated outreach system for agenc
 - No Tailwind in `App.jsx` (only in agents)
 - No new API files until the Vercel function count limit is resolved
 - All AI calls must go through proxy endpoints (CORS restriction)
+- lucide-react (`react-icons/lu`) for all icons in the dashboard
