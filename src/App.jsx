@@ -2180,46 +2180,42 @@ const _F = '#BF360C';     // feet (darker orange)
 const _M = '#B71C1C';     // mouth red
 const _H = '#FFAB91';     // highlight
 
-const PP_SC = 9; // scale: 9px per "pixel"
+const PP_SC = 6; // scale: 6px per pixel → 10×10 grid = 60×60px
 
-// Sprite frames (10 wide × rows tall)
+// Sprite frames — 10 wide × 10 tall = 60×60px total
+// rows 0-1: ears | rows 2-7: square body | rows 8-9: legs
 const PP_HEAD = [
-  [_X,_X,_B,_B,_B,_B,_B,_B,_X,_X],
-  [_X,_B,_B,_B,_B,_B,_B,_B,_B,_X],
-  [_B,_B,_H,_B,_B,_B,_B,_H,_B,_B],
+  [_B,_B,_X,_X,_X,_X,_X,_X,_B,_B], // ears top
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B], // ears base + body top (square)
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
   [_B,_B,_D,_D,_B,_B,_D,_D,_B,_B], // eyes open row A
   [_B,_B,_D,_D,_B,_B,_D,_D,_B,_B], // eyes open row B
   [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
   [_B,_B,_X,_M,_M,_M,_M,_X,_B,_B], // mouth neutral
-  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
-  [_X,_B,_B,_B,_B,_B,_B,_B,_B,_X],
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B], // body bottom (square)
 ];
 const PP_EYE_CLOSED = [
   [_B,_B,_M,_M,_B,_B,_M,_M,_B,_B],
   [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
 ];
-const PP_MOUTH_HAPPY = [_B,_M,_M,_M,_M,_M,_M,_M,_B,_B];
-const PP_BLUSH_L = [_X,_B,_H,_H,_B,_X,_X,_X,_X,_X]; // cheek blush (left side)
-const PP_BLUSH_R = [_X,_X,_X,_X,_X,_B,_H,_H,_B,_X];
+const PP_MOUTH_HAPPY = [_B,_M,_M,_M,_M,_M,_M,_M,_M,_B];
+const PP_BLUSH_L = [_H,_H,_X,_X,_X,_X,_X,_X,_H,_H]; // cheek blush on body sides
+const PP_BLUSH_R = [_H,_H,_X,_X,_X,_X,_X,_X,_H,_H];
 const PP_LEGS_STAND = [
-  [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
-  [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
-  [_X,_X,_F,_F,_X,_X,_F,_F,_X,_X],
+  [_X,_X,_X,_B,_X,_X,_B,_X,_X,_X],
+  [_X,_X,_X,_F,_X,_X,_F,_X,_X,_X],
 ];
 const PP_LEGS_A = [   // left foot forward
-  [_X,_B,_B,_X,_X,_X,_X,_X,_B,_X],
-  [_X,_B,_X,_X,_X,_X,_X,_X,_B,_X],
-  [_X,_F,_F,_X,_X,_X,_X,_X,_F,_X],
+  [_X,_X,_B,_B,_X,_X,_X,_B,_X,_X],
+  [_X,_X,_F,_X,_X,_X,_X,_F,_X,_X],
 ];
 const PP_LEGS_B = [   // right foot forward
-  [_X,_X,_B,_X,_X,_X,_X,_B,_B,_X],
-  [_X,_X,_B,_X,_X,_X,_X,_X,_B,_X],
-  [_X,_X,_F,_X,_X,_X,_X,_F,_F,_X],
+  [_X,_X,_B,_X,_X,_X,_B,_B,_X,_X],
+  [_X,_X,_F,_X,_X,_X,_X,_F,_X,_X],
 ];
 const PP_LEGS_JUMP = [
   [_X,_B,_X,_X,_X,_X,_X,_X,_B,_X],
   [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
-  [_X,_X,_X,_X,_X,_X,_X,_X,_X,_X],
 ];
 
 function ppDraw(ctx, rows, yOff, flipX, canvasW) {
@@ -2239,10 +2235,10 @@ function PixelPet({ page }) {
   const rafRef = useRef(null);
 
   const pet = useRef({
-    x: window.innerWidth - 160,
-    y: window.innerHeight - 130,
+    x: window.innerWidth - 90,
+    y: window.innerHeight - 80,
     vx: 0, vy: 0,
-    groundY: window.innerHeight - 130,
+    groundY: window.innerHeight - 80,
     state: 'idle',    // idle | walking | jumping | happy | flyup | falling
     time: 0,
     lastTs: 0,
@@ -2258,8 +2254,8 @@ function PixelPet({ page }) {
     sparkles: [],     // {x,y,age} for happy sparkle particles
   });
 
-  const CW = 10 * PP_SC; // canvas width  = 90
-  const CH = 12 * PP_SC; // canvas height = 108
+  const CW = 10 * PP_SC; // canvas width  = 60
+  const CH = 10 * PP_SC; // canvas height = 60
 
   // ── draw ──────────────────────────────────────────────────
   function draw() {
@@ -2301,7 +2297,7 @@ function PixelPet({ page }) {
     } else {
       legs = PP_LEGS_STAND;
     }
-    ppDraw(ctx, legs, 9 * PP_SC + breathY, fl, CW);
+    ppDraw(ctx, legs, 8 * PP_SC + breathY, fl, CW);
 
     // sparkle particles
     p.sparkles.forEach(sp => {
@@ -2344,7 +2340,7 @@ function PixelPet({ page }) {
           p.vx = (Math.random() - 0.5) * 4;
         } else {
           // walk to random x
-          const tx = 40 + Math.random() * (window.innerWidth - 180);
+          const tx = 40 + Math.random() * (window.innerWidth - 120);
           p.walkTarget = tx;
           p.facingLeft = tx < p.x;
           p.vx = (p.facingLeft ? -1 : 1) * (1.2 + Math.random() * 2);
@@ -2441,7 +2437,7 @@ function PixelPet({ page }) {
       pp.x = 60 + Math.random() * (window.innerWidth - 220);
       pp.y = -CH - 20;
       pp.vy = 6;
-      pp.groundY = window.innerHeight - 130;
+      pp.groundY = window.innerHeight - 80;
       pp.state = 'falling';
     }, 650);
   }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
