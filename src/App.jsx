@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useRef, useMemo } from "react";
 import {
   LuLayoutDashboard, LuUsers, LuFilePen, LuClipboardList, LuSettings,
-  LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuMessageSquare,
+  LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuHouse,
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
@@ -776,95 +776,6 @@ const getStatsData = () => {
   } catch { return { totalContacts: 0, emailsSent: 0, categories: 5, successRate: 0 }; }
 };
 const STATS_DATA = getStatsData();
-
-function getSmartResponse(text) {
-  const lower = text.toLowerCase();
-  const categories = ["network", "cps", "cpl", "cpa", "mobile"];
-  const matchedCat = categories.find(c => lower.includes(c.toLowerCase()));
-
-  // Greetings
-  if (/^(hi|hello|hey|yo|sup|hola|namaste|salaam)/i.test(lower)) {
-    return { text: "Hey there! I'm your thehotspot assistant. I can help you with:\n\n• Sending outreach emails (by category or all)\n• Checking campaign stats & status\n• Pausing or resuming workflows\n• Adding new contacts\n• Modifying email templates\n\nJust tell me what you need!", action: null };
-  }
-
-  // What can you do
-  if (lower.includes("what") && (lower.includes("can you") || lower.includes("you do") || lower.includes("things"))) {
-    return { text: "Here's everything I can do for you:\n\n**Email Management**\n• Send emails to all contacts or by category (Network, CPS, CPL, CPA, Mobile)\n• Check email delivery status\n\n**Campaign Stats**\n• View total contacts, emails sent, success rate\n• Get category-wise breakdown\n\n**Workflow Control**\n• Pause the outreach workflow\n• Resume the outreach workflow\n• Schedule campaigns\n\n**Contact Management**\n• Add new contacts to the database\n• Remove contacts\n• Filter by category\n\n**Templates**\n• View current email templates\n• Modify templates by category\n\nJust type what you need in plain English!", action: null };
-  }
-
-  // Send emails
-  if (lower.includes("send") && (lower.includes("email") || lower.includes("mail"))) {
-    if (matchedCat) {
-      return { text: `Got it! Triggering outreach emails to all **${matchedCat.toUpperCase()}** companies now.\n\nThe workflow will:\n1. Fetch contacts from the ${matchedCat.toUpperCase()} category\n2. Generate personalized emails\n3. Send via Gmail\n\nI'll notify you once it's done!`, action: { type: "send_emails", category: matchedCat } };
-    }
-    return { text: "Sending outreach emails to **all categories** (Network, CPS, CPL, CPA, Mobile).\n\nThis will process all contacts in your database. I'll notify you when complete!", action: { type: "send_emails", category: "all" } };
-  }
-
-  // Status / Stats
-  if (lower.includes("status") || lower.includes("stats") || lower.includes("report") || lower.includes("how") && lower.includes("going")) {
-    return { text: `Here's your current campaign overview:\n\n**Campaign Dashboard**\n• Total Contacts: ${STATS_DATA.totalContacts}\n• Emails Sent: ${STATS_DATA.emailsSent}\n• Active Categories: ${STATS_DATA.categories}\n• Success Rate: ${STATS_DATA.successRate}%\n• Failed: ${STATS_DATA.totalContacts - STATS_DATA.emailsSent} pending/failed\n\nWant me to drill down into a specific category?`, action: { type: "show_stats" } };
-  }
-
-  // Pause
-  if (lower.includes("pause") || lower.includes("stop") || lower.includes("hold")) {
-    return { text: "Pausing the outreach workflow now.\n\nNo new emails will be sent until you resume. Any emails currently in queue will be held.\n\nSay **\"resume\"** when you're ready to continue.", action: { type: "pause_workflow" } };
-  }
-
-  // Resume / Start
-  if (lower.includes("resume") || lower.includes("start") || lower.includes("continue") || lower.includes("unpause")) {
-    return { text: "Resuming the outreach workflow!\n\nEmails will continue sending from where we left off. The queue is being processed now.\n\nI'll keep you updated on progress!", action: { type: "resume_workflow" } };
-  }
-
-  // Add contact
-  if (lower.includes("add") && (lower.includes("contact") || lower.includes("company") || lower.includes("email"))) {
-    return { text: "Sure! To add a new contact, I'll need:\n\n1. **Company Name** — e.g., AdCombo\n2. **Email Address** — e.g., partner@adcombo.com\n3. **Category** — Network, CPS, CPL, CPA, or Mobile\n\nYou can type it like:\n\"Add AdCombo, partner@adcombo.com, Network\"\n\nOr just give me the details one by one!", action: null };
-  }
-
-  // Template
-  if (lower.includes("template") || lower.includes("email body") || lower.includes("email content")) {
-    return { text: "Which category's email template would you like to modify?\n\n• **Network** — Affiliate network partnership emails\n• **CPS** — Cost-per-sale campaign emails\n• **CPL** — Cost-per-lead campaign emails\n• **CPA** — Cost-per-action campaign emails\n• **Mobile** — Mobile marketing emails\n\nJust tell me the category and what changes you'd like!", action: null };
-  }
-
-  // Schedule
-  if (lower.includes("schedule") || lower.includes("later") || lower.includes("tomorrow") || lower.includes("time")) {
-    return { text: "I can help schedule your campaigns! Here are your options:\n\n**Scheduling Options:**\n• Send now\n• Schedule for a specific date & time\n• Set up recurring daily/weekly sends\n\nJust tell me when you'd like the emails to go out, e.g.:\n\"Schedule Network emails for tomorrow 10 AM\"", action: null };
-  }
-
-  // Remove / Delete contact
-  if (lower.includes("remove") || lower.includes("delete")) {
-    return { text: "To remove a contact, tell me the **company name** or **email address** you want to delete.\n\nFor example:\n\"Remove ByteForge AI\"\n\"Delete partner@adcombo.com\"\n\nNote: This action cannot be undone, so I'll ask for confirmation before deleting.", action: null };
-  }
-
-  // Help
-  if (lower.includes("help") || lower.includes("how do i") || lower.includes("guide")) {
-    return { text: "Here's a quick guide to using thehotspot:\n\n**Getting Started:**\n• \"Send emails to all companies\" — triggers full outreach\n• \"Send emails to CPA companies\" — category-specific\n\n**Monitoring:**\n• \"Show me stats\" — campaign overview\n• \"Campaign status\" — delivery report\n\n**Control:**\n• \"Pause workflow\" — stop sending\n• \"Resume workflow\" — continue sending\n\n**Contacts:**\n• \"Add a contact\" — new entry\n• \"Remove a contact\" — delete entry\n\nJust type naturally — I understand plain English!", action: null };
-  }
-
-  // Category info
-  if (matchedCat && !lower.includes("send")) {
-    const catInfo = {
-      network: "Network category contains affiliate network partners. These are companies that manage multiple affiliate programs.",
-      cps: "CPS (Cost Per Sale) category contains partners where commission is earned per successful sale.",
-      cpl: "CPL (Cost Per Lead) category contains partners where payment is made per qualified lead generated.",
-      cpa: "CPA (Cost Per Action) category contains partners where payment is triggered by a specific user action.",
-      mobile: "Mobile category contains mobile marketing and app-based advertising partners."
-    };
-    return { text: `**${matchedCat.toUpperCase()} Category:**\n${catInfo[matchedCat]}\n\nWant me to:\n• Send emails to all ${matchedCat.toUpperCase()} contacts?\n• Show ${matchedCat.toUpperCase()} specific stats?\n• Modify the ${matchedCat.toUpperCase()} email template?`, action: null };
-  }
-
-  // Thanks
-  if (lower.includes("thank") || lower.includes("thanks") || lower.includes("shukriya") || lower.includes("dhanyavad")) {
-    return { text: "You're welcome! 😊 Let me know if you need anything else. I'm always here to help manage your outreach campaigns!", action: null };
-  }
-
-  // Count / How many
-  if (lower.includes("how many") || lower.includes("count") || lower.includes("total")) {
-    return { text: `Here's the count breakdown:\n\n• **Total Contacts:** ${STATS_DATA.totalContacts}\n• **Emails Sent:** ${STATS_DATA.emailsSent}\n• **Pending:** ${STATS_DATA.totalContacts - STATS_DATA.emailsSent}\n• **Categories:** ${STATS_DATA.categories} (Network, CPS, CPL, CPA, Mobile)\n• **Success Rate:** ${STATS_DATA.successRate}%`, action: null };
-  }
-
-  // Fallback — still helpful!
-  return { text: `I'm not sure I understood that fully, but here's what I can help with:\n\n• **\"Send emails\"** — to all or specific category\n• **\"Show stats\"** — campaign overview\n• **\"Pause/Resume\"** — control workflow\n• **\"Add contact\"** — new entry\n• **\"Help\"** — full guide\n\nTry rephrasing or pick one of the above!`, action: null };
-}
 
 /* ───────── STYLES (object) ───────── */
 const S = {
@@ -1904,6 +1815,137 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
         <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "none", background: canSubmit ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24", color: canSubmit ? "#fff" : "#475569", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", cursor: canSubmit ? "pointer" : "default", transition: "all .2s", boxShadow: canSubmit ? "0 4px 16px rgba(16,185,129,0.28)" : "none" }}>
           {saving ? "Saving…" : "Save & Continue →"}
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── HOME PAGE ───────── */
+const AGENT_LIST = [
+  { id: "lead-finder",            label: "Lead Finder",            desc: "Discover new prospects",       accent: "#10b981" },
+  { id: "lead-scoring",           label: "Lead Scoring",           desc: "Rank leads by fit",            accent: "#0ea5e9" },
+  { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  desc: "Audit any landing page",       accent: "#8b5cf6" },
+  { id: "email-sequence-builder", label: "Email Sequence",         desc: "Build multi-step sequences",   accent: "#f59e0b" },
+  { id: "ab-email-tester",        label: "A/B Email Tester",       desc: "Compare email variants",       accent: "#ec4899" },
+  { id: "reply-detector",         label: "Reply Detector",         desc: "Detect & classify replies",    accent: "#6366f1" },
+  { id: "blog-generator",         label: "Blog Generator",         desc: "Draft SEO-ready posts",        accent: "#14b8a6" },
+  { id: "competitor-analyzer",    label: "Competitor Analyzer",    desc: "Analyze competitor strategy",  accent: "#f97316" },
+  { id: "backlink-outreach",      label: "Backlink Outreach",      desc: "Find link-building targets",   accent: "#0ea5e9" },
+  { id: "campaign-dashboard",     label: "Campaign Dashboard",     desc: "Track campaign performance",   accent: "#10b981" },
+  { id: "crm-lite",               label: "CRM Lite",               desc: "Lightweight contact CRM",      accent: "#8b5cf6" },
+  { id: "csv-import-export",      label: "CSV Import/Export",      desc: "Bulk import or export data",   accent: "#64748b" },
+];
+
+function HomePage({ user, contactCount, sentCount, setPage, gmailConnected }) {
+  const now = new Date();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+  const dateLabel = now.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
+
+  const successRate = (() => {
+    try {
+      const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+      const s = h.reduce((a, x) => a + (x.sent || 0), 0);
+      const f = h.reduce((a, x) => a + (x.failed || 0), 0);
+      return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—";
+    } catch { return "—"; }
+  })();
+
+  const campaignCount = (() => {
+    try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]").length; } catch { return 0; }
+  })();
+
+  const recentActivity = (() => {
+    try {
+      const h = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
+      return h.slice(-8).reverse().map(c => ({
+        label: `Campaign "${c.category || "all"}" — ${c.sent || 0} sent`,
+        ts: c.ranAt ? new Date(c.ranAt) : null,
+      }));
+    } catch { return []; }
+  })();
+
+  function relativeTime(date) {
+    if (!date) return "";
+    const diff = Date.now() - date.getTime();
+    const mins = Math.floor(diff / 60000);
+    const hrs = Math.floor(mins / 60);
+    const days = Math.floor(hrs / 24);
+    if (days > 0) return days === 1 ? "Yesterday" : `${days}d ago`;
+    if (hrs > 0) return `${hrs}h ago`;
+    if (mins > 0) return `${mins}m ago`;
+    return "Just now";
+  }
+
+  const [agentHover, setAgentHover] = useState(null);
+
+  return (
+    <div style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
+      {/* Greeting row */}
+      <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 28 }}>
+        <div>
+          <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.5 }}>{greeting}, {firstName}</div>
+          <div style={{ fontSize: 13, color: "#475569", marginTop: 3 }}>{dateLabel}</div>
+        </div>
+        <div style={{ fontSize: 12, color: "#334155", fontWeight: 500 }}>thehotspot</div>
+      </div>
+
+      {/* Stat cards */}
+      <div style={{ display: "flex", gap: 14, marginBottom: 28 }}>
+        <StatCard icon={<LuUsers size={18} />} label="Contacts" value={contactCount} accent="#10b981" onClick={() => setPage("totalContacts")} />
+        <StatCard icon={<LuMail size={18} />} label="Emails Sent" value={sentCount || 0} accent="#0ea5e9" onClick={() => setPage("emailsSent")} />
+        <StatCard icon={<LuTrendingUp size={18} />} label="Success Rate" value={successRate} accent="#8b5cf6" onClick={() => setPage("successRate")} />
+        <StatCard icon={<LuRadio size={18} />} label="Campaigns" value={campaignCount} accent="#f59e0b" onClick={() => setPage("campaignStatus")} />
+      </div>
+
+      {/* 2-col content */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 2fr", gap: 20 }}>
+
+        {/* Recent Activity */}
+        <div style={{ background: "#111116", border: "1px solid #ffffff08", borderRadius: 14, padding: "20px 0", overflow: "hidden" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "0 20px", marginBottom: 16 }}>
+            <LuClock size={14} color="#475569" />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#64748B", letterSpacing: 0.8, textTransform: "uppercase" }}>Recent Activity</span>
+          </div>
+          {recentActivity.length === 0 ? (
+            <div style={{ padding: "12px 20px", fontSize: 13, color: "#334155" }}>No recent activity yet</div>
+          ) : recentActivity.map((item, i) => (
+            <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 20px", borderTop: i > 0 ? "1px solid #ffffff06" : "none" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
+                <span style={{ fontSize: 13, color: "#94A3B8", fontWeight: 400 }}>{item.label}</span>
+              </div>
+              <span style={{ fontSize: 11, color: "#334155", whiteSpace: "nowrap", marginLeft: 12 }}>{relativeTime(item.ts)}</span>
+            </div>
+          ))}
+        </div>
+
+        {/* AI Agents grid */}
+        <div style={{ background: "#111116", border: "1px solid #ffffff08", borderRadius: 14, padding: 20 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 16 }}>
+            <LuSparkles size={14} color="#475569" />
+            <span style={{ fontSize: 12, fontWeight: 600, color: "#64748B", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</span>
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+            {AGENT_LIST.map(agent => (
+              <a
+                key={agent.id}
+                href={`/agents/${agent.id}`}
+                onMouseEnter={() => setAgentHover(agent.id)}
+                onMouseLeave={() => setAgentHover(null)}
+                style={{ display: "block", background: agentHover === agent.id ? "#1a1a22" : "#0f0f14", border: `1px solid ${agentHover === agent.id ? agent.accent + "40" : "#ffffff08"}`, borderRadius: 10, padding: "12px 14px", textDecoration: "none", transition: "all .18s ease", transform: agentHover === agent.id ? "translateY(-1px)" : "none", boxShadow: agentHover === agent.id ? `0 4px 16px ${agent.accent}14` : "none" }}
+              >
+                <div style={{ width: 28, height: 28, borderRadius: 8, background: agent.accent + "18", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 8 }}>
+                  <LuZap size={13} color={agent.accent} />
+                </div>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1", marginBottom: 3, lineHeight: 1.3 }}>{agent.label}</div>
+                <div style={{ fontSize: 11, color: "#475569", lineHeight: 1.4 }}>{agent.desc}</div>
+              </a>
+            ))}
+          </div>
+        </div>
+
       </div>
     </div>
   );
@@ -3802,15 +3844,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
   const [gmailToken, setGmailToken] = useState(() => user?.gmailToken || null);
   const [sentCount, setSentCount] = useState(() => user?.sentCount || 0);
   const [contactCount, setContactCount] = useState(0);
-  const [messages, setMessages] = useState([
-    { role: "assistant", content: "Hey! I'm your Outreach Assistant for thehotspot. I can send emails, manage contacts, check stats, or modify campaigns.\n\nTry saying:\n• \"Send emails to all Network companies\"\n• \"Show me the campaign status\"\n• \"Pause the outreach workflow\"\n\nWhat would you like to do?" }
-  ]);
-  const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [listening, setListening] = useState(false);
   const [toast, setToast] = useState(null);
-  const chatEnd = useRef(null);
-  const recog = useRef(null);
   const cancelCampaign = useRef(false);
   const [campaignRunning, setCampaignRunning] = useState(false);
 
@@ -3835,7 +3871,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         if (due.length > 0) {
           localStorage.setItem("thehotspot_scheduled", JSON.stringify(remaining));
           due.forEach(s => {
-            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled campaign is starting now...` }]);
+            setToast("Scheduled campaign starting...");
+            setTimeout(() => setToast(null), 3000);
             runEmailCampaign(s.category || "all", null, s.offerContext || "");
           });
         }
@@ -3846,55 +3883,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     return () => clearInterval(interval);
   }, [gmailToken]);
 
-  useEffect(() => { chatEnd.current?.scrollIntoView({ behavior: "smooth" }); }, [messages]);
-  useEffect(() => {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (SR) {
-      recog.current = new SR();
-      recog.current.continuous = false;
-      recog.current.interimResults = false;
-      recog.current.lang = "en-US";
-      recog.current.onresult = (e) => { setInput(e.results[0][0].transcript); setListening(false); };
-      recog.current.onerror = () => setListening(false);
-      recog.current.onend = () => setListening(false);
-    }
-  }, []);
-
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
-  const toggleVoice = () => {
-    if (!recog.current) return showToast("Voice not supported");
-    if (listening) { recog.current.stop(); setListening(false); }
-    else { recog.current.start(); setListening(true); }
-  };
-  const executeAction = (action) => {
-    if (!action) return;
-    if (action.type === "show_stats") { setPage("dashboard"); return; }
-    if (action.type === "show_contacts") { setPage("contacts"); return; }
-    const labels = {
-      pause_workflow: "Workflow control coming soon",
-      resume_workflow: "Workflow control coming soon",
-      add_contact: "Contact import coming soon",
-    };
-    showToast(labels[action.type] || "Feature coming soon");
-  };
-
-  // Extract email addresses from any message
-  const extractEmails = (msg) => {
-    const matches = msg.match(/[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}/g);
-    return matches ? [...new Set(matches)] : [];
-  };
-
-  // Detect send intent: direct emails in message OR "send emails" command
-  const parseSendIntent = (msg) => {
-    const emails = extractEmails(msg);
-    if (emails.length > 0) return { type: "send_emails", emails, category: null };
-    const lower = msg.toLowerCase();
-    const isSend = (lower.includes("send") && (lower.includes("email") || lower.includes("mail") || lower.includes("outreach"))) || lower.includes("send campaign");
-    if (!isSend) return null;
-    const cats = ["network", "cps", "cpl", "cpa", "mobile"];
-    const matched = cats.find(c => lower.includes(c));
-    return { type: "send_emails", emails: null, category: matched || "all" };
-  };
 
   // Daily send limits — warm-up schedule to protect Gmail account health
   const getDailyLimit = () => {
@@ -4118,272 +4107,6 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     setLoading(false);
   };
 
-  // Add a contact from chat
-  const chatAddContact = ({ email, company, name, category, website }) => {
-    if (!email) return "No email address provided — can't add contact.";
-    try {
-      const contacts = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
-      if (contacts.find(c => c.email === email)) return `**${email}** is already in your contacts.`;
-      const newContact = {
-        id: "c_" + Date.now(),
-        email,
-        company: company || name || email.split("@")[0],
-        name: name || company || email.split("@")[0],
-        category: category || "Network",
-        website: website || "",
-        status: "Pending",
-        createdAt: new Date().toISOString(),
-      };
-      contacts.push(newContact);
-      localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
-      setContactCount(contacts.length);
-      return `Added **${newContact.company}** (${email}) to **${newContact.category}** contacts.`;
-    } catch {
-      return "Failed to save contact — try again.";
-    }
-  };
-
-  // Remove contact(s) from chat
-  const chatRemoveContact = ({ email, category }) => {
-    try {
-      let contacts = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
-      const before = contacts.length;
-      if (email) {
-        contacts = contacts.filter(c => c.email !== email);
-      } else if (category) {
-        contacts = contacts.filter(c => c.category?.toLowerCase() !== category.toLowerCase());
-      }
-      const removed = before - contacts.length;
-      if (removed === 0) return `No contacts found matching that criteria.`;
-      localStorage.setItem("thehotspot_contacts", JSON.stringify(contacts));
-      setContactCount(contacts.length);
-      return `Removed **${removed} contact${removed !== 1 ? "s" : ""}**.`;
-    } catch {
-      return "Failed to remove contact — try again.";
-    }
-  };
-
-  // Show campaign history
-  const showCampaignHistory = () => {
-    try {
-      const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-      if (history.length === 0) return "No campaigns sent yet. Start your first outreach by saying **\"send emails\"**.";
-      const lines = history.slice(0, 5).map((h, i) => {
-        const date = new Date(h.date).toLocaleString();
-        const status = h.cancelled ? "Cancelled" : "Completed";
-        const cat = h.category && h.category !== "all" ? ` · ${h.category.toUpperCase()}` : "";
-        return `**${i + 1}. ${date}**${cat}\n${status} · ${h.sent} sent${h.failed > 0 ? ` · ${h.failed} failed` : ""}${h.offerContext ? `\n_"${h.offerContext.slice(0, 60)}${h.offerContext.length > 60 ? "..." : ""}"_` : ""}`;
-      });
-      return `**Campaign History** (last ${history.slice(0, 5).length} campaigns)\n\n${lines.join("\n\n")}`;
-    } catch {
-      return "Could not load campaign history.";
-    }
-  };
-
-  // Send follow-up emails to contacts from past campaigns who haven't replied
-  const runFollowUpCampaign = async (offerContext = "", daysAgo = 3) => {
-    if (!gmailToken) {
-      setMessages(prev => [...prev, { role: "assistant", content: `Connect Gmail first to send follow-ups.` }]);
-      return;
-    }
-    try {
-      const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-      const cutoff = Date.now() - daysAgo * 24 * 60 * 60 * 1000;
-      const recentContacts = [];
-      history.forEach(h => {
-        if (new Date(h.date).getTime() >= cutoff && h.contacts) {
-          h.contacts.forEach(c => {
-            if (!recentContacts.find(r => r.email === c.email)) {
-              recentContacts.push(c);
-            }
-          });
-        }
-      });
-      if (recentContacts.length === 0) {
-        setMessages(prev => [...prev, { role: "assistant", content: `No emails found sent in the last ${daysAgo} days to follow up on.` }]);
-        setLoading(false);
-        return;
-      }
-      const followUpContext = offerContext || `This is a follow-up to my previous email. Just checking if you had a chance to review it.`;
-      const targets = recentContacts.map(c => ({ email: c.email, company: c.company, name: c.company, category: "Network", website: "" }));
-      setMessages(prev => [...prev, { role: "assistant", content: `📬 Sending follow-ups to **${targets.length} contact${targets.length !== 1 ? "s"  : ""}** from the last ${daysAgo} days...` }]);
-      await runEmailCampaign("all", targets.map(t => t.email), followUpContext);
-    } catch {
-      setMessages(prev => [...prev, { role: "assistant", content: "Failed to load past campaigns for follow-up." }]);
-      setLoading(false);
-    }
-  };
-
-  const handleSend = async (text) => {
-    const msg = (text || input).trim();
-    if (!msg || loading) return;
-    const userMsg = { role: "user", content: msg };
-    setMessages(prev => [...prev, userMsg]);
-    setInput("");
-    setLoading(true);
-
-    try {
-      const apiMessages = [...messages.filter(m => m.role !== "system"), userMsg]
-        .map(m => ({ role: m.role, content: m.content }));
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: apiMessages }),
-      });
-      const data = await res.json();
-      const { message, action, params } = data;
-
-      // Execute whatever the AI decided
-      if (action === "stop_campaign") {
-        cancelCampaign.current = true;
-        setMessages(prev => [...prev, { role: "assistant", content: message || "Stopping campaign..." }]);
-        setLoading(false);
-        return;
-      }
-      if (action === "send_emails") {
-        // Don't show AI's description — it would differ from the actual generated email.
-        // runEmailCampaign will show the real email content in chat.
-        const emails = params?.emails?.length ? params.emails : null;
-        const category = params?.category || "all";
-        const offerContext = params?.offerContext || "";
-        const maxChars = params?.maxChars || null;
-        await runEmailCampaign(category, emails, offerContext, null, maxChars);
-        return;
-      }
-
-      // For all other actions: show AI reply
-      setMessages(prev => [...prev, { role: "assistant", content: message || "Got it!" }]);
-      if (action === "schedule_emails") {
-        const timeStr = new Date(params.scheduledFor).toLocaleString();
-        try {
-          const r = await fetch("/api/schedule-campaign", {
-            method: "POST", headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              userId: user?.username || user?.email || "unknown",
-              scheduledFor: params.scheduledFor,
-              category: params.category || "all",
-              offerContext: params.offerContext || "",
-              maxChars: params.maxChars || null,
-            }),
-          });
-          const data = await r.json();
-          if (data.success) {
-            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled for **${timeStr}**. The daily cron will send these at 9 AM — no need to keep the tab open.` }]);
-          } else {
-            // Fallback to localStorage if Airtable not configured
-            const scheduled = JSON.parse(localStorage.getItem("thehotspot_scheduled") || "[]");
-            scheduled.push({ scheduledFor: params.scheduledFor, category: params.category || "all", offerContext: params.offerContext || "" });
-            localStorage.setItem("thehotspot_scheduled", JSON.stringify(scheduled));
-            setMessages(prev => [...prev, { role: "assistant", content: `Scheduled for **${timeStr}** (browser-only — keep the tab open). Set up Airtable to enable server-side scheduling.` }]);
-          }
-        } catch {
-          setMessages(prev => [...prev, { role: "assistant", content: "Couldn't schedule — try again." }]);
-        }
-        setLoading(false);
-        return;
-      }
-      if (action === "send_followup") {
-        await runFollowUpCampaign(params?.offerContext || "", params?.daysAgo || 3);
-        return;
-      }
-      if (action === "add_contact") {
-        const result = chatAddContact(params || {});
-        setMessages(prev => [...prev, { role: "assistant", content: result }]);
-        setLoading(false);
-        return;
-      }
-      if (action === "remove_contact") {
-        const result = chatRemoveContact(params || {});
-        setMessages(prev => [...prev, { role: "assistant", content: result }]);
-        setLoading(false);
-        return;
-      }
-      if (action === "show_history") {
-        const historyMsg = showCampaignHistory();
-        setMessages(prev => [...prev, { role: "assistant", content: historyMsg }]);
-        setLoading(false);
-        return;
-      }
-      if (action === "find_leads") {
-        const { leads = [], category: leadCat = "Network" } = params || {};
-        if (!leads.length) {
-          setLoading(false);
-          return;
-        }
-        try {
-          const existing = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
-          const newLeads = leads
-            .filter(l => l.email && !existing.find(e => e.email === l.email))
-            .map(l => ({
-              id: "c_" + Date.now() + "_" + Math.floor(Math.random() * 10000),
-              email: l.email,
-              company: l.company || l.email.split("@")[0],
-              company_name: l.company || l.email.split("@")[0],
-              name: l.company || l.email.split("@")[0],
-              category: l.category || leadCat,
-              website: l.website || "",
-              description: l.description || "",
-              createdAt: new Date().toISOString(),
-            }));
-          if (newLeads.length > 0) {
-            localStorage.setItem("thehotspot_contacts", JSON.stringify([...newLeads, ...existing]));
-            setContactCount(prev => prev + newLeads.length);
-          }
-          const suffix = newLeads.length > 0
-            ? `\n\n**${newLeads.length} new leads added** to your contacts. Say "send emails to ${leadCat}" to reach out.`
-            : leads.length > 0 ? `\n\n_(All ${leads.length} were already in your contacts.)_` : "";
-          setMessages(prev => [...prev, { role: "assistant", content: message + suffix }]);
-        } catch {
-          setMessages(prev => [...prev, { role: "assistant", content: message }]);
-        }
-        setLoading(false);
-        return;
-      }
-      if (action === "check_replies") {
-        try {
-          const history = JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]");
-          const recent = history.flatMap(h => (h.contacts || []).filter(c => c.threadId).map(c => ({ email: c.email, threadId: c.threadId })));
-          if (!recent.length) {
-            setMessages(prev => [...prev, { role: "assistant", content: "No sent emails with reply tracking found. Campaigns sent before this update don't have thread IDs." }]);
-            setLoading(false);
-            return;
-          }
-          const r = await fetch("/api/check-replies", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ gmailToken, threads: recent.slice(0, 50) }),
-          });
-          const data = await r.json();
-          const repliedList = data.replied || [];
-          const msg = repliedList.length > 0
-            ? `📬 **${repliedList.length} reply${repliedList.length > 1 ? "s" : ""} found!**\n\n${repliedList.map(r => `• **${r.email}** — replied ${r.repliedAt ? new Date(r.repliedAt).toLocaleDateString() : ""}`).join("\n")}\n\n${data.notReplied?.length > 0 ? `${data.notReplied.length} contacts still haven't replied.` : ""}`
-            : `No replies yet out of ${data.checked} tracked emails. Consider sending a follow-up — say "send follow-up".`;
-          setMessages(prev => [...prev, { role: "assistant", content: msg }]);
-        } catch {
-          setMessages(prev => [...prev, { role: "assistant", content: "Couldn't check replies right now — make sure Gmail is connected." }]);
-        }
-        setLoading(false);
-        return;
-      }
-      // show_page (new) and legacy page navigation actions
-      if (action === "show_page" && params?.page) setPage(params.page);
-      if (action === "show_stats") setPage("dashboard");
-      if (action === "show_contacts") setPage("contacts");
-      if (action === "open_email_sender") setPage("emailSender");
-
-    } catch (err) {
-      // Fallback: if API is down, try local intent detection
-      const emails = extractEmails(msg);
-      if (emails.length > 0) {
-        setMessages(prev => [...prev, { role: "assistant", content: `Sending to ${emails.join(", ")}...` }]);
-        await runEmailCampaign("all", emails);
-        return;
-      }
-      const response = getSmartResponse(msg);
-      setMessages(prev => [...prev, { role: "assistant", content: response.text }]);
-    }
-    setLoading(false);
-  };
   const connectGmail = () => {
     if (!window.google?.accounts?.oauth2) {
       showToast("Google Sign-In not available — please refresh the page.");
@@ -4472,43 +4195,34 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         </div>
       )}
 
-      {/* ═══════ TOP NAV BAR (always visible) ═══════ */}
-      <div style={{ background: "#111116", borderBottom: "1px solid #ffffff10", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
+      {/* ═══════ TOP NAV BAR ═══════ */}
+      <div style={{ background: "#0d0d12", borderBottom: "1px solid #ffffff08", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
         {/* Left: hamburger + logo + breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", cursor: "pointer", padding: 4, display: "flex", flexDirection: "column", gap: 4, borderRadius: 6 }}
+        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, display: "flex", flexDirection: "column", gap: 4, borderRadius: 6 }}
             title={sidebarOpen ? "Close menu" : "Open menu"}>
-            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(45deg) translate(4px,4px)" : "none" }} />
-            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", opacity: sidebarOpen ? 0 : 1 }} />
-            <span style={{ display: "block", width: 18, height: 2, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }} />
+            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(45deg) translate(4px,4px)" : "none" }} />
+            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", opacity: sidebarOpen ? 0 : 1 }} />
+            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }} />
           </button>
           <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-            <Logo size={24} />
-            <span style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9" }}>thehotspot</span>
+            <Logo size={22} />
+            <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.2 }}>thehotspot</span>
           </button>
-          {page && page !== "dashboard" && (
+          {page !== null && (
             <>
-              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
-              <button onClick={() => setPage("dashboard")} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", padding: 0, fontFamily: "'DM Sans',sans-serif" }}>Dashboard</button>
-              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", display: "flex", alignItems: "center", gap: 6 }}>{pageIcon}{pageLabel}</span>
-            </>
-          )}
-          {page === "dashboard" && (
-            <>
-              <span style={{ color: "#CBD5E1", fontSize: 16 }}>›</span>
-              <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Dashboard</span>
+              <span style={{ color: "#1e293b", fontSize: 14 }}>/</span>
+              <span style={{ fontSize: 13, fontWeight: 500, color: "#94A3B8" }}>{pageLabel}</span>
             </>
           )}
         </div>
-        {/* Right: Chat toggle + profile avatar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          {page !== null && (
-            <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 6, background: "#6366f120", border: "none", borderRadius: 20, padding: "6px 14px", color: "#818cf8", fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              <LuMessageSquare size={14} /> Chat
-            </button>
-          )}
-          <button onClick={() => setPage("profile")} title="Profile" style={{ width: 32, height: 32, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "#fff", border: "2px solid #ffffff10", cursor: "pointer", transition: "border-color .15s", flexShrink: 0 }}
+        {/* Right: Gmail status + profile avatar */}
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 8, background: gmailConnected ? "#10b98110" : "#f9731610", border: gmailConnected ? "1px solid #10b98120" : "1px solid #f9731620" }}>
+            <span style={{ width: 6, height: 6, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
+            <span style={{ fontSize: 11, fontWeight: 500, color: gmailConnected ? "#10b981" : "#f97316" }}>{gmailConnected ? "Gmail" : "Connect"}</span>
+          </div>
+          <button onClick={() => setPage("profile")} title="Profile" style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", border: "1.5px solid #ffffff10", cursor: "pointer", transition: "border-color .15s", flexShrink: 0 }}
             onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
             onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff10"}
           >
@@ -4528,78 +4242,94 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         {/* LEFT SIDEBAR — slides in/out */}
         <div style={{
           position: "fixed", top: 56, left: 0, bottom: 0, zIndex: 50,
-          width: 220, background: "#111116", borderRight: "1px solid #ffffff10",
-          display: "flex", flexDirection: "column", flexShrink: 0, padding: "12px 0",
+          width: 220, background: "#0d0d12", borderRight: "1px solid #ffffff08",
+          display: "flex", flexDirection: "column", flexShrink: 0,
           transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
           transition: "transform .22s cubic-bezier(.4,0,.2,1)",
-          boxShadow: sidebarOpen ? "4px 0 24px rgba(15,23,42,0.08)" : "none",
+          boxShadow: sidebarOpen ? "8px 0 32px rgba(0,0,0,0.4)" : "none",
         }}>
-          <div style={{ fontSize: 10, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", padding: "4px 14px 10px" }}>Navigation</div>
-          {[
-            { id: "dashboard",      label: "Dashboard",       icon: <LuLayoutDashboard size={16} /> },
-            { id: "totalContacts",  label: "Total Contacts",  icon: <LuUsers size={16} /> },
-            { id: "emailTemplates", label: "Email Templates", icon: <LuFilePen size={16} /> },
-            { id: "contacts",       label: "Contacts DB",     icon: <LuClipboardList size={16} /> },
-            { id: "settings",       label: "Settings",        icon: <LuSettings size={16} /> },
-            { id: "__agents__",     label: "AI Agents",       icon: <LuSparkles size={16} /> },
-          ].map(item => (
-            <button key={item.id} onClick={() => { if (item.id === "__agents__") { window.location.href = "/agents"; return; } setPage(item.id); setSidebarOpen(false); }} style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "10px 14px", margin: "2px 8px", borderRadius: 10,
-              background: page === item.id ? "#6366f120" : "transparent",
-              color: page === item.id ? "#818cf8" : "#64748B",
-              fontWeight: page === item.id ? 600 : 400,
-              border: "none", cursor: "pointer", textAlign: "left",
-              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
-            }}
-              onMouseEnter={e => { if (page !== item.id) e.currentTarget.style.background = "#16161e"; }}
-              onMouseLeave={e => { if (page !== item.id) e.currentTarget.style.background = "transparent"; }}
-            >
-              {item.icon}
-              {item.label}
-            </button>
-          ))}
+          {/* Logo wordmark */}
+          <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "20px 16px 16px" }}>
+            <Logo size={22} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.2 }}>thehotspot</span>
+          </div>
 
-          {/* Bottom: Gmail status + Profile + Logout */}
-          <div style={{ marginTop: "auto", borderTop: "1px solid #ffffff10", padding: "12px 8px 8px" }}>
-            {/* Gmail connect */}
+          {/* Nav items */}
+          <div style={{ flex: 1, padding: "4px 8px" }}>
+            {[
+              { id: null,              label: "Home",        icon: <LuHouse size={15} /> },
+              { id: "contacts",        label: "Contacts",    icon: <LuUsers size={15} /> },
+              { id: "campaignStatus",  label: "Campaigns",   icon: <LuRadio size={15} /> },
+              { id: "emailTemplates",  label: "Templates",   icon: <LuFilePen size={15} /> },
+              { id: "__agents__",      label: "AI Agents",   icon: <LuSparkles size={15} /> },
+              { id: "settings",        label: "Settings",    icon: <LuSettings size={15} /> },
+            ].map(item => {
+              const isActive = page === item.id;
+              return (
+                <button key={String(item.id)} onClick={() => {
+                  if (item.id === "__agents__") { window.location.href = "/agents"; return; }
+                  setPage(item.id); setSidebarOpen(false);
+                }} style={{
+                  display: "flex", alignItems: "center", gap: 9, width: "100%",
+                  padding: "9px 12px", marginBottom: 2, borderRadius: 8,
+                  background: isActive ? "#ffffff0c" : "transparent",
+                  color: isActive ? "#F1F5F9" : "#64748B",
+                  fontWeight: isActive ? 600 : 400,
+                  border: "none", cursor: "pointer", textAlign: "left",
+                  fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
+                  borderLeft: isActive ? "2px solid #10b981" : "2px solid transparent",
+                }}
+                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "#ffffff06"; e.currentTarget.style.color = "#94A3B8"; }}}
+                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748B"; }}}
+                >
+                  <span style={{ color: isActive ? "#10b981" : "inherit", display: "flex" }}>{item.icon}</span>
+                  {item.label}
+                  {item.id === "__agents__" && <span style={{ marginLeft: "auto", fontSize: 9, color: "#475569", letterSpacing: 0.5 }}>↗</span>}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Bottom section */}
+          <div style={{ borderTop: "1px solid #ffffff08", padding: "10px 8px 12px" }}>
             <button onClick={() => { connectGmail(); setSidebarOpen(false); }} style={{
               display: "flex", alignItems: "center", gap: 8, width: "100%",
-              padding: "9px 14px", borderRadius: 10, marginBottom: 4,
-              background: gmailConnected ? "#ECFDF5" : "#FFF7ED",
-              border: gmailConnected ? "1px solid #10b98130" : "1px solid #f9731630",
-              color: gmailConnected ? "#059669" : "#ea580c",
-              fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-            }}>
-              <span style={{ width: 8, height: 8, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
-              {gmailConnected ? "Gmail connected" : "Connect Gmail"}
-            </button>
-            {/* Profile row */}
-            <button onClick={() => { setPage("profile"); setSidebarOpen(false); }} style={{
-              display: "flex", alignItems: "center", gap: 10, width: "100%",
-              padding: "9px 14px", borderRadius: 10, marginBottom: 4,
+              padding: "8px 12px", borderRadius: 8, marginBottom: 2,
               background: "transparent", border: "none", cursor: "pointer",
-              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+              fontSize: 12, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
             }}
-              onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
+              onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
               onMouseLeave={e => e.currentTarget.style.background = "transparent"}
             >
-              <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
+              <span style={{ color: gmailConnected ? "#10b981" : "#f97316", fontWeight: 500 }}>
+                {gmailConnected ? "Gmail connected" : "Connect Gmail"}
+              </span>
+            </button>
+            <button onClick={() => { setPage("profile"); setSidebarOpen(false); }} style={{
+              display: "flex", alignItems: "center", gap: 9, width: "100%",
+              padding: "8px 12px", borderRadius: 8, marginBottom: 2,
+              background: "transparent", border: "none", cursor: "pointer",
+              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
+              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+            >
+              <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
                 {user?.username?.[0]?.toUpperCase() || "U"}
               </div>
-              <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 500 }}>{user?.username}</span>
+              <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.username}</span>
             </button>
-            {/* Logout */}
             <button onClick={onLogout} style={{
-              display: "flex", alignItems: "center", gap: 10, width: "100%",
-              padding: "9px 14px", borderRadius: 10,
+              display: "flex", alignItems: "center", gap: 9, width: "100%",
+              padding: "8px 12px", borderRadius: 8,
               background: "transparent", border: "none", cursor: "pointer",
-              fontSize: 13, color: "#EF4444", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+              fontSize: 12, color: "#475569", fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
             }}
-              onMouseEnter={e => e.currentTarget.style.background = "#2d0f0f"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
+              onMouseEnter={e => { e.currentTarget.style.background = "#2d0f0f"; e.currentTarget.style.color = "#f87171"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#475569"; }}
             >
-              <I.Logout /> Logout
+              <I.Logout /> Sign out
             </button>
           </div>
         </div>
@@ -4607,192 +4337,37 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         {/* RIGHT PANEL */}
         <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
-        {/* CHAT VIEW */}
-        {page === null && (() => {
-          const isHero = messages.length === 1 && messages[0].role === "assistant";
-
-          const suggestions = [
-            { Icon: LuMail,       label: "Send emails",     sub: "to all Network companies" },
-            { Icon: LuChartBar,   label: "Campaign status", sub: "check active campaigns" },
-            { Icon: LuUsers,      label: "Add a contact",   sub: "to any category" },
-            { Icon: LuSend,       label: "Send follow-ups", sub: "to recent outreach" },
-          ];
-
-          const renderMsg = (text) => {
-            const lines = text.split("\n");
-            return lines.map((line, li) => {
-              const parts = line.split(/(\*\*[^*]+\*\*)/g);
-              return (
-                <div key={li} style={{ minHeight: li < lines.length - 1 ? "1.5em" : undefined }}>
-                  {parts.map((p, pi) =>
-                    p.startsWith("**") && p.endsWith("**")
-                      ? <strong key={pi} style={{ color: "#f1f5f9", fontWeight: 700 }}>{p.slice(2, -2)}</strong>
-                      : p
-                  )}
-                </div>
-              );
-            });
-          };
-
-          return (
-            <div style={{ flex: 1, display: "flex", flexDirection: "column", width: "100%", minHeight: 0, overflow: "hidden", background: "#09090d" }}>
-
-              {isHero ? (
-                /* ── HERO / EMPTY STATE ── */
-                <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", padding: "32px 24px 0", gap: 28, overflow: "hidden" }}>
-                  {/* Glow + Avatar */}
-                  <div style={{ position: "relative", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ position: "absolute", width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle, #10b98122 0%, transparent 70%)", pointerEvents: "none" }} />
-                    <div style={{ position: "absolute", width: 80, height: 80, borderRadius: "50%", background: "radial-gradient(circle, #0ea5e918 0%, transparent 70%)", pointerEvents: "none" }} />
-                    <div style={{ width: 68, height: 68, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 0 0 8px #10b98112, 0 0 0 16px #10b9810a, 0 8px 32px #10b98130", position: "relative" }}>
-                      <I.Bot style={{ width: 30, height: 30 }} />
-                    </div>
-                  </div>
-
-                  {/* Greeting */}
-                  <div style={{ textAlign: "center" }}>
-                    <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>
-                      Hey, {user?.username || "there"}
-                    </div>
-                    <div style={{ fontSize: 13.5, color: "#64748B", maxWidth: 340, lineHeight: 1.6 }}>
-                      I can send emails, manage contacts, check campaign stats — just tell me what you need.
-                    </div>
-                  </div>
-
-                  {/* Suggestion cards */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, maxWidth: 460, width: "100%" }}>
-                    {suggestions.map((s, i) => (
-                      <button key={i} onClick={() => handleSend(`${s.label} ${s.sub}`)} style={{
-                        background: "#111116", border: "1px solid #ffffff0e", borderRadius: 14,
-                        padding: "14px 16px", cursor: "pointer", textAlign: "left",
-                        display: "flex", flexDirection: "column", gap: 5,
-                        transition: "all .18s", fontFamily: "'DM Sans',sans-serif",
-                      }}
-                        onMouseEnter={e => { e.currentTarget.style.background = "#15151d"; e.currentTarget.style.borderColor = "#10b98128"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-                        onMouseLeave={e => { e.currentTarget.style.background = "#111116"; e.currentTarget.style.borderColor = "#ffffff0e"; e.currentTarget.style.transform = "translateY(0)"; }}
-                      >
-                        <s.Icon size={18} style={{ color: "#64748B" }} />
-                        <span style={{ fontSize: 12.5, fontWeight: 600, color: "#CBD5E1" }}>{s.label}</span>
-                        <span style={{ fontSize: 11.5, color: "#475569", lineHeight: 1.3 }}>{s.sub}</span>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : (
-                /* ── CHAT MESSAGES ── */
-                <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", display: "flex", flexDirection: "column", gap: 16, maxWidth: 800, width: "100%", margin: "0 auto", minHeight: 0, WebkitOverflowScrolling: "touch" }}>
-                  {messages.map((m, i) => (
-                    <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start", gap: 10, alignItems: "flex-end" }}>
-                      {m.role === "assistant" && (
-                        <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginBottom: 2, boxShadow: "0 0 12px #10b98120" }}>
-                          <I.Bot />
-                        </div>
-                      )}
-                      <div style={{
-                        maxWidth: "76%", padding: "12px 16px", fontSize: 13.5, lineHeight: 1.75,
-                        borderRadius: m.role === "user" ? "18px 18px 4px 18px" : "4px 18px 18px 18px",
-                        background: m.role === "user" ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#111116",
-                        color: m.role === "user" ? "#fff" : "#CBD5E1",
-                        fontWeight: m.role === "user" ? 500 : 400,
-                        border: m.role === "user" ? "none" : "1px solid #ffffff0d",
-                        boxShadow: m.role === "user" ? "0 4px 16px #10b98128" : "0 2px 8px rgba(0,0,0,0.25)",
-                      }}>{renderMsg(m.content)}</div>
-                    </div>
-                  ))}
-
-                  {/* Typing indicator */}
-                  {loading && (
-                    <div style={{ display: "flex", alignItems: "flex-end", gap: 10 }}>
-                      <div style={{ width: 28, height: 28, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, boxShadow: "0 0 12px #10b98120" }}>
-                        <I.Bot />
-                      </div>
-                      <div style={{ padding: "13px 17px", borderRadius: "4px 18px 18px 18px", background: "#111116", border: "1px solid #ffffff0d", display: "flex", alignItems: "center", gap: 5 }}>
-                        {[0, 1, 2].map(d => (
-                          <div key={d} style={{ width: 7, height: 7, borderRadius: "50%", background: `hsl(${152 + d * 12},70%,50%)`, animation: `pulse 1.1s ease-in-out ${d * 0.18}s infinite` }} />
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  <div ref={chatEnd} />
-                </div>
-              )}
-
-              {/* ── Input bar ── */}
-              <div style={{ padding: isHero ? "20px 24px 24px" : "12px 20px 16px", borderTop: isHero ? "none" : "1px solid #ffffff08", background: isHero ? "transparent" : "#111116", flexShrink: 0 }}>
-                <div style={{ maxWidth: 600, margin: "0 auto" }}>
-                  <div style={{
-                    display: "flex", gap: 8, alignItems: "center",
-                    background: "#111116", border: "1px solid #ffffff14",
-                    borderRadius: 30, padding: "6px 6px 6px 18px",
-                    boxShadow: isHero ? "0 4px 32px rgba(0,0,0,0.4)" : "none",
-                    transition: "border-color .2s, box-shadow .2s",
-                  }}>
-                    <button onClick={toggleVoice} title={listening ? "Stop" : "Voice input"} style={{
-                      width: 34, height: 34, borderRadius: "50%", flexShrink: 0, cursor: "pointer",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      background: listening ? "#10b98118" : "transparent",
-                      border: listening ? "1px solid #10b98148" : "1px solid transparent",
-                      color: listening ? "#10b981" : "#475569", transition: "all .2s",
-                      animation: listening ? "ringPulse 1.5s ease-in-out infinite" : "none",
-                    }}>
-                      {listening ? <I.MicOff /> : <I.Mic />}
-                    </button>
-                    <input
-                      type="text" value={input} onChange={e => setInput(e.target.value)}
-                      onKeyDown={e => e.key === "Enter" && handleSend()}
-                      placeholder={listening ? "Listening..." : "Message your assistant..."}
-                      style={{ flex: 1, background: "transparent", border: "none", color: "#E2E8F0", fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", padding: "6px 0" }}
-                    />
-                    <button onClick={() => handleSend()} disabled={loading || !input.trim()} style={{
-                      width: 38, height: 38, borderRadius: "50%", border: "none", flexShrink: 0,
-                      cursor: input.trim() ? "pointer" : "default",
-                      background: input.trim() ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
-                      color: input.trim() ? "#fff" : "#334155",
-                      display: "flex", alignItems: "center", justifyContent: "center",
-                      boxShadow: input.trim() ? "0 4px 14px #10b98135" : "none",
-                      transition: "all .2s",
-                    }}>
-                      <I.Send />
-                    </button>
-                  </div>
-                  <div style={{ fontSize: 10, color: "#1e293b", textAlign: "center", marginTop: 6, letterSpacing: 0.3 }}>Press Enter to send</div>
-                </div>
-              </div>
-
-            </div>
-          );
-        })()}
-
-        {/* PAGE VIEW */}
-        {page !== null && (
-          <div style={{ flex: 1, overflowY: "auto", padding: "24px 20px", width: "100%", position: "relative" }}>
-            {/* Page transition loader */}
-            {pageLoading && (
-              <div style={{ position: "fixed", inset: 0, background: "#09090d", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, animation: "fadeIn .15s ease" }}>
-                <img src="/logo.png" alt="thehotspot" style={{ width: 72, height: 72, objectFit: "contain", animation: "splashFloat 1.4s ease-in-out infinite alternate" }} />
-                <div style={{ color: "#ffffff", fontFamily: "'DM Sans',sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.85, animation: "splashFadeIn 0.6s ease forwards" }}>thehotspot</div>
-              </div>
-            )}
-            <div style={{ maxWidth: 960, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
-
-              {/* ── DASHBOARD HOME ── */}
-              {page === "dashboard" && <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />}
-
-              {/* ── OTHER PAGES ── */}
-              {page === "emailSender"    && <EmailSenderPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
-              {page === "emailTemplates" && <EmailTemplatesPage onBack={() => setPage("dashboard")} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
-              {page === "contacts"       && <ContactsPage onBack={() => setPage("dashboard")} showToast={showToast} user={user} />}
-              {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage("dashboard")} />}
-              {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage("dashboard")} user={user} />}
-              {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage("dashboard")} sentCount={sentCount} gmailConnected={gmailConnected} user={user} />}
-              {page === "categories"     && <CategoriesPage onBack={() => setPage("dashboard")} />}
-              {page === "successRate"    && <SuccessRatePage onBack={() => setPage("dashboard")} />}
-              {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
-              {page === "settings"       && <SettingsPage onBack={() => setPage("dashboard")} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
-            </div>
+        {/* PAGE TRANSITION LOADER */}
+        {pageLoading && (
+          <div style={{ position: "fixed", inset: 0, background: "#09090d", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, animation: "fadeIn .15s ease" }}>
+            <img src="/logo.png" alt="thehotspot" style={{ width: 72, height: 72, objectFit: "contain", animation: "splashFloat 1.4s ease-in-out infinite alternate" }} />
+            <div style={{ color: "#ffffff", fontFamily: "'DM Sans',sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.85, animation: "splashFadeIn 0.6s ease forwards" }}>thehotspot</div>
           </div>
         )}
+
+        {/* MAIN CONTENT */}
+        <div style={{ flex: 1, overflowY: "auto", padding: "28px 28px", width: "100%", position: "relative" }}>
+          <div style={{ maxWidth: 1000, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
+
+            {/* ── HOME ── */}
+            {page === null && <HomePage user={user} contactCount={contactCount} sentCount={sentCount} setPage={setPage} gmailConnected={gmailConnected} />}
+
+            {/* ── DASHBOARD ── */}
+            {page === "dashboard" && <DashboardPage user={user} contactCount={contactCount} setPage={setPage} />}
+
+            {/* ── OTHER PAGES ── */}
+            {page === "emailSender"    && <EmailSenderPage onBack={() => setPage(null)} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
+            {page === "emailTemplates" && <EmailTemplatesPage onBack={() => setPage(null)} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
+            {page === "contacts"       && <ContactsPage onBack={() => setPage(null)} showToast={showToast} user={user} />}
+            {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage(null)} />}
+            {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage(null)} user={user} />}
+            {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage(null)} sentCount={sentCount} gmailConnected={gmailConnected} user={user} />}
+            {page === "categories"     && <CategoriesPage onBack={() => setPage(null)} />}
+            {page === "successRate"    && <SuccessRatePage onBack={() => setPage(null)} />}
+            {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
+            {page === "settings"       && <SettingsPage onBack={() => setPage(null)} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
+          </div>
+        </div>
         </div>{/* end right panel */}
       </div>{/* end body */}
 
