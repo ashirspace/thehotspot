@@ -2171,280 +2171,308 @@ function DashboardPage({ user, contactCount, setPage }) {
 }
 
 /* ───────── PET ASSISTANT ───────── */
-const PET_SEED = [
-  { role: "user", content: "You are Spot — a friendly AI pet who lives on the thehotspot dashboard. Keep your answers short (2-3 sentences), warm, and casual. Help the user understand and use this outreach platform." },
-  { role: "assistant", content: "Hey! I'm Spot. Ask me anything about thehotspot — campaigns, contacts, agents, you name it." },
+/* ───────── PIXEL PET (Tamagotchi-style) ───────── */
+// Pixel art color palette
+const _X = null;          // transparent
+const _B = '#FF7043';     // body orange/salmon
+const _D = '#1A1A1A';     // dark square eyes
+const _F = '#BF360C';     // feet (darker orange)
+const _M = '#B71C1C';     // mouth red
+const _H = '#FFAB91';     // highlight
+
+const PP_SC = 9; // scale: 9px per "pixel"
+
+// Sprite frames (10 wide × rows tall)
+const PP_HEAD = [
+  [_X,_X,_B,_B,_B,_B,_B,_B,_X,_X],
+  [_X,_B,_B,_B,_B,_B,_B,_B,_B,_X],
+  [_B,_B,_H,_B,_B,_B,_B,_H,_B,_B],
+  [_B,_B,_D,_D,_B,_B,_D,_D,_B,_B], // eyes open row A
+  [_B,_B,_D,_D,_B,_B,_D,_D,_B,_B], // eyes open row B
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
+  [_B,_B,_X,_M,_M,_M,_M,_X,_B,_B], // mouth neutral
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
+  [_X,_B,_B,_B,_B,_B,_B,_B,_B,_X],
+];
+const PP_EYE_CLOSED = [
+  [_B,_B,_M,_M,_B,_B,_M,_M,_B,_B],
+  [_B,_B,_B,_B,_B,_B,_B,_B,_B,_B],
+];
+const PP_MOUTH_HAPPY = [_B,_M,_M,_M,_M,_M,_M,_M,_B,_B];
+const PP_BLUSH_L = [_X,_B,_H,_H,_B,_X,_X,_X,_X,_X]; // cheek blush (left side)
+const PP_BLUSH_R = [_X,_X,_X,_X,_X,_B,_H,_H,_B,_X];
+const PP_LEGS_STAND = [
+  [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
+  [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
+  [_X,_X,_F,_F,_X,_X,_F,_F,_X,_X],
+];
+const PP_LEGS_A = [   // left foot forward
+  [_X,_B,_B,_X,_X,_X,_X,_X,_B,_X],
+  [_X,_B,_X,_X,_X,_X,_X,_X,_B,_X],
+  [_X,_F,_F,_X,_X,_X,_X,_X,_F,_X],
+];
+const PP_LEGS_B = [   // right foot forward
+  [_X,_X,_B,_X,_X,_X,_X,_B,_B,_X],
+  [_X,_X,_B,_X,_X,_X,_X,_X,_B,_X],
+  [_X,_X,_F,_X,_X,_X,_X,_F,_F,_X],
+];
+const PP_LEGS_JUMP = [
+  [_X,_B,_X,_X,_X,_X,_X,_X,_B,_X],
+  [_X,_X,_B,_X,_X,_X,_X,_B,_X,_X],
+  [_X,_X,_X,_X,_X,_X,_X,_X,_X,_X],
 ];
 
-function PetAssistant({ user }) {
-  const [open, setOpen] = useState(false);
-  const [msgs, setMsgs] = useState([]);
-  const [input, setInput] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [mood, setMood] = useState("idle");
-  const [petPos, setPetPos] = useState(() => ({ x: window.innerWidth - 100, y: window.innerHeight - 100 }));
-  const [eyeOff, setEyeOff] = useState({ x: 0, y: 0 });
-  const [hearts, setHearts] = useState([]);
-  const [hovered, setHovered] = useState(false);
+function ppDraw(ctx, rows, yOff, flipX, canvasW) {
+  rows.forEach((row, ry) => {
+    row.forEach((color, rx) => {
+      if (!color) return;
+      const px = flipX ? canvasW - (rx + 1) * PP_SC : rx * PP_SC;
+      ctx.fillStyle = color;
+      ctx.fillRect(px, yOff + ry * PP_SC, PP_SC, PP_SC);
+    });
+  });
+}
 
-  const isDragging = useRef(false);
-  const dragOffset = useRef({ x: 0, y: 0 });
-  const petRef = useRef(null);
-  const chatEndRef = useRef(null);
-  const petVelRef = useRef({ x: 0, y: 0, t: 0, count: 0 });
-  const moodTimer = useRef(null);
-  const blinkTimer = useRef(null);
+function PixelPet({ page }) {
+  const canvasRef = useRef(null);
+  const prevPage = useRef(page);
+  const rafRef = useRef(null);
 
-  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+  const pet = useRef({
+    x: window.innerWidth - 160,
+    y: window.innerHeight - 130,
+    vx: 0, vy: 0,
+    groundY: window.innerHeight - 130,
+    state: 'idle',    // idle | walking | jumping | happy | flyup | falling
+    time: 0,
+    lastTs: 0,
+    blinking: false,
+    blinkStart: 0,
+    nextBlink: 4000,
+    walkTarget: 0,
+    legFrame: 0,
+    nextAction: 3000 + Math.random() * 2000,
+    happyTimer: 0,
+    breathPhase: 0,
+    facingLeft: false,
+    sparkles: [],     // {x,y,age} for happy sparkle particles
+  });
 
-  // Blink every 4-6s
-  useEffect(() => {
-    const doBlink = () => {
-      setMood(m => m === "idle" ? "blinking" : m);
-      setTimeout(() => setMood(m => m === "blinking" ? "idle" : m), 160);
-      blinkTimer.current = setTimeout(doBlink, 4000 + Math.random() * 2000);
-    };
-    blinkTimer.current = setTimeout(doBlink, 3000);
-    return () => clearTimeout(blinkTimer.current);
-  }, []);
+  const CW = 10 * PP_SC; // canvas width  = 90
+  const CH = 12 * PP_SC; // canvas height = 108
 
-  // Mouse tracking: eye offset + petting + drag
-  useEffect(() => {
-    const onMove = (e) => {
-      if (isDragging.current) {
-        setPetPos({ x: e.clientX - dragOffset.current.x, y: e.clientY - dragOffset.current.y });
-        return;
-      }
-      const petEl = petRef.current;
-      if (!petEl) return;
-      const rect = petEl.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist < 150) {
-        setEyeOff({ x: clamp(dx / 60, -3, 3), y: clamp(dy / 60, -3, 3) });
-      }
-      // Petting detection
-      if (dist < 48) {
-        const now = Date.now();
-        const vel = petVelRef.current;
-        const moveDist = Math.sqrt((e.clientX - vel.x) ** 2 + (e.clientY - vel.y) ** 2);
-        if (moveDist > 18 && now - vel.t < 500) {
-          vel.count += 1;
-          if (vel.count >= 3) {
-            vel.count = 0;
-            triggerHappy();
-          }
-        } else if (now - vel.t > 500) {
-          vel.count = 1;
-        }
-        vel.x = e.clientX; vel.y = e.clientY; vel.t = now;
-      }
-    };
-    const onUp = () => { isDragging.current = false; };
-    window.addEventListener("mousemove", onMove);
-    window.addEventListener("mouseup", onUp);
-    return () => { window.removeEventListener("mousemove", onMove); window.removeEventListener("mouseup", onUp); };
-  }, []);
+  // ── draw ──────────────────────────────────────────────────
+  function draw() {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const p = pet.current;
+    ctx.clearRect(0, 0, CW, CH);
+    const fl = p.facingLeft;
 
-  // Scroll chat to bottom
-  useEffect(() => { chatEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, [msgs, loading]);
+    // head / body (copy rows to mutate)
+    const head = PP_HEAD.map(r => r.slice());
 
-  const triggerHappy = () => {
-    setMood("happy");
-    const id = Date.now();
-    setHearts(h => [...h, id]);
-    setTimeout(() => setHearts(h => h.filter(x => x !== id)), 900);
-    clearTimeout(moodTimer.current);
-    moodTimer.current = setTimeout(() => setMood("idle"), 1200);
-  };
-
-  const onPetMouseDown = (e) => {
-    if (e.button !== 0) return;
-    const rect = petRef.current.getBoundingClientRect();
-    dragOffset.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    isDragging.current = true;
-    e.preventDefault();
-  };
-
-  const onPetClick = (e) => {
-    if (Math.abs(e.clientX - (petPos.x + dragOffset.current.x)) > 4) return;
-    setOpen(o => !o);
-  };
-
-  const sendMessage = async () => {
-    const text = input.trim();
-    if (!text || loading) return;
-    const next = [...msgs, { role: "user", content: text }];
-    setMsgs(next);
-    setInput("");
-    setLoading(true);
-    setMood("talking");
-    try {
-      const res = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: [...PET_SEED, ...next] }),
-      });
-      const data = await res.json();
-      setMsgs(m => [...m, { role: "assistant", content: data.message || "Hmm, I'm not sure about that one." }]);
-      triggerHappy();
-    } catch {
-      setMsgs(m => [...m, { role: "assistant", content: "Oops, something went wrong. Try again?" }]);
-    } finally {
-      setLoading(false);
-      setMood("idle");
+    // blink
+    if (p.blinking) {
+      head[3] = PP_EYE_CLOSED[0];
+      head[4] = PP_EYE_CLOSED[1];
     }
+    // happy mouth + blush
+    if (p.state === 'happy') {
+      head[6] = PP_MOUTH_HAPPY;
+    }
+
+    const breathY = Math.round(Math.sin(p.breathPhase) * 1);
+    ppDraw(ctx, head, breathY, fl, CW);
+
+    // blush cheeks on happy
+    if (p.state === 'happy') {
+      ppDraw(ctx, [PP_BLUSH_L], 4 * PP_SC + breathY, fl, CW);
+      ppDraw(ctx, [PP_BLUSH_R], 4 * PP_SC + breathY, fl, CW);
+    }
+
+    // legs
+    let legs;
+    if (p.state === 'jumping' || p.state === 'flyup' || p.state === 'falling') {
+      legs = PP_LEGS_JUMP;
+    } else if (p.state === 'walking' || p.state === 'happy') {
+      legs = p.legFrame % 2 === 0 ? PP_LEGS_A : PP_LEGS_B;
+    } else {
+      legs = PP_LEGS_STAND;
+    }
+    ppDraw(ctx, legs, 9 * PP_SC + breathY, fl, CW);
+
+    // sparkle particles
+    p.sparkles.forEach(sp => {
+      const alpha = Math.max(0, 1 - sp.age / 40);
+      ctx.globalAlpha = alpha;
+      ctx.fillStyle = '#FFD54F';
+      ctx.fillRect(sp.x, sp.y, 3, 3);
+      ctx.globalAlpha = 1;
+    });
+  }
+
+  // ── update ────────────────────────────────────────────────
+  function update(ts) {
+    const p = pet.current;
+    const dt = p.lastTs ? Math.min(ts - p.lastTs, 50) : 16;
+    p.lastTs = ts;
+    p.time += dt;
+    p.breathPhase += dt * 0.0018;
+
+    // blink
+    if (!p.blinking && p.time > p.nextBlink) {
+      p.blinking = true;
+      p.blinkStart = p.time;
+      p.nextBlink = p.time + 3000 + Math.random() * 3000;
+    }
+    if (p.blinking && p.time - p.blinkStart > 150) p.blinking = false;
+
+    // sparkle age
+    p.sparkles = p.sparkles.map(s => ({ ...s, age: s.age + 1 })).filter(s => s.age < 40);
+
+    // state machine
+    if (p.state === 'idle') {
+      p.nextAction -= dt;
+      if (p.nextAction <= 0) {
+        if (Math.random() < 0.38) {
+          // jump
+          p.groundY = p.y;
+          p.state = 'jumping';
+          p.vy = -9 - Math.random() * 4;
+          p.vx = (Math.random() - 0.5) * 4;
+        } else {
+          // walk to random x
+          const tx = 40 + Math.random() * (window.innerWidth - 180);
+          p.walkTarget = tx;
+          p.facingLeft = tx < p.x;
+          p.vx = (p.facingLeft ? -1 : 1) * (1.2 + Math.random() * 2);
+          p.state = 'walking';
+        }
+      }
+
+    } else if (p.state === 'walking') {
+      p.x += p.vx;
+      p.legFrame = Math.floor(p.time / 160) % 2;
+      const done = p.vx > 0 ? p.x >= p.walkTarget : p.x <= p.walkTarget;
+      if (done) {
+        p.x = p.walkTarget;
+        p.vx = 0;
+        p.state = 'idle';
+        p.nextAction = 2000 + Math.random() * 4000;
+      }
+
+    } else if (p.state === 'jumping') {
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.42; // gravity
+      if (p.y >= p.groundY) {
+        p.y = p.groundY;
+        p.vy = 0; p.vx = 0;
+        p.state = 'idle';
+        p.nextAction = 1500 + Math.random() * 3000;
+      }
+
+    } else if (p.state === 'happy') {
+      p.happyTimer -= dt;
+      p.y = p.groundY + Math.sin(p.time * 0.016) * 11;
+      p.legFrame = Math.floor(p.time / 130) % 2;
+      // spawn sparkles
+      if (Math.random() < 0.18) {
+        p.sparkles.push({ x: Math.random() * CW, y: Math.random() * CH * 0.7, age: 0 });
+      }
+      if (p.happyTimer <= 0) {
+        p.y = p.groundY;
+        p.state = 'idle';
+        p.nextAction = 2000;
+      }
+
+    } else if (p.state === 'flyup') {
+      p.y -= 15;
+      p.facingLeft = false;
+      // handled by timeout in effect
+
+    } else if (p.state === 'falling') {
+      p.y += p.vy;
+      p.vy = Math.min(p.vy + 1.2, 22);
+      if (p.y >= p.groundY) {
+        p.y = p.groundY;
+        p.vy = 0;
+        // small bounce
+        p.state = 'jumping';
+        p.groundY = p.y;
+        p.vy = -4;
+        p.nextAction = 1200;
+      }
+    }
+
+    // clamp x
+    p.x = Math.max(8, Math.min(window.innerWidth - CW - 8, p.x));
+
+    // move canvas
+    const canvas = canvasRef.current;
+    if (canvas) {
+      canvas.style.left = Math.round(p.x) + 'px';
+      canvas.style.top = Math.round(p.y) + 'px';
+    }
+  }
+
+  // ── RAF loop ──────────────────────────────────────────────
+  useEffect(() => {
+    const loop = (ts) => {
+      update(ts);
+      draw();
+      rafRef.current = requestAnimationFrame(loop);
+    };
+    rafRef.current = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(rafRef.current);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── page change → fly up then fall down ──────────────────
+  useEffect(() => {
+    if (page === prevPage.current) return;
+    prevPage.current = page;
+    const p = pet.current;
+    if (p.state === 'flyup' || p.state === 'falling') return;
+    p.state = 'flyup';
+    setTimeout(() => {
+      const pp = pet.current;
+      pp.x = 60 + Math.random() * (window.innerWidth - 220);
+      pp.y = -CH - 20;
+      pp.vy = 6;
+      pp.groundY = window.innerHeight - 130;
+      pp.state = 'falling';
+    }, 650);
+  }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── click → happy ─────────────────────────────────────────
+  const handleClick = () => {
+    const p = pet.current;
+    if (p.state === 'flyup' || p.state === 'falling') return;
+    p.groundY = p.y;
+    p.state = 'happy';
+    p.happyTimer = 2400;
+    p.facingLeft = false;
   };
-
-  const petAnim = mood === "happy" ? "petHappy .5s ease" : "petFloat 3s ease-in-out infinite";
-
-  // SVG pet face
-  const eyeL = { cx: 22, cy: 30 };
-  const eyeR = { cx: 42, cy: 30 };
-  const isBlinking = mood === "blinking";
-  const isHappy = mood === "happy";
-
-  const panelBottom = window.innerHeight - petPos.y + 12;
-  const panelRight = window.innerWidth - petPos.x - 64;
 
   return (
-    <>
-      {/* Floating hearts */}
-      {hearts.map(id => (
-        <div key={id} style={{ position: "fixed", left: petPos.x + 24, top: petPos.y - 8, pointerEvents: "none", zIndex: 9600, animation: "heartFloat .9s ease forwards", fontSize: 16, color: "#ec4899" }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="#ec4899" stroke="none"><path d="M12 21C12 21 3 14 3 8a5 5 0 0 1 9-3 5 5 0 0 1 9 3c0 6-9 13-9 13z"/></svg>
-        </div>
-      ))}
-
-      {/* Chat panel */}
-      {open && (
-        <div style={{ position: "fixed", bottom: panelBottom, right: panelRight, width: 300, maxHeight: 380, background: "#111116", border: "1px solid #ffffff12", borderRadius: 16, display: "flex", flexDirection: "column", zIndex: 9501, boxShadow: "0 16px 48px rgba(0,0,0,0.6)", animation: "chatSlide .2s ease" }}>
-          {/* Header */}
-          <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "12px 14px", borderBottom: "1px solid #ffffff08", flexShrink: 0 }}>
-            <svg width="24" height="24" viewBox="0 0 64 64" style={{ flexShrink: 0 }}>
-              <circle cx="32" cy="36" r="22" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
-              <polygon points="14,20 20,8 26,20" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
-              <polygon points="38,20 44,8 50,20" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
-              <ellipse cx="22" cy="34" rx="5" ry="3.5" fill="#F1F5F9"/>
-              <ellipse cx="42" cy="34" rx="5" ry="3.5" fill="#F1F5F9"/>
-              <circle cx="23" cy="34" r="2" fill="#09090d"/>
-              <circle cx="43" cy="34" r="2" fill="#09090d"/>
-              <circle cx="24" cy="33" r="0.8" fill="white"/>
-              <circle cx="44" cy="33" r="0.8" fill="white"/>
-              <circle cx="32" cy="41" r="2" fill="#ec4899"/>
-              <path d="M27,45 Q32,49 37,45" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
-            </svg>
-            <div>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>Spot</div>
-              <div style={{ fontSize: 10, color: "#10b981" }}>AI assistant</div>
-            </div>
-            <button onClick={() => setOpen(false)} style={{ marginLeft: "auto", background: "none", border: "none", color: "#475569", cursor: "pointer", fontSize: 16, lineHeight: 1, padding: 4 }}>
-              <LuX size={14} />
-            </button>
-          </div>
-
-          {/* Messages */}
-          <div style={{ flex: 1, overflowY: "auto", padding: "12px 14px", display: "flex", flexDirection: "column", gap: 8 }}>
-            {msgs.length === 0 && (
-              <div style={{ fontSize: 12, color: "#475569", textAlign: "center", marginTop: 20 }}>
-                Hey {user?.username?.split(" ")[0] || "there"}! Ask me anything about thehotspot.
-              </div>
-            )}
-            {msgs.map((m, i) => (
-              <div key={i} style={{ display: "flex", justifyContent: m.role === "user" ? "flex-end" : "flex-start" }}>
-                <div style={{ maxWidth: "82%", padding: "8px 11px", borderRadius: m.role === "user" ? "12px 12px 3px 12px" : "12px 12px 12px 3px", background: m.role === "user" ? "#10b981" : "#1e1e2e", color: m.role === "user" ? "#fff" : "#CBD5E1", fontSize: 12, lineHeight: 1.55 }}>
-                  {m.content}
-                </div>
-              </div>
-            ))}
-            {loading && (
-              <div style={{ display: "flex", gap: 4, padding: "8px 11px", background: "#1e1e2e", borderRadius: "12px 12px 12px 3px", width: "fit-content" }}>
-                {[0, 1, 2].map(i => (
-                  <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: "#475569", animation: `pulse 1.2s ease ${i * 0.2}s infinite` }} />
-                ))}
-              </div>
-            )}
-            <div ref={chatEndRef} />
-          </div>
-
-          {/* Input */}
-          <div style={{ display: "flex", gap: 6, padding: "10px 14px", borderTop: "1px solid #ffffff08", flexShrink: 0 }}>
-            <input
-              value={input}
-              onChange={e => setInput(e.target.value)}
-              onKeyDown={e => e.key === "Enter" && sendMessage()}
-              placeholder="Ask Spot anything..."
-              style={{ flex: 1, background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 8, padding: "7px 10px", color: "#F1F5F9", fontSize: 12, outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-            />
-            <button onClick={sendMessage} disabled={loading} style={{ background: "#10b981", border: "none", borderRadius: 8, padding: "7px 10px", color: "#fff", cursor: loading ? "not-allowed" : "pointer", opacity: loading ? 0.5 : 1, display: "flex", alignItems: "center" }}>
-              <LuSend size={13} />
-            </button>
-          </div>
-        </div>
-      )}
-
-      {/* Pet body */}
-      <div
-        ref={petRef}
-        onMouseDown={onPetMouseDown}
-        onClick={onPetClick}
-        onMouseEnter={() => setHovered(true)}
-        onMouseLeave={() => setHovered(false)}
-        style={{ position: "fixed", left: petPos.x, top: petPos.y, width: 64, height: 64, cursor: isDragging.current ? "grabbing" : "grab", zIndex: 9500, userSelect: "none", animation: petAnim, transition: "filter .2s", filter: hovered ? "drop-shadow(0 0 10px #10b98155)" : "none" }}
-      >
-        <svg width="64" height="64" viewBox="0 0 64 64" style={{ overflow: "visible" }}>
-          {/* Ears */}
-          <polygon points="10,24 16,8 24,22" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
-          <polygon points="40,22 48,8 54,24" fill="#1a1a2e" stroke="#10b981" strokeWidth="1.5"/>
-          <polygon points="13,23 17,12 22,22" fill="#10b98122"/>
-          <polygon points="42,22 47,12 52,23" fill="#10b98122"/>
-          {/* Body */}
-          <circle cx="32" cy="36" r="26" fill="#1a1a2e" stroke={open ? "#10b981" : hovered ? "#10b98188" : "#10b98144"} strokeWidth="1.5"/>
-          {/* Blush (happy) */}
-          {isHappy && <>
-            <ellipse cx="16" cy="40" rx="6" ry="3.5" fill="#ec489930" />
-            <ellipse cx="48" cy="40" rx="6" ry="3.5" fill="#ec489930" />
-          </>}
-          {/* Eyes */}
-          {isBlinking ? <>
-            <rect x={eyeL.cx - 5} y={eyeL.cy - 0.5} width="10" height="1.5" rx="0.75" fill="#F1F5F9"/>
-            <rect x={eyeR.cx - 5} y={eyeR.cy - 0.5} width="10" height="1.5" rx="0.75" fill="#F1F5F9"/>
-          </> : isHappy ? <>
-            <path d={`M${eyeL.cx-5},${eyeL.cy+1} Q${eyeL.cx},${eyeL.cy-4} ${eyeL.cx+5},${eyeL.cy+1}`} fill="none" stroke="#F1F5F9" strokeWidth="2.5" strokeLinecap="round"/>
-            <path d={`M${eyeR.cx-5},${eyeR.cy+1} Q${eyeR.cx},${eyeR.cy-4} ${eyeR.cx+5},${eyeR.cy+1}`} fill="none" stroke="#F1F5F9" strokeWidth="2.5" strokeLinecap="round"/>
-          </> : <>
-            <ellipse cx={eyeL.cx} cy={eyeL.cy} rx="5.5" ry="5" fill="#F1F5F9"/>
-            <ellipse cx={eyeR.cx} cy={eyeR.cy} rx="5.5" ry="5" fill="#F1F5F9"/>
-            <circle cx={eyeL.cx + eyeOff.x} cy={eyeL.cy + eyeOff.y} r="2.5" fill="#09090d"/>
-            <circle cx={eyeR.cx + eyeOff.x} cy={eyeR.cy + eyeOff.y} r="2.5" fill="#09090d"/>
-            <circle cx={eyeL.cx + eyeOff.x + 1} cy={eyeL.cy + eyeOff.y - 1} r="0.9" fill="white"/>
-            <circle cx={eyeR.cx + eyeOff.x + 1} cy={eyeR.cy + eyeOff.y - 1} r="0.9" fill="white"/>
-          </>}
-          {/* Nose */}
-          <polygon points="32,44 29,48 35,48" fill="#ec4899"/>
-          {/* Mouth */}
-          {mood === "talking"
-            ? <path d="M27,51 Q32,56 37,51" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
-            : isHappy
-              ? <path d="M26,51 Q32,57 38,51" fill="none" stroke="#ec4899" strokeWidth="2" strokeLinecap="round"/>
-              : <path d="M28,51 Q32,54 36,51" fill="none" stroke="#ec4899" strokeWidth="1.5" strokeLinecap="round"/>
-          }
-          {/* Talking dots */}
-          {loading && [0, 1, 2].map(i => (
-            <circle key={i} cx={26 + i * 6} cy={58} r="1.8" fill="#475569" style={{ animation: `pulse 1.2s ease ${i * 0.2}s infinite` }}/>
-          ))}
-        </svg>
-        {/* Hover tooltip */}
-        {hovered && !open && (
-          <div style={{ position: "absolute", bottom: "calc(100% + 8px)", left: "50%", transform: "translateX(-50%)", background: "#1e1e2e", border: "1px solid #ffffff10", borderRadius: 8, padding: "5px 10px", fontSize: 11, color: "#94A3B8", whiteSpace: "nowrap", pointerEvents: "none" }}>
-            Click to chat with Spot
-          </div>
-        )}
-      </div>
-    </>
+    <canvas
+      ref={canvasRef}
+      width={CW}
+      height={CH}
+      onClick={handleClick}
+      title="Click me!"
+      style={{
+        position: 'fixed',
+        left: pet.current.x,
+        top: pet.current.y,
+        cursor: 'pointer',
+        zIndex: 9500,
+        imageRendering: 'pixelated',
+        filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))',
+      }}
+    />
   );
 }
 
@@ -4486,7 +4514,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         </div>
       )}
 
-      <PetAssistant user={user} />
+      <PixelPet page={page} />
 
       {/* ═══════ TOP NAV BAR ═══════ */}
       <div style={{ background: "#0d0d12", borderBottom: "1px solid #ffffff08", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
