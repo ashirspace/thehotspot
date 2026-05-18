@@ -2229,10 +2229,23 @@ function ppDraw(ctx, rows, yOff, flipX, canvasW) {
   });
 }
 
+const PET_SEED = [
+  { role: "user", content: "You are Spot — a friendly AI assistant that lives on the thehotspot dashboard. Keep answers short (2-3 sentences), warm and casual. Help the user understand and use this B2B outreach platform. If asked about features, mention: contacts, campaigns, email templates, 12 AI agents, Gmail integration." },
+  { role: "assistant", content: "Hi, I'm Spot. Ask me anything about thehotspot — campaigns, contacts, agents, you name it." },
+];
+
 function PixelPet({ page }) {
   const canvasRef = useRef(null);
+  const containerRef = useRef(null);
   const prevPage = useRef(page);
   const rafRef = useRef(null);
+  const messagesEndRef = useRef(null);
+
+  // chat state
+  const [open, setOpen] = useState(false);
+  const [messages, setMessages] = useState([PET_SEED[1]]);
+  const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const pet = useRef({
     x: window.innerWidth - 90,
@@ -2256,6 +2269,7 @@ function PixelPet({ page }) {
 
   const CW = 10 * PP_SC; // canvas width  = 60
   const CH = 10 * PP_SC; // canvas height = 60
+  const openRef = useRef(false);
 
   // ── draw ──────────────────────────────────────────────────
   function draw() {
@@ -2327,6 +2341,12 @@ function PixelPet({ page }) {
 
     // sparkle age
     p.sparkles = p.sparkles.map(s => ({ ...s, age: s.age + 1 })).filter(s => s.age < 40);
+
+    // freeze pet while chat is open
+    if (openRef.current) {
+      p.state = 'idle';
+      p.vx = 0;
+    }
 
     // state machine
     if (p.state === 'idle') {
@@ -2406,11 +2426,11 @@ function PixelPet({ page }) {
     // clamp x
     p.x = Math.max(8, Math.min(window.innerWidth - CW - 8, p.x));
 
-    // move canvas
-    const canvas = canvasRef.current;
-    if (canvas) {
-      canvas.style.left = Math.round(p.x) + 'px';
-      canvas.style.top = Math.round(p.y) + 'px';
+    // move container
+    const ctr = containerRef.current;
+    if (ctr) {
+      ctr.style.left = Math.round(p.x) + 'px';
+      ctr.style.top = Math.round(p.y) + 'px';
     }
   }
 
@@ -2424,6 +2444,11 @@ function PixelPet({ page }) {
     rafRef.current = requestAnimationFrame(loop);
     return () => cancelAnimationFrame(rafRef.current);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // ── auto-scroll chat to bottom ───────────────────────────
+  useEffect(() => {
+    if (messagesEndRef.current) messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   // ── page change → fly up then fall down ──────────────────
   useEffect(() => {
@@ -2442,33 +2467,179 @@ function PixelPet({ page }) {
     }, 650);
   }, [page]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── click → happy ─────────────────────────────────────────
+  // ── send message ──────────────────────────────────────────
+  const sendMessage = async () => {
+    const text = input.trim();
+    if (!text || loading) return;
+    const userMsg = { role: 'user', content: text };
+    setMessages(prev => [...prev, userMsg]);
+    setInput('');
+    setLoading(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [...PET_SEED, ...messages, userMsg] }),
+      });
+      const data = await res.json();
+      const reply = data.content?.[0]?.text || data.message || 'Sorry, I could not reach the server.';
+      setMessages(prev => [...prev, { role: 'assistant', content: reply }]);
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Connection error — try again.' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // ── click → toggle chat + happy ───────────────────────────
   const handleClick = () => {
     const p = pet.current;
     if (p.state === 'flyup' || p.state === 'falling') return;
-    p.groundY = p.y;
-    p.state = 'happy';
-    p.happyTimer = 2400;
-    p.facingLeft = false;
+    const nextOpen = !openRef.current;
+    openRef.current = nextOpen;
+    setOpen(nextOpen);
+    if (nextOpen) {
+      p.groundY = p.y;
+      p.state = 'happy';
+      p.happyTimer = 1200;
+      p.facingLeft = false;
+    }
   };
 
   return (
-    <canvas
-      ref={canvasRef}
-      width={CW}
-      height={CH}
-      onClick={handleClick}
-      title="Click me!"
+    <div
+      ref={containerRef}
       style={{
         position: 'fixed',
         left: pet.current.x,
         top: pet.current.y,
-        cursor: 'pointer',
         zIndex: 9500,
-        imageRendering: 'pixelated',
-        filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'flex-end',
       }}
-    />
+    >
+      {/* chat panel — floats above the pet */}
+      {open && (
+        <div style={{
+          position: 'absolute',
+          bottom: CH + 10,
+          right: 0,
+          width: 300,
+          background: '#0d0d12',
+          border: '1px solid #ffffff15',
+          borderRadius: 16,
+          overflow: 'hidden',
+          boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
+          display: 'flex',
+          flexDirection: 'column',
+          animation: 'chatSlide .18s ease',
+        }}>
+          {/* header */}
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            padding: '10px 14px', borderBottom: '1px solid #ffffff0d',
+            background: '#111116',
+          }}>
+            <canvas
+              width={CW} height={CH}
+              style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0 }}
+              ref={el => { if (el) { const ctx = el.getContext('2d'); ctx.clearRect(0,0,CW,CH); ppDraw(ctx, PP_HEAD, 0, false, CW); } }}
+            />
+            <span style={{ flex: 1, fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, color: '#f1f5f9' }}>Spot</span>
+            <span style={{ fontSize: 11, color: '#10b981', background: '#10b98118', borderRadius: 20, padding: '2px 8px', fontFamily: "'DM Sans',sans-serif" }}>online</span>
+            <button
+              onClick={(e) => { e.stopPropagation(); openRef.current = false; setOpen(false); }}
+              style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}
+            >
+              <LuX size={14} />
+            </button>
+          </div>
+
+          {/* messages */}
+          <div style={{
+            padding: '12px 12px 8px',
+            overflowY: 'auto',
+            maxHeight: 260,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 8,
+          }}>
+            {messages.map((m, i) => (
+              <div key={i} style={{
+                display: 'flex',
+                justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
+              }}>
+                <div style={{
+                  maxWidth: '82%',
+                  padding: '7px 11px',
+                  borderRadius: m.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
+                  background: m.role === 'user' ? '#10b981' : '#1a1a24',
+                  color: m.role === 'user' ? '#fff' : '#cbd5e1',
+                  fontSize: 12.5,
+                  lineHeight: 1.5,
+                  fontFamily: "'DM Sans',sans-serif",
+                }}>
+                  {m.content}
+                </div>
+              </div>
+            ))}
+            {loading && (
+              <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: '#1a1a24', color: '#64748b', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>
+                  ...
+                </div>
+              </div>
+            )}
+            <div ref={messagesEndRef} />
+          </div>
+
+          {/* input */}
+          <div style={{
+            display: 'flex', gap: 6, padding: '8px 10px 10px',
+            borderTop: '1px solid #ffffff0d', background: '#111116',
+          }}>
+            <input
+              value={input}
+              onChange={e => setInput(e.target.value)}
+              onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
+              placeholder="Ask Spot anything..."
+              style={{
+                flex: 1, background: '#0d0d12', border: '1px solid #ffffff10',
+                borderRadius: 10, padding: '7px 11px', color: '#f1f5f9',
+                fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none',
+              }}
+            />
+            <button
+              onClick={sendMessage}
+              disabled={!input.trim() || loading}
+              style={{
+                background: '#10b981', border: 'none', borderRadius: 10,
+                padding: '7px 10px', cursor: 'pointer', display: 'flex',
+                alignItems: 'center', opacity: (!input.trim() || loading) ? 0.4 : 1,
+              }}
+            >
+              <LuSend size={13} color="#fff" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* pet canvas */}
+      <canvas
+        ref={canvasRef}
+        width={CW}
+        height={CH}
+        onClick={handleClick}
+        title="Click to chat with Spot"
+        style={{
+          cursor: 'pointer',
+          imageRendering: 'pixelated',
+          filter: 'drop-shadow(0 4px 12px rgba(255,112,67,0.35))',
+          display: 'block',
+        }}
+      />
+    </div>
   );
 }
 
