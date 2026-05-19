@@ -1,6 +1,6 @@
-# thehotspot
+# thehotspot — Grow Connections Easily
 
-B2B outreach automation platform — find leads, write emails, run campaigns, and analyze results, powered by AI at every step.
+AI-powered cold outreach that gets real replies. Find leads, write personalised emails, run campaigns, and watch replies land in your own Gmail inbox.
 
 **Production:** [thehotspot.in](https://www.thehotspot.in)
 
@@ -10,11 +10,9 @@ B2B outreach automation platform — find leads, write emails, run campaigns, an
 
 thehotspot has three surfaces:
 
-- **Home (`/`)** — platform overview showing the 5 core components: Lead Input, AI Engine, Outreach Channels, Sequence Manager, and Reply Detection — with Live / Soon / Agent status per feature
-- **Dashboard (`/dashboard`)** — real-time control center: stat cards, outreach tool groups, AI agent grid, and recent campaign activity
-- **AI Agents (`/agents/*`)** — 12 specialized agents, each with one job (lead finder, email writer, reply detector, competitor analyzer, etc.)
-
-See [`docs/what-are-we-building.md`](docs/what-are-we-building.md) for the full product overview.
+- **Landing (`/`)** — editorial-grade public homepage (Inter + Plus Jakarta Sans, light theme, bento feature grid, horizontal how-it-works scroll)
+- **Dashboard (post-login)** — real-time control center: stat cards, campaign manager, AI agent grid, and analytics
+- **AI Agents (`/agents/*`)** — 12 specialised agents, each with one job
 
 ---
 
@@ -24,8 +22,9 @@ See [`docs/what-are-we-building.md`](docs/what-are-we-building.md) for the full 
 |-------|------|
 | Frontend | React 19 + Vite |
 | Routing | React Router 7 |
-| Styling | Inline JS objects (dashboard) / Tailwind CSS 4 (agents) |
-| Icons | lucide-react (dashboard + agents) |
+| Landing page styles | `src/styles/theme.css` (CSS custom properties) |
+| Dashboard styles | Inline JS objects — dark theme |
+| Icons | lucide-react (dashboard) · inline SVG (landing page) |
 | Charts | Recharts |
 | Backend | Vercel Serverless Functions (Node.js) |
 | Database | Neon (PostgreSQL serverless) |
@@ -43,6 +42,32 @@ npm run build     # Production build
 npm run lint      # ESLint
 npm run preview   # Preview production build locally
 ```
+
+---
+
+## Landing Page Architecture
+
+The public homepage is built from 12 composable components assembled in `src/pages/Home.jsx`:
+
+```
+AnnouncementBar → Navbar → Hero (60/40 split)
+→ LogoMarquee → Features (bento grid) → HowItWorks (scroll-snap)
+→ Stats (animated counters) → Testimonial → Pricing
+→ FAQ (accordion) → CTA → Footer
+```
+
+All landing page styles live in `src/styles/theme.css`. CSS custom properties:
+
+```css
+--bg: #ffffff         /* page background */
+--teal: #0d9488       /* brand accent */
+--text: #0f172a       /* body text */
+--font-sans: 'Inter'
+--font-display: 'Plus Jakarta Sans'
+--radius: 6px         /* sharp, not bubbly */
+```
+
+The authenticated app and admin panel use inline dark styles — completely independent of `theme.css`.
 
 ---
 
