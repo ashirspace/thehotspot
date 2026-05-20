@@ -1,21 +1,32 @@
 import { useState } from "react";
 
 export default function AnnouncementBar() {
-  const [dismissed, setDismissed] = useState(false);
-  if (dismissed) return null;
+  const [visible, setVisible] = useState(true);
+  if (!visible) return null;
 
   return (
-    <div className="ann-bar">
-      <span className="ann-bar__dot" />
-      Now in Beta — Join 500+ companies growing with{" "}
-      <a className="ann-bar__link" href="#features">thehotspot</a>
-      {" →"}
+    <div className="lp-announce" role="region" aria-label="Announcement">
+      <div className="lp-announce-inner">
+        <span className="lp-announce-dot" aria-hidden="true" />
+        <span>
+          Now in Beta — Join 500+ companies growing with{" "}
+          <a href="#pricing">thehotspot &rarr;</a>
+        </span>
+      </div>
       <button
-        className="ann-bar__close"
-        onClick={() => setDismissed(true)}
+        type="button"
+        className="lp-announce-close"
         aria-label="Dismiss announcement"
+        onClick={() => setVisible(false)}
       >
-        ×
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+          <path
+            d="M1 1l12 12M13 1L1 13"
+            stroke="currentColor"
+            strokeWidth="1.6"
+            strokeLinecap="round"
+          />
+        </svg>
       </button>
     </div>
   );

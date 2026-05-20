@@ -5,39 +5,42 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [2.0.0] — 2026-05-19
+## [2.0.0] — Light Theme Redesign — 2026-05-19
 
 ### Changed
 
-- **Landing page complete visual overhaul** — dark AI-template aesthetic replaced with a premium editorial light theme (Stripe × Linear × Notion × Superhuman)
-- `src/styles/theme.css` rewritten from scratch: new CSS custom property system (`--bg`, `--teal`, `--text`, `--font-sans`, `--font-display`, `--radius`), zero `--th-` prefix
-- Fonts upgraded: Plus Jakarta Sans (display) + Inter (body); DM Sans retained for authenticated app
-- `index.html`: new title, meta description, OG/Twitter card tags
+- Complete landing page UI overhaul: dark AI-template aesthetic replaced
+  with a premium editorial light theme (Stripe × Linear × Notion ×
+  Superhuman)
+- `src/styles/theme.css` rewritten from scratch — new CSS custom property
+  system (`--bg`, `--teal`, `--text`, `--font-display`, `--radius`)
+- New bento grid feature section replacing the 3-column layout
+- New typography system: Plus Jakarta Sans (display) + Inter (body)
+- Refreshed color palette centered on teal `#0d9488`
+- Asymmetric 60/40 hero layout with a product dashboard mockup
+- Editorial-style single pull-quote testimonial
 
 ### Added
 
-- `src/components/AnnouncementBar.jsx` — dismissable beta announcement strip
-- `src/components/Navbar.jsx` — sticky white 64px nav, scroll shadow, mobile hamburger drawer
-- `src/components/Hero.jsx` — 60/40 asymmetric split, dot-grid background, browser mockup
-- `src/components/LogoMarquee.jsx` — infinite CSS marquee, pauses on hover, `prefers-reduced-motion` safe
-- `src/components/Features.jsx` — bento grid (CSS Grid varied spans), IntersectionObserver reveal
-- `src/components/HowItWorks.jsx` — horizontal scroll-snap, 3 steps, large teal outline numbers
-- `src/components/Stats.jsx` — dark strip, rAF-based animated counters
-- `src/components/Testimonial.jsx` — single pull quote, no stars, teal-tint background
-- `src/components/Pricing.jsx` — 3-tier cards, inline SVG checkmarks, popular card teal border
-- `src/components/FAQ.jsx` — accordion with Set-based open state, max-height CSS transition
-- `src/components/CTA.jsx` — white background, centered headline
-- `src/components/Footer.jsx` — dark background, 2fr/1fr/1fr/1fr column grid, inline SVG social icons
-- `src/pages/Home.jsx` — assembles all 12 landing page components
+- Announcement bar with beta callout
+- Horizontal-scroll logo marquee
+- Animated stat counters (rAF, IntersectionObserver)
+- FAQ accordion section
+- Mobile drawer navigation
+- Dot grid hero background
 
 ### Removed
 
-- All inline landing page JSX and inline `<style>` tag from `LoginPage` in `src/App.jsx` — extracted to components
-- Old dark landing page CSS variables (`--th-*` prefix) from `theme.css`
+- Dark theme variants and `--th-*` CSS variables
+- Emoji icons in feature cards
+- Generic 3-column testimonial cards
+- Soft pill buttons
 
-### Internal
+### Performance
 
-- `src/App.jsx` `LoginPage` return now renders `<Home onSignIn=... onGetStarted=... />` — auth modal flow unchanged
+- No animation libraries — all motion is CSS / rAF only
+- `prefers-reduced-motion` disables marquee and scroll reveals
+- Lazy-loaded images, explicit dimensions to avoid layout shift
 
 ---
 

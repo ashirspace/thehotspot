@@ -1,64 +1,77 @@
 import { useState } from "react";
 
-const FAQS = [
+const ITEMS = [
   {
-    q: "Does it really send from my Gmail?",
-    a: "Yes. thehotspot connects to your Gmail account via OAuth. Emails go out from your own address, so inbox placement is real and reply threads land back in your Gmail. No shared IP, no shared reputation.",
+    q: "Will my emails land in spam?",
+    a: "Every sending inbox runs through automated warm-up and per-domain throttling. We keep volume inside safe limits and monitor reputation so your messages reach the primary inbox, not the spam folder.",
   },
   {
-    q: "What happens when a prospect replies?",
-    a: "Our Reply Detection agent monitors your Gmail in real time. The moment a reply comes in on any thread, the follow-up sequence for that contact is automatically stopped. You take over from there.",
+    q: "How is the AI personalization different from mail merge?",
+    a: "Mail merge swaps in a first name. thehotspot reads live company signals — funding rounds, hiring, product launches — and writes a genuinely specific opening line for each contact. You review and approve in bulk.",
   },
   {
-    q: "How is this different from Mailshake or Lemlist?",
-    a: "Those tools help you send sequences. thehotspot writes the emails too. Our AI personalizes every single message using the contact's company, role, and context — no manual copywriting required.",
+    q: "Can I use my own email address?",
+    a: "Yes. Connect any Gmail or Outlook inbox. thehotspot sends through your real account, so replies thread normally and prospects see a familiar address.",
   },
   {
-    q: "Is there a sending limit?",
-    a: "Gmail's API allows roughly 500 emails per day on a standard account. With G Suite or Google Workspace, this can be higher. We optimize send timing to keep you within safe limits automatically.",
+    q: "Do I need a credit card to start?",
+    a: "No. The 14-day trial needs no card. You only enter billing details if you decide to continue on a paid plan.",
   },
   {
-    q: "Can I import my existing contacts?",
-    a: "Yes. Upload any CSV with name, email, company, and optional fields. Our system normalizes and deduplicates the list before your first send.",
+    q: "What happens when someone replies?",
+    a: "Replies are detected automatically, the contact is removed from any further sending, and the conversation surfaces in your unified inbox so you can take it from there.",
   },
 ];
 
 export default function FAQ() {
-  const [open, setOpen] = useState(new Set());
+  const [open, setOpen] = useState(new Set([0]));
 
-  const toggle = (i) =>
+  const toggle = (i) => {
     setOpen((prev) => {
       const next = new Set(prev);
       next.has(i) ? next.delete(i) : next.add(i);
       return next;
     });
+  };
 
   return (
-    <section className="faq-section" id="faq">
-      <div className="faq-section__inner">
-        <div className="faq-section__left">
-          <p className="lp-eyebrow" style={{ marginBottom: 12 }}>FAQ</p>
-          <h2 className="lp-h2">Questions we get a lot.</h2>
-          <p className="faq-section__contact">
-            Still curious?{" "}
-            <a href="mailto:hello@thehotspot.in">Email us →</a>
-          </p>
-        </div>
+    <section className="lp-faq" id="faq">
+      <div className="lp-container">
+        <div className="lp-faq-grid">
+          <div className="lp-faq-aside">
+            <span className="lp-eyebrow">FAQ</span>
+            <h2 className="lp-h2">Questions, answered.</h2>
+            <p className="lp-faq-mail">
+              Still curious?{" "}
+              <a href="mailto:hello@thehotspot.in">Email us</a> — we reply
+              within a day.
+            </p>
+          </div>
 
-        <div className="faq-list">
-          {FAQS.map((item, i) => (
-            <div key={i} className={`faq-item${open.has(i) ? " open" : ""}`}>
-              <button
-                className="faq-item__trigger"
-                onClick={() => toggle(i)}
-                aria-expanded={open.has(i)}
-              >
-                <span className="faq-item__question">{item.q}</span>
-                <span className="faq-item__icon" aria-hidden="true">+</span>
-              </button>
-              <div className="faq-item__answer">{item.a}</div>
-            </div>
-          ))}
+          <div className="lp-faq-list">
+            {ITEMS.map((item, i) => {
+              const isOpen = open.has(i);
+              return (
+                <div
+                  key={item.q}
+                  className={`lp-faq-item${isOpen ? " is-open" : ""}`}
+                >
+                  <button
+                    type="button"
+                    className="lp-faq-trigger"
+                    aria-expanded={isOpen}
+                    onClick={() => toggle(i)}
+                  >
+                    {item.q}
+                    <span className="lp-faq-icon" aria-hidden="true" />
+                  </button>
+                  <div className="lp-faq-panel">
+                    <p className="lp-faq-panel-inner">{item.a}</p>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>

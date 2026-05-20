@@ -1,119 +1,86 @@
-# thehotspot — Grow Connections Easily
+# thehotspot.in
 
-AI-powered cold outreach that gets real replies. Find leads, write personalised emails, run campaigns, and watch replies land in your own Gmail inbox.
+> Grow Connections Easily — AI-powered cold outreach automation.
 
-**Production:** [thehotspot.in](https://www.thehotspot.in)
+[Live](https://thehotspot.in) · [Report Bug](https://github.com/ashirspace/thehotspot/issues) · [Request Feature](https://github.com/ashirspace/thehotspot/issues)
 
----
+## What it does
 
-## What It Is
+thehotspot is an AI outreach platform that helps marketing teams,
+agencies, and founders send cold emails that actually get replies. We
+combine AI personalization with battle-tested deliverability
+infrastructure so you can scale outreach without spamming inboxes.
 
-thehotspot has three surfaces:
+## Tech stack
 
-- **Landing (`/`)** — editorial-grade public homepage (Inter + Plus Jakarta Sans, light theme, bento feature grid, horizontal how-it-works scroll)
-- **Dashboard (post-login)** — real-time control center: stat cards, campaign manager, AI agent grid, and analytics
-- **AI Agents (`/agents/*`)** — 12 specialised agents, each with one job
+| Layer            | Choice                          |
+| ---------------- | ------------------------------- |
+| Frontend         | React 19 + Vite                 |
+| Styling          | Custom CSS (`src/styles/theme.css`) |
+| Hosting          | Vercel (auto-deploy from `main`) |
+| Backend automation | n8n                           |
+| Email delivery   | Gmail API                       |
+| Data             | Airtable + Google Sheets        |
 
----
-
-## Stack
-
-| Layer | Tech |
-|-------|------|
-| Frontend | React 19 + Vite |
-| Routing | React Router 7 |
-| Landing page styles | `src/styles/theme.css` (CSS custom properties) |
-| Dashboard styles | Inline JS objects — dark theme |
-| Icons | lucide-react (dashboard) · inline SVG (landing page) |
-| Charts | Recharts |
-| Backend | Vercel Serverless Functions (Node.js) |
-| Database | Neon (PostgreSQL serverless) |
-| AI | Anthropic Claude + OpenAI GPT-4o-mini |
-| Email | Gmail API (OAuth 2.0) |
-| Auth DB | Airtable (legacy) + PostgreSQL |
-
----
-
-## Commands
+## Run locally
 
 ```bash
-npm run dev       # Start dev server → http://localhost:5173
-npm run build     # Production build
-npm run lint      # ESLint
-npm run preview   # Preview production build locally
+git clone https://github.com/ashirspace/thehotspot
+cd thehotspot
+npm install
+npm run dev
 ```
 
----
+The dev server runs at http://localhost:5173.
 
-## Landing Page Architecture
-
-The public homepage is built from 12 composable components assembled in `src/pages/Home.jsx`:
-
-```
-AnnouncementBar → Navbar → Hero (60/40 split)
-→ LogoMarquee → Features (bento grid) → HowItWorks (scroll-snap)
-→ Stats (animated counters) → Testimonial → Pricing
-→ FAQ (accordion) → CTA → Footer
+```bash
+npm run build     # production build
+npm run preview   # preview the production build
+npm run lint      # run ESLint
 ```
 
-All landing page styles live in `src/styles/theme.css`. CSS custom properties:
+## Deploy
 
-```css
---bg: #ffffff         /* page background */
---teal: #0d9488       /* brand accent */
---text: #0f172a       /* body text */
---font-sans: 'Inter'
---font-display: 'Plus Jakarta Sans'
---radius: 6px         /* sharp, not bubbly */
+Push to `main` → Vercel deploys automatically.
+
+## Folder structure
+
+```
+thehotspot/
+├── index.html                  Google Fonts + meta tags
+├── src/
+│   ├── main.jsx                router entry
+│   ├── App.jsx                 auth + authenticated dashboard
+│   ├── styles/
+│   │   └── theme.css           single source of truth for landing CSS
+│   ├── components/             12 landing page sections
+│   │   ├── AnnouncementBar.jsx
+│   │   ├── Navbar.jsx
+│   │   ├── Hero.jsx
+│   │   ├── LogoMarquee.jsx
+│   │   ├── Features.jsx
+│   │   ├── HowItWorks.jsx
+│   │   ├── Stats.jsx
+│   │   ├── Testimonial.jsx
+│   │   ├── Pricing.jsx
+│   │   ├── FAQ.jsx
+│   │   ├── CTA.jsx
+│   │   └── Footer.jsx
+│   └── pages/
+│       └── Home.jsx            assembles the landing page
+├── README.md
+├── CHANGELOG.md
+└── CONTRIBUTING.md
 ```
 
-The authenticated app and admin panel use inline dark styles — completely independent of `theme.css`.
+## Brand
 
----
+- Primary: `#0d9488` (teal)
+- Typography: Plus Jakarta Sans (display) + Inter (body)
+- Logo: thehotspot (always lowercase, one word)
+- Parent: Ibra Digitals Branding Services LLC
 
-## The 12 AI Agents
+## Links
 
-| Agent | Route |
-|-------|-------|
-| Lead Finder | `/agents/lead-finder` |
-| Lead Scoring | `/agents/lead-scoring` |
-| Landing Page Analyzer | `/agents/landing-page-analyzer` |
-| Email Sequence Builder | `/agents/email-sequence-builder` |
-| A/B Email Tester | `/agents/ab-email-tester` |
-| Reply Detector | `/agents/reply-detector` |
-| Blog Generator | `/agents/blog-generator` |
-| Competitor Analyzer | `/agents/competitor-analyzer` |
-| Backlink Outreach | `/agents/backlink-outreach` |
-| Campaign Dashboard | `/agents/campaign-dashboard` |
-| CRM Lite | `/agents/crm-lite` |
-| CSV Import/Export | `/agents/csv-import-export` |
-
----
-
-## Environment Variables
-
-| Variable | Purpose |
-|----------|---------|
-| `ANTHROPIC_API_KEY` | Claude API (agents) |
-| `OPENAI_API_KEY` | Email/angle generation |
-| `DATABASE_URL` | Neon PostgreSQL |
-| `VITE_AIRTABLE_API_KEY` | Legacy user auth |
-| `VITE_AIRTABLE_BASE_ID` | Legacy user auth |
-| `VITE_AIRTABLE_TABLE_NAME` | Defaults to `"Users"` |
-
----
-
-## Docs
-
-| File | Contents |
-|------|----------|
-| [`docs/what-are-we-building.md`](docs/what-are-we-building.md) | Product overview, surfaces, agents, current state |
-| [`docs/how-are-we-building.md`](docs/how-are-we-building.md) | Tech stack, architecture decisions, data flow |
-| [`docs/source-of-truth.md`](docs/source-of-truth.md) | Routing, API endpoints, DB schema, env vars, style rules |
-| [`docs/context.md`](docs/context.md) | Why it exists, decisions made, what's next |
-
----
-
-## Deployment
-
-Auto-deploys to Vercel on push to `main`. Serverless function limit: 11 / 12 (Vercel Hobby).
+- Site: https://thehotspot.in
+- Repo: https://github.com/ashirspace/thehotspot

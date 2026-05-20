@@ -3,74 +3,67 @@ import { useRef, useState, useEffect } from "react";
 const STEPS = [
   {
     num: "01",
-    label: "Step 1",
-    title: "Import your contacts",
-    desc: "Upload a CSV or let our Lead Finder AI discover qualified prospects in your target industry. Every contact is instantly ready for outreach.",
+    title: "Import your list",
+    desc: "Drop in a CSV or sync from your CRM. thehotspot enriches every contact with live company signals automatically.",
   },
   {
     num: "02",
-    label: "Step 2",
-    title: "AI writes every email",
-    desc: "Our Email Writer Agent crafts a unique, personalized cold email for each contact — referencing their company, role, and context. No templates.",
+    title: "Let AI write the first draft",
+    desc: "Each email is generated from real context — recent news, role, industry. Edit a few, approve the rest in bulk.",
   },
   {
     num: "03",
-    label: "Step 3",
-    title: "Launch and watch replies come in",
-    desc: "Hit send. thehotspot delivers from your Gmail, tracks opens, and automatically fires follow-ups for contacts who haven't responded.",
+    title: "Send, track, and reply",
+    desc: "Campaigns send on a safe schedule. Opens and replies stream into one inbox so you only touch the warm ones.",
   },
 ];
 
 export default function HowItWorks() {
   const trackRef = useRef(null);
-  const [active, setActive] = useState(0);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const track = trackRef.current;
-    if (!track) return;
+    const el = trackRef.current;
+    if (!el) return;
     const onScroll = () => {
-      const idx = Math.round(track.scrollLeft / (track.clientWidth * 0.6));
-      setActive(Math.min(idx, STEPS.length - 1));
+      const max = el.scrollWidth - el.clientWidth;
+      setProgress(max > 0 ? el.scrollLeft / max : 0);
     };
-    track.addEventListener("scroll", onScroll, { passive: true });
-    return () => track.removeEventListener("scroll", onScroll);
+    el.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => el.removeEventListener("scroll", onScroll);
   }, []);
 
-  const scrollTo = (i) => {
-    const track = trackRef.current;
-    if (!track) return;
-    track.scrollTo({ left: track.clientWidth * 0.6 * i, behavior: "smooth" });
-  };
-
   return (
-    <section className="hiw-section" id="how-it-works">
-      <div className="hiw-section__head">
-        <p className="lp-eyebrow" style={{ marginBottom: 12 }}>How it works</p>
-        <h2 className="lp-h2">Up and running in three steps.</h2>
+    <section className="lp-how" id="how">
+      <div className="lp-container">
+        <div className="lp-section-head">
+          <span className="lp-eyebrow">How it works</span>
+          <h2 className="lp-h2">From cold list to booked call.</h2>
+          <p className="lp-lead">
+            Three steps. No onboarding calls, no implementation team.
+          </p>
+        </div>
       </div>
 
-      <div className="hiw-track" ref={trackRef}>
-        {STEPS.map((step) => (
-          <div key={step.num} className="hiw-card">
-            <div>
-              <div className="hiw-card__step-label">{step.label}</div>
-              <h3 className="hiw-card__title">{step.title}</h3>
-              <p className="hiw-card__desc">{step.desc}</p>
-            </div>
-            <div className="hiw-card__num" aria-hidden="true">{step.num}</div>
+      <div className="lp-container">
+        <div className="lp-how-track-wrap">
+          <div className="lp-how-track" ref={trackRef}>
+            {STEPS.map((s) => (
+              <article className="lp-how-card" key={s.num}>
+                <span className="lp-how-num" aria-hidden="true">{s.num}</span>
+                <h3 className="lp-how-title">{s.title}</h3>
+                <p className="lp-how-desc">{s.desc}</p>
+                <div className="lp-how-progress" aria-hidden="true">
+                  <div
+                    className="lp-how-progress-bar"
+                    style={{ width: `${20 + progress * 80}%` }}
+                  />
+                </div>
+              </article>
+            ))}
           </div>
-        ))}
-      </div>
-
-      <div className="hiw-dots">
-        {STEPS.map((_, i) => (
-          <button
-            key={i}
-            className={`hiw-dot${active === i ? " active" : ""}`}
-            onClick={() => scrollTo(i)}
-            aria-label={`Go to step ${i + 1}`}
-          />
-        ))}
+        </div>
       </div>
     </section>
   );

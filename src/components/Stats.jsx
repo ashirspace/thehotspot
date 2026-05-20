@@ -1,69 +1,66 @@
 import { useEffect, useRef, useState } from "react";
 
 const STATS = [
-  { target: 500, suffix: "+", label: "Campaigns launched" },
-  { target: 98,  suffix: "%", label: "Delivery rate" },
-  { target: 40,  suffix: "+", label: "Industries served" },
-  { target: 3,   suffix: " min", label: "Avg setup time" },
+  { value: 500, prefix: "", suffix: "+", label: "Campaigns launched" },
+  { value: 98, prefix: "", suffix: "%", label: "Delivery rate" },
+  { value: 40, prefix: "", suffix: "+", label: "Industries served" },
+  { value: 3, prefix: "", suffix: " min", label: "Avg setup time" },
 ];
 
-function useCounter(target, active) {
-  const [count, setCount] = useState(0);
-  const raf = useRef(null);
+function StatItem({ stat, run }) {
+  const [val, setVal] = useState(0);
 
   useEffect(() => {
-    if (!active) return;
-    const duration = 1400;
+    if (!run) return;
+    let raf;
     const start = performance.now();
-
     const tick = (now) => {
-      const elapsed = now - start;
-      const progress = Math.min(elapsed / duration, 1);
-      const eased = 1 - Math.pow(1 - progress, 3);
-      setCount(Math.round(eased * target));
-      if (progress < 1) raf.current = requestAnimationFrame(tick);
+      const p = Math.min((now - start) / 1600, 1);
+      setVal(Math.round(stat.value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
     };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [run, stat.value]);
 
-    raf.current = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf.current);
-  }, [active, target]);
-
-  return count;
-}
-
-function StatItem({ stat, active }) {
-  const count = useCounter(stat.target, active);
   return (
-    <div className="stat-item">
-      <div className="stat-item__num">
-        {count}{stat.suffix}
+    <div>
+      <div className="lp-stat-num">
+        {stat.prefix}{val}{stat.suffix}
       </div>
-      <div className="stat-item__label">{stat.label}</div>
+      <div className="lp-stat-label">{stat.label}</div>
     </div>
   );
 }
 
 export default function Stats() {
   const ref = useRef(null);
-  const [active, setActive] = useState(false);
+  const [run, setRun] = useState(false);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
-      ([entry]) => { if (entry.isIntersecting) { setActive(true); io.disconnect(); } },
-      { threshold: 0.3 }
+      ([e]) => {
+        if (e.isIntersecting) {
+          setRun(true);
+          io.disconnect();
+        }
+      },
+      { threshold: 0.4 }
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
 
   return (
-    <section className="stats-section" ref={ref}>
-      <div className="stats-section__inner">
-        {STATS.map((stat) => (
-          <StatItem key={stat.label} stat={stat} active={active} />
-        ))}
+    <section className="lp-stats" ref={ref}>
+      <div className="lp-container">
+        <div className="lp-stats-grid">
+          {STATS.map((s) => (
+            <StatItem key={s.label} stat={s} run={run} />
+          ))}
+        </div>
       </div>
     </section>
   );

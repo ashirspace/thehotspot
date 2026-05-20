@@ -1,97 +1,103 @@
 const CheckIcon = () => (
-  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="pricing-card__check">
-    <path d="M2.5 7L5.5 10L11.5 4" stroke="#0d9488" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+  <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+    <path
+      d="M3 8.5l3.2 3.2L13 4.5"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
   </svg>
 );
 
 const PLANS = [
   {
     name: "Starter",
-    price: "0",
-    desc: "For founders and solo SDRs just getting started with cold outreach.",
-    features: [
-      "500 contacts",
-      "1 active campaign",
-      "AI email generation",
-      "Gmail integration",
-      "Basic analytics",
-    ],
+    price: 0,
+    unit: "/month",
+    desc: "For founders sending their first campaigns.",
     cta: "Start free",
-    popular: false,
+    variant: "lp-btn-outline",
+    features: [
+      "200 emails / month",
+      "1 sending inbox",
+      "AI draft generation",
+      "Open & reply tracking",
+    ],
   },
   {
     name: "Growth",
-    price: "49",
-    desc: "For growing teams scaling outreach across multiple campaigns and markets.",
-    features: [
-      "5,000 contacts",
-      "10 active campaigns",
-      "AI personalization engine",
-      "Follow-up sequences",
-      "Reply detection",
-      "Advanced analytics",
-      "Priority support",
-    ],
-    cta: "Start 14-day trial",
+    price: 49,
+    unit: "/month",
+    desc: "For SDRs and small teams scaling outreach.",
+    cta: "Start free trial",
+    variant: "lp-btn-primary",
     popular: true,
+    features: [
+      "10,000 emails / month",
+      "5 sending inboxes",
+      "AI personalization from live signals",
+      "Inbox warm-up & throttling",
+      "Pipeline & campaign analytics",
+    ],
   },
   {
     name: "Scale",
-    price: "149",
-    desc: "For agencies and enterprise teams with high-volume outreach needs.",
-    features: [
-      "Unlimited contacts",
-      "Unlimited campaigns",
-      "All AI agents",
-      "Custom send schedules",
-      "Team collaboration",
-      "API access",
-      "Dedicated onboarding",
-    ],
+    price: 149,
+    unit: "/month",
+    desc: "For agencies running outreach at volume.",
     cta: "Talk to sales",
-    popular: false,
+    variant: "lp-btn-outline",
+    features: [
+      "Unlimited emails",
+      "Unlimited inboxes",
+      "Dedicated deliverability manager",
+      "Team workspaces & roles",
+      "Priority support",
+    ],
   },
 ];
 
-export default function Pricing() {
+export default function Pricing({ onGetStarted }) {
   return (
-    <section className="pricing-section" id="pricing">
-      <div className="pricing-section__inner">
-        <div className="pricing-section__header">
-          <p className="lp-eyebrow" style={{ marginBottom: 12 }}>Pricing</p>
-          <h2 className="lp-h2">Simple, honest pricing.</h2>
-          <p className="lp-lead" style={{ marginTop: 14 }}>
-            No hidden fees. No per-seat nonsense. Cancel anytime.
+    <section className="lp-pricing" id="pricing">
+      <div className="lp-container">
+        <div className="lp-section-head">
+          <span className="lp-eyebrow">Pricing</span>
+          <h2 className="lp-h2">Pay for replies, not seats.</h2>
+          <p className="lp-lead">
+            Every plan includes AI drafting and deliverability tooling.
+            Upgrade when your volume does.
           </p>
         </div>
 
-        <div className="pricing-grid">
-          {PLANS.map((plan) => (
-            <div
-              key={plan.name}
-              className={`pricing-card${plan.popular ? " pricing-card--popular" : ""}`}
+        <div className="lp-pricing-grid">
+          {PLANS.map((p) => (
+            <article
+              key={p.name}
+              className={`lp-price-card${p.popular ? " is-popular" : ""}`}
             >
-              {plan.popular && <div className="pricing-card__tab" />}
-
-              {plan.popular && (
-                <div style={{ paddingTop: plan.popular ? 8 : 0 }}>
-                  <span className="pricing-card__badge">Most Popular</span>
-                </div>
+              {p.popular && (
+                <>
+                  <span className="lp-price-card-band" aria-hidden="true" />
+                  <span className="lp-price-badge">Most Popular</span>
+                </>
               )}
 
-              <div className="pricing-card__name">{plan.name}</div>
+              <span className="lp-eyebrow lp-price-name">{p.name}</span>
 
-              <div className="pricing-card__price">
-                <span className="pricing-card__currency">$</span>
-                <span className="pricing-card__amount">{plan.price}</span>
-                <span className="pricing-card__period">/mo</span>
+              <div className="lp-price-amount">
+                <span className="lp-price-amount-num">${p.price}</span>
+                <span className="lp-price-amount-unit">{p.unit}</span>
               </div>
 
-              <p className="pricing-card__desc">{plan.desc}</p>
+              <p className="lp-price-desc">{p.desc}</p>
 
-              <ul className="pricing-card__features">
-                {plan.features.map((f) => (
-                  <li key={f} className="pricing-card__feature">
+              <div className="lp-price-divider" />
+
+              <ul className="lp-price-features">
+                {p.features.map((f) => (
+                  <li className="lp-price-feature" key={f}>
                     <CheckIcon />
                     {f}
                   </li>
@@ -99,11 +105,13 @@ export default function Pricing() {
               </ul>
 
               <button
-                className={`btn btn-lg${plan.popular ? " btn-primary" : " btn-outline"}`}
+                type="button"
+                className={`lp-btn ${p.variant} lp-btn-block`}
+                onClick={onGetStarted}
               >
-                {plan.cta}
+                {p.cta}
               </button>
-            </div>
+            </article>
           ))}
         </div>
       </div>
