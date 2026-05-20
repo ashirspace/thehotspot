@@ -2840,45 +2840,45 @@ function ContactsPage({ onBack, showToast, user }) {
   if (view === "hub") return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ textAlign: "center", marginBottom: 32 }}>
-        <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>{c("cp_title", "Contacts Database")}</div>
-        <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>{c("cp_subtitle", "Connect an existing data source or build your database from scratch.")}</div>
-      </div>
-      <div className="rsp-contacts-hub" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}
-          onClick={() => setView("connect_sheets")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(16,185,129,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98110,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
+      <header className="dash-page-head">
+        <span className="dash-eyebrow">02 — Contacts</span>
+        <h1 className="dash-page-title">{c("cp_title", "Contacts Database")}</h1>
+        <p style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 520 }}>
+          {c("cp_subtitle", "Connect an existing data source or build your list from scratch.")}
+        </p>
+      </header>
+      <section className="dash-action-grid">
+        <article className="dash-card pad-lg" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <LuLink size={18} strokeWidth={1.5} style={{ color: "var(--text-soft)" }} />
+            <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", margin: 0 }}>{c("cp_card1_title", "Connect Data Source")}</h3>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{c("cp_card1_title", "Connect Data Source")}</div>
-          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card1_desc", "Import contacts from Google Sheets, Airtable, or CSV files you already have.")}</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500 }}>{s}</span>
-            ))}
+          <p style={{ fontSize: 13, color: "var(--text-soft)", lineHeight: 1.55, margin: 0, flex: 1 }}>
+            {c("cp_card1_desc", "Import contacts from tools you already use.")}
+          </p>
+          <ul className="dash-action-list">
+            <li onClick={() => setView("connect_sheets")}>→&nbsp;&nbsp;Google Sheets</li>
+            <li onClick={() => setView("connect_sheets")}>→&nbsp;&nbsp;Airtable</li>
+            <li onClick={() => setView("connect_sheets")}>→&nbsp;&nbsp;CSV upload</li>
+          </ul>
+          <button className="dash-btn dash-btn-primary" style={{ width: "100%" }} onClick={() => setView("connect_sheets")}>Connect →</button>
+        </article>
+        <article className="dash-card pad-lg" style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <LuDatabase size={18} strokeWidth={1.5} style={{ color: "var(--text-soft)" }} />
+            <h3 style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", margin: 0 }}>{c("cp_card2_title", "Create New Database")}</h3>
           </div>
-        </div>
-        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}
-          onClick={() => setView("create_db")}
-          onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(99,102,241,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; }}>
-          <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f110,transparent 70%)" }} />
-          <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
-          </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{c("cp_card2_title", "Create New Database")}</div>
-          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card2_desc", "Start fresh — define custom fields, add contacts manually, build your list from scratch.")}</div>
-          <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-            {["Custom Fields", "Manual Entry", "Full Control"].map(s => (
-              <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#6366f120", color: "#818cf8", fontWeight: 500 }}>{s}</span>
-            ))}
-          </div>
-        </div>
-      </div>
+          <p style={{ fontSize: 13, color: "var(--text-soft)", lineHeight: 1.55, margin: 0, flex: 1 }}>
+            {c("cp_card2_desc", "Start fresh with full control over your schema.")}
+          </p>
+          <ul className="dash-action-list">
+            <li onClick={() => setView("create_db")}>→&nbsp;&nbsp;Custom fields</li>
+            <li onClick={() => setView("create_db")}>→&nbsp;&nbsp;Manual entry</li>
+            <li onClick={() => setView("create_db")}>→&nbsp;&nbsp;Full control</li>
+          </ul>
+          <button className="dash-btn dash-btn-outline" style={{ width: "100%" }} onClick={() => setView("create_db")}>Start fresh</button>
+        </article>
+      </section>
     </div>
   );
 
