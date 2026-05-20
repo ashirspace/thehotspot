@@ -1925,6 +1925,32 @@
   min-height: 0;
 }
 
+.dash-burger {
+  display: none;
+  width: 36px;
+  height: 36px;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--r);
+  color: var(--text-soft);
+  cursor: pointer;
+}
+
+.dash-burger:hover {
+  background: var(--bg-hover);
+  color: var(--text);
+}
+
+.dash-backdrop {
+  display: none;
+  position: fixed;
+  inset: 64px 0 0 0;
+  z-index: 30;
+  background: rgba(15, 23, 42, 0.28);
+}
+
 /* === DASHBOARD · SIDEBAR ================================ */
 .dash-sidebar {
   flex: 0 0 240px;
@@ -2459,6 +2485,8 @@
   .dash-sidebar.is-open { transform: translateX(0); }
   .dash-stat-grid { grid-template-columns: 1fr 1fr; }
   .dash-main { padding: 24px; }
+  .dash-burger { display: inline-flex; }
+  .dash-backdrop { display: block; }
 }
 
 @media (max-width: 640px) {

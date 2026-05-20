@@ -7,6 +7,7 @@ import {
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
+  LuMenu,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
@@ -516,12 +517,12 @@ const STATS_DATA = getStatsData();
 
 /* ───────── STYLES (object) ───────── */
 const S = {
-  app: { fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#F1F5F9", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%", maxWidth: "100vw", overflow: "hidden" },
-  header: { padding: "16px 28px", borderBottom: "1px solid #ffffff10", display: "flex", alignItems: "center", justifyContent: "space-between", background: "#111116" },
-  logo: { width: 36, height: 36, borderRadius: 10, background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#fff" },
+  app: { fontFamily: "var(--font-sans)", background: "var(--bg)", color: "var(--text)", minHeight: "100vh", display: "flex", flexDirection: "column", width: "100%", maxWidth: "100vw", overflow: "hidden" },
+  header: { padding: "16px 28px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--bg)" },
+  logo: { width: 36, height: 36, borderRadius: 10, background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontWeight: 800, fontSize: 14, color: "#fff" },
   layout: { flex: 1, display: "flex", overflow: "hidden", height: "calc(100vh - 65px)" },
   content: { flex: 1, padding: "24px 28px", overflowY: "auto" },
-  sectionLabel: { fontSize: 12, color: "#64748B", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 },
+  sectionLabel: { fontSize: 12, color: "var(--text-soft)", fontWeight: 600, letterSpacing: 1, textTransform: "uppercase", marginBottom: 12 },
 };
 
 /* ───────── COMPONENTS ───────── */
@@ -4486,48 +4487,48 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
   const pageIcon  = navItems.find(n => n.id === page)?.icon  || "";
 
   return (
-    <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", color: "#F1F5F9", height: "100dvh", width: "100vw", display: "flex", flexDirection: "column", overflow: "hidden", position: "fixed", inset: 0 }}>
+    <div className="dash-shell" style={{ width: "100vw", position: "fixed", inset: 0 }}>
 
-      {/* TOAST */}
+      {/* TOAST — white card + colored left border, never a bright fill */}
       {toast && (
-        <div style={{ position: "fixed", top: 20, right: 20, background: "#10b981", color: "#fff", padding: "12px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 1000, display: "flex", alignItems: "center", gap: 8, boxShadow: "0 8px 32px #10b98144", animation: "slideIn .3s ease" }}>
-          <I.Zap /> {toast}
+        <div style={{ position: "fixed", top: 20, right: 20, zIndex: 1000, animation: "slideIn .3s ease" }}>
+          <div className="dash-toast is-green">
+            <LuZap size={15} style={{ color: "var(--green)", flexShrink: 0, marginTop: 1 }} />
+            <span>{toast}</span>
+          </div>
         </div>
       )}
 
       <PixelPet />
 
       {/* ═══════ TOP NAV BAR ═══════ */}
-      <div style={{ background: "#0d0d12", borderBottom: "1px solid #ffffff08", padding: "0 20px", height: 56, display: "flex", alignItems: "center", justifyContent: "space-between", flexShrink: 0, zIndex: 10 }}>
-        {/* Left: hamburger + logo + breadcrumb */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
-          <button onClick={() => setSidebarOpen(o => !o)} style={{ background: "none", border: "none", cursor: "pointer", padding: 6, display: "flex", flexDirection: "column", gap: 4, borderRadius: 6 }}
-            title={sidebarOpen ? "Close menu" : "Open menu"}>
-            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(45deg) translate(4px,4px)" : "none" }} />
-            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", opacity: sidebarOpen ? 0 : 1 }} />
-            <span style={{ display: "block", width: 16, height: 1.5, background: "#64748B", borderRadius: 2, transition: "all .2s", transform: sidebarOpen ? "rotate(-45deg) translate(4px,-4px)" : "none" }} />
+      <div className="dash-topbar">
+        <button className="dash-burger" onClick={() => setSidebarOpen(o => !o)}
+          aria-label={sidebarOpen ? "Close menu" : "Open menu"}>
+          {sidebarOpen ? <LuX size={18} /> : <LuMenu size={18} />}
+        </button>
+        <button onClick={() => setPage(null)} className="dash-wordmark"
+          style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
+          <span className="dash-wordmark-dot" />
+          thehotspot
+        </button>
+        {page !== null && (
+          <span className="dash-breadcrumb rsp-breadcrumb">
+            <span className="dash-breadcrumb-sep">/</span>
+            {pageLabel}
+          </span>
+        )}
+        <div className="dash-topbar-right">
+          <label className="dash-search rsp-gmail-badge">
+            <LuSearch size={14} style={{ flexShrink: 0 }} />
+            <input placeholder="Search campaigns, contacts…" readOnly />
+            <span className="dash-kbd">⌘K</span>
+          </label>
+          <button className="dash-icon-btn" onClick={() => connectGmail()}
+            title={gmailConnected ? "Gmail connected" : "Connect Gmail"}>
+            <LuMail size={17} style={{ color: gmailConnected ? "var(--teal)" : "var(--text-soft)" }} />
           </button>
-          <button onClick={() => setPage(null)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-            <Logo size={22} />
-            <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.2 }}>thehotspot</span>
-          </button>
-          {page !== null && (
-            <span className="rsp-breadcrumb" style={{ display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ color: "#1e293b", fontSize: 14 }}>/</span>
-              <span style={{ fontSize: 13, fontWeight: 500, color: "#94A3B8" }}>{pageLabel}</span>
-            </span>
-          )}
-        </div>
-        {/* Right: Gmail status + profile avatar */}
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div className="rsp-gmail-badge" style={{ display: "flex", alignItems: "center", gap: 6, padding: "5px 10px", borderRadius: 8, background: gmailConnected ? "#10b98110" : "#f9731610", border: gmailConnected ? "1px solid #10b98120" : "1px solid #f9731620" }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
-            <span style={{ fontSize: 11, fontWeight: 500, color: gmailConnected ? "#10b981" : "#f97316" }}>{gmailConnected ? "Gmail" : "Connect"}</span>
-          </div>
-          <button onClick={() => setPage("profile")} title="Profile" style={{ width: 30, height: 30, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, fontWeight: 700, color: "#fff", border: "1.5px solid #ffffff10", cursor: "pointer", transition: "border-color .15s", flexShrink: 0 }}
-            onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"}
-            onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff10"}
-          >
+          <button className="dash-avatar" onClick={() => setPage("profile")} title="Profile">
             {user?.username?.[0]?.toUpperCase() || "U"}
           </button>
         </div>
@@ -4538,116 +4539,74 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
         {/* SIDEBAR BACKDROP */}
         {sidebarOpen && (
-          <div onClick={() => setSidebarOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 40, background: "rgba(15,23,42,0.25)", backdropFilter: "blur(1px)" }} />
+          <div className="dash-backdrop" onClick={() => setSidebarOpen(false)} />
         )}
 
-        {/* LEFT SIDEBAR — slides in/out */}
-        <div style={{
-          position: "fixed", top: 56, left: 0, bottom: 0, zIndex: 50,
-          width: 220, background: "#0d0d12", borderRight: "1px solid #ffffff08",
-          display: "flex", flexDirection: "column", flexShrink: 0,
-          transform: sidebarOpen ? "translateX(0)" : "translateX(-100%)",
-          transition: "transform .22s cubic-bezier(.4,0,.2,1)",
-          boxShadow: sidebarOpen ? "8px 0 32px rgba(0,0,0,0.4)" : "none",
-        }}>
-          {/* Logo wordmark */}
-          <div style={{ display: "flex", alignItems: "center", gap: 9, padding: "20px 16px 16px" }}>
-            <Logo size={22} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.2 }}>thehotspot</span>
-          </div>
-
-          {/* Nav items */}
-          <div style={{ flex: 1, padding: "4px 8px" }}>
-            {[
-              { id: null,              label: "Home",        icon: <LuHouse size={15} /> },
-              { id: "dashboard",       label: "Dashboard",   icon: <LuLayoutDashboard size={15} /> },
-              { id: "contacts",        label: "Contacts",    icon: <LuUsers size={15} /> },
-              { id: "campaignStatus",  label: "Campaigns",   icon: <LuRadio size={15} /> },
-              { id: "emailTemplates",  label: "Templates",   icon: <LuFilePen size={15} /> },
-              { id: "settings",        label: "Settings",    icon: <LuSettings size={15} /> },
-            ].map(item => {
-              const isActive = page === item.id;
-              return (
-                <button key={String(item.id)} onClick={() => {
-                  setPage(item.id); setSidebarOpen(false);
-                }} style={{
-                  display: "flex", alignItems: "center", gap: 9, width: "100%",
-                  padding: "9px 12px", marginBottom: 2, borderRadius: 8,
-                  background: isActive ? "#ffffff0c" : "transparent",
-                  color: isActive ? "#F1F5F9" : "#64748B",
-                  fontWeight: isActive ? 600 : 400,
-                  border: "none", cursor: "pointer", textAlign: "left",
-                  fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
-                  borderLeft: isActive ? "2px solid #10b981" : "2px solid transparent",
-                }}
-                  onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "#ffffff06"; e.currentTarget.style.color = "#94A3B8"; }}}
-                  onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748B"; }}}
-                >
-                  <span style={{ color: isActive ? "#10b981" : "inherit", display: "flex" }}>{item.icon}</span>
+        {/* LEFT SIDEBAR — persistent on desktop, drawer below 1024px */}
+        <aside className={`dash-sidebar${sidebarOpen ? " is-open" : ""}`}>
+          {[
+            { eyebrow: "Workspace", items: [
+              { id: null,             label: "Home",         icon: <LuHouse size={18} /> },
+              { id: "dashboard",      label: "Dashboard",    icon: <LuLayoutDashboard size={18} /> },
+              { id: "contacts",       label: "Contacts",     icon: <LuUsers size={18} /> },
+              { id: "campaignStatus", label: "Campaigns",    icon: <LuRadio size={18} /> },
+            ] },
+            { eyebrow: "Intelligence", items: [
+              { id: "emailSender",    label: "Email Sender", icon: <LuSend size={18} /> },
+              { id: "emailTemplates", label: "Templates",    icon: <LuFilePen size={18} /> },
+            ] },
+            { eyebrow: "Account", items: [
+              { id: "settings",       label: "Settings",     icon: <LuSettings size={18} /> },
+            ] },
+          ].map(section => (
+            <div key={section.eyebrow}>
+              <div className="dash-sidebar-section">
+                <span className="dash-sidebar-eyebrow">{section.eyebrow}</span>
+              </div>
+              {section.items.map(item => (
+                <button key={String(item.id)}
+                  className={`dash-nav-item${page === item.id ? " is-active" : ""}`}
+                  onClick={() => { setPage(item.id); setSidebarOpen(false); }}>
+                  {item.icon}
                   {item.label}
                 </button>
-              );
-            })}
-          </div>
+              ))}
+            </div>
+          ))}
 
-          {/* Bottom section */}
-          <div style={{ borderTop: "1px solid #ffffff08", padding: "10px 8px 12px" }}>
-            <button onClick={() => { connectGmail(); setSidebarOpen(false); }} style={{
-              display: "flex", alignItems: "center", gap: 8, width: "100%",
-              padding: "8px 12px", borderRadius: 8, marginBottom: 2,
-              background: "transparent", border: "none", cursor: "pointer",
-              fontSize: 12, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-            >
-              <span style={{ width: 6, height: 6, borderRadius: "50%", background: gmailConnected ? "#10b981" : "#f97316", flexShrink: 0 }} />
-              <span style={{ color: gmailConnected ? "#10b981" : "#f97316", fontWeight: 500 }}>
-                {gmailConnected ? "Gmail connected" : "Connect Gmail"}
+          <div className="dash-sidebar-footer">
+            <button className="dash-user-card"
+              onClick={() => { setPage("profile"); setSidebarOpen(false); }}
+              style={{ width: "100%", border: "none", cursor: "pointer" }}>
+              <span className="dash-avatar">{user?.username?.[0]?.toUpperCase() || "U"}</span>
+              <span style={{ minWidth: 0, textAlign: "left" }}>
+                <span className="dash-user-name" style={{ display: "block" }}>{user?.username || "User"}</span>
+                <span className="dash-user-mail" style={{ display: "block" }}>{user?.gmailEmail || user?.email || "Not connected"}</span>
               </span>
             </button>
-            <button onClick={() => { setPage("profile"); setSidebarOpen(false); }} style={{
-              display: "flex", alignItems: "center", gap: 9, width: "100%",
-              padding: "8px 12px", borderRadius: 8, marginBottom: 2,
-              background: "transparent", border: "none", cursor: "pointer",
-              fontSize: 13, fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
-            }}
-              onMouseEnter={e => e.currentTarget.style.background = "#ffffff06"}
-              onMouseLeave={e => e.currentTarget.style.background = "transparent"}
-            >
-              <div style={{ width: 24, height: 24, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: "#fff", flexShrink: 0 }}>
-                {user?.username?.[0]?.toUpperCase() || "U"}
-              </div>
-              <span style={{ fontSize: 12, color: "#94A3B8", fontWeight: 500, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user?.username}</span>
+            <button className="dash-nav-item" onClick={onLogout}
+              style={{ width: "calc(100% - 16px)", marginTop: 4 }}>
+              <I.Logout />
+              Sign out
             </button>
-            <button onClick={onLogout} style={{
-              display: "flex", alignItems: "center", gap: 9, width: "100%",
-              padding: "8px 12px", borderRadius: 8,
-              background: "transparent", border: "none", cursor: "pointer",
-              fontSize: 12, color: "#475569", fontFamily: "'DM Sans',sans-serif", transition: "all .12s",
-            }}
-              onMouseEnter={e => { e.currentTarget.style.background = "#2d0f0f"; e.currentTarget.style.color = "#f87171"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#475569"; }}
-            >
-              <I.Logout /> Sign out
-            </button>
+            <div className="dash-version">v2.3 beta</div>
           </div>
-        </div>
+        </aside>
 
         {/* RIGHT PANEL */}
         <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
 
         {/* PAGE TRANSITION LOADER */}
         {pageLoading && (
-          <div style={{ position: "fixed", inset: 0, background: "#09090d", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 20, animation: "fadeIn .15s ease" }}>
-            <img src="/logo.png" alt="thehotspot" style={{ width: 72, height: 72, objectFit: "contain", animation: "splashFloat 1.4s ease-in-out infinite alternate" }} />
-            <div style={{ color: "#ffffff", fontFamily: "'DM Sans',sans-serif", fontSize: 22, fontWeight: 700, letterSpacing: "0.04em", opacity: 0.85, animation: "splashFadeIn 0.6s ease forwards" }}>thehotspot</div>
+          <div style={{ position: "fixed", inset: 0, background: "var(--bg)", zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 18 }}>
+            <img src="/logo.png" alt="thehotspot" style={{ width: 52, height: 52, objectFit: "contain" }} />
+            <div className="dash-dots"><span /><span /><span /></div>
           </div>
         )}
 
         {/* MAIN CONTENT */}
-        <div className="rsp-main-content" style={{ flex: 1, overflowY: "auto", padding: "28px 28px", width: "100%", position: "relative" }}>
-          <div style={{ maxWidth: 1000, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
+        <div className="rsp-main-content" style={{ flex: 1, overflowY: "auto", padding: "32px", width: "100%", position: "relative", background: "var(--bg)" }}>
+          <div style={{ maxWidth: 1080, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
 
             {/* ── HOME ── */}
             {page === null && <HomePage user={user} contactCount={contactCount} setPage={setPage} />}
@@ -4683,10 +4642,10 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         @keyframes chatSlide  { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
         @keyframes smokeCloud { 0%{transform:scale(.25) translateY(0);opacity:.75} 100%{transform:scale(3) translateY(-30px);opacity:0} }
         *{box-sizing:border-box;margin:0;padding:0}
-        html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#09090d;overflow:hidden;position:fixed;inset:0;}
-        ::-webkit-scrollbar{width:4px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#ffffff20;border-radius:3px}
-        input::placeholder{color:#ffffff30}
-        select{color-scheme:dark}
+        html,body,#root{width:100%;height:100dvh;margin:0;padding:0;background:#ffffff;overflow:hidden;position:fixed;inset:0;}
+        ::-webkit-scrollbar{width:8px;height:8px} ::-webkit-scrollbar-track{background:transparent} ::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:4px} ::-webkit-scrollbar-thumb:hover{background:#94a3b8}
+        input::placeholder,textarea::placeholder{color:#94a3b8}
+        select{color-scheme:light}
 
         /* ── RESPONSIVE ─────────────────────────────────────── */
 
