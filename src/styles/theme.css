@@ -816,7 +816,7 @@
 .lp-bento {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 220px;
+  grid-auto-rows: minmax(260px, auto);
   gap: 18px;
 }
 
@@ -849,11 +849,10 @@
 }
 
 .lp-bento-body {
-  flex: 1;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  justify-content: flex-end;
 }
 
 .lp-bento-desc {
@@ -1633,7 +1632,7 @@
 
   .lp-bento {
     grid-template-columns: repeat(2, 1fr);
-    grid-auto-rows: 220px;
+    grid-auto-rows: minmax(260px, auto);
   }
   .lp-bento-card-wide  { grid-column: span 2; }
   .lp-bento-card-full  { grid-column: span 2; }
