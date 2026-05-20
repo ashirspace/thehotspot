@@ -1,5 +1,6 @@
 // v2
 import React, { useState, useEffect, useRef, useMemo } from "react";
+import Home from "./pages/Home";
 import {
   LuLayoutDashboard, LuUsers, LuFilePen, LuClipboardList, LuSettings,
   LuSend, LuRadio, LuMail, LuFolder, LuTrendingUp, LuHouse,
@@ -117,6 +118,21 @@ function Logo({ size = 32 }) {
 }
 
 /* ───────── LOGIN PAGE ───────── */
+// ─── Shared CMS hook — fetches once, cached at module level ───────────────────
+let __cmsCache = null;
+let __cmsPromise = null;
+function useCms() {
+  const [cms, setCms] = useState(() => __cmsCache || {});
+  useEffect(() => {
+    if (__cmsCache) { setCms(__cmsCache); return; }
+    if (!__cmsPromise) {
+      __cmsPromise = fetch("/api/admin").then(r => r.json()).then(d => { __cmsCache = d.content || {}; return __cmsCache; }).catch(() => { __cmsCache = {}; return {}; });
+    }
+    __cmsPromise.then(c => setCms(c));
+  }, []);
+  return (key, fallback) => cms[key] || fallback;
+}
+
 function useExternalLinkTransition() {
   useEffect(() => {
     const handler = (e) => {
@@ -169,6 +185,7 @@ function LoginPage({ onLogin }) {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const isSignup = authMode === "signup";
+  const c = useCms();
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -458,317 +475,14 @@ function LoginPage({ onLogin }) {
   );
 
   return (
-    <div className="lp-root" style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", display: "flex", flexDirection: "column", position: "relative" }}>
-
-      {/* Login modal */}
+    <>
       {showLogin && <LoginModal />}
+      <Home
+        onSignIn={() => { setAuthMode("login"); setShowLogin(true); }}
+        onGetStarted={() => { setAuthMode("signup"); setShowLogin(true); }}
+      />
 
-      {/* Background glow orbs */}
-      <div style={{ position: "fixed", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle,#10b98112,transparent 70%)", top: -200, left: -200, pointerEvents: "none", zIndex: 0 }} />
-      <div style={{ position: "fixed", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle,#0ea5e90e,transparent 70%)", bottom: -150, right: -150, pointerEvents: "none", zIndex: 0 }} />
-      <div style={{ position: "fixed", width: 300, height: 300, borderRadius: "50%", background: "radial-gradient(circle,#6366f10a,transparent 70%)", top: "40%", right: "20%", pointerEvents: "none", zIndex: 0 }} />
-
-      {/* ── Top nav ── */}
-      <nav className="rsp-lp-nav" style={{ padding: "16px 40px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #ffffff0d", background: "#09090dcc", backdropFilter: "blur(12px)", position: "sticky", top: 0, zIndex: 10, flexShrink: 0 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Logo size={28} />
-          <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <button onClick={() => setShowLogin(true)} style={{ padding: "8px 22px", borderRadius: 20, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 20px #10b98130" }}>
-            Sign In
-          </button>
-        </div>
-      </nav>
-
-      {/* ── Scrollable body ── */}
-      <div className="lp-body" style={{ flex: 1, overflowY: "auto", position: "relative", zIndex: 1 }}>
-
-        {/* ── HERO ── */}
-        <div className="lp-hero" style={{ maxWidth: 960, margin: "0 auto", padding: "96px 40px 72px", textAlign: "center" }}>
-          <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#10b98112", border: "1px solid #10b98130", borderRadius: 20, padding: "5px 16px", marginBottom: 28 }}>
-            <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block", boxShadow: "0 0 6px #10b981" }} />
-            <span style={{ fontSize: 11, color: "#10b981", fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" }}>AI-Powered Outreach Platform</span>
-          </div>
-          <h1 className="lp-h1" style={{ fontSize: "clamp(36px,5.5vw,68px)", fontWeight: 900, color: "#F1F5F9", letterSpacing: -3, marginBottom: 20, lineHeight: 1.06 }}>
-            Stop chasing clients.<br />
-            <span style={{ background: "linear-gradient(135deg,#10b981,#0ea5e9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Let AI do the work.</span>
-          </h1>
-          <p style={{ fontSize: 17, color: "#94A3B8", lineHeight: 1.8, maxWidth: 640, margin: "0 auto 40px" }}>
-            thehotspot is your always-on outbound engine. It finds leads, writes personalised emails, sends campaigns, follows up automatically, and tracks every open — while you focus on closing.
-          </p>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
-            <button onClick={() => setShowLogin(true)} style={{ padding: "13px 32px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 32px #10b98140", letterSpacing: -0.2 }}>
-              Get Started Free
-            </button>
-            <button onClick={() => setShowLogin(true)} style={{ padding: "13px 28px", borderRadius: 24, background: "transparent", color: "#94A3B8", border: "1px solid #ffffff15", fontSize: 15, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
-              Sign In
-            </button>
-          </div>
-        </div>
-
-        {/* ── Stats bar ── */}
-        <div className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 100px", padding: "0 40px" }}>
-          <div className="rsp-stats-bar" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 1, background: "#ffffff08", border: "1px solid #ffffff0d", borderRadius: 16, overflow: "hidden" }}>
-            {[
-              { value: "12", label: "AI Agents", color: "#10b981" },
-              { value: "50+", label: "Emails / Day", color: "#0ea5e9" },
-              { value: "3-Step", label: "Auto Follow-ups", color: "#6366f1" },
-              { value: "Live", label: "Open Tracking", color: "#f59e0b" },
-            ].map((s, i) => (
-              <div key={s.label} style={{ padding: "24px 20px", textAlign: "center", background: "#111116", borderRight: i < 3 ? "1px solid #ffffff0d" : "none" }}>
-                <div style={{ fontSize: 26, fontWeight: 900, color: s.color, letterSpacing: -1, marginBottom: 4 }}>{s.value}</div>
-                <div style={{ fontSize: 11, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{s.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Features ── */}
-        <div ref={featRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
-          <div style={{ textAlign: "center", marginBottom: 48, opacity: featVisible ? 1 : 0, transform: featVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>What We Provide</div>
-            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>Everything you need to scale outreach</div>
-            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Six modules working together so you never have to touch the pipeline manually.</div>
-            <a href="/what-we-provide.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>Explore all features →</a>
-          </div>
-          <div className="rsp-features-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 18 }}>
-            {[
-              { icon: <LuUsers size={20} />, title: "Lead Generation", desc: "AI finds qualified prospects in any industry or region and adds them to your contacts instantly.", accent: "#10b981" },
-              { icon: <LuMail size={20} />, title: "Cold Email Campaigns", desc: "Unique, personalised emails for every contact — written by AI, never copy-paste.", accent: "#0ea5e9" },
-              { icon: <LuClock size={20} />, title: "Follow-up Sequences", desc: "3-step automated drip at Day 0, 3, and 7. Stops the moment a prospect replies.", accent: "#6366f1" },
-              { icon: <LuTrendingUp size={20} />, title: "Campaign Analytics", desc: "Real-time open and click tracking embedded in every email you send.", accent: "#f59e0b" },
-              { icon: <LuClipboardList size={20} />, title: "Contact Database", desc: "Organise hundreds of contacts across Network, CPS, CPL, CPA, and Mobile.", accent: "#ec4899" },
-              { icon: <LuSend size={20} />, title: "Gmail Integration", desc: "Emails send from your own Gmail. Better deliverability, real sender trust.", accent: "#14b8a6" },
-            ].map((f, i) => (
-              <div key={f.title} style={{
-                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px 24px",
-                opacity: featVisible ? 1 : 0,
-                transform: featVisible ? "translateY(0)" : "translateY(52px)",
-                transition: `opacity 0.65s ease ${0.1 + i * 0.09}s, transform 0.65s ease ${0.1 + i * 0.09}s, border-color 0.2s`,
-              }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = `${f.accent}40`}
-                onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff0d"}
-              >
-                <div style={{ width: 46, height: 46, borderRadius: 14, background: `${f.accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: f.accent, marginBottom: 16 }}>{f.icon}</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>{f.title}</div>
-                <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{f.desc}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── AI Agents ── */}
-        <div ref={agentsRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
-          <div style={{ textAlign: "center", marginBottom: 48, opacity: agentsVisible ? 1 : 0, transform: agentsVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#0ea5e9", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>Meet the Team</div>
-            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>12 AI agents working for you 24/7</div>
-            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Each agent has one job and does it better than any human could — at any scale.</div>
-            <a href="/meet-the-team.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#0ea5e9", textDecoration: "none", borderBottom: "1px solid #0ea5e940", paddingBottom: 1 }}>Meet all agents →</a>
-          </div>
-          <div className="lp-agents-grid" style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14 }}>
-            {[
-              { name: "Email Sequence Builder", role: "Email Automation", desc: "Generate a full 2-5 email cold outreach sequence with follow-up timing built in — ready to copy and send.", color: "#0ea5e9", icon: <LuMailbox size={16} /> },
-              { name: "Lead Finder", role: "Prospect Discovery", desc: "Search for qualified B2B companies by industry, location, and size. Returns a ready-to-outreach prospect table.", color: "#10b981", icon: <LuUsers size={16} /> },
-              { name: "Campaign Dashboard", role: "Analytics & Reporting", desc: "Live charts of opens, clicks, and delivery stats across all your email campaigns at a glance.", color: "#6366f1", icon: <LuChartBar size={16} /> },
-              { name: "CRM Lite", role: "Contact Management", desc: "Browse and inline-edit your entire contact database. Click any cell to update it in real time.", color: "#f59e0b", icon: <LuFolder size={16} /> },
-              { name: "Email Writer Agent", role: "Content Generation", desc: "Writes a unique, personalised cold email for every single contact — never the same email twice.", color: "#14b8a6", icon: <LuFilePen size={16} /> },
-              { name: "Follow-up Agent", role: "Reply Detection & Drip", desc: "Monitors Gmail threads, detects replies, and sends follow-ups only to contacts who haven't responded.", color: "#ec4899", icon: <LuRadio size={16} /> },
-            ].map((a, i) => (
-              <div key={i} style={{
-                display: "flex", gap: 18, padding: "22px 26px", alignItems: "flex-start",
-                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16,
-                opacity: agentsVisible ? 1 : 0,
-                transform: agentsVisible ? "translateY(0)" : "translateY(52px)",
-                transition: `opacity 0.65s ease ${0.1 + i * 0.1}s, transform 0.65s ease ${0.1 + i * 0.1}s, background 0.15s`,
-              }}
-                onMouseEnter={e => e.currentTarget.style.background = "#16161e"}
-                onMouseLeave={e => e.currentTarget.style.background = "#111116"}
-              >
-                <div style={{ width: 44, height: 44, borderRadius: 12, background: `${a.color}18`, border: `1px solid ${a.color}30`, display: "flex", alignItems: "center", justifyContent: "center", color: a.color, flexShrink: 0 }}>
-                  {a.icon}
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>{a.name}</span>
-                    <span style={{ fontSize: 10, fontWeight: 600, color: a.color, background: `${a.color}18`, border: `1px solid ${a.color}30`, padding: "2px 9px", borderRadius: 20 }}>{a.role}</span>
-                  </div>
-                  <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.65 }}>{a.desc}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── How it grows your business ── */}
-        <div ref={outcomeRef} className="lp-section" style={{ maxWidth: 1280, margin: "0 auto 160px", padding: "0 40px" }}>
-          <div style={{ textAlign: "center", marginBottom: 48, opacity: outcomeVisible ? 1 : 0, transform: outcomeVisible ? "translateY(0)" : "translateY(48px)", transition: "opacity 0.7s ease, transform 0.7s ease" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", letterSpacing: 1.5, textTransform: "uppercase", marginBottom: 12 }}>The Outcome</div>
-            <div style={{ fontSize: "clamp(22px,2.8vw,34px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -1 }}>How thehotspot grows your business</div>
-            <div style={{ fontSize: 14, color: "#64748B", marginTop: 12, lineHeight: 1.75 }}>Real results, not vanity metrics — what you'll see in your pipeline after week one.</div>
-            <a href="/the-outcome.html" style={{ display: "inline-block", marginTop: 18, fontSize: 13, fontWeight: 600, color: "#10b981", textDecoration: "none", borderBottom: "1px solid #10b98140", paddingBottom: 1 }}>See the full picture →</a>
-          </div>
-          <div className="lp-outcomes-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18 }}>
-            {[
-              { point: "Consistent pipeline at scale", detail: "Your AI agent runs outreach daily so your pipeline never dries up — even when you're offline.", icon: <LuZap size={16} />, accent: "#10b981" },
-              { point: "Zero missed follow-ups", detail: "Most deals close on the 2nd or 3rd touch. The follow-up agent handles every sequence automatically.", icon: <LuCheck size={16} />, accent: "#0ea5e9" },
-              { point: "Hyper-personalised at volume", detail: "Every email is written for that specific company — not a blast. Higher reply rates, more conversions.", icon: <LuSparkles size={16} />, accent: "#6366f1" },
-              { point: "Know what's working", detail: "Open and click data tells you exactly which campaigns and subject lines get the best response.", icon: <LuTrendingUp size={16} />, accent: "#ec4899" },
-            ].map((item, i) => (
-              <div key={i} style={{
-                background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px 26px",
-                display: "flex", gap: 18, alignItems: "flex-start",
-                opacity: outcomeVisible ? 1 : 0,
-                transform: outcomeVisible ? "translateY(0)" : "translateY(52px)",
-                transition: `opacity 0.65s ease ${0.1 + i * 0.1}s, transform 0.65s ease ${0.1 + i * 0.1}s, border-color 0.2s`,
-              }}
-                onMouseEnter={e => e.currentTarget.style.borderColor = `${item.accent}40`}
-                onMouseLeave={e => e.currentTarget.style.borderColor = "#ffffff0d"}
-              >
-                <div style={{ width: 42, height: 42, borderRadius: 12, background: `${item.accent}18`, border: `1px solid ${item.accent}35`, display: "flex", alignItems: "center", justifyContent: "center", color: item.accent, flexShrink: 0 }}>
-                  {item.icon}
-                </div>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{item.point}</div>
-                  <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.7 }}>{item.detail}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* ── Final CTA ── */}
-        <div className="lp-section lp-cta" style={{ maxWidth: 720, margin: "0 auto 80px", padding: "0 40px", textAlign: "center" }}>
-          <div style={{ fontSize: "clamp(20px,2.5vw,28px)", fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 12 }}>Ready to automate your outreach?</div>
-          <p style={{ fontSize: 14, color: "#64748B", marginBottom: 28 }}>Join businesses using AI to fill their pipeline on autopilot.</p>
-          <button onClick={() => setShowLogin(true)} style={{ padding: "14px 40px", borderRadius: 24, background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff", border: "none", fontSize: 15, fontWeight: 700, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 0 40px #10b98135" }}>
-            Start for Free
-          </button>
-        </div>
-
-        {/* ── Footer ── */}
-        <footer className="lp-footer" style={{ borderTop: "1px solid #ffffff0d", padding: "56px 40px 32px", marginTop: 16 }}>
-          <div style={{ maxWidth: 1280, margin: "0 auto" }}>
-
-            {/* Top row — brand + columns */}
-            <div className="lp-footer-grid" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr 1fr", gap: 40, marginBottom: 48 }}>
-
-              {/* Brand */}
-              <div>
-                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 16 }}>
-                  <Logo size={26} />
-                  <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", letterSpacing: -0.3 }}>thehotspot</span>
-                </div>
-                <p style={{ fontSize: 13, color: "#64748B", lineHeight: 1.75, maxWidth: 280 }}>
-                  We build AI systems and web products that help businesses move faster and scale smarter.
-                </p>
-              </div>
-
-              {/* Services */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Services</div>
-                {[
-                  ["AI Automation", "/ai-automation.html"],
-                  ["Web Development", "/web-development.html"],
-                  ["AI Agents", "/ai-agents.html"],
-                  ["API Integration", "/api-integration.html"],
-                ].map(([label, href]) => (
-                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
-                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
-                  >{label}</a>
-                ))}
-              </div>
-
-              {/* Company */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Company</div>
-                {[["Blog", "/blog.html"], ["Glossary", "/glossary.html"], ["FAQ", "/faq.html"], ["Contact", "/contact.html"]].map(([label, href]) => (
-                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "#10b981"}
-                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
-                  >{label}</a>
-                ))}
-              </div>
-
-              {/* Connect */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#94A3B8", letterSpacing: 1.2, textTransform: "uppercase", marginBottom: 16 }}>Connect</div>
-                {[
-                  { label: "Twitter / X", href: "#" },
-                  { label: "LinkedIn", href: "#" },
-                  { label: "Instagram", href: "#" },
-                  { label: "GitHub", href: "#" },
-                ].map(({ label, href }) => (
-                  <a key={label} href={href} style={{ display: "block", fontSize: 13, color: "#64748B", marginBottom: 10, textDecoration: "none", transition: "color .15s" }}
-                    onMouseEnter={e => e.currentTarget.style.color = "#0ea5e9"}
-                    onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
-                  >{label}</a>
-                ))}
-              </div>
-            </div>
-
-            {/* Bottom bar */}
-            <div style={{ borderTop: "1px solid #ffffff08", paddingTop: 24, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
-              <span style={{ fontSize: 12, color: "#94A3B8" }}>&copy; 2026 thehotspot. All rights reserved.</span>
-              <div style={{ display: "flex", gap: 20 }}>
-                <a href="/privacy.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Privacy Policy</a>
-                <a href="/terms.html" style={{ fontSize: 12, color: "#64748B", textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#10b981"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>Terms of Service</a>
-              </div>
-            </div>
-          </div>
-        </footer>
-      </div>
-
-      <style>{`
-        @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
-        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-        @keyframes slideUp { from{transform:translateX(-50%) translateY(100%)} to{transform:translateX(-50%) translateY(0)} }
-        *{box-sizing:border-box;margin:0;padding:0}
-        input::placeholder{color:#475569}
-        .lp-root { height:100vh; overflow:hidden; }
-        .lp-body { overflow-y:scroll; }
-        .lp-body::-webkit-scrollbar { width:7px; }
-        .lp-body::-webkit-scrollbar-track { background:#0d0d12; }
-        .lp-body::-webkit-scrollbar-thumb { background:#334155; border-radius:4px; }
-        .lp-body::-webkit-scrollbar-thumb:hover { background:#475569; }
-
-        /* ── Tablet: 768–1024px ── */
-        @media (max-width:1024px) {
-          .rsp-lp-nav       { padding: 14px 24px !important; }
-          .lp-hero          { padding: 72px 32px 56px !important; }
-          .lp-section       { padding: 0 32px !important; }
-          .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
-          .rsp-features-grid{ grid-template-columns: repeat(2,1fr) !important; gap:14px !important; }
-          .lp-footer-grid   { grid-template-columns: 1fr 1fr !important; gap: 28px !important; }
-          .lp-footer        { padding: 48px 32px 28px !important; }
-        }
-
-        /* ── Mobile: ≤767px ── */
-        @media (max-width:767px) {
-          .lp-root          { height:100dvh !important; }
-          .rsp-lp-nav       { padding: 12px 16px !important; }
-          .lp-hero          { padding: 48px 16px 36px !important; }
-          .lp-h1            { letter-spacing: -1px !important; font-size: clamp(30px,8vw,48px) !important; line-height: 1.12 !important; }
-          .lp-section       { padding: 0 16px !important; margin-bottom: 72px !important; }
-          .rsp-stats-bar    { grid-template-columns: repeat(2,1fr) !important; }
-          .rsp-features-grid{ grid-template-columns: 1fr !important; gap:10px !important; }
-          .lp-agents-grid   { grid-template-columns: 1fr !important; gap:10px !important; }
-          .lp-outcomes-grid { grid-template-columns: 1fr !important; gap:10px !important; }
-          .lp-footer-grid   { grid-template-columns: 1fr 1fr !important; gap: 20px !important; }
-          .lp-footer        { padding: 36px 16px 24px !important; }
-        }
-
-        /* ── Mobile small: ≤480px ── */
-        @media (max-width:480px) {
-          .rsp-lp-nav       { padding: 10px 14px !important; }
-          .lp-hero          { padding: 36px 14px 28px !important; }
-          .lp-section       { padding: 0 12px !important; margin-bottom: 56px !important; }
-          .lp-footer-grid   { grid-template-columns: 1fr !important; }
-          .lp-footer        { padding: 28px 12px 20px !important; }
-        }
-      `}</style>
-    </div>
+    </>
   );
 }
 
@@ -1199,9 +913,15 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
   });
 
   useEffect(() => {
-    fetch("/api/campaigns")
+    const uid = encodeURIComponent(user?.username || user?.email || "");
+    fetch(`/api/campaigns${uid ? `?userId=${uid}` : ""}`)
       .then(r => r.json())
-      .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
+      .then(data => {
+        if (data.configured && data.campaigns?.length > 0) {
+          setHistory(data.campaigns);
+          localStorage.setItem("thehotspot_campaigns", JSON.stringify(data.campaigns));
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -1546,10 +1266,18 @@ function CategoriesPage({ onBack }) {
   );
 }
 
-function SuccessRatePage({ onBack }) {
+function SuccessRatePage({ onBack, user }) {
   const [history, setHistory] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
   useEffect(() => {
-    fetch("/api/campaigns").then(r => r.json()).then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); }).catch(() => {});
+    const uid = encodeURIComponent(user?.username || user?.email || "");
+    fetch(`/api/campaigns${uid ? `?userId=${uid}` : ""}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.configured && data.campaigns?.length > 0) {
+          setHistory(data.campaigns);
+          localStorage.setItem("thehotspot_campaigns", JSON.stringify(data.campaigns));
+        }
+      }).catch(() => {});
   }, []);
   const totalSent      = useMemo(() => history.reduce((s, h) => s + (h.sent   || 0), 0), [history]);
   const totalFailed    = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
@@ -1880,6 +1608,7 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
 
 /* ───────── HOME PAGE ───────── */
 function HomePage({ user, contactCount, setPage }) {
+  const c = useCms();
   const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
 
   const Badge = ({ type }) => {
@@ -1938,7 +1667,7 @@ function HomePage({ user, contactCount, setPage }) {
           Welcome back, {firstName}
         </div>
         <div style={{ fontSize: 13, color: "#475569" }}>
-          Your B2B outreach platform — find leads, write emails, run campaigns, and detect replies at scale.
+          {c("hp_subtitle", "Your B2B outreach platform — find leads, write emails, run campaigns, and detect replies at scale.")}
         </div>
       </div>
 
@@ -1946,8 +1675,8 @@ function HomePage({ user, contactCount, setPage }) {
       <div className="rsp-pillars-top" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
         <PillarCard
           icon={<LuDatabase size={20} />}
-          title="Lead Input"
-          desc="Import leads from spreadsheets, connect CRM tools, or add contacts manually."
+          title={c("hp_p1_title", "Lead Input")}
+          desc={c("hp_p1_desc", "Import leads from spreadsheets, connect CRM tools, or add contacts manually.")}
           accent="#10b981"
           features={[
             { label: "CSV / Spreadsheet upload",    href: "/agents/csv-import-export" },
@@ -1955,13 +1684,13 @@ function HomePage({ user, contactCount, setPage }) {
             { label: "CRM integration (HubSpot)",   status: "soon" },
             { label: "Manual entry",                status: "live" },
           ]}
-          ctaLabel="Manage Contacts"
+          ctaLabel={c("hp_p1_cta", "Manage Contacts")}
           ctaAction={() => setPage("contacts")}
         />
         <PillarCard
           icon={<LuSparkles size={20} />}
-          title="AI Engine"
-          desc="GPT-4o-mini writes personalized outreach using templates and contact variables."
+          title={c("hp_p2_title", "AI Engine")}
+          desc={c("hp_p2_desc", "GPT-4o-mini writes personalized outreach using templates and contact variables.")}
           accent="#6366f1"
           features={[
             { label: "LLM (GPT-4o-mini)",              status: "live" },
@@ -1969,13 +1698,13 @@ function HomePage({ user, contactCount, setPage }) {
             { label: "Personalization variables",       status: "live" },
             { label: "Email sequence builder",          href: "/agents/email-sequence-builder" },
           ]}
-          ctaLabel="Open Templates"
+          ctaLabel={c("hp_p2_cta", "Open Templates")}
           ctaAction={() => setPage("emailTemplates")}
         />
         <PillarCard
           icon={<LuSend size={20} />}
-          title="Outreach Channels"
-          desc="Send emails via Gmail today. LinkedIn, WhatsApp, and SMS are on the roadmap."
+          title={c("hp_p3_title", "Outreach Channels")}
+          desc={c("hp_p3_desc", "Send emails via Gmail today. LinkedIn, WhatsApp, and SMS are on the roadmap.")}
           accent="#0ea5e9"
           features={[
             { label: "Email (Gmail API / SMTP)",  status: "live" },
@@ -1983,7 +1712,7 @@ function HomePage({ user, contactCount, setPage }) {
             { label: "WhatsApp (Twilio)",         status: "soon" },
             { label: "SMS (Twilio)",              status: "soon" },
           ]}
-          ctaLabel="Send Emails"
+          ctaLabel={c("hp_p3_cta", "Send Emails")}
           ctaAction={() => setPage("emailSender")}
         />
       </div>
@@ -1992,8 +1721,8 @@ function HomePage({ user, contactCount, setPage }) {
       <div className="rsp-pillars-bot" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
         <PillarCard
           icon={<LuRadio size={20} />}
-          title="Sequence / Campaign Manager"
-          desc="Multi-step follow-up sequences that stop automatically when a reply is detected."
+          title={c("hp_p4_title", "Sequence / Campaign Manager")}
+          desc={c("hp_p4_desc", "Multi-step follow-up sequences that stop automatically when a reply is detected.")}
           accent="#f59e0b"
           features={[
             { label: "Multi-step follow-up (Day 1 → 3 → 7)", status: "live" },
@@ -2001,20 +1730,20 @@ function HomePage({ user, contactCount, setPage }) {
             { label: "Campaign scheduling",                  status: "live" },
             { label: "Sequence builder agent",               href: "/agents/email-sequence-builder" },
           ]}
-          ctaLabel="View Campaigns"
+          ctaLabel={c("hp_p4_cta", "View Campaigns")}
           ctaAction={() => setPage("campaignStatus")}
         />
         <PillarCard
           icon={<LuMailbox size={20} />}
-          title="Reply Detection & Inbox"
-          desc="Detect and classify replies as interested, not interested, or out of office — automatically."
+          title={c("hp_p5_title", "Reply Detection & Inbox")}
+          desc={c("hp_p5_desc", "Detect and classify replies as interested, not interested, or out of office — automatically.")}
           accent="#ec4899"
           features={[
             { label: "Gmail reply polling",              status: "live" },
             { label: "Webhook reply detection",          status: "soon" },
             { label: "Classify: Interested / OOO / No", href: "/agents/reply-detector" },
           ]}
-          ctaLabel="Check Replies"
+          ctaLabel={c("hp_p5_cta", "Check Replies")}
           ctaAction={() => setPage("campaignStatus")}
         />
       </div>
@@ -2024,10 +1753,12 @@ function HomePage({ user, contactCount, setPage }) {
 
 /* ───────── DASHBOARD PAGE ───────── */
 function DashboardPage({ user, contactCount, setPage }) {
+  const c = useCms();
   const [campaigns, setCampaigns] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
 
   useEffect(() => {
-    fetch("/api/campaigns")
+    const uid = encodeURIComponent(user?.username || user?.email || "");
+    fetch(`/api/campaigns${uid ? `?userId=${uid}` : ""}`)
       .then(r => r.json())
       .then(data => {
         if (data.configured && data.campaigns?.length > 0) {
@@ -2082,16 +1813,16 @@ function DashboardPage({ user, contactCount, setPage }) {
         <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 4 }}>
           Good {greeting}, {user?.username?.split(" ")[0] || "there"}.
         </div>
-        <div style={{ fontSize: 13, color: "#64748B" }}>{dateStr} · Here's your outreach hub.</div>
+        <div style={{ fontSize: 13, color: "#64748B" }}>{dateStr} · {c("dp_tagline", "Here's your outreach hub.")}</div>
       </div>
 
       {/* Stat cards */}
       <div ref={statsRef} className="rsp-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
         {[
-          { label: "Contacts", value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={16} />, sub: "in database" },
-          { label: "Emails Sent", value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={16} />, sub: "total delivered" },
-          { label: "Categories", value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={16} />, sub: "active groups" },
-          { label: "Success Rate", value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={16} />, sub: "delivery rate" },
+          { label: c("dp_stat1_label", "Contacts"), value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={16} />, sub: c("dp_stat1_sub", "in database") },
+          { label: c("dp_stat2_label", "Emails Sent"), value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={16} />, sub: c("dp_stat2_sub", "total delivered") },
+          { label: c("dp_stat3_label", "Categories"), value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={16} />, sub: c("dp_stat3_sub", "active groups") },
+          { label: c("dp_stat4_label", "Success Rate"), value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={16} />, sub: c("dp_stat4_sub", "delivery rate") },
         ].map((s, i) => (
           <button key={s.label} onClick={() => setPage(s.page)} style={{
             ...revealStyle(statsVisible, i * 0.07),
@@ -3078,6 +2809,7 @@ function SpreadsheetEditor({ db, databases, saveDbs, onBack, showToast, T }) {
 
 /* ───────── CONTACTS PAGE (Database Hub) ───────── */
 function ContactsPage({ onBack, showToast, user }) {
+  const c = useCms();
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState("hub");
@@ -3170,8 +2902,8 @@ function ContactsPage({ onBack, showToast, user }) {
       <BackButton onClick={onBack} />
       <div style={{ textAlign: "center", marginBottom: 32 }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>Contacts Database</div>
-        <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>Connect an existing data source or build your database from scratch.</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_title", "Contacts Database")}</div>
+        <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>{c("cp_subtitle", "Connect an existing data source or build your database from scratch.")}</div>
       </div>
       <div className="rsp-contacts-hub" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
         <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}
@@ -3182,8 +2914,8 @@ function ContactsPage({ onBack, showToast, user }) {
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>Connect Data Source</div>
-          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>Import contacts from Google Sheets, Airtable, or CSV files you already have.</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_card1_title", "Connect Data Source")}</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card1_desc", "Import contacts from Google Sheets, Airtable, or CSV files you already have.")}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
               <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500 }}>{s}</span>
@@ -3198,8 +2930,8 @@ function ContactsPage({ onBack, showToast, user }) {
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>Create New Database</div>
-          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>Start fresh — define custom fields, add contacts manually, build your list from scratch.</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_card2_title", "Create New Database")}</div>
+          <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card2_desc", "Start fresh — define custom fields, add contacts manually, build your list from scratch.")}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Custom Fields", "Manual Entry", "Full Control"].map(s => (
               <span key={s} style={{ fontSize: 11, padding: "4px 10px", borderRadius: 8, background: "#6366f120", color: "#818cf8", fontWeight: 500 }}>{s}</span>
@@ -3339,7 +3071,8 @@ function ContactsPage({ onBack, showToast, user }) {
 }
 
 /* ───────── CAMPAIGN STATUS PAGE ───────── */
-function CampaignStatusPage({ onBack }) {
+function CampaignStatusPage({ onBack, user }) {
+  const c = useCms();
   const [now, setNow] = useState(() => Date.now());
   const [openEmail, setOpenEmail] = useState(null); // { company, email, subject, body, sentAt, category }
 
@@ -3353,11 +3086,16 @@ function CampaignStatusPage({ onBack }) {
     return () => clearInterval(t);
   }, []);
 
-  // Pull live data from Airtable
   useEffect(() => {
-    fetch("/api/campaigns")
+    const uid = encodeURIComponent(user?.username || user?.email || "");
+    fetch(`/api/campaigns${uid ? `?userId=${uid}` : ""}`)
       .then(r => r.json())
-      .then(data => { if (data.configured && data.campaigns?.length > 0) setHistory(data.campaigns); })
+      .then(data => {
+        if (data.configured && data.campaigns?.length > 0) {
+          setHistory(data.campaigns);
+          localStorage.setItem("thehotspot_campaigns", JSON.stringify(data.campaigns));
+        }
+      })
       .catch(() => {});
   }, []);
 
@@ -3402,7 +3140,7 @@ function CampaignStatusPage({ onBack }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>Campaign Status</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>{c("camp_title", "Campaign Status")}</div>
           <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
             {last24.length > 0 ? `${last24.length} campaign${last24.length !== 1 ? "s" : ""} in the last 24 hours` : "No activity in last 24 hours"}
             {totalSent > 0 && ` · ${totalSent} sent all time`}
@@ -3527,6 +3265,7 @@ function CampaignStatusPage({ onBack }) {
 
 /* ───────── PROFILE PAGE ───────── */
 function ProfilePage({ user, onBack, onLogout }) {
+  const c = useCms();
   return (
     <div>
       <BackButton onClick={onBack} />
@@ -3540,7 +3279,7 @@ function ProfilePage({ user, onBack, onLogout }) {
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
-          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Account Info</div>
+          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>{c("pp_section1_label", "Account Info")}</div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Username</span>
             <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 600 }}>{user?.username}</span>
@@ -3556,7 +3295,7 @@ function ProfilePage({ user, onBack, onLogout }) {
         </div>
 
         <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
-          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>Platform Stats</div>
+          <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>{c("pp_section2_label", "Platform Stats")}</div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Total Contacts</span>
             <span style={{ fontSize: 13, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
@@ -3589,6 +3328,7 @@ function ProfilePage({ user, onBack, onLogout }) {
 
 /* ───────── SETTINGS ───────── */
 function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
+  const c = useCms();
   const [defaultChars, setDefaultChars] = useState(() => parseInt(localStorage.getItem("thehotspot_default_chars") || "400"));
   const [sendDelay, setSendDelay] = useState(() => parseInt(localStorage.getItem("thehotspot_send_delay") || "2500"));
 
@@ -3621,7 +3361,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 24 }}>Settings</div>
+      <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 24 }}>{c("sp_title", "Settings")}</div>
 
       <Card title="Email Preferences">
         <Row label="Default email length" sub="Characters per email body">
@@ -4067,6 +3807,7 @@ const TEMPLATES = [
 ];
 
 function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user }) {
+  const c = useCms();
   const [step, setStep] = useState("pick"); // pick | fill | preview
   const [template, setTemplate] = useState(null);
   const [form, setForm] = useState({ recipientCompany: "", contactName: "", website: "", angle: "", maxChars: "560" });
@@ -4145,7 +3886,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   if (step === "pick") return (
     <div>
       <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: T.tx, marginBottom: 6 }}>Email Templates</div>
+        <div style={{ fontSize: 20, fontWeight: 700, color: T.tx, marginBottom: 6 }}>{c("tp_title", "Email Templates")}</div>
         <div style={{ fontSize: 14, color: T.tx2 }}>Pick a template category, fill in the details, and get a professional email ready to send.</div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
@@ -4918,11 +4659,11 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             {page === "emailSender"    && <EmailSenderPage onBack={() => setPage(null)} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
             {page === "emailTemplates" && <EmailTemplatesPage onBack={() => setPage(null)} gmailToken={gmailToken} connectGmail={connectGmail} showToast={showToast} user={user} />}
             {page === "contacts"       && <ContactsPage onBack={() => setPage(null)} showToast={showToast} user={user} />}
-            {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage(null)} />}
+            {page === "campaignStatus" && <CampaignStatusPage onBack={() => setPage(null)} user={user} />}
             {page === "totalContacts"  && <TotalContactsPage onBack={() => setPage(null)} user={user} />}
             {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage(null)} sentCount={sentCount} gmailConnected={gmailConnected} user={user} />}
             {page === "categories"     && <CategoriesPage onBack={() => setPage(null)} />}
-            {page === "successRate"    && <SuccessRatePage onBack={() => setPage(null)} />}
+            {page === "successRate"    && <SuccessRatePage onBack={() => setPage(null)} user={user} />}
             {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
             {page === "settings"       && <SettingsPage onBack={() => setPage(null)} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
           </div>
