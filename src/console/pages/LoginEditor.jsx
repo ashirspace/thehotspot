@@ -3,6 +3,7 @@ import { useOutletContext } from "react-router-dom";
 import { LuCheck, LuTriangleAlert } from "react-icons/lu";
 import { fetchLoginContent, saveLoginContent } from "../api/contentApi.js";
 import { LOGIN_DEFAULTS, LOGIN_SECTIONS, MAX_SINGLE, MAX_MULTI } from "../loginFields.js";
+import LoginPreview from "../LoginPreview.jsx";
 
 function timeAgo(iso) {
   if (!iso) return null;
@@ -140,7 +141,8 @@ export default function LoginEditor() {
         </div>
       )}
 
-      <div style={{ maxWidth: 720 }}>
+      <div className="console-form">
+        <div>
         {LOGIN_SECTIONS.map(section => (
           <div key={section.eyebrow} className="console-section">
             <span className="dash-eyebrow">{section.eyebrow}</span>
@@ -167,6 +169,8 @@ export default function LoginEditor() {
             </button>
           </div>
         </div>
+        </div>
+        <LoginPreview form={form} />
       </div>
     </div>
   );
