@@ -73,7 +73,7 @@ export default async function handler(req, res) {
     if (action === "login") {
       const { username, password } = body;
       const rows = await sql`
-        SELECT id, username, email, full_name, company, role_title, website, phone, profile_complete, gmail_refresh_token
+        SELECT id, username, email, full_name, company, role_title, role, website, phone, profile_complete, gmail_refresh_token
         FROM users WHERE username = ${username} AND password = ${password} LIMIT 1
       `;
       if (!rows.length) return res.status(200).json({ found: false });
@@ -87,6 +87,7 @@ export default async function handler(req, res) {
           name: u.full_name || "",
           company: u.company || "",
           role_title: u.role_title || "",
+          role: u.role || "user",
           website: u.website || "",
           phone: u.phone || "",
           profileComplete: !!(u.profile_complete || (u.full_name && u.company)),
@@ -109,15 +110,15 @@ export default async function handler(req, res) {
       const { email, username } = body;
       let rows;
       if (email) {
-        rows = await sql`SELECT id, username, email, full_name, company, role_title, website, phone, profile_complete FROM users WHERE email = ${email} LIMIT 1`;
+        rows = await sql`SELECT id, username, email, full_name, company, role_title, role, website, phone, profile_complete FROM users WHERE email = ${email} LIMIT 1`;
       } else {
-        rows = await sql`SELECT id, username, email, full_name, company, role_title, website, phone, profile_complete FROM users WHERE username = ${username} LIMIT 1`;
+        rows = await sql`SELECT id, username, email, full_name, company, role_title, role, website, phone, profile_complete FROM users WHERE username = ${username} LIMIT 1`;
       }
       if (!rows.length) return res.status(200).json({ found: false });
       const u = rows[0];
       return res.status(200).json({
         found: true,
-        user: { id: u.id, username: u.username, email: u.email, name: u.full_name || "", company: u.company || "", role_title: u.role_title || "", website: u.website || "", phone: u.phone || "", profileComplete: !!(u.profile_complete || (u.full_name && u.company)) },
+        user: { id: u.id, username: u.username, email: u.email, name: u.full_name || "", company: u.company || "", role_title: u.role_title || "", role: u.role || "user", website: u.website || "", phone: u.phone || "", profileComplete: !!(u.profile_complete || (u.full_name && u.company)) },
       });
     }
 

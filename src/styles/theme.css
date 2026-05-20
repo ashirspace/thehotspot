@@ -2747,3 +2747,311 @@
   .dash-bento-card.wide { grid-column: span 1; }
   .dash-bento-card.tall { grid-row: span 1; }
 }
+
+/* =========================================================
+   === CONSOLE ===
+   Light-theme admin console. Reuses the .dash-* shell, cards,
+   buttons and form tokens; only console-specific pieces below.
+   ========================================================= */
+.console-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--teal-dark);
+  background: var(--teal-tint);
+  border: 1px solid var(--teal-light);
+  border-radius: var(--r-sm);
+  padding: 3px 7px;
+}
+
+.console-nav-soon {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--text-faint);
+}
+
+.dash-nav-item.is-stub {
+  color: var(--text-faint);
+  cursor: not-allowed;
+}
+
+.dash-nav-item.is-stub:hover {
+  background: none;
+  color: var(--text-faint);
+}
+
+/* --- Editor: form / preview split --- */
+.console-form {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.console-section {
+  margin-bottom: 28px;
+}
+
+.console-section > .dash-eyebrow {
+  display: block;
+  margin-bottom: 12px;
+}
+
+.console-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.console-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.console-field-req {
+  color: var(--red);
+  margin-left: 2px;
+}
+
+.console-field-meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+}
+
+.console-field-error {
+  font-size: 12px;
+  color: var(--red);
+}
+
+.console-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.console-actions-btns {
+  display: flex;
+  gap: 10px;
+}
+
+/* --- Stub page card --- */
+.console-stub {
+  max-width: 480px;
+  padding: 32px;
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--r-md);
+  background: var(--bg-alt);
+}
+
+.console-stub-icon {
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--r);
+  color: var(--text-faint);
+}
+
+.console-stub h3 {
+  font-family: var(--font-display);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 14px 0 4px;
+}
+
+.console-stub p {
+  font-size: 13px;
+  color: var(--text-muted);
+  max-width: 360px;
+  line-height: 1.55;
+  margin-bottom: 12px;
+}
+
+/* --- Live login preview (the ONE dark element) --- */
+.login-preview {
+  position: sticky;
+  top: 24px;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--r-md);
+  padding: 16px;
+}
+
+.login-preview-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.login-preview-frame {
+  background: #09090d;
+  border-radius: var(--r);
+  padding: 28px 22px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  overflow: hidden;
+}
+
+.lp-mini-logo {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #10b981, #0ea5e9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 15px;
+  color: #fff;
+}
+
+.lp-mini-brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 15px;
+  color: #f1f5f9;
+  margin-top: 8px;
+}
+
+.lp-mini-tagline {
+  font-size: 10px;
+  color: #64748b;
+  margin-bottom: 14px;
+}
+
+.lp-mini-card {
+  width: 100%;
+  background: #111116;
+  border: 1px solid #ffffff14;
+  border-radius: 12px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.lp-mini-title {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 14px;
+  color: #f1f5f9;
+}
+
+.lp-mini-sub {
+  font-size: 10px;
+  color: #64748b;
+  margin-bottom: 4px;
+}
+
+.lp-mini-gbtn {
+  height: 30px;
+  border: 1px solid #ffffff14;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #e2e8f0;
+}
+
+.lp-mini-gbtn::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #4285f4, #ea4335);
+}
+
+.lp-mini-divider {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 9px;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin: 2px 0;
+}
+
+.lp-mini-divider::before,
+.lp-mini-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: #ffffff14;
+}
+
+.lp-mini-label {
+  font-size: 9px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #64748b;
+}
+
+.lp-mini-input {
+  height: 28px;
+  background: #0d0d12;
+  border: 1px solid #ffffff10;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  padding: 0 9px;
+  font-size: 10px;
+  color: #475569;
+}
+
+.lp-mini-btn {
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #10b981, #0ea5e9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: #fff;
+  margin-top: 4px;
+}
+
+.lp-mini-toggle {
+  text-align: center;
+  font-size: 10px;
+  color: #64748b;
+  margin-top: 2px;
+}
+
+.lp-mini-toggle em {
+  font-style: normal;
+  color: #10b981;
+  font-weight: 600;
+}
+
+.lp-mini-footer {
+  font-size: 9px;
+  color: #475569;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .console-form { grid-template-columns: 1fr; }
+  .login-preview { position: static; }
+}
