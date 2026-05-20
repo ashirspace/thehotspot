@@ -1612,62 +1612,42 @@ function HomePage({ user, contactCount, setPage }) {
   const c = useCms();
   const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
 
-  const Badge = ({ type }) => {
-    const cfg = {
-      live:  { bg: "#10b98118", color: "#10b981", label: "Live" },
-      soon:  { bg: "#ffffff08", color: "#475569", label: "Soon" },
-    }[type];
-    return (
-      <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: cfg.bg, color: cfg.color, letterSpacing: 0.3, flexShrink: 0 }}>
-        {cfg.label}
-      </span>
-    );
-  };
-
   const Feature = ({ label, status, href }) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #ffffff06" }}>
-      <span style={{ fontSize: 12, color: "#94A3B8", lineHeight: 1.4 }}>{label}</span>
+    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
+      <span style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.4 }}>{label}</span>
       {href
-        ? <a href={href} style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 20, background: "#6366f118", color: "#818cf8", textDecoration: "none", flexShrink: 0, letterSpacing: 0.3 }}>Agent</a>
-        : <Badge type={status} />
+        ? <a href={href} className="dash-chip is-teal" style={{ textDecoration: "none", flexShrink: 0 }}>Agent</a>
+        : <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)", flexShrink: 0 }}>
+            <span className={`dash-dot ${status === "live" ? "is-green" : ""}`} />
+            {status === "live" ? "Live" : "Soon"}
+          </span>
       }
     </div>
   );
 
-  const PillarCard = ({ icon, title, desc, accent, features, ctaLabel, ctaAction }) => {
-    const [hov, setHov] = useState(false);
-    return (
-      <div
-        onMouseEnter={() => setHov(true)}
-        onMouseLeave={() => setHov(false)}
-        style={{ background: "#111116", border: `1px solid ${hov ? accent + "35" : "#ffffff08"}`, borderTop: `2px solid ${accent}`, borderRadius: 16, padding: "24px", display: "flex", flexDirection: "column", transition: "border-color .18s" }}
-      >
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: accent + "18", border: `1px solid ${accent}25`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>
-          {icon}
-        </div>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6, letterSpacing: -0.2 }}>{title}</div>
-        <div style={{ fontSize: 12, color: "#475569", lineHeight: 1.65, marginBottom: 16 }}>{desc}</div>
-        <div style={{ flex: 1 }}>
-          {features.map((f, i) => <Feature key={i} label={f.label} status={f.status} href={f.href} />)}
-        </div>
-        <button
-          onClick={ctaAction}
-          style={{ marginTop: 18, width: "100%", padding: "9px 0", borderRadius: 10, background: accent + "18", border: `1px solid ${accent}30`, color: accent, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "background .15s" }}
-          onMouseEnter={e => { e.currentTarget.style.background = accent + "28"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = accent + "18"; }}
-        >{ctaLabel}</button>
+  const PillarCard = ({ icon, title, desc, accent, features, ctaLabel, ctaAction }) => (
+    <div className="dash-card is-liftable" style={{ display: "flex", flexDirection: "column", padding: 24 }}>
+      <div style={{ width: 40, height: 40, borderRadius: "var(--r)", background: "var(--bg-alt)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-soft)", marginBottom: 16 }}>
+        {icon}
       </div>
-    );
-  };
+      <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 6, letterSpacing: "-0.015em" }}>{title}</div>
+      <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 14 }}>{desc}</div>
+      <div style={{ flex: 1 }}>
+        {features.map((f, i) => <Feature key={i} label={f.label} status={f.status} href={f.href} />)}
+      </div>
+      <button onClick={ctaAction} className="dash-btn dash-btn-outline" style={{ marginTop: 16, width: "100%" }}>
+        {ctaLabel}
+      </button>
+    </div>
+  );
 
   return (
-    <div className="rsp-hp-wrap" style={{ padding: "28px 32px", maxWidth: 1200, margin: "0 auto" }}>
+    <div className="rsp-hp-wrap" style={{ maxWidth: 1200, margin: "0 auto" }}>
       {/* Header */}
-      <div style={{ marginBottom: 32 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 6 }}>
-          Welcome back, {firstName}
-        </div>
-        <div style={{ fontSize: 13, color: "#475569" }}>
+      <div className="dash-page-head">
+        <span className="dash-eyebrow">01 — Overview</span>
+        <h1 className="dash-h1">Welcome back, <span className="dash-h1-light">{firstName}</span></h1>
+        <div style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 580 }}>
           {c("hp_subtitle", "Your B2B outreach platform — find leads, write emails, run campaigns, and detect replies at scale.")}
         </div>
       </div>
@@ -1784,20 +1764,18 @@ function DashboardPage({ user, contactCount, setPage }) {
   const greeting = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
   const dateStr = new Date().toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" });
 
-  const ToolBtn = ({ id, icon, label, desc, accent }) => (
-    <button onClick={() => setPage(id)} style={{
-      background: "#0d0d12", border: "1px solid #ffffff08", borderRadius: 14, padding: "22px 20px",
-      cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .18s", width: "100%",
-    }}
-      onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}50`; e.currentTarget.style.background = "#13131a"; e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = `0 8px 24px ${accent}14`; }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.transform = "none"; e.currentTarget.style.boxShadow = "none"; }}
-    >
-      <div style={{ width: 48, height: 48, borderRadius: 13, background: `${accent}18`, border: `1px solid ${accent}30`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>{icon}</div>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6, letterSpacing: -0.2 }}>{label}</div>
-      <div style={{ fontSize: 12, color: "#64748B", lineHeight: 1.6, marginBottom: 14 }}>{desc}</div>
-      <div style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 600, color: accent }}>
-        Open <LuChevronRight size={12} />
+  const ToolBtn = ({ id, icon, label, desc }) => (
+    <button onClick={() => setPage(id)} className="dash-card is-liftable" style={{
+      padding: 16, cursor: "pointer", textAlign: "left", width: "100%", display: "block",
+    }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
+        <span style={{ color: "var(--text-soft)", display: "flex" }}>{icon}</span>
+        <span style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", letterSpacing: "-0.01em" }}>{label}</span>
       </div>
+      <div style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.55, marginBottom: 10 }}>{desc}</div>
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, fontWeight: 600, color: "var(--teal)" }}>
+        Open <LuChevronRight size={12} />
+      </span>
     </button>
   );
 
@@ -1810,94 +1788,89 @@ function DashboardPage({ user, contactCount, setPage }) {
   return (
     <>
       {/* Greeting */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 4 }}>
-          Good {greeting}, {user?.username?.split(" ")[0] || "there"}.
-        </div>
-        <div style={{ fontSize: 13, color: "#64748B" }}>{dateStr} · {c("dp_tagline", "Here's your outreach hub.")}</div>
+      <div className="dash-page-head">
+        <span className="dash-eyebrow">{dateStr}</span>
+        <h1 className="dash-h1">Good {greeting}, <span className="dash-h1-light">{user?.username?.split(" ")[0] || "there"}</span></h1>
+        <div style={{ fontSize: 14, color: "var(--text-muted)" }}>{c("dp_tagline", "Here's your outreach hub.")}</div>
       </div>
 
-      {/* Stat cards */}
-      <div ref={statsRef} className="rsp-stat-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 12, marginBottom: 28 }}>
+      {/* Stat cards — asymmetric grid, mono numbers, one sparkline */}
+      <div ref={statsRef} className="rsp-stat-grid" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: 14, marginBottom: 32 }}>
         {[
-          { label: c("dp_stat1_label", "Contacts"), value: contactCount || user?.contactsCount || 0, color: "#10b981", page: "contacts", icon: <LuUsers size={16} />, sub: c("dp_stat1_sub", "in database") },
-          { label: c("dp_stat2_label", "Emails Sent"), value: emailsSent, color: "#6366f1", page: "emailsSent", icon: <LuMail size={16} />, sub: c("dp_stat2_sub", "total delivered") },
-          { label: c("dp_stat3_label", "Categories"), value: 5, color: "#f97316", page: "categories", icon: <LuFolder size={16} />, sub: c("dp_stat3_sub", "active groups") },
-          { label: c("dp_stat4_label", "Success Rate"), value: successRate, color: "#0ea5e9", page: "successRate", icon: <LuTrendingUp size={16} />, sub: c("dp_stat4_sub", "delivery rate") },
+          { label: c("dp_stat1_label", "Contacts"), value: contactCount || user?.contactsCount || 0, page: "contacts", icon: <LuUsers size={16} />, sub: c("dp_stat1_sub", "in database"), spark: true },
+          { label: c("dp_stat2_label", "Emails Sent"), value: emailsSent, page: "emailsSent", icon: <LuMail size={16} />, sub: c("dp_stat2_sub", "total delivered") },
+          { label: c("dp_stat3_label", "Categories"), value: 5, page: "categories", icon: <LuFolder size={16} />, sub: c("dp_stat3_sub", "active groups") },
+          { label: c("dp_stat4_label", "Success Rate"), value: successRate, page: "successRate", icon: <LuTrendingUp size={16} />, sub: c("dp_stat4_sub", "delivery rate") },
         ].map((s, i) => (
-          <button key={s.label} onClick={() => setPage(s.page)} style={{
+          <button key={s.label} onClick={() => setPage(s.page)} className="dash-card is-liftable" style={{
             ...revealStyle(statsVisible, i * 0.07),
-            background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "20px 18px",
-            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: `border-color .15s, background .15s, opacity 0.6s ease ${i * 0.07}s, transform 0.6s ease ${i * 0.07}s`,
-          }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = `${s.color}44`; e.currentTarget.style.background = "#16161e"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
-          >
+            padding: s.spark ? 24 : 20, cursor: "pointer", textAlign: "left", display: "block",
+            transition: `border-color .2s, box-shadow .2s, opacity 0.6s ease ${i * 0.07}s, transform 0.6s ease ${i * 0.07}s`,
+          }}>
             <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <div style={{ width: 32, height: 32, borderRadius: 8, background: `${s.color}18`, display: "flex", alignItems: "center", justifyContent: "center", color: s.color }}>{s.icon}</div>
-              <LuChevronRight size={13} style={{ color: "#334155" }} />
+              <span className="dash-stat-label">{s.label}</span>
+              <span style={{ color: "var(--text-faint)", display: "flex" }}>{s.icon}</span>
             </div>
-            <div style={{ fontSize: 28, fontWeight: 900, color: "#F1F5F9", letterSpacing: -1, marginBottom: 4, lineHeight: 1 }}>{s.value}</div>
-            <div style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8", marginBottom: 2 }}>{s.label}</div>
-            <div style={{ fontSize: 10, color: "#475569" }}>{s.sub}</div>
+            <div className="dash-stat-value">{s.value}</div>
+            {s.spark && (
+              <div className="dash-sparkline" style={{ marginTop: 14 }}>
+                {[40, 52, 34, 61, 48, 72, 55, 80, 46, 68, 58, 90].map((h, j) => (
+                  <span key={j} className={h >= 80 ? "is-peak" : ""} style={{ height: `${h}%` }} />
+                ))}
+              </div>
+            )}
+            <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: s.spark ? 10 : 6 }}>{s.sub}</div>
           </button>
         ))}
       </div>
 
       {/* Three tool groups */}
       <div className="rsp-tool-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
-
-        {/* Outreach */}
-        <div ref={col1Ref} style={{ ...revealStyle(col1Visible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #10b981" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", border: "1px solid #10b98130", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981" }}><LuSend size={17} /></div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#10b981", letterSpacing: 0.8, textTransform: "uppercase" }}>Outreach</div>
+        {[
+          { eyebrow: "Outreach", icon: <LuSend size={15} />, desc: "Write and send personalized cold emails to your contact list at scale.",
+            tools: [
+              { id: "emailSender", icon: <LuSend size={18} />, label: "Email Sender", desc: "Bulk send AI-generated campaigns to your entire contact list or a specific category." },
+              { id: "emailTemplates", icon: <LuFilePen size={18} />, label: "Email Templates", desc: "Pick a category template, enter a company, and generate a targeted single email." },
+            ] },
+          { eyebrow: "Contacts & Data", icon: <LuClipboardList size={15} />, desc: "Manage your prospect database across all five outreach categories.",
+            tools: [
+              { id: "contacts", icon: <LuClipboardList size={18} />, label: "Contacts DB", desc: "Add, edit, import and manage all your outreach contacts in one place." },
+              { id: "totalContacts", icon: <LuUsers size={18} />, label: "Total Contacts", desc: "See a full overview of every contact across all categories and statuses." },
+              { id: "categories", icon: <LuFolder size={18} />, label: "Categories", desc: "Browse contacts by Network, CPS, CPL, CPA, and Mobile groups." },
+            ] },
+          { eyebrow: "Analytics", icon: <LuTrendingUp size={15} />, desc: "Track campaign performance, reply rates, and delivery results over time.",
+            tools: [
+              { id: "campaignStatus", icon: <LuRadio size={18} />, label: "Campaign Status", desc: "Monitor active and completed campaigns in real time with live progress." },
+              { id: "emailsSent", icon: <LuMail size={18} />, label: "Emails Sent", desc: "View the full history of every email sent, including delivery stats and dates." },
+              { id: "successRate", icon: <LuTrendingUp size={18} />, label: "Success Rate", desc: "Measure open rates, click-through, and overall campaign performance scores." },
+            ] },
+        ].map((group, gi) => (
+          <div key={group.eyebrow}
+            ref={gi === 0 ? col1Ref : gi === 1 ? col2Ref : col3Ref}
+            className="dash-card pad-lg"
+            style={{ ...revealStyle(gi === 0 ? col1Visible : gi === 1 ? col2Visible : col3Visible, gi * 0.1) }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, color: "var(--text-soft)" }}>
+              {group.icon}
+              <span className="dash-eyebrow" style={{ color: "var(--text-soft)" }}>{group.eyebrow}</span>
+            </div>
+            <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 18, lineHeight: 1.6 }}>{group.desc}</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {group.tools.map(t => <ToolBtn key={t.id} {...t} />)}
+            </div>
           </div>
-          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Write and send personalized cold emails to your contact list at scale.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <ToolBtn id="emailSender" icon={<LuSend size={20} />} label="Email Sender" desc="Bulk send AI-generated campaigns to your entire contact list or a specific category." accent="#10b981" />
-            <ToolBtn id="emailTemplates" icon={<LuFilePen size={20} />} label="Email Templates" desc="Pick a category template, enter a company, and generate a targeted single email." accent="#6366f1" />
-          </div>
-        </div>
-
-        {/* Contacts & Data */}
-        <div ref={col2Ref} style={{ ...revealStyle(col2Visible, 0.1), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #f97316" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f9731618", border: "1px solid #f9731630", display: "flex", alignItems: "center", justifyContent: "center", color: "#f97316" }}><LuClipboardList size={17} /></div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#f97316", letterSpacing: 0.8, textTransform: "uppercase" }}>Contacts & Data</div>
-          </div>
-          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Manage your prospect database across all five outreach categories.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <ToolBtn id="contacts" icon={<LuClipboardList size={20} />} label="Contacts DB" desc="Add, edit, import and manage all your outreach contacts in one place." accent="#f97316" />
-            <ToolBtn id="totalContacts" icon={<LuUsers size={20} />} label="Total Contacts" desc="See a full overview of every contact across all categories and statuses." accent="#8b5cf6" />
-            <ToolBtn id="categories" icon={<LuFolder size={20} />} label="Categories" desc="Browse contacts by Network, CPS, CPL, CPA, and Mobile groups." accent="#14b8a6" />
-          </div>
-        </div>
-
-        {/* Analytics */}
-        <div ref={col3Ref} style={{ ...revealStyle(col3Visible, 0.2), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "28px", borderTop: "2px solid #0ea5e9" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#0ea5e918", border: "1px solid #0ea5e930", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><LuTrendingUp size={17} /></div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#0ea5e9", letterSpacing: 0.8, textTransform: "uppercase" }}>Analytics</div>
-          </div>
-          <div style={{ fontSize: 12, color: "#475569", marginBottom: 20, lineHeight: 1.6 }}>Track campaign performance, reply rates, and delivery results over time.</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-            <ToolBtn id="campaignStatus" icon={<LuRadio size={20} />} label="Campaign Status" desc="Monitor active and completed campaigns in real time with live progress." accent="#0ea5e9" />
-            <ToolBtn id="emailsSent" icon={<LuMail size={20} />} label="Emails Sent" desc="View the full history of every email sent, including delivery stats and dates." accent="#ec4899" />
-            <ToolBtn id="successRate" icon={<LuTrendingUp size={20} />} label="Success Rate" desc="Measure open rates, click-through, and overall campaign performance scores." accent="#f59e0b" />
-          </div>
-        </div>
-
+        ))}
       </div>
 
       {/* AI Agents */}
-      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 18, padding: "24px 28px", marginBottom: 20, borderTop: "2px solid #6366f1" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6366f118", border: "1px solid #6366f130", display: "flex", alignItems: "center", justifyContent: "center", color: "#6366f1" }}><LuSparkles size={17} /></div>
+      <div className="dash-card pad-lg" style={{ marginBottom: 20 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 700, color: "#818cf8", letterSpacing: 0.8, textTransform: "uppercase" }}>AI Agents</div>
-            <div style={{ fontSize: 11, color: "#475569", marginTop: 1 }}>12 autonomous agents — each with one job, done perfectly</div>
+            <span className="dash-eyebrow">Intelligence</span>
+            <div className="dash-h2" style={{ marginTop: 4 }}>AI Agents</div>
           </div>
+          <span style={{ fontSize: 12, color: "var(--text-faint)" }}>
+            <span className="dash-num">12</span> autonomous agents
+          </span>
         </div>
         <div className="rsp-agent-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
           {[
@@ -1917,16 +1890,15 @@ function DashboardPage({ user, contactCount, setPage }) {
             <a
               key={agent.id}
               href={`/agents/${agent.id}`}
-              style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", borderRadius: 12, background: "#0d0d12", border: "1px solid #ffffff08", textDecoration: "none", transition: "all .15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = `${agent.color}35`; e.currentTarget.style.background = "#13131a"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff08"; e.currentTarget.style.background = "#0d0d12"; }}
+              className="dash-card is-liftable"
+              style={{ display: "flex", alignItems: "center", gap: 12, padding: 14, textDecoration: "none" }}
             >
-              <div style={{ width: 34, height: 34, borderRadius: 9, background: `${agent.color}14`, border: `1px solid ${agent.color}25`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <agent.Icon size={16} style={{ color: agent.color }} />
+              <div style={{ width: 34, height: 34, borderRadius: "var(--r)", background: "var(--bg-alt)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--text-soft)" }}>
+                <agent.Icon size={16} />
               </div>
               <div style={{ minWidth: 0 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1", lineHeight: 1.3 }}>{agent.label}</div>
-                <div style={{ fontSize: 10, color: "#475569", marginTop: 2, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.tagline}</div>
+                <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text)", lineHeight: 1.3 }}>{agent.label}</div>
+                <div style={{ fontSize: 10.5, color: "var(--text-faint)", marginTop: 2, lineHeight: 1.4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{agent.tagline}</div>
               </div>
             </a>
           ))}
@@ -1935,38 +1907,39 @@ function DashboardPage({ user, contactCount, setPage }) {
 
       {/* Recent campaigns */}
       {recentCampaigns.length > 0 && (
-        <div ref={actRef} style={{ ...revealStyle(actVisible, 0), background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "20px 22px", marginBottom: 16 }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: "#64748B", letterSpacing: 1, textTransform: "uppercase", marginBottom: 14 }}>Recent Campaigns</div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {recentCampaigns.map((c, i) => (
-              <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 0", borderBottom: i < recentCampaigns.length - 1 ? "1px solid #ffffff08" : "none" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: c.cancelled ? "#f43737" : c.failed > 0 ? "#f59e0b" : "#10b981", flexShrink: 0 }} />
-                  <div>
-                    <div style={{ fontSize: 12, fontWeight: 600, color: "#CBD5E1" }}>{c.category || "All"} · {c.sent || 0} sent{c.failed ? `, ${c.failed} failed` : ""}</div>
-                    <div style={{ fontSize: 10, color: "#475569" }}>{c.date ? new Date(c.date).toLocaleDateString("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</div>
+        <div ref={actRef} className="dash-card" style={{ ...revealStyle(actVisible, 0), marginBottom: 16 }}>
+          <div className="dash-eyebrow" style={{ marginBottom: 14 }}>Recent Campaigns</div>
+          <div>
+            {recentCampaigns.map((c, i) => {
+              const state = c.cancelled ? "red" : c.failed > 0 ? "amber" : "green";
+              return (
+                <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "11px 0", borderBottom: i < recentCampaigns.length - 1 ? "1px solid var(--border)" : "none" }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                    <span className={`dash-dot is-${state}`} />
+                    <div>
+                      <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>
+                        {c.category || "All"} · <span className="dash-num">{c.sent || 0}</span> sent{c.failed ? <>, <span className="dash-num">{c.failed}</span> failed</> : ""}
+                      </div>
+                      <div className="dash-num" style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 2 }}>{c.date ? new Date(c.date).toLocaleDateString("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }) : "—"}</div>
+                    </div>
                   </div>
+                  <span className={`dash-chip is-${state}`}>
+                    {c.cancelled ? "Cancelled" : c.failed > 0 ? "Partial" : "Delivered"}
+                  </span>
                 </div>
-                <span style={{ fontSize: 10, fontWeight: 600, padding: "3px 8px", borderRadius: 20, background: c.cancelled ? "#f4373720" : c.failed > c.sent ? "#f59e0b20" : "#10b98120", color: c.cancelled ? "#f43737" : c.failed > c.sent ? "#f59e0b" : "#10b981" }}>
-                  {c.cancelled ? "Cancelled" : c.failed > 0 ? "Partial" : "Delivered"}
-                </span>
-              </div>
-            ))}
+              );
+            })}
           </div>
-          <button onClick={() => setPage("emailsSent")} style={{ marginTop: 12, background: "none", border: "none", color: "#475569", fontSize: 11, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", padding: 0 }}
-            onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
-            onMouseLeave={e => e.currentTarget.style.color = "#475569"}
-          >View all campaigns →</button>
+          <button onClick={() => setPage("emailsSent")} style={{ marginTop: 12, background: "none", border: "none", color: "var(--teal)", fontSize: 12, fontWeight: 600, cursor: "pointer", padding: 0 }}>
+            View all campaigns →
+          </button>
         </div>
       )}
 
       {/* Settings link */}
       <div style={{ display: "flex", justifyContent: "flex-end" }}>
-        <button onClick={() => setPage("settings")} style={{ background: "none", border: "none", color: "#475569", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 5, padding: "6px 0" }}
-          onMouseEnter={e => e.currentTarget.style.color = "#94A3B8"}
-          onMouseLeave={e => e.currentTarget.style.color = "#475569"}
-        >
-          <LuSettings size={13} /> Settings & Account
+        <button onClick={() => setPage("settings")} style={{ background: "none", border: "none", color: "var(--text-soft)", fontSize: 13, cursor: "pointer", display: "flex", alignItems: "center", gap: 6, padding: "6px 0" }}>
+          <LuSettings size={14} /> Settings &amp; Account
         </button>
       </div>
     </>
