@@ -1,32 +1,31 @@
 import { useState, useEffect } from "react";
-import { LuSearch, LuX, LuFilter } from "react-icons/lu";
+import { LuFilter, LuX } from "react-icons/lu";
+import "./AdminEmailLogs.css";
 
-const FF = "'DM Sans', sans-serif";
-const C = { card: "#111116", border: "#ffffff12", text: "#F1F5F9", muted: "#64748B", purple: "#6366f1", green: "#10b981", blue: "#0ea5e9" };
-
-async function api(body) {
-  const r = await fetch("/api/admin", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
-  return r.json();
+async function adminApi(body) {
+  const res = await fetch("/api/admin", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+  return res.json();
 }
-
-const inp = { background: "#0d0d12", border: `1px solid ${C.border}`, borderRadius: 8, padding: "9px 12px", fontSize: 13, color: C.text, fontFamily: FF, outline: "none", boxSizing: "border-box" };
-const lbl = { fontSize: 11, fontWeight: 700, color: C.muted, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.5 };
 
 function fmtDate(d) {
   if (!d) return "—";
-  return new Date(d).toLocaleString("en-IN", { day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  return new Date(d).toLocaleString("en-IN", {
+    day: "numeric", month: "short", year: "numeric",
+    hour: "2-digit", minute: "2-digit",
+  });
 }
 
-function Pager({ page, total, limit = 20, onChange }) {
-  const pages = Math.max(1, Math.ceil(total / limit));
-  if (pages <= 1 && total <= limit) return null;
+function StatusBadges({ opened, replied, bounced }) {
   return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 14, marginTop: 8, borderTop: `1px solid ${C.border}` }}>
-      <span style={{ fontSize: 12, color: C.muted }}>{(page - 1) * limit + 1}–{Math.min(page * limit, total)} of {total}</span>
-      <div style={{ display: "flex", gap: 6 }}>
-        <button onClick={() => onChange(page - 1)} disabled={page <= 1} style={{ padding: "6px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: "#0d0d12", color: page > 1 ? C.text : C.muted, fontSize: 12, cursor: page > 1 ? "pointer" : "default", fontFamily: FF }}>Prev</button>
-        <button onClick={() => onChange(page + 1)} disabled={page >= pages} style={{ padding: "6px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: "#0d0d12", color: page < pages ? C.text : C.muted, fontSize: 12, cursor: page < pages ? "pointer" : "default", fontFamily: FF }}>Next</button>
-      </div>
+    <div className="badge-row">
+      {bounced  && <span className="badge badge--red">Bounced</span>}
+      {replied  && <span className="badge badge--green">Replied</span>}
+      {opened && !replied && !bounced && <span className="badge badge--blue">Opened</span>}
+      {!opened && !replied && !bounced && <span className="badge badge--gray">Sent</span>}
     </div>
   );
 }
@@ -36,101 +35,152 @@ export default function AdminEmailLogs() {
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [campaignId, setCampaignId] = useState("");
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
-  const [active, setActive] = useState({});
+  const [activeFilters, setActiveFilters] = useState({});
+  const LIMIT = 25;
 
-  function load(p = 1, filters = active) {
+  function fetch_(p, filters) {
     setLoading(true);
-    api({ action: "emailLogs", page: p, ...filters })
-      .then(d => { setRows(d.rows || []); setTotal(d.total || 0); setLoading(false); })
-      .catch(() => setLoading(false));
+    adminApi({ action: "emailLogs", page: p, ...filters })
+      .then(d => {
+        if (d.error) setError(d.error);
+        else { setRows(d.rows || []); setTotal(d.total || 0); }
+      })
+      .catch(() => setError("Failed to load email logs"))
+      .finally(() => setLoading(false));
   }
 
-  useEffect(() => { load(1, {}); }, []);
+  useEffect(() => { fetch_(1, {}); }, []);
 
   function applyFilters() {
-    const f = {};
-    if (campaignId.trim()) f.campaignId = campaignId.trim();
-    if (dateFrom) f.dateFrom = dateFrom;
-    if (dateTo) f.dateTo = dateTo;
-    setActive(f); setPage(1); load(1, f);
+    const filters = {};
+    if (campaignId.trim()) filters.campaignId = campaignId.trim();
+    if (dateFrom) filters.dateFrom = dateFrom;
+    if (dateTo)   filters.dateTo   = dateTo + "T23:59:59";
+    setActiveFilters(filters);
+    setPage(1);
+    fetch_(1, filters);
   }
 
   function clearFilters() {
-    setCampaignId(""); setDateFrom(""); setDateTo("");
-    setActive({}); setPage(1); load(1, {});
+    setCampaignId("");
+    setDateFrom("");
+    setDateTo("");
+    setActiveFilters({});
+    setPage(1);
+    fetch_(1, {});
+  }
+
+  function goPage(p) {
+    setPage(p);
+    fetch_(p, activeFilters);
   }
 
   const hasFilters = campaignId || dateFrom || dateTo;
+  const totalPages = Math.max(1, Math.ceil(total / LIMIT));
+  const start = (page - 1) * LIMIT + 1;
+  const end = Math.min(page * LIMIT, total);
 
   return (
-    <div style={{ fontFamily: FF }}>
-      <div style={{ marginBottom: 22 }}>
-        <div style={{ fontSize: 22, fontWeight: 800, color: C.text, letterSpacing: -0.5 }}>Email Logs</div>
-        <div style={{ fontSize: 13, color: C.muted, marginTop: 3 }}>{total} email record{total !== 1 ? "s" : ""}</div>
+    <div>
+      <div className="page-header">
+        <div className="page-header__left">
+          <h1>Email Logs</h1>
+          <p>All sent emails and their delivery status</p>
+        </div>
       </div>
 
-      {/* Filter bar */}
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 12, padding: "14px 16px", marginBottom: 16, display: "flex", gap: 12, alignItems: "flex-end", flexWrap: "wrap" }}>
-        <div>
-          <label style={lbl}>Campaign ID</label>
-          <input type="number" value={campaignId} onChange={e => setCampaignId(e.target.value)} placeholder="e.g. 42" min="1" style={{ ...inp, width: 120 }} />
+      {error && <div className="msg-error">{error}</div>}
+
+      <div className="logs-filter-bar">
+        <div className="logs-filter-group">
+          <label>Campaign ID</label>
+          <input
+            className="form-input logs-filter-input"
+            type="number"
+            placeholder="e.g. 42"
+            value={campaignId}
+            onChange={e => setCampaignId(e.target.value)}
+            min="1"
+          />
         </div>
-        <div>
-          <label style={lbl}>Date From</label>
-          <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} style={{ ...inp, width: 160 }} />
+        <div className="logs-filter-group">
+          <label>Date from</label>
+          <input
+            className="form-input logs-filter-input"
+            type="date"
+            value={dateFrom}
+            onChange={e => setDateFrom(e.target.value)}
+          />
         </div>
-        <div>
-          <label style={lbl}>Date To</label>
-          <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} style={{ ...inp, width: 160 }} />
+        <div className="logs-filter-group">
+          <label>Date to</label>
+          <input
+            className="form-input logs-filter-input"
+            type="date"
+            value={dateTo}
+            onChange={e => setDateTo(e.target.value)}
+          />
         </div>
-        <button onClick={applyFilters} style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 16px", borderRadius: 8, border: "none", background: C.purple, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer", fontFamily: FF }}>
-          <LuFilter size={13} /> Apply
+        <button className="btn-primary logs-filter-apply" onClick={applyFilters}>
+          <LuFilter size={14} />
+          Apply
         </button>
         {hasFilters && (
-          <button onClick={clearFilters} style={{ display: "flex", alignItems: "center", gap: 6, padding: "9px 14px", borderRadius: 8, border: `1px solid ${C.border}`, background: "transparent", color: C.muted, fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: FF }}>
-            <LuX size={13} /> Clear
+          <button className="btn-ghost logs-filter-clear" onClick={clearFilters}>
+            <LuX size={14} />
+            Clear
           </button>
         )}
       </div>
 
-      <div style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, overflow: "hidden" }}>
+      <div className="table-wrap">
         {loading ? (
-          <div style={{ padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>Loading…</div>
+          <div className="state-loading" />
         ) : rows.length === 0 ? (
-          <div style={{ padding: 40, textAlign: "center", color: C.muted, fontSize: 13 }}>No email logs found</div>
+          <div className="state-empty">No email logs found</div>
         ) : (
-          <div style={{ overflowX: "auto" }}>
-            <table style={{ width: "100%", borderCollapse: "collapse" }}>
-              <thead>
-                <tr style={{ background: "#0d0d12" }}>
-                  {["#", "Campaign", "Recipient", "Company", "Subject", "Sent At"].map(h => (
-                    <th key={h} style={{ padding: "11px 14px", textAlign: "left", fontSize: 11, fontWeight: 700, color: C.muted, textTransform: "uppercase", letterSpacing: 0.5, whiteSpace: "nowrap" }}>{h}</th>
-                  ))}
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>To</th>
+                <th>Campaign</th>
+                <th>Sent At</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map(r => (
+                <tr key={r.id}>
+                  <td>{r.id}</td>
+                  <td className="text-primary">{r.to_email}</td>
+                  <td>#{r.campaign_id}</td>
+                  <td>{fmtDate(r.sent_at)}</td>
+                  <td>
+                    <StatusBadges
+                      opened={r.opened}
+                      replied={r.replied}
+                      bounced={r.bounced}
+                    />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {rows.map((r, i) => (
-                  <tr key={r.id} style={{ borderTop: `1px solid ${C.border}`, background: i % 2 === 1 ? "#0d0d1210" : "transparent" }}>
-                    <td style={{ padding: "11px 14px", fontSize: 12, color: C.muted, fontFamily: "'JetBrains Mono',monospace" }}>{r.id}</td>
-                    <td style={{ padding: "11px 14px" }}>
-                      <span style={{ fontSize: 12, fontWeight: 700, color: C.purple, background: "#6366f118", border: "1px solid #6366f128", borderRadius: 20, padding: "3px 8px" }}>#{r.campaign_id}</span>
-                    </td>
-                    <td style={{ padding: "11px 14px", fontSize: 13, fontWeight: 600, color: C.text }}>{r.contact_email || "—"}</td>
-                    <td style={{ padding: "11px 14px", fontSize: 12, color: C.muted }}>{r.company || "—"}</td>
-                    <td style={{ padding: "11px 14px", fontSize: 12, color: C.muted, maxWidth: 240, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{r.subject || "—"}</td>
-                    <td style={{ padding: "11px 14px", fontSize: 11, color: C.muted, whiteSpace: "nowrap" }}>{fmtDate(r.sent_at)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         )}
+
         {!loading && rows.length > 0 && (
-          <div style={{ padding: "0 16px 14px" }}>
-            <Pager page={page} total={total} onChange={p => { setPage(p); load(p); }} />
+          <div className="pagination">
+            <span className="pagination__info">{start}–{end} of {total}</span>
+            <div className="pagination__btns">
+              <button className="btn-page" onClick={() => goPage(page - 1)} disabled={page <= 1}>Prev</button>
+              <button className="btn-page" onClick={() => goPage(page + 1)} disabled={page >= totalPages}>Next</button>
+            </div>
           </div>
         )}
       </div>
