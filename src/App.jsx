@@ -8,7 +8,7 @@ import {
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
   LuMenu, LuInbox, LuCreditCard, LuCircleHelp, LuBookOpen,
-  LuMessageCircle, LuStar, LuArchive, LuReply,
+  LuMessageCircle, LuStar, LuArchive, LuReply, LuShield,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
@@ -4747,6 +4747,18 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
               ))}
             </div>
           ))}
+
+          {(user?.role === "admin" || user?.role === "manager") && (
+            <>
+              <div className="dash-sidebar-section">
+                <span className="dash-sidebar-eyebrow">Admin</span>
+              </div>
+              <a href="/console" className="dash-nav-item" style={{ textDecoration: "none" }}>
+                <LuShield size={18} />
+                Admin Console
+              </a>
+            </>
+          )}
 
           <div className="dash-sidebar-footer">
             <button className="dash-user-card"
