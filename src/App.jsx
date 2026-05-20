@@ -143,7 +143,7 @@ function useExternalLinkTransition() {
       if (!h || h.startsWith('#') || h.startsWith('/') || h.startsWith('mailto:')) return;
       e.preventDefault();
       const o = document.createElement('div');
-      o.style.cssText = 'position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';
+      o.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';
       o.innerHTML = '<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';
       document.body.appendChild(o);
       requestAnimationFrame(() => { o.style.opacity = '1'; });
@@ -539,7 +539,7 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
       onClick={locked ? onConnect : onClick}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
-      style={{ background: "#111116", border: `1px solid ${hover && !locked ? accent + "55" : "#ffffff10"}`, borderRadius: 16, padding: "20px 22px", flex: 1, minWidth: 140, position: "relative", overflow: "hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition: "all .3s ease", cursor: "pointer", transform: hover && !locked ? "translateY(-2px)" : "none", boxShadow: hover && !locked ? `0 8px 24px ${accent}18` : "0 2px 8px rgba(0,0,0,0.25)" }}>
+      style={{ background: "var(--bg)", border: `1px solid ${hover && !locked ? accent + "55" : "var(--border)"}`, borderRadius: 16, padding: "20px 22px", flex: 1, minWidth: 140, position: "relative", overflow: "hidden", opacity: locked ? 0.5 : 1, filter: locked ? "grayscale(0.5)" : "none", transition: "all .3s ease", cursor: "pointer", transform: hover && !locked ? "translateY(-2px)" : "none", boxShadow: hover && !locked ? `0 8px 24px ${accent}18` : "0 2px 8px rgba(15,23,42,0.05)" }}>
       <div style={{ position: "absolute", top: 0, right: 0, width: 80, height: 80, background: `radial-gradient(circle at top right,${accent}12,transparent 70%)` }} />
       {locked && (
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "rgba(9,9,13,0.85)", zIndex: 2, borderRadius: 16, cursor: "pointer", backdropFilter: "blur(4px)" }} onClick={onConnect}>
@@ -549,9 +549,9 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
       )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
         <div style={{ width: 40, height: 40, borderRadius: 12, background: `${accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>{icon}</div>
-        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "#CBD5E1"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
+        {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
+      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
       <div style={{ fontSize: 12, color: "#64748B", marginTop: 4, fontWeight: 500, letterSpacing: .5, textTransform: "uppercase" }}>{label}</div>
     </div>
   );
@@ -561,7 +561,7 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
 function BackButton({ onClick, label }) {
   return (
     <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, transition: "color .2s" }}
-      onMouseEnter={e => e.currentTarget.style.color = "#F1F5F9"}
+      onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
       onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
@@ -579,17 +579,17 @@ function EmailPreviewModal({ email: e, onClose }) {
 
   return (
     <div onClick={onClose} style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div onClick={ev => ev.stopPropagation()} style={{ background: "#111116", borderRadius: 20, width: "100%", maxWidth: 540, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(0,0,0,0.4)", overflow: "hidden" }}>
+      <div onClick={ev => ev.stopPropagation()} style={{ background: "var(--bg)", borderRadius: 20, width: "100%", maxWidth: 540, maxHeight: "88vh", display: "flex", flexDirection: "column", boxShadow: "0 24px 64px rgba(15,23,42,0.08)", overflow: "hidden" }}>
 
         {/* Header */}
-        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid #ffffff10", flexShrink: 0 }}>
+        <div style={{ padding: "20px 24px 16px", borderBottom: "1px solid var(--border)", flexShrink: 0 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 38, height: 38, borderRadius: 10, background: `${cat.dot}18`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 15, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
                 {(e.company || e.email || "?")[0].toUpperCase()}
               </div>
               <div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9" }}>{e.company || e.email}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{e.company || e.email}</div>
                 <div style={{ fontSize: 12, color: "#64748B" }}>To: {e.email}</div>
               </div>
             </div>
@@ -607,18 +607,18 @@ function EmailPreviewModal({ email: e, onClose }) {
         {/* Subject */}
         <div style={{ padding: "14px 24px 0", flexShrink: 0 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 4 }}>Subject</div>
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9" }}>{e.subject || "—"}</div>
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)" }}>{e.subject || "—"}</div>
         </div>
 
         {/* Body */}
         <div style={{ padding: "14px 24px 24px", overflowY: "auto", flex: 1 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Message</div>
           {e.body ? (
-            <div style={{ fontSize: 14, color: "#E2E8F0", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "#0d0d12", borderRadius: 12, padding: "16px 18px", border: "1px solid #ffffff10", fontFamily: "'DM Sans',sans-serif" }}>
+            <div style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "var(--bg-alt)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif" }}>
               {e.body}
             </div>
           ) : (
-            <div style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic", background: "#0d0d12", borderRadius: 12, padding: "16px 18px", border: "1px solid #ffffff10" }}>
+            <div style={{ fontSize: 13, color: "#94A3B8", fontStyle: "italic", background: "var(--bg-alt)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)" }}>
               Email body not stored for this email — full body is saved for all emails sent going forward.
             </div>
           )}
@@ -725,17 +725,17 @@ function TotalContactsPage({ onBack, user }) {
     if (contact?.airtableId) manualContactDelete(contact.airtableId);
   };
 
-  const inp = { background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "#E2E8F0", outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--text)", outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
   const lbl = { fontSize: 11, fontWeight: 600, color: "#64748B", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: .5 };
   const focusStyle = (e) => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; };
-  const blurStyle  = (e) => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; };
+  const blurStyle  = (e) => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; };
 
   return (
     <div>
       {/* Header */}
       <div className="rsp-tc-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>Total Contacts</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>Total Contacts</div>
           <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{contacts.length} contact{contacts.length !== 1 ? "s" : ""} total</div>
         </div>
         <button onClick={openAdd} style={{
@@ -755,17 +755,17 @@ function TotalContactsPage({ onBack, user }) {
           const count = countByCat[cat] || 0;
           return (
             <button key={cat} onClick={() => setFilterCat(filterCat === cat ? "All" : cat)} style={{
-              background: "#111116", border: filterCat === cat ? `2px solid ${c.dot}` : "1px solid #ffffff10",
+              background: "var(--bg)", border: filterCat === cat ? `2px solid ${c.dot}` : "1px solid var(--border)",
               borderRadius: 12, padding: "12px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
-                  <span style={{ fontSize: 13, fontWeight: 600, color: c.text || "#F1F5F9" }}>{cat}</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: c.text || "var(--text)" }}>{cat}</span>
                 </div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
               </div>
-              <div style={{ width: "100%", height: 5, background: "#ffffff10", borderRadius: 3, overflow: "hidden" }}>
+              <div style={{ width: "100%", height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
                 <div style={{ width: `${(count / maxCount) * 100}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .6s ease" }} />
               </div>
             </button>
@@ -784,9 +784,9 @@ function TotalContactsPage({ onBack, user }) {
 
       {/* Contact list */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 14, border: "1px dashed #ffffff10" }}>
-          <LuUsers size={32} style={{ marginBottom: 12, color: "#CBD5E1" }} />
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
+        <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 14, border: "1px dashed var(--border)" }}>
+          <LuUsers size={32} style={{ marginBottom: 12, color: "var(--text-muted)" }} />
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
           <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20 }}>{contacts.length === 0 ? "Add your first contact to get started." : "Try a different search or filter."}</div>
           {contacts.length === 0 && <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Add Contact</button>}
         </div>
@@ -796,9 +796,9 @@ function TotalContactsPage({ onBack, user }) {
           {filtered.map(c => {
             const cat = CAT[c.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
             return (
-              <div key={c.id} className="rsp-tc-card" style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(0,0,0,0.25)", transition: "box-shadow .15s" }}
-                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(0,0,0,0.4)"}
-                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.25)"}
+              <div key={c.id} className="rsp-tc-card" style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px 16px", display: "flex", alignItems: "center", gap: 14, boxShadow: "0 1px 3px rgba(15,23,42,0.05)", transition: "box-shadow .15s" }}
+                onMouseEnter={e => e.currentTarget.style.boxShadow = "0 4px 12px rgba(15,23,42,0.08)"}
+                onMouseLeave={e => e.currentTarget.style.boxShadow = "0 1px 3px rgba(15,23,42,0.05)"}
               >
                 {/* Avatar */}
                 <div style={{ width: 38, height: 38, borderRadius: "50%", background: `${cat.dot}22`, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 14, fontWeight: 700, color: cat.dot, flexShrink: 0 }}>
@@ -806,7 +806,7 @@ function TotalContactsPage({ onBack, user }) {
                 </div>
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{c.company || c.name || "—"}</div>
+                  <div style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>{c.company || c.name || "—"}</div>
                   <div style={{ fontSize: 12, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{c.email}</div>
                 </div>
                 {/* Category badge */}
@@ -815,7 +815,7 @@ function TotalContactsPage({ onBack, user }) {
                 {c.country && <span style={{ fontSize: 12, color: "#94A3B8", flexShrink: 0 }}>{c.country}</span>}
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  <button onClick={() => openEdit(c)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #ffffff10", background: "#0d0d12", color: "#64748B", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Edit</button>
+                  <button onClick={() => openEdit(c)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Edit</button>
                   <button onClick={() => deleteContact(c.id)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #fee2e2", background: "#fef2f2", color: "#ef4444", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>✕</button>
                 </div>
               </div>
@@ -827,9 +827,9 @@ function TotalContactsPage({ onBack, user }) {
       {/* Add / Edit Modal */}
       {showModal && (
         <div style={{ position: "fixed", inset: 0, background: "rgba(15,23,42,0.4)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }} onClick={e => { if (e.target === e.currentTarget) setShowModal(false); }}>
-          <div style={{ background: "#111116", borderRadius: 18, padding: 28, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.4)", maxHeight: "90vh", overflowY: "auto" }}>
+          <div style={{ background: "var(--bg)", borderRadius: 18, padding: 28, width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(15,23,42,0.08)", maxHeight: "90vh", overflowY: "auto" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 22 }}>
-              <div style={{ fontSize: 17, fontWeight: 700, color: "#F1F5F9" }}>{editId ? "Edit Contact" : "Add Contact"}</div>
+              <div style={{ fontSize: 17, fontWeight: 700, color: "var(--text)" }}>{editId ? "Edit Contact" : "Add Contact"}</div>
               <button onClick={() => setShowModal(false)} style={{ background: "none", border: "none", fontSize: 20, color: "#94A3B8", cursor: "pointer", lineHeight: 1 }}>✕</button>
             </div>
 
@@ -869,8 +869,8 @@ function TotalContactsPage({ onBack, user }) {
                     return (
                       <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))} style={{
                         padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
-                        border: form.category === cat ? `2px solid ${c.dot || "#6366f1"}` : "1px solid #ffffff10",
-                        background: form.category === cat ? (c.bg || "#EEF2FF") : "#0d0d12",
+                        border: form.category === cat ? `2px solid ${c.dot || "#6366f1"}` : "1px solid var(--border)",
+                        background: form.category === cat ? (c.bg || "#EEF2FF") : "var(--bg-alt)",
                         color: form.category === cat ? (c.text || "#4F46E5") : "#64748B",
                       }}>{cat}</button>
                     );
@@ -892,7 +892,7 @@ function TotalContactsPage({ onBack, user }) {
                 }}>
                   {editId ? "Save Changes" : "Add Contact"}
                 </button>
-                <button onClick={() => setShowModal(false)} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid #ffffff10", background: "#0d0d12", color: "#64748B", fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+                <button onClick={() => setShowModal(false)} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
                   Cancel
                 </button>
               </div>
@@ -930,7 +930,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
   const totalFailed   = useMemo(() => history.reduce((s, h) => s + (h.failed || 0), 0), [history]);
   const totalCancelled = useMemo(() => history.filter(h => h.cancelled).length, [history]);
   const deliveryRate  = totalSent + totalFailed > 0 ? Math.round(totalSent / (totalSent + totalFailed) * 100) : 0;
-  const rateColor     = deliveryRate >= 80 ? "#10b981" : deliveryRate >= 50 ? "#facc15" : deliveryRate > 0 ? "#f87171" : "#ffffff20";
+  const rateColor     = deliveryRate >= 80 ? "#10b981" : deliveryRate >= 50 ? "#facc15" : deliveryRate > 0 ? "#f87171" : "var(--border-strong)";
 
   const last7 = useMemo(() => {
     const days = Array.from({ length: 7 }, (_, i) => {
@@ -955,7 +955,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
       {/* Header */}
       <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Emails Sent</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", letterSpacing: -0.5, marginBottom: 3 }}>Emails Sent</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} · {totalSent + totalFailed} attempted</div>
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -963,7 +963,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
             <div style={{ fontSize: 26, fontWeight: 900, color: "#6366f1", letterSpacing: -1 }}>{totalSent.toLocaleString()}</div>
             <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Delivered</div>
           </div>
-          <div style={{ display: "flex", background: "#16161e", borderRadius: 10, padding: 3, gap: 2 }}>
+          <div style={{ display: "flex", background: "var(--bg-hover)", borderRadius: 10, padding: 3, gap: 2 }}>
             <button style={tabBtn("overview")} onClick={() => setTab("overview")}>Overview</button>
             <button style={tabBtn("history")} onClick={() => setTab("history")}>History</button>
           </div>
@@ -990,7 +990,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
               { label: "Campaigns", value: history.length,  color: "#0ea5e9" },
               { label: "Cancelled", value: totalCancelled,  color: "#facc15" },
             ].map(s => (
-              <div key={s.label} style={{ background: "#111116", border: `1px solid ${s.color}18`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
+              <div key={s.label} style={{ background: "var(--bg)", border: `1px solid ${s.color}18`, borderRadius: 12, padding: "14px 16px", textAlign: "center" }}>
                 <div style={{ fontSize: 22, fontWeight: 900, color: s.color, letterSpacing: -0.8, marginBottom: 3 }}>{s.value}</div>
                 <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>{s.label}</div>
               </div>
@@ -998,20 +998,20 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
           </div>
 
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
-              <LuMailbox size={32} style={{ marginBottom: 12, color: "#334155" }} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No emails sent yet</div>
+            <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
+              <LuMailbox size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No emails sent yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
             </div>
           ) : (
             <>
               {/* Delivery rate */}
-              <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
+              <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                  <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Delivery Rate</span>
+                  <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Delivery Rate</span>
                   <span style={{ fontSize: 18, fontWeight: 800, color: rateColor }}>{deliveryRate}%</span>
                 </div>
-                <div style={{ height: 8, background: "#ffffff08", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
+                <div style={{ height: 8, background: "var(--border)", borderRadius: 4, overflow: "hidden", marginBottom: 8 }}>
                   <div style={{ width: `${deliveryRate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${rateColor})`, borderRadius: 4, transition: "width .6s ease" }} />
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 11, color: "#64748B" }}>
@@ -1021,7 +1021,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
               </div>
 
               {/* 7-day chart */}
-              <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
+              <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", marginBottom: 14 }}>
                 <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 18 }}>Last 7 Days</div>
                 <div style={{ display: "flex", alignItems: "flex-end", gap: 8, height: 90 }}>
                   {last7.map(d => {
@@ -1033,7 +1033,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
                         <div style={{ width: "100%", display: "flex", alignItems: "flex-end", height: 64 }}>
                           <div style={{
                             width: "100%", height: `${h}px`,
-                            background: d.sent > 0 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "#ffffff08",
+                            background: d.sent > 0 ? "linear-gradient(180deg,#818cf8,#6366f1)" : "var(--border)",
                             borderRadius: "4px 4px 2px 2px", transition: "height .4s ease",
                             boxShadow: d.sent > 0 ? "0 0 10px #6366f130" : "none",
                           }} />
@@ -1047,20 +1047,20 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
 
               {/* By category */}
               {Object.keys(byCat).length > 0 && (
-                <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, overflow: "hidden" }}>
-                  <div style={{ padding: "14px 18px", borderBottom: "1px solid #ffffff08", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>By Category</div>
+                <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
+                  <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>By Category</div>
                   {Object.entries(byCat).sort((a, b) => b[1] - a[1]).map(([cat, count], i, arr) => {
                     const c = CAT[cat] || { dot: "#94A3B8" };
                     const pct = totalSent > 0 ? Math.round(count / totalSent * 100) : 0;
                     return (
-                      <div key={cat} style={{ padding: "12px 18px", borderBottom: i < arr.length - 1 ? "1px solid #ffffff08" : "none" }}>
+                      <div key={cat} style={{ padding: "12px 18px", borderBottom: i < arr.length - 1 ? "1px solid var(--border)" : "none" }}>
                         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 7 }}>
                           <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, flexShrink: 0, boxShadow: `0 0 5px ${c.dot}80` }} />
-                          <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", flex: 1 }}>{cat}</span>
+                          <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", flex: 1 }}>{cat}</span>
                           <span style={{ fontSize: 11, color: c.dot, fontWeight: 700 }}>{count}</span>
                           <span style={{ fontSize: 10, color: "#64748B", background: `${c.dot}15`, padding: "1px 7px", borderRadius: 10 }}>{pct}%</span>
                         </div>
-                        <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                        <div style={{ height: 4, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
                           <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 2, transition: "width .5s ease" }} />
                         </div>
                       </div>
@@ -1076,9 +1076,9 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
       {tab === "history" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
-              <LuMailbox size={32} style={{ marginBottom: 12, color: "#334155" }} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No campaigns yet</div>
+            <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
+              <LuMailbox size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
+              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No campaigns yet</div>
               <div style={{ fontSize: 13, color: "#64748B" }}>Your sent campaigns will appear here.</div>
             </div>
           ) : [...history].reverse().map(h => {
@@ -1089,7 +1089,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
             const pctColor = pct >= 80 ? "#10b981" : pct >= 50 ? "#facc15" : "#f87171";
             const dateStr = new Date(h.date).toLocaleDateString("en", { day: "numeric", month: "short", year: "numeric" });
             return (
-              <div key={h.id} style={{ background: "#111116", border: `1px solid ${isOpen ? c.dot + "30" : "#ffffff0d"}`, borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
+              <div key={h.id} style={{ background: "var(--bg)", border: `1px solid ${isOpen ? c.dot + "30" : "var(--border)"}`, borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
                 <button onClick={() => setExpandedId(isOpen ? null : h.id)} style={{
                   width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
                   background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textAlign: "left",
@@ -1099,7 +1099,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                      <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{h.category || "Campaign"}</span>
+                      <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{h.category || "Campaign"}</span>
                       {h.cancelled && <span style={{ fontSize: 10, fontWeight: 600, color: "#facc15", background: "#facc1518", border: "1px solid #facc1530", padding: "1px 7px", borderRadius: 10 }}>Cancelled</span>}
                     </div>
                     <div style={{ fontSize: 11, color: "#475569" }}>{dateStr}</div>
@@ -1108,18 +1108,18 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
                     <div style={{ display: "flex", gap: 10, alignItems: "center" }}>
                       <span style={{ fontSize: 13, fontWeight: 700, color: "#10b981" }}>{h.sent || 0} sent</span>
                       {(h.failed || 0) > 0 && <span style={{ fontSize: 12, color: "#f87171" }}>{h.failed} failed</span>}
-                      <span style={{ color: "#334155", fontSize: 13, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .2s", display: "inline-block" }}>›</span>
+                      <span style={{ color: "var(--text-faint)", fontSize: 13, transform: isOpen ? "rotate(90deg)" : "none", transition: "transform .2s", display: "inline-block" }}>›</span>
                     </div>
-                    <div style={{ width: 80, height: 3, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                    <div style={{ width: 80, height: 3, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
                       <div style={{ width: `${pct}%`, height: "100%", background: pctColor, borderRadius: 2 }} />
                     </div>
                   </div>
                 </button>
 
                 {isOpen && (
-                  <div style={{ borderTop: "1px solid #ffffff08", padding: "14px 16px", background: "#0d0d12" }}>
+                  <div style={{ borderTop: "1px solid var(--border)", padding: "14px 16px", background: "var(--bg-alt)" }}>
                     {h.offerContext && (
-                      <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, padding: "10px 12px", background: "#111116", borderRadius: 8, border: "1px solid #ffffff0d", lineHeight: 1.6 }}>
+                      <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12, padding: "10px 12px", background: "var(--bg)", borderRadius: 8, border: "1px solid var(--border)", lineHeight: 1.6 }}>
                         <span style={{ color: "#64748B", fontWeight: 600 }}>Offer context: </span>{h.offerContext}
                       </div>
                     )}
@@ -1129,13 +1129,13 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
                         <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
                           {h.contacts.map((ct, i) => (
                             <div key={i} onClick={() => setOpenEmail({ ...ct, category: h.category })}
-                              style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "#111116", borderRadius: 10, border: "1px solid #ffffff0d", cursor: "pointer", transition: "all .15s" }}
-                              onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f150"; e.currentTarget.style.background = "#16161e"; }}
-                              onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff0d"; e.currentTarget.style.background = "#111116"; }}
+                              style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", background: "var(--bg)", borderRadius: 10, border: "1px solid var(--border)", cursor: "pointer", transition: "all .15s" }}
+                              onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f150"; e.currentTarget.style.background = "var(--bg-hover)"; }}
+                              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.background = "var(--bg)"; }}
                             >
                               <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
                               <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9" }}>{ct.company || ct.email}</div>
+                                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{ct.company || ct.email}</div>
                                 {ct.subject && <div style={{ fontSize: 11, color: "#475569", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{ct.subject}</div>}
                               </div>
                               <span style={{ fontSize: 11, color: "#6366f1", fontWeight: 600, flexShrink: 0 }}>View →</span>
@@ -1190,7 +1190,7 @@ function CategoriesPage({ onBack }) {
       {/* Header */}
       <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Contact Categories</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", letterSpacing: -0.5, marginBottom: 3 }}>Contact Categories</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{total} total contacts across 5 categories</div>
         </div>
         <div style={{ background: "#f9731618", border: "1px solid #f9731630", borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
@@ -1200,10 +1200,10 @@ function CategoriesPage({ onBack }) {
       </div>
 
       {/* Distribution bar */}
-      <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "18px 20px", marginBottom: 16 }}>
+      <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", marginBottom: 16 }}>
         <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 14 }}>Contact Distribution</div>
         {total === 0 ? (
-          <div style={{ height: 10, background: "#ffffff08", borderRadius: 5 }} />
+          <div style={{ height: 10, background: "var(--border)", borderRadius: 5 }} />
         ) : (
           <div style={{ display: "flex", height: 10, borderRadius: 5, overflow: "hidden", gap: 2 }}>
             {categories.map(c => (
@@ -1229,9 +1229,9 @@ function CategoriesPage({ onBack }) {
         {categories.map((c, i) => {
           const pct = total > 0 ? Math.round(c.count / total * 100) : 0;
           return (
-            <div key={c.name} style={{ background: "#111116", border: `1px solid ${c.dot}20`, borderRadius: 14, padding: "16px 18px", transition: "all .15s" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = `${c.dot}50`; e.currentTarget.style.background = "#16161e"; e.currentTarget.style.transform = "translateX(3px)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = `${c.dot}20`; e.currentTarget.style.background = "#111116"; e.currentTarget.style.transform = "none"; }}
+            <div key={c.name} style={{ background: "var(--bg)", border: `1px solid ${c.dot}20`, borderRadius: 14, padding: "16px 18px", transition: "all .15s" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = `${c.dot}50`; e.currentTarget.style.background = "var(--bg-hover)"; e.currentTarget.style.transform = "translateX(3px)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = `${c.dot}20`; e.currentTarget.style.background = "var(--bg)"; e.currentTarget.style.transform = "none"; }}
             >
               <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
                 {/* Rank */}
@@ -1243,12 +1243,12 @@ function CategoriesPage({ onBack }) {
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
                     <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block", boxShadow: `0 0 6px ${c.dot}80` }} />
-                    <span style={{ fontSize: 14, fontWeight: 700, color: "#F1F5F9" }}>{c.name}</span>
+                    <span style={{ fontSize: 14, fontWeight: 700, color: "var(--text)" }}>{c.name}</span>
                     <span style={{ fontSize: 10, color: c.dot, background: `${c.dot}18`, border: `1px solid ${c.dot}30`, padding: "1px 7px", borderRadius: 10, fontWeight: 600 }}>{pct}%</span>
                   </div>
                   <div style={{ fontSize: 11, color: "#64748B", marginBottom: 8 }}>{c.desc}</div>
                   {/* Bar */}
-                  <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                  <div style={{ height: 4, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
                     <div style={{ width: `${pct}%`, height: "100%", background: c.dot, borderRadius: 2, transition: "width .6s ease", opacity: 0.8 }} />
                   </div>
                 </div>
@@ -1286,20 +1286,20 @@ function SuccessRatePage({ onBack, user }) {
   const cancelledCount = history.filter(h => h.cancelled).length;
   const totalAttempted = totalSent + totalFailed;
   const rate = totalAttempted > 0 ? Math.round(totalSent / totalAttempted * 100) : 0;
-  const ringColor = rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : rate > 0 ? "#f87171" : "#ffffff20";
+  const ringColor = rate >= 80 ? "#10b981" : rate >= 50 ? "#facc15" : rate > 0 ? "#f87171" : "var(--border-strong)";
 
   const Arrow = () => (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, flexShrink: 0 }}>
-      <div style={{ width: 1, height: 28, background: "linear-gradient(180deg,#ffffff15,#ffffff30)" }} />
-      <svg width="10" height="8" viewBox="0 0 10 8"><path d="M5 8L0 0h10z" fill="#ffffff25" /></svg>
+      <div style={{ width: 1, height: 28, background: "linear-gradient(180deg,var(--border-strong),var(--text-faint))" }} />
+      <svg width="10" height="8" viewBox="0 0 10 8"><path d="M5 8L0 0h10z" fill="var(--border-strong)" /></svg>
     </div>
   );
 
   const FlowNode = ({ icon, label, value, sub, color, dim = false }) => (
-    <div style={{ background: dim ? "#0d0d12" : "#111116", border: `1px solid ${color}25`, borderRadius: 14, padding: "16px 18px", textAlign: "center", minWidth: 120, opacity: dim ? 0.5 : 1 }}>
+    <div style={{ background: dim ? "var(--bg-alt)" : "var(--bg)", border: `1px solid ${color}25`, borderRadius: 14, padding: "16px 18px", textAlign: "center", minWidth: 120, opacity: dim ? 0.5 : 1 }}>
       <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", color, margin: "0 auto 10px" }}>{icon}</div>
-      <div style={{ fontSize: 22, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.8, marginBottom: 2 }}>{value}</div>
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#F1F5F9", marginBottom: 2 }}>{label}</div>
+      <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", letterSpacing: -0.8, marginBottom: 2 }}>{value}</div>
+      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>{label}</div>
       {sub && <div style={{ fontSize: 10, color: "#64748B" }}>{sub}</div>}
     </div>
   );
@@ -1311,7 +1311,7 @@ function SuccessRatePage({ onBack, user }) {
       {/* Header */}
       <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "#F1F5F9", letterSpacing: -0.5, marginBottom: 3 }}>Campaign Pipeline</div>
+          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", letterSpacing: -0.5, marginBottom: 3 }}>Campaign Pipeline</div>
           <div style={{ fontSize: 12, color: "#64748B" }}>{totalCampaigns} campaign{totalCampaigns !== 1 ? "s" : ""} · {totalAttempted} emails attempted</div>
         </div>
         {/* Rate badge */}
@@ -1322,15 +1322,15 @@ function SuccessRatePage({ onBack, user }) {
       </div>
 
       {totalCampaigns === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 24px", background: "#111116", borderRadius: 16, border: "1px dashed #ffffff10" }}>
-          <LuChartBar size={32} style={{ marginBottom: 12, color: "#334155" }} />
-          <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>No pipeline data yet</div>
+        <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
+          <LuChartBar size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
+          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No pipeline data yet</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign to see your outreach funnel here.</div>
         </div>
       ) : (
         <>
           {/* Flowchart */}
-          <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 16, padding: "28px 24px", marginBottom: 20 }}>
+          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "28px 24px", marginBottom: 20 }}>
             <div style={{ fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.4, textTransform: "uppercase", marginBottom: 20 }}>Outreach Flow</div>
 
             {/* Vertical pipeline */}
@@ -1349,16 +1349,16 @@ function SuccessRatePage({ onBack, user }) {
                 {/* Left line */}
                 <div style={{ flex: 1, display: "flex", justifyContent: "flex-end", paddingRight: 0 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", width: "100%" }}>
-                    <div style={{ height: 1, background: "#ffffff15", width: "50%" }} />
+                    <div style={{ height: 1, background: "var(--border-strong)", width: "50%" }} />
                     <div style={{ width: 1, height: 24, background: "#10b98130", marginRight: "calc(50% - 1px)" }} />
                   </div>
                 </div>
                 {/* Centre dot */}
-                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "#ffffff20", flexShrink: 0, marginTop: -5, zIndex: 1 }} />
+                <div style={{ width: 10, height: 10, borderRadius: "50%", background: "var(--border-strong)", flexShrink: 0, marginTop: -5, zIndex: 1 }} />
                 {/* Right line */}
                 <div style={{ flex: 1, paddingLeft: 0 }}>
                   <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-start", width: "100%" }}>
-                    <div style={{ height: 1, background: "#ffffff15", width: "50%" }} />
+                    <div style={{ height: 1, background: "var(--border-strong)", width: "50%" }} />
                     <div style={{ width: 1, height: 24, background: "#f8717130", marginLeft: "calc(50% - 1px)" }} />
                   </div>
                 </div>
@@ -1372,7 +1372,7 @@ function SuccessRatePage({ onBack, user }) {
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#10b981", marginBottom: 4 }}>Delivered</div>
                   <div style={{ fontSize: 10, color: "#64748B" }}>{rate}% of attempted</div>
                   {/* Mini bar */}
-                  <div style={{ height: 4, background: "#ffffff10", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
+                  <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
                     <div style={{ width: `${rate}%`, height: "100%", background: "#10b981", borderRadius: 2 }} />
                   </div>
                 </div>
@@ -1383,7 +1383,7 @@ function SuccessRatePage({ onBack, user }) {
                   <div style={{ fontSize: 12, fontWeight: 600, color: "#f87171", marginBottom: 4 }}>Failed</div>
                   <div style={{ fontSize: 10, color: "#64748B" }}>{totalAttempted > 0 ? 100 - rate : 0}% of attempted</div>
                   {/* Mini bar */}
-                  <div style={{ height: 4, background: "#ffffff10", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
+                  <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
                     <div style={{ width: `${totalAttempted > 0 ? 100 - rate : 0}%`, height: "100%", background: "#f87171", borderRadius: 2 }} />
                   </div>
                 </div>
@@ -1392,12 +1392,12 @@ function SuccessRatePage({ onBack, user }) {
           </div>
 
           {/* Summary bar */}
-          <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, padding: "16px 20px", marginBottom: 14 }}>
+          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 20px", marginBottom: 14 }}>
             <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
               <span style={{ fontSize: 12, fontWeight: 600, color: "#94A3B8" }}>Overall Delivery</span>
               <span style={{ fontSize: 12, fontWeight: 700, color: ringColor }}>{rate}%</span>
             </div>
-            <div style={{ height: 6, background: "#ffffff0d", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ height: 6, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
               <div style={{ width: `${rate}%`, height: "100%", background: `linear-gradient(90deg,#6366f1,${ringColor})`, borderRadius: 3, transition: "width .8s ease" }} />
             </div>
             <div style={{ display: "flex", justifyContent: "space-between", marginTop: 8 }}>
@@ -1417,19 +1417,19 @@ function SuccessRatePage({ onBack, user }) {
 
           {/* Per-campaign breakdown */}
           {history.length > 0 && (
-            <div style={{ background: "#111116", border: "1px solid #ffffff0d", borderRadius: 14, overflow: "hidden" }}>
-              <div style={{ padding: "14px 18px", borderBottom: "1px solid #ffffff08", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>Per Campaign</div>
+            <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, overflow: "hidden" }}>
+              <div style={{ padding: "14px 18px", borderBottom: "1px solid var(--border)", fontSize: 10, fontWeight: 700, color: "#64748B", letterSpacing: 1.2, textTransform: "uppercase" }}>Per Campaign</div>
               {history.slice(-6).reverse().map((h, i) => {
                 const total = (h.sent || 0) + (h.failed || 0);
                 const pct = total > 0 ? Math.round((h.sent || 0) / total * 100) : 0;
                 const col = pct >= 80 ? "#10b981" : pct >= 50 ? "#facc15" : "#f87171";
                 return (
-                  <div key={i} style={{ padding: "12px 18px", borderBottom: i < Math.min(history.length, 6) - 1 ? "1px solid #ffffff08" : "none" }}>
+                  <div key={i} style={{ padding: "12px 18px", borderBottom: i < Math.min(history.length, 6) - 1 ? "1px solid var(--border)" : "none" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: "#E2E8F0" }}>{h.category || "Campaign"} · {h.date ? new Date(h.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "–"}</div>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)" }}>{h.category || "Campaign"} · {h.date ? new Date(h.date).toLocaleDateString("en-GB", { day: "numeric", month: "short" }) : "–"}</div>
                       <div style={{ fontSize: 12, fontWeight: 700, color: col }}>{pct}%</div>
                     </div>
-                    <div style={{ height: 4, background: "#ffffff08", borderRadius: 2, overflow: "hidden" }}>
+                    <div style={{ height: 4, background: "var(--border)", borderRadius: 2, overflow: "hidden" }}>
                       <div style={{ width: `${pct}%`, height: "100%", background: col, borderRadius: 2 }} />
                     </div>
                     <div style={{ display: "flex", gap: 12, marginTop: 5, fontSize: 10, color: "#64748B" }}>
@@ -1454,11 +1454,11 @@ class AppErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div style={{ fontFamily: "'DM Sans',sans-serif", background: "#09090d", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
-          <div style={{ background: "#111116", borderRadius: 16, padding: 32, maxWidth: 500, width: "100%", boxShadow: "0 4px 24px rgba(0,0,0,0.4)", border: "1px solid #ffffff10" }}>
+        <div style={{ fontFamily: "'DM Sans',sans-serif", background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+          <div style={{ background: "var(--bg)", borderRadius: 16, padding: 32, maxWidth: 500, width: "100%", boxShadow: "0 4px 24px rgba(15,23,42,0.08)", border: "1px solid var(--border)" }}>
             <LuTriangleAlert size={32} style={{ marginBottom: 12, color: "#F59E0B" }} />
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>Something went wrong</div>
-            <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20, background: "#0d0d12", borderRadius: 8, padding: "12px 14px", fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Something went wrong</div>
+            <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20, background: "var(--bg-alt)", borderRadius: 8, padding: "12px 14px", fontFamily: "monospace", whiteSpace: "pre-wrap", wordBreak: "break-all" }}>
               {this.state.error?.message || String(this.state.error)}
             </div>
             <button onClick={() => { window.location.href = "/"; }} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#4F46E5", color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "inherit" }}>
@@ -1554,7 +1554,7 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
     }
   };
 
-  const inp = { width: "100%", background: "#0d0d12", border: "1px solid #ffffff15", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
+  const inp = { width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
   const lbl = { display: "block", color: "#94A3B8", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "'DM Sans',sans-serif" };
   const req  = <span style={{ color: "#10b981", marginLeft: 3 }}>*</span>;
 
@@ -1571,16 +1571,16 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
 
   return (
     <div onClick={onDismiss} style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,0,0,0.78)", backdropFilter: "blur(8px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}>
-      <div onClick={e => e.stopPropagation()} style={{ position: "relative", background: "#111116", border: "1px solid #ffffff12", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
+      <div onClick={e => e.stopPropagation()} style={{ position: "relative", background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 22, padding: "36px 32px", width: "100%", maxWidth: 520, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,0.65)", animation: "fadeIn .3s ease" }}>
         {onDismiss && (
-          <button onClick={onDismiss} style={{ position: "absolute", top: 16, right: 16, width: 32, height: 32, borderRadius: "50%", background: "#ffffff0d", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", fontSize: 18, lineHeight: 1, fontFamily: "sans-serif", transition: "all .15s" }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#ffffff1a"; e.currentTarget.style.color = "#F1F5F9"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "#ffffff0d"; e.currentTarget.style.color = "#64748B"; }}
+          <button onClick={onDismiss} style={{ position: "absolute", top: 16, right: 16, width: 32, height: 32, borderRadius: "50%", background: "var(--border)", border: "none", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", color: "#64748B", fontSize: 18, lineHeight: 1, fontFamily: "sans-serif", transition: "all .15s" }}
+            onMouseEnter={e => { e.currentTarget.style.background = "var(--border-strong)"; e.currentTarget.style.color = "var(--text)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "var(--border)"; e.currentTarget.style.color = "#64748B"; }}
           >×</button>
         )}
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <img src="/logo.png" alt="logo" style={{ width: 52, height: 52, objectFit: "contain", marginBottom: 14 }} />
-          <div style={{ color: "#fff", fontSize: 20, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", marginBottom: 6 }}>Welcome to thehotspot!</div>
+          <div style={{ color: "var(--text)", fontSize: 20, fontWeight: 700, fontFamily: "var(--font-display)", marginBottom: 6 }}>Welcome to thehotspot</div>
           <div style={{ color: "#64748B", fontSize: 13, fontFamily: "'DM Sans',sans-serif", lineHeight: 1.55 }}>Fill in your details so every outreach email you send is signed with the right sender info.</div>
         </div>
 
@@ -2326,8 +2326,8 @@ function PixelPet() {
           bottom: CH + 10,
           ...panelPos,
           width: 300,
-          background: '#0d0d12',
-          border: '1px solid #ffffff15',
+          background: 'var(--bg-alt)',
+          border: '1px solid var(--border-strong)',
           borderRadius: 16,
           overflow: 'hidden',
           boxShadow: '0 16px 48px rgba(0,0,0,0.6)',
@@ -2336,7 +2336,7 @@ function PixelPet() {
           animation: 'chatSlide .18s ease',
         }}>
           {/* header */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid #ffffff0d', background: '#111116' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'var(--bg)' }}>
             <canvas
               width={CW} height={CH}
               style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0 }}
@@ -2373,13 +2373,13 @@ function PixelPet() {
           </div>
 
           {/* input */}
-          <div style={{ display: 'flex', gap: 6, padding: '8px 10px 10px', borderTop: '1px solid #ffffff0d', background: '#111116' }}>
+          <div style={{ display: 'flex', gap: 6, padding: '8px 10px 10px', borderTop: '1px solid var(--border)', background: 'var(--bg)' }}>
             <input
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               placeholder="Ask Spot anything..."
-              style={{ flex: 1, background: '#0d0d12', border: '1px solid #ffffff10', borderRadius: 10, padding: '7px 11px', color: '#f1f5f9', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none' }}
+              style={{ flex: 1, background: 'var(--bg-alt)', border: '1px solid var(--border)', borderRadius: 10, padding: '7px 11px', color: '#f1f5f9', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none' }}
             />
             <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ background: '#10b981', border: 'none', borderRadius: 10, padding: '7px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: (!input.trim() || loading) ? 0.4 : 1 }}>
               <LuSend size={13} color="#fff" />
@@ -2479,7 +2479,7 @@ function CreateDatabasePage({ onBack, showToast }) {
     showToast(`"${name}" created`);
   };
 
-  const T = { bg: "#09090d", card: "#111116", bd: "#ffffff15", bdL: "#ffffff10", tx: "#F1F5F9", tx2: "#94A3B8", tx3: "#64748B", ac: "#6366f1", acBg: "#6366f120", acL: "#6366f130", gn: "#059669", gnBg: "#05966920", rd: "#DC2626", rdBg: "#DC262620", bl: "#38bdf8", amber: "#D97706", amberBg: "#D9770620", hd: "#0d0d12", hv: "#16161e", sh: "0 1px 2px rgba(0,0,0,0.25)" };
+  const T = { bg: "var(--bg)", card: "var(--bg)", bd: "var(--border-strong)", bdL: "var(--border)", tx: "var(--text)", tx2: "#94A3B8", tx3: "#64748B", ac: "#6366f1", acBg: "#6366f120", acL: "#6366f130", gn: "#059669", gnBg: "#05966920", rd: "#DC2626", rdBg: "#DC262620", bl: "#38bdf8", amber: "#D97706", amberBg: "#D9770620", hd: "var(--bg-alt)", hv: "var(--bg-hover)", sh: "0 1px 2px rgba(15,23,42,0.05)" };
 
   const activeDb = databases.find(d => d.id === activeDbId);
 
@@ -2876,19 +2876,19 @@ function ContactsPage({ onBack, showToast, user }) {
       <BackButton onClick={onBack} />
       <div style={{ textAlign: "center", marginBottom: 32 }}>
         <div style={{ width: 56, height: 56, borderRadius: 16, background: "linear-gradient(135deg,#10b98118,#0ea5e918)", display: "inline-flex", alignItems: "center", justifyContent: "center", color: "#10b981", marginBottom: 16 }}><I.Users /></div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_title", "Contacts Database")}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>{c("cp_title", "Contacts Database")}</div>
         <div style={{ fontSize: 14, color: "#64748B", maxWidth: 400, margin: "0 auto", lineHeight: 1.6 }}>{c("cp_subtitle", "Connect an existing data source or build your database from scratch.")}</div>
       </div>
       <div className="rsp-contacts-hub" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 24 }}>
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}
           onClick={() => setView("connect_sheets")}
           onMouseEnter={e => { e.currentTarget.style.borderColor = "#10b981"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(16,185,129,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.25)"; }}>
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; }}>
           <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#10b98110,transparent 70%)" }} />
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_card1_title", "Connect Data Source")}</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{c("cp_card1_title", "Connect Data Source")}</div>
           <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card1_desc", "Import contacts from Google Sheets, Airtable, or CSV files you already have.")}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Google Sheets", "Airtable", "CSV Upload"].map(s => (
@@ -2896,15 +2896,15 @@ function ContactsPage({ onBack, showToast, user }) {
             ))}
           </div>
         </div>
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "28px 24px", cursor: "pointer", transition: "all .2s", position: "relative", overflow: "hidden", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}
           onClick={() => setView("create_db")}
           onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 4px 16px rgba(99,102,241,0.12)"; }}
-          onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.25)"; }}>
+          onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; }}>
           <div style={{ position: "absolute", top: 0, right: 0, width: 120, height: 120, borderRadius: "50%", background: "radial-gradient(circle,#6366f110,transparent 70%)" }} />
           <div style={{ width: 40, height: 40, borderRadius: 12, background: "#6366f118", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
           </div>
-          <div style={{ fontSize: 16, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>{c("cp_card2_title", "Create New Database")}</div>
+          <div style={{ fontSize: 16, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{c("cp_card2_title", "Create New Database")}</div>
           <div style={{ fontSize: 13, color: "#64748B", lineHeight: 1.6, marginBottom: 16 }}>{c("cp_card2_desc", "Start fresh — define custom fields, add contacts manually, build your list from scratch.")}</div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {["Custom Fields", "Manual Entry", "Full Control"].map(s => (
@@ -2928,18 +2928,18 @@ function ContactsPage({ onBack, showToast, user }) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
         </div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>Connect Data Source</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>Connect Data Source</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Choose where your contact data lives</div>
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #10b98133", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+        <div style={{ background: "var(--bg)", border: "1px solid #10b98133", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
             <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9" }}>Google Sheets</div>
+              <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>Google Sheets</div>
               <div style={{ fontSize: 12, color: "#64748B" }}>Paste your sheet URL to import all rows</div>
             </div>
             <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#ECFDF5", color: "#059669", fontWeight: 500, border: "1px solid #10b98133" }}>Available</span>
@@ -2947,11 +2947,11 @@ function ContactsPage({ onBack, showToast, user }) {
           <div className="rsp-sheet-row" style={{ display: "flex", gap: 10 }}>
             <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
-              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
             <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
               padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
-              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#16161e",
+              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "var(--bg-hover)",
               color: sheetUrl ? "#fff" : "#94A3B8", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
             }}>{loading ? "Connecting..." : "Connect"}</button>
           </div>
@@ -2962,13 +2962,13 @@ function ContactsPage({ onBack, showToast, user }) {
           { name: "CSV / XLSX Upload", desc: "Upload a spreadsheet file directly", color: "#8b5cf6", icon: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>' },
           { name: "Slack", desc: "Import contacts from Slack workspace", color: "#e01155", icon: '<path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/>' },
         ].map(src => (
-          <div key={src.name} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "20px", opacity: .5, boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+          <div key={src.name} style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px", opacity: .5, boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
               <div style={{ width: 36, height: 36, borderRadius: 10, background: `${src.color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: src.icon }} />
               </div>
               <div style={{ flex: 1 }}>
-                <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9" }}>{src.name}</div>
+                <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{src.name}</div>
                 <div style={{ fontSize: 12, color: "#64748B" }}>{src.desc}</div>
               </div>
               <span style={{ fontSize: 11, padding: "3px 10px", borderRadius: 8, background: "#FEF3C7", color: "#D97706", fontWeight: 500, border: "1px solid #f59e0b33" }}>Coming Soon</span>
@@ -2989,12 +2989,12 @@ function ContactsPage({ onBack, showToast, user }) {
             <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
           </div>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#F1F5F9" }}>{sheetName || "Google Sheet"}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)" }}>{sheetName || "Google Sheet"}</div>
             <div style={{ fontSize: 12, color: "#64748B" }}>Google Sheets · {contacts.length} contacts · <span style={{ color: "#10b981" }}>Connected</span></div>
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #ffffff10", background: "#111116", color: "#64748B", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "#64748B", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
             {loading ? "Syncing..." : "↻ Sync"}
           </button>
           <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #EF444433", background: "#FEF2F2", color: "#EF4444", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
@@ -3002,7 +3002,7 @@ function ContactsPage({ onBack, showToast, user }) {
       </div>
       <div className="rsp-contact-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
         {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
-          <div key={s.l} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "14px", textAlign: "center", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+          <div key={s.l} style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px", textAlign: "center", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
             <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
             <div style={{ fontSize: 11, color: "#64748B" }}>{s.l}</div>
           </div>
@@ -3010,25 +3010,25 @@ function ContactsPage({ onBack, showToast, user }) {
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
-          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
+          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
       <div style={{ fontSize: 12, color: "#64748B", marginBottom: 8 }}>Showing {filtered.length} of {contacts.length}</div>
       <div style={{ overflowX: "auto" }}>
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, overflow: "hidden", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", minWidth: 750 }}>
-            <thead><tr style={{ borderBottom: "1px solid #ffffff10", background: "#0d0d12" }}>
+            <thead><tr style={{ borderBottom: "1px solid var(--border)", background: "var(--bg-alt)" }}>
               {["#", "Company", "Website", "Email", "Category", "Country"].map(h => (
                 <th key={h} style={{ padding: "12px 14px", textAlign: "left", fontSize: 11, fontWeight: 600, color: "#64748B", letterSpacing: .5, textTransform: "uppercase" }}>{h}</th>
               ))}
             </tr></thead>
             <tbody>
               {filtered.slice(0, 100).map((c, i) => (
-                <tr key={c.id} style={{ borderBottom: "1px solid #ffffff08" }}>
+                <tr key={c.id} style={{ borderBottom: "1px solid var(--border)" }}>
                   <td style={{ padding: "10px 14px", fontSize: 11, color: "#94A3B8" }}>{i + 1}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{c.company_name}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{c.company_name}</td>
                   <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#0ea5e9", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
                   <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#64748B" : "#EF444488" }}>{c.email || "⚠ Missing"}</td>
                   <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#EFF1F8", color: CAT[c.category]?.text || "#64748B", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#94A3B8" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
@@ -3037,7 +3037,7 @@ function ContactsPage({ onBack, showToast, user }) {
               ))}
             </tbody>
           </table>
-          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#64748B", borderTop: "1px solid #ffffff10" }}>Showing first 100 of {filtered.length}</div>}
+          {filtered.length > 100 && <div style={{ padding: "12px", textAlign: "center", fontSize: 12, color: "#64748B", borderTop: "1px solid var(--border)" }}>Showing first 100 of {filtered.length}</div>}
         </div>
       </div>
     </div>
@@ -3114,7 +3114,7 @@ function CampaignStatusPage({ onBack, user }) {
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
         <div style={{ width: 44, height: 44, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Activity /></div>
         <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9" }}>{c("camp_title", "Campaign Status")}</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>{c("camp_title", "Campaign Status")}</div>
           <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
             {last24.length > 0 ? `${last24.length} campaign${last24.length !== 1 ? "s" : ""} in the last 24 hours` : "No activity in last 24 hours"}
             {totalSent > 0 && ` · ${totalSent} sent all time`}
@@ -3129,7 +3129,7 @@ function CampaignStatusPage({ onBack, user }) {
           { label: "Failed (24h)",   value: failed24,       color: "#EF4444",  bg: "#EF444408" },
           { label: "Campaigns (24h)",value: last24.length,  color: "#0ea5e9",  bg: "#0ea5e908" },
         ].map(s => (
-          <div key={s.label} style={{ background: s.bg, border: "1px solid #ffffff10", borderRadius: 12, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
+          <div key={s.label} style={{ background: s.bg, border: "1px solid var(--border)", borderRadius: 12, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
             <div style={{ fontSize: 26, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
             <div style={{ fontSize: 10, color: "#64748B", marginTop: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
           </div>
@@ -3138,12 +3138,12 @@ function CampaignStatusPage({ onBack, user }) {
 
       {/* Delivery rate bar — only show if there was activity */}
       {(sent24 + failed24) > 0 && (
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "16px 18px", marginBottom: 20, boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px", marginBottom: 20, boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>Delivery Rate (24h)</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Delivery Rate (24h)</span>
             <span style={{ fontSize: 14, fontWeight: 700, color: deliveryRate >= 80 ? "#059669" : deliveryRate >= 50 ? "#D97706" : "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{deliveryRate}%</span>
           </div>
-          <div style={{ height: 8, background: "#ffffff10", borderRadius: 4, overflow: "hidden" }}>
+          <div style={{ height: 8, background: "var(--border)", borderRadius: 4, overflow: "hidden" }}>
             <div style={{ width: `${deliveryRate}%`, height: "100%", background: deliveryRate >= 80 ? "linear-gradient(90deg,#6366f1,#10b981)" : deliveryRate >= 50 ? "linear-gradient(90deg,#6366f1,#f59e0b)" : "#EF4444", borderRadius: 4, transition: "width .6s ease" }} />
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "#94A3B8" }}>
@@ -3159,9 +3159,9 @@ function CampaignStatusPage({ onBack, user }) {
       </div>
 
       {emails24.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "40px 24px", background: "#111116", borderRadius: 14, border: "1px dashed #ffffff10", marginBottom: 20 }}>
-          <LuRadio size={32} style={{ marginBottom: 10, color: "#CBD5E1" }} />
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#F1F5F9", marginBottom: 6 }}>No emails sent in the last 24 hours</div>
+        <div style={{ textAlign: "center", padding: "40px 24px", background: "var(--bg)", borderRadius: 14, border: "1px dashed var(--border)", marginBottom: 20 }}>
+          <LuRadio size={32} style={{ marginBottom: 10, color: "var(--text-muted)" }} />
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>No emails sent in the last 24 hours</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
         </div>
       ) : (
@@ -3169,9 +3169,9 @@ function CampaignStatusPage({ onBack, user }) {
           {emails24.map((e, i) => {
             const cat = CAT[e.category] || { dot: "#94A3B8", text: "#64748B", bg: "#F8FAFF" };
             return (
-              <div key={i} onClick={() => setOpenEmail(e)} style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 1px 3px rgba(0,0,0,0.25)", cursor: "pointer", transition: "all .15s" }}
+              <div key={i} onClick={() => setOpenEmail(e)} style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 12, boxShadow: "0 1px 3px rgba(15,23,42,0.05)", cursor: "pointer", transition: "all .15s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = "#6366f1"; e.currentTarget.style.boxShadow = "0 4px 12px rgba(99,102,241,0.1)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(0,0,0,0.25)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 3px rgba(15,23,42,0.05)"; }}
               >
                 {/* Status dot */}
                 <div style={{ width: 8, height: 8, borderRadius: "50%", background: "#10b981", flexShrink: 0 }} />
@@ -3181,7 +3181,7 @@ function CampaignStatusPage({ onBack, user }) {
                 </div>
                 {/* Info */}
                 <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", marginBottom: 1 }}>{e.company || e.email}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", marginBottom: 1 }}>{e.company || e.email}</div>
                   {e.subject && <div style={{ fontSize: 11, color: "#64748B", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>Subject: {e.subject}</div>}
                   {!e.subject && <div style={{ fontSize: 11, color: "#94A3B8" }}>{e.email}</div>}
                 </div>
@@ -3206,16 +3206,16 @@ function CampaignStatusPage({ onBack, user }) {
           <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>
             All Time · {older.length + last24.length} Campaigns
           </div>
-          <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 3px rgba(0,0,0,0.25)" }}>
+          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
               <span style={{ fontSize: 13, color: "#64748B" }}>Older than 24h</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace" }}>{older.reduce((s, h) => s + (h.sent || 0), 0)} sent</span>
+              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{older.reduce((s, h) => s + (h.sent || 0), 0)} sent</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
               {older.slice(0, 5).map(h => (
-                <div key={h.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid #ffffff08" }}>
+                <div key={h.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
                   <div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{h.category || "Campaign"}</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{h.category || "Campaign"}</span>
                     {h.cancelled && <span style={{ fontSize: 10, color: "#f59e0b", background: "#FEF3C7", padding: "1px 7px", borderRadius: 20, marginLeft: 8, fontWeight: 600 }}>Cancelled</span>}
                   </div>
                   <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
@@ -3247,20 +3247,20 @@ function ProfilePage({ user, onBack, onLogout }) {
         <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: "#fff", marginBottom: 16 }}>
           {user?.username?.[0]?.toUpperCase() || "U"}
         </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "#F1F5F9" }}>{user?.username}</div>
+        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)" }}>{user?.username}</div>
         <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
           <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>{c("pp_section1_label", "Account Info")}</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Username</span>
-            <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 600 }}>{user?.username}</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>{user?.username}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Login Method</span>
-            <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 600 }}>{user?.method === "google" ? "Google Sign-In" : "Password"}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Role</span>
@@ -3268,15 +3268,15 @@ function ProfilePage({ user, onBack, onLogout }) {
           </div>
         </div>
 
-        <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)" }}>
+        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 20px", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
           <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>{c("pp_section2_label", "Platform Stats")}</div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Total Contacts</span>
-            <span style={{ fontSize: 13, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #ffffff08" }}>
+          <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Emails Sent</span>
-            <span style={{ fontSize: 13, color: "#F1F5F9", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Success Rate</span>
@@ -3309,9 +3309,9 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   const save = (key, val) => localStorage.setItem(key, String(val));
 
   const Row = ({ label, sub, children }) => (
-    <div className="rsp-settings-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #ffffff08" }}>
+    <div className="rsp-settings-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid var(--border)" }}>
       <div>
-        <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{label}</div>
+        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{label}</div>
         {sub && <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 2 }}>{sub}</div>}
       </div>
       {children}
@@ -3319,7 +3319,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   );
 
   const Card = ({ title, children }) => (
-    <div style={{ background: "#111116", border: "1px solid #ffffff10", borderRadius: 14, padding: "4px 20px 12px", boxShadow: "0 1px 4px rgba(0,0,0,0.25)", marginBottom: 16 }}>
+    <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "4px 20px 12px", boxShadow: "0 1px 4px rgba(15,23,42,0.05)", marginBottom: 16 }}>
       <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 700, padding: "16px 0 4px" }}>{title}</div>
       {children}
     </div>
@@ -3335,12 +3335,12 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ fontSize: 20, fontWeight: 700, color: "#F1F5F9", marginBottom: 24 }}>{c("sp_title", "Settings")}</div>
+      <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 24 }}>{c("sp_title", "Settings")}</div>
 
       <Card title="Email Preferences">
         <Row label="Default email length" sub="Characters per email body">
           <select value={defaultChars} onChange={e => { setDefaultChars(+e.target.value); save("thehotspot_default_chars", e.target.value); }}
-            style={{ border: "1px solid #ffffff10", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "#E2E8F0", background: "#0d0d12", cursor: "pointer" }}>
+            style={{ border: "1px solid var(--border)", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "var(--text)", background: "var(--bg-alt)", cursor: "pointer" }}>
             <option value={200}>Short (200)</option>
             <option value={400}>Medium (400)</option>
             <option value={800}>Long (800)</option>
@@ -3348,7 +3348,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
         </Row>
         <Row label="Delay between sends" sub="Prevents spam flags — min 1s">
           <select value={sendDelay} onChange={e => { setSendDelay(+e.target.value); save("thehotspot_send_delay", e.target.value); }}
-            style={{ border: "1px solid #ffffff10", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "#E2E8F0", background: "#0d0d12", cursor: "pointer" }}>
+            style={{ border: "1px solid var(--border)", borderRadius: 8, padding: "6px 10px", fontSize: 13, color: "var(--text)", background: "var(--bg-alt)", cursor: "pointer" }}>
             <option value={1000}>1 second</option>
             <option value={2500}>2.5 seconds</option>
             <option value={5000}>5 seconds</option>
@@ -3362,7 +3362,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
         </Row>
         {dailyLimits.map((limit, i) => (
           <Row key={i} label={`Week ${i + 1}`} sub={i + 1 === week ? "Current" : i + 1 < week ? "Completed" : "Upcoming"}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: i + 1 === week ? "#10b981" : i + 1 < week ? "#94A3B8" : "#CBD5E1" }}>{limit} emails/day</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: i + 1 === week ? "#10b981" : i + 1 < week ? "#94A3B8" : "var(--text-muted)" }}>{limit} emails/day</span>
           </Row>
         ))}
       </Card>
@@ -3530,51 +3530,51 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   const sentCount = sendProgress.results.filter(r => r.status === "sent").length;
   const failedCount = sendProgress.results.filter(r => r.status === "failed").length;
 
-  const card = { background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "24px", marginBottom: 20, boxShadow: "0 2px 8px rgba(0,0,0,0.25)" };
+  const card = { background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px", marginBottom: 20, boxShadow: "0 2px 8px rgba(15,23,42,0.05)" };
   const btn = (color) => ({ padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13 });
 
   /* ── CONFIGURE ── */
   if (step === "configure") return (
     <div>
       <div style={card}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 16 }}>1. Select Contacts</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>1. Select Contacts</div>
         {/* Category filter */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           {["All", "Network", "CPS", "CPL", "CPA", "Mobile"].map(cat => (
             <button key={cat} onClick={() => { setSelectedCategory(cat); setSelectedIds(new Set((cat === "All" ? allContacts : allContacts.filter(c => c.category === cat)).map((_, i) => i))); }} style={{
               padding: "6px 14px", borderRadius: 20, border: "1px solid", fontSize: 12, fontWeight: 600, cursor: "pointer",
-              background: selectedCategory === cat ? "#6366f120" : "#0d0d12",
+              background: selectedCategory === cat ? "#6366f120" : "var(--bg-alt)",
               color: selectedCategory === cat ? "#818cf8" : "#64748B",
-              borderColor: selectedCategory === cat ? "#6366f1" : "#ffffff10",
+              borderColor: selectedCategory === cat ? "#6366f1" : "var(--border)",
               fontFamily: "'DM Sans',sans-serif",
             }}>{cat}</button>
           ))}
         </div>
         {/* Select all / none */}
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button onClick={selectAll} style={{ ...btn(), background: "#0d0d12", color: "#818cf8", border: "1px solid #ffffff10" }}>Select All</button>
-          <button onClick={selectNone} style={{ ...btn(), background: "#0d0d12", color: "#64748B", border: "1px solid #ffffff10" }}>Clear</button>
+          <button onClick={selectAll} style={{ ...btn(), background: "var(--bg-alt)", color: "#818cf8", border: "1px solid var(--border)" }}>Select All</button>
+          <button onClick={selectNone} style={{ ...btn(), background: "var(--bg-alt)", color: "#64748B", border: "1px solid var(--border)" }}>Clear</button>
           <span style={{ marginLeft: "auto", fontSize: 12, color: "#64748B", alignSelf: "center" }}>{selectedIds.size} selected</span>
         </div>
         {/* Contact list */}
-        <div style={{ maxHeight: 260, overflowY: "auto", border: "1px solid #ffffff10", borderRadius: 10 }}>
+        <div style={{ maxHeight: 260, overflowY: "auto", border: "1px solid var(--border)", borderRadius: 10 }}>
           {filteredContacts.length === 0 ? (
             <div style={{ padding: 24, textAlign: "center", color: "#94A3B8", fontSize: 13 }}>No contacts found. Add contacts in the Contacts DB.</div>
           ) : filteredContacts.map((c, i) => (
             <div key={i} onClick={() => toggleSelect(i)} style={{
               display: "flex", alignItems: "center", gap: 12, padding: "10px 14px",
               borderBottom: i < filteredContacts.length - 1 ? "1px solid #F1F5FF" : "none",
-              cursor: "pointer", background: selectedIds.has(i) ? "#16161e" : "transparent",
+              cursor: "pointer", background: selectedIds.has(i) ? "var(--bg-hover)" : "transparent",
               transition: "background .1s",
             }}>
               <div style={{
-                width: 18, height: 18, borderRadius: 4, border: `2px solid ${selectedIds.has(i) ? "#4F46E5" : "#CBD5E1"}`,
+                width: 18, height: 18, borderRadius: 4, border: `2px solid ${selectedIds.has(i) ? "#4F46E5" : "var(--text-muted)"}`,
                 background: selectedIds.has(i) ? "#4F46E5" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 {selectedIds.has(i) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
               </div>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.company || c.name || "Unknown"}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{c.company || c.name || "Unknown"}</div>
                 <div style={{ fontSize: 11, color: "#94A3B8" }}>{c.email || "No email"} · {c.category || "—"}</div>
               </div>
             </div>
@@ -3583,16 +3583,16 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
       </div>
 
       <div style={card}>
-        <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 4 }}>2. About Your Offer (optional)</div>
+        <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 4 }}>2. About Your Offer (optional)</div>
         <div style={{ fontSize: 12, color: "#94A3B8", marginBottom: 12 }}>AI will use this to personalize the outreach emails</div>
         <textarea
           value={offerContext}
           onChange={e => setOfferContext(e.target.value)}
           placeholder="e.g. We offer 30% commission on all sales, top-tier creatives, weekly payouts..."
           rows={3}
-          style={{ width: "100%", background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 10, padding: "12px 14px", fontSize: 13, color: "#E2E8F0", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }}
+          style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }}
           onFocus={e => { e.target.style.borderColor = "#4F46E5"; e.target.style.boxShadow = "0 0 0 3px #4F46E515"; }}
-          onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }}
+          onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }}
         />
       </div>
 
@@ -3609,7 +3609,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
 
       <button
         onClick={generateDrafts}
-        style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#E2E8F0", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 4px 16px rgba(16,185,129,0.3)" : "none", transition: "all .2s" }}
+        style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "var(--text)", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 4px 16px rgba(16,185,129,0.3)" : "none", transition: "all .2s" }}
       >
         <LuSparkles size={16} /> Generate {selectedIds.size} Draft{selectedIds.size !== 1 ? "s" : ""} with AI
       </button>
@@ -3619,20 +3619,20 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   /* ── GENERATING ── */
   if (step === "generating") return (
     <div style={card}>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
         <LuSparkles size={16} /> Generating personalized drafts...
       </div>
-      <div style={{ background: "#ffffff15", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
+      <div style={{ background: "var(--border-strong)", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#10b981,#0ea5e9)", width: `${genProgress.total ? (genProgress.current / genProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
       </div>
       <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 24 }}>{genProgress.current} / {genProgress.total} drafts created</div>
       {drafts.length > 0 && (
         <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 8 }}>
           {drafts.map((d, i) => (
-            <div key={i} style={{ background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
+            <div key={i} style={{ background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", display: "flex", alignItems: "center", gap: 10 }}>
               <LuCheck size={16} style={{ color: "#10b981", flexShrink: 0 }} />
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: "#F1F5F9" }}>{d.contact.company || d.contact.name}</div>
+                <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{d.contact.company || d.contact.name}</div>
                 <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.subject}</div>
               </div>
             </div>
@@ -3648,7 +3648,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
     return (
       <div>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
-          <div style={{ fontSize: 14, color: "#64748B" }}><span style={{ fontWeight: 700, color: "#F1F5F9" }}>{approvedCount}</span> of {drafts.length} approved</div>
+          <div style={{ fontSize: 14, color: "#64748B" }}><span style={{ fontWeight: 700, color: "var(--text)" }}>{approvedCount}</span> of {drafts.length} approved</div>
           <div style={{ display: "flex", gap: 8 }}>
             <button onClick={() => setDrafts(d => d.map(x => ({ ...x, approved: true })))} style={{ ...btn(), background: "#ECFDF5", color: "#059669", border: "1px solid #BBF7D0" }}>Approve All</button>
             <button onClick={() => setDrafts(d => d.map(x => ({ ...x, approved: false })))} style={{ ...btn(), background: "#FEF2F2", color: "#EF4444", border: "1px solid #FECACA" }}>Reject All</button>
@@ -3656,26 +3656,26 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         </div>
         <div style={{ display: "flex", flexDirection: "column", gap: 14, marginBottom: 20 }}>
           {drafts.map((d) => (
-            <div key={d.id} style={{ background: "#111116", border: `1px solid ${d.approved ? "#BBF7D0" : "#ffffff10"}`, borderRadius: 14, padding: "18px", boxShadow: "0 2px 8px rgba(0,0,0,0.25)", opacity: d.approved ? 1 : 0.55, transition: "all .2s" }}>
+            <div key={d.id} style={{ background: "var(--bg)", border: `1px solid ${d.approved ? "#BBF7D0" : "var(--border)"}`, borderRadius: 14, padding: "18px", boxShadow: "0 2px 8px rgba(15,23,42,0.05)", opacity: d.approved ? 1 : 0.55, transition: "all .2s" }}>
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
                 <div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "#F1F5F9" }}>{d.contact.company || d.contact.name}</div>
+                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text)" }}>{d.contact.company || d.contact.name}</div>
                   <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.contact.email}</div>
                 </div>
                 <button onClick={() => updateDraft(d.id, "approved", !d.approved)} style={{
                   padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 12,
-                  background: d.approved ? "#ECFDF5" : "#16161e", color: d.approved ? "#059669" : "#64748B",
+                  background: d.approved ? "#ECFDF5" : "var(--bg-hover)", color: d.approved ? "#059669" : "#64748B",
                 }}>
                   {d.approved ? "✓ Approved" : "Approve"}
                 </button>
               </div>
               <div style={{ marginBottom: 8 }}>
                 <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Subject</div>
-                <input value={d.subject} onChange={e => updateDraft(d.id, "subject", e.target.value)} style={{ width: "100%", background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#E2E8F0", fontFamily: "'DM Sans',sans-serif", outline: "none" }} />
+                <input value={d.subject} onChange={e => updateDraft(d.id, "subject", e.target.value)} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none" }} />
               </div>
               <div>
                 <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Body</div>
-                <textarea value={d.body} onChange={e => updateDraft(d.id, "body", e.target.value)} rows={5} style={{ width: "100%", background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "#E2E8F0", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }} />
+                <textarea value={d.body} onChange={e => updateDraft(d.id, "body", e.target.value)} rows={5} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }} />
               </div>
             </div>
           ))}
@@ -3683,7 +3683,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         <button
           onClick={sendEmails}
           disabled={approvedCount === 0}
-          style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "linear-gradient(135deg,#4F46E5,#0ea5e9)" : "#16161e", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 4px 16px rgba(79,70,229,0.3)" : "none", transition: "all .2s" }}
+          style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "linear-gradient(135deg,#4F46E5,#0ea5e9)" : "var(--bg-hover)", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 4px 16px rgba(79,70,229,0.3)" : "none", transition: "all .2s" }}
         >
           <LuSend size={15} /> Send {approvedCount} Email{approvedCount !== 1 ? "s" : ""}
         </button>
@@ -3694,8 +3694,8 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   /* ── SENDING ── */
   if (step === "sending") return (
     <div style={card}>
-      <div style={{ fontSize: 15, fontWeight: 700, color: "#F1F5F9", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><LuSend size={16} /> Sending emails...</div>
-      <div style={{ background: "#ffffff15", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
+      <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><LuSend size={16} /> Sending emails...</div>
+      <div style={{ background: "var(--border-strong)", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
         <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#4F46E5,#0ea5e9)", width: `${sendProgress.total ? (sendProgress.current / sendProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
       </div>
       <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 20 }}>{sendProgress.current} / {sendProgress.total} sent</div>
@@ -3703,7 +3703,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         {sendProgress.results.map((r, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 12px", background: r.status === "sent" ? "#ECFDF5" : "#FEF2F2", borderRadius: 8 }}>
             {r.status === "sent" ? <LuCheck size={16} style={{ color: "#10b981" }} /> : <LuX size={16} style={{ color: "#EF4444" }} />}
-            <span style={{ fontSize: 13, color: "#F1F5F9", fontWeight: 500 }}>{r.contact.company || r.contact.name}</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontWeight: 500 }}>{r.contact.company || r.contact.name}</span>
             {r.error && <span style={{ fontSize: 11, color: "#EF4444", marginLeft: "auto" }}>{r.error}</span>}
           </div>
         ))}
@@ -3715,14 +3715,14 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   return (
     <div style={{ ...card, textAlign: "center" }}>
       <LuPartyPopper size={48} style={{ marginBottom: 12, color: "#10b981" }} />
-      <div style={{ fontSize: 18, fontWeight: 700, color: "#F1F5F9", marginBottom: 8 }}>Campaign Complete!</div>
+      <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Campaign Complete!</div>
       <div style={{ fontSize: 14, color: "#64748B", marginBottom: 24 }}>
         <span style={{ color: "#059669", fontWeight: 700 }}>{sentCount} sent</span>
         {failedCount > 0 && <> · <span style={{ color: "#EF4444", fontWeight: 700 }}>{failedCount} failed</span></>}
       </div>
       <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
         <button onClick={() => { setStep("configure"); setDrafts([]); setSelectedIds(new Set(allContacts.map((_, i) => i))); }} style={{ ...btn(), background: "#6366f120", color: "#818cf8", border: "1px solid #6366f130" }}>Send Another Campaign</button>
-        <button onClick={onBack} style={{ ...btn(), background: "#16161e", color: "#64748B", border: "1px solid #ffffff10" }}>Back to Dashboard</button>
+        <button onClick={onBack} style={{ ...btn(), background: "var(--bg-hover)", color: "#64748B", border: "1px solid var(--border)" }}>Back to Dashboard</button>
       </div>
     </div>
   );
@@ -3790,8 +3790,8 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   const [email, setEmail] = useState({ subject: "", body: "" });
   const [sending, setSending] = useState(false);
 
-  const T = { bg: "#09090d", card: "#111116", bd: "#ffffff10", tx: "#F1F5F9", tx2: "#64748B", tx3: "#94A3B8", ac: "#4F46E5", acBg: "#6366f120" };
-  const inp = { background: "#0d0d12", border: "1px solid #ffffff10", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: T.tx, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const T = { bg: "var(--bg)", card: "var(--bg)", bd: "var(--border)", tx: "var(--text)", tx2: "#64748B", tx3: "#94A3B8", ac: "#4F46E5", acBg: "#6366f120" };
+  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: T.tx, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
   const lbl = { fontSize: 12, fontWeight: 600, color: T.tx2, marginBottom: 6, display: "block" };
 
   const generate = async () => {
@@ -3866,12 +3866,12 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
         {TEMPLATES.map(t => (
           <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: pickAngle(t.id) })); setStep("fill"); }} style={{
-            background: "#111116", border: "1px solid #ffffff10", borderRadius: 16, padding: "22px 20px",
+            background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "22px 20px",
             cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
-            boxShadow: "0 1px 4px rgba(0,0,0,0.25)", transition: "all .15s",
+            boxShadow: "0 1px 4px rgba(15,23,42,0.05)", transition: "all .15s",
           }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = t.color; e.currentTarget.style.boxShadow = `0 6px 24px ${t.color}22`; e.currentTarget.style.transform = "translateY(-2px)"; }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff10"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(0,0,0,0.25)"; e.currentTarget.style.transform = "none"; }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; e.currentTarget.style.transform = "none"; }}
           >
             <div style={{ width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: t.color, marginBottom: 14 }}>{t.icon}</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: T.tx, marginBottom: 5 }}>{t.label}</div>
@@ -3900,38 +3900,38 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         </div>
       </div>
 
-      <div style={{ background: "#111116", borderRadius: 16, border: "1px solid #ffffff10", padding: 24, display: "flex", flexDirection: "column", gap: 18 }}>
+      <div style={{ background: "var(--bg)", borderRadius: 16, border: "1px solid var(--border)", padding: 24, display: "flex", flexDirection: "column", gap: 18 }}>
         {/* Recipient info */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #ffffff10", paddingBottom: 8 }}>Recipient</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid var(--border)", paddingBottom: 8 }}>Recipient</div>
         <div>
           <label style={lbl}>Company Name *</label>
           <input style={inp} placeholder="e.g. AdCombo, Notion, Shopify" value={form.recipientCompany} onChange={e => setForm(f => ({ ...f, recipientCompany: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
-            onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+            onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
         </div>
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
           <div>
             <label style={lbl}>Contact Name <span style={{ color: T.tx3, fontWeight: 400 }}>(optional)</span></label>
             <input style={inp} placeholder="e.g. John, Sarah" value={form.contactName} onChange={e => setForm(f => ({ ...f, contactName: e.target.value }))}
               onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
-              onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+              onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           </div>
           <div>
             <label style={lbl}>Their Email <span style={{ color: T.tx3, fontWeight: 400 }}>(to send)</span></label>
             <input style={inp} placeholder="partner@company.com" value={form.recipientEmail || ""} onChange={e => setForm(f => ({ ...f, recipientEmail: e.target.value }))}
               onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
-              onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+              onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           </div>
         </div>
         <div>
           <label style={lbl}>Their Website <span style={{ color: T.tx3, fontWeight: 400 }}>(helps personalize)</span></label>
           <input style={inp} placeholder="e.g. adcombo.com" value={form.website} onChange={e => setForm(f => ({ ...f, website: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
-            onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+            onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
         </div>
 
         {/* Angle / message */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #ffffff10", paddingBottom: 8, marginTop: 4 }}>Email Angle</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid var(--border)", paddingBottom: 8, marginTop: 4 }}>Email Angle</div>
         <div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6 }}>
             <label style={{ ...lbl, marginBottom: 0 }}>What's your pitch? <span style={{ color: T.tx3, fontWeight: 400 }}>(edit freely)</span></label>
@@ -3951,26 +3951,26 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
                 } catch { /* silent */ }
                 setRegeneratingAngle(false);
               }}
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: regeneratingAngle ? "#94A3B8" : "#6366f1", fontSize: 12, fontWeight: 600, cursor: regeneratingAngle ? "default" : "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0, transition: "all .15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-alt)", color: regeneratingAngle ? "#94A3B8" : "#6366f1", fontSize: 12, fontWeight: 600, cursor: regeneratingAngle ? "default" : "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0, transition: "all .15s" }}
               onMouseEnter={e => { if (!regeneratingAngle) { e.currentTarget.style.background = "#6366f120"; e.currentTarget.style.borderColor = "#6366f1"; } }}
-              onMouseLeave={e => { e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.borderColor = "#ffffff10"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-alt)"; e.currentTarget.style.borderColor = "var(--border)"; }}
             >
               {regeneratingAngle ? "Generating..." : "↻ Regenerate"}
             </button>
           </div>
           <textarea style={{ ...inp, minHeight: 90, resize: "vertical", lineHeight: 1.6 }} value={form.angle} onChange={e => setForm(f => ({ ...f, angle: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; }}
-            onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+            onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           <div style={{ fontSize: 11, color: T.tx3, marginTop: 5 }}>Be specific — mention commission %, offer types, audience size, or any details that make this relevant to them.</div>
         </div>
 
         {/* Length */}
-        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid #ffffff10", paddingBottom: 8, marginTop: 4 }}>Length</div>
+        <div style={{ fontSize: 11, fontWeight: 700, color: T.tx3, letterSpacing: 1, textTransform: "uppercase", borderBottom: "1px solid var(--border)", paddingBottom: 8, marginTop: 4 }}>Length</div>
         <div style={{ display: "flex", gap: 10 }}>
           {[["Short", "350", "4–6 lines"], ["Medium", "560", "6–8 lines"], ["Detailed", "850", "10–12 lines"]].map(([label, val, hint]) => (
             <button key={val} onClick={() => setForm(f => ({ ...f, maxChars: val }))} style={{
-              flex: 1, padding: "10px 8px", borderRadius: 10, border: form.maxChars === val ? `2px solid ${template.color}` : "1px solid #ffffff10",
-              background: form.maxChars === val ? `${template.color}10` : "#0d0d12",
+              flex: 1, padding: "10px 8px", borderRadius: 10, border: form.maxChars === val ? `2px solid ${template.color}` : "1px solid var(--border)",
+              background: form.maxChars === val ? `${template.color}10` : "var(--bg-alt)",
               color: form.maxChars === val ? template.color : T.tx2,
               fontSize: 13, fontWeight: form.maxChars === val ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
               transition: "all .15s",
@@ -3983,7 +3983,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
 
         <button onClick={generate} disabled={generating || !form.recipientCompany.trim()} style={{
           marginTop: 8, padding: "13px 20px", borderRadius: 12, border: "none", cursor: form.recipientCompany.trim() ? "pointer" : "default",
-          background: form.recipientCompany.trim() ? `linear-gradient(135deg, ${template.color}, ${template.color}cc)` : "#16161e",
+          background: form.recipientCompany.trim() ? `linear-gradient(135deg, ${template.color}, ${template.color}cc)` : "var(--bg-hover)",
           color: form.recipientCompany.trim() ? "#fff" : "#94A3B8", fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
           boxShadow: form.recipientCompany.trim() ? `0 4px 14px ${template.color}40` : "none", transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
@@ -4013,26 +4013,26 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         </button>
       </div>
 
-      <div style={{ background: "#111116", borderRadius: 16, border: "1px solid #ffffff10", padding: 24, marginBottom: 16 }}>
+      <div style={{ background: "var(--bg)", borderRadius: 16, border: "1px solid var(--border)", padding: 24, marginBottom: 16 }}>
         {/* Subject */}
         <div style={{ marginBottom: 16 }}>
           <label style={{ ...lbl, color: template.color }}>Subject Line</label>
           <input style={{ ...inp, fontWeight: 600, fontSize: 15 }} value={email.subject} onChange={e => setEmail(em => ({ ...em, subject: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = template.color; e.target.style.boxShadow = `0 0 0 3px ${template.color}15`; }}
-            onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+            onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           <div style={{ fontSize: 11, color: email.subject.length > 50 ? "#ef4444" : T.tx3, marginTop: 4 }}>
             {email.subject.length} / 50 chars {email.subject.length > 50 ? <><LuTriangleAlert size={11} /> too long</> : <LuCheck size={11} />}
           </div>
         </div>
         {/* Divider */}
-        <div style={{ height: 1, background: "#ffffff10", margin: "4px 0 16px" }} />
+        <div style={{ height: 1, background: "var(--border)", margin: "4px 0 16px" }} />
         {/* Body */}
         <div>
           <label style={{ ...lbl, color: template.color }}>Email Body</label>
           <textarea style={{ ...inp, minHeight: 260, resize: "vertical", lineHeight: 1.8, whiteSpace: "pre-wrap" }}
             value={email.body} onChange={e => setEmail(em => ({ ...em, body: e.target.value }))}
             onFocus={e => { e.target.style.borderColor = template.color; e.target.style.boxShadow = `0 0 0 3px ${template.color}15`; }}
-            onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+            onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           <div style={{ fontSize: 11, color: T.tx3, marginTop: 4 }}>{email.body.length} chars · {email.body.split(/\s+/).filter(Boolean).length} words</div>
         </div>
       </div>
@@ -4046,7 +4046,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
             <input style={{ ...inp, width: "100%", background: "#fff", fontSize: 13 }} placeholder="partner@company.com"
               value={form.recipientEmail || ""} onChange={e => setForm(f => ({ ...f, recipientEmail: e.target.value }))}
               onFocus={e => { e.target.style.borderColor = "#f97316"; e.target.style.boxShadow = "0 0 0 3px #f9731615"; }}
-              onBlur={e => { e.target.style.borderColor = "#ffffff10"; e.target.style.boxShadow = "none"; }} />
+              onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }} />
           </div>
         </div>
       )}
@@ -4063,7 +4063,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
           {sending ? "Sending..." : <><LuSend size={15} /> Send Email</>}
         </button>
         <button onClick={() => { navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`); showToast("Copied to clipboard"); }} style={{
-          padding: "13px 18px", borderRadius: 12, border: "1px solid #ffffff10", background: "#0d0d12",
+          padding: "13px 18px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--bg-alt)",
           color: T.tx2, fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 500,
         }}>
           Copy
