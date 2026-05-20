@@ -3076,59 +3076,44 @@ function CampaignStatusPage({ onBack, user }) {
     <div>
       <BackButton onClick={onBack} />
 
-      {/* Header */}
-      <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 20 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: "#0ea5e918", display: "flex", alignItems: "center", justifyContent: "center", color: "#0ea5e9" }}><I.Activity /></div>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>{c("camp_title", "Campaign Status")}</div>
-          <div style={{ fontSize: 12, color: "#64748B", marginTop: 2 }}>
-            {last24.length > 0 ? `${last24.length} campaign${last24.length !== 1 ? "s" : ""} in the last 24 hours` : "No activity in last 24 hours"}
-            {totalSent > 0 && ` · ${totalSent} sent all time`}
-          </div>
-        </div>
-      </div>
+      {/* Editorial header — inline mono stats, no stat cards */}
+      <header className="dash-page-head">
+        <span className="dash-eyebrow">01 — Campaigns</span>
+        <h1 className="dash-page-title">Campaign <em>status</em></h1>
+        <p className="dash-page-stats">
+          <span className="dash-dot is-green" /><strong>{sent24}</strong>&nbsp;sent&nbsp;(24h)
+          <span className="sep">·</span>
+          <span className="dash-dot is-red" /><strong>{failed24}</strong>&nbsp;failed
+          <span className="sep">·</span>
+          <strong>{totalSent}</strong>&nbsp;all time
+        </p>
+      </header>
 
-      {/* 24h stat cards */}
-      <div className="rsp-camp-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 10, marginBottom: 20 }}>
-        {[
-          { label: "Sent (24h)",     value: sent24,         color: "#6366f1",  bg: "#6366f108" },
-          { label: "Failed (24h)",   value: failed24,       color: "#EF4444",  bg: "#EF444408" },
-          { label: "Campaigns (24h)",value: last24.length,  color: "#0ea5e9",  bg: "#0ea5e908" },
-        ].map(s => (
-          <div key={s.label} style={{ background: s.bg, border: "1px solid var(--border)", borderRadius: 12, padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
-            <div style={{ fontSize: 26, fontWeight: 700, color: s.color, fontFamily: "'JetBrains Mono',monospace" }}>{s.value}</div>
-            <div style={{ fontSize: 10, color: "#64748B", marginTop: 4, fontWeight: 600, textTransform: "uppercase", letterSpacing: .4 }}>{s.label}</div>
-          </div>
-        ))}
-      </div>
-
-      {/* Delivery rate bar — only show if there was activity */}
+      {/* Delivery rate — slim strip, only when there was activity */}
       {(sent24 + failed24) > 0 && (
-        <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px", marginBottom: 20, boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
+        <div style={{ border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "14px 18px", marginBottom: 24 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Delivery Rate (24h)</span>
-            <span style={{ fontSize: 14, fontWeight: 700, color: deliveryRate >= 80 ? "#059669" : deliveryRate >= 50 ? "#D97706" : "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{deliveryRate}%</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>Delivery rate <span style={{ color: "var(--text-faint)" }}>· 24h</span></span>
+            <span className="dash-num" style={{ fontSize: 14, fontWeight: 700, color: deliveryRate === 0 ? "var(--text)" : deliveryRate >= 80 ? "var(--green)" : deliveryRate >= 50 ? "var(--amber)" : "var(--red)" }}>{deliveryRate}%</span>
           </div>
-          <div style={{ height: 8, background: "var(--border)", borderRadius: 4, overflow: "hidden" }}>
-            <div style={{ width: `${deliveryRate}%`, height: "100%", background: deliveryRate >= 80 ? "linear-gradient(90deg,#6366f1,#10b981)" : deliveryRate >= 50 ? "linear-gradient(90deg,#6366f1,#f59e0b)" : "#EF4444", borderRadius: 4, transition: "width .6s ease" }} />
+          <div style={{ height: 6, background: "var(--bg-section)", borderRadius: 3, overflow: "hidden" }}>
+            <div style={{ width: `${deliveryRate}%`, height: "100%", background: deliveryRate >= 80 ? "var(--teal)" : deliveryRate >= 50 ? "var(--amber)" : "var(--red)", borderRadius: 3, transition: "width .6s ease" }} />
           </div>
-          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "#94A3B8" }}>
+          <div className="dash-num" style={{ display: "flex", justifyContent: "space-between", marginTop: 6, fontSize: 11, color: "var(--text-faint)" }}>
             <span>{sent24} delivered</span>
             <span>{failed24} failed</span>
           </div>
         </div>
       )}
 
-      {/* Emails sent in last 24h */}
-      <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>
-        Emails Sent — Last 24 Hours
-      </div>
+      {/* Recent activity */}
+      <div className="dash-eyebrow" style={{ marginBottom: 12 }}>Last 24 hours</div>
 
       {emails24.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "40px 24px", background: "var(--bg)", borderRadius: 14, border: "1px dashed var(--border)", marginBottom: 20 }}>
-          <LuRadio size={32} style={{ marginBottom: 10, color: "var(--text-muted)" }} />
-          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>No emails sent in the last 24 hours</div>
-          <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
+        <div className="dash-empty">
+          <div className="dash-empty-title">No activity in the last 24 hours</div>
+          <div className="dash-empty-text">Emails sent from active campaigns appear here in real time, as they go out.</div>
+          <button className="dash-link" onClick={onBack}>Start a campaign →</button>
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
@@ -3153,12 +3138,12 @@ function CampaignStatusPage({ onBack, user }) {
                 </div>
                 {/* Category badge */}
                 {e.category && e.category !== "all" && (
-                  <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 20, flexShrink: 0 }}>{e.category}</span>
+                  <span style={{ fontSize: 10, fontWeight: 600, color: cat.text || cat.dot, background: cat.bg || `${cat.dot}15`, padding: "2px 8px", borderRadius: 4, flexShrink: 0 }}>{e.category}</span>
                 )}
                 {/* Time + view hint */}
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2, flexShrink: 0 }}>
-                  <span style={{ fontSize: 11, color: "#94A3B8", fontFamily: "'JetBrains Mono',monospace" }}>{timeAgo(e.campaignDate)}</span>
-                  <span style={{ fontSize: 10, color: "#6366f1", fontWeight: 500 }}>View →</span>
+                  <span style={{ fontSize: 11, color: "var(--text-faint)", fontFamily: "var(--font-mono)" }}>{timeAgo(e.campaignDate)}</span>
+                  <span style={{ fontSize: 10, color: "var(--text-faint)", fontWeight: 500 }}>View →</span>
                 </div>
               </div>
             );
@@ -3166,35 +3151,52 @@ function CampaignStatusPage({ onBack, user }) {
         </div>
       )}
 
-      {/* Older campaigns summary */}
+      {/* Older campaigns — grouped table */}
       {older.length > 0 && (
-        <>
-          <div style={{ fontSize: 12, fontWeight: 600, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>
-            All Time · {older.length + last24.length} Campaigns
+        <div className="dash-section" style={{ marginTop: 28 }}>
+          <div className="dash-section-head">
+            <span className="dash-eyebrow">All time · {older.length + last24.length} campaigns</span>
+            <span className="dash-num" style={{ fontSize: 12, color: "var(--text-faint)" }}>
+              {older.reduce((s, h) => s + (h.sent || 0), 0)} sent
+            </span>
           </div>
-          <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "16px 18px", boxShadow: "0 1px 3px rgba(15,23,42,0.05)" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-              <span style={{ fontSize: 13, color: "#64748B" }}>Older than 24h</span>
-              <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{older.reduce((s, h) => s + (h.sent || 0), 0)} sent</span>
-            </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
-              {older.slice(0, 5).map(h => (
-                <div key={h.id} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
-                  <div>
-                    <span style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{h.category || "Campaign"}</span>
-                    {h.cancelled && <span style={{ fontSize: 10, color: "#f59e0b", background: "#FEF3C7", padding: "1px 7px", borderRadius: 20, marginLeft: 8, fontWeight: 600 }}>Cancelled</span>}
-                  </div>
-                  <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
-                    <span style={{ fontSize: 12, color: "#059669", fontWeight: 700, fontFamily: "'JetBrains Mono',monospace" }}>{h.sent} sent</span>
-                    {h.failed > 0 && <span style={{ fontSize: 11, color: "#EF4444", fontFamily: "'JetBrains Mono',monospace" }}>{h.failed} failed</span>}
-                    <span style={{ fontSize: 11, color: "#94A3B8" }}>{timeAgo(h.date)}</span>
-                  </div>
-                </div>
-              ))}
-              {older.length > 5 && <div style={{ fontSize: 12, color: "#94A3B8", textAlign: "center", paddingTop: 6 }}>+{older.length - 5} more campaigns — see full history in Emails Sent</div>}
-            </div>
+          <div className="dash-card" style={{ padding: 0, overflow: "hidden" }}>
+            <table className="dash-table">
+              <thead>
+                <tr>
+                  <th>Campaign</th>
+                  <th>Status</th>
+                  <th style={{ textAlign: "right" }}>Sent</th>
+                  <th style={{ textAlign: "right" }}>Failed</th>
+                  <th style={{ textAlign: "right" }}>When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {older.slice(0, 8).map(h => {
+                  const named = h.category && h.category !== "all";
+                  return (
+                    <tr key={h.id}>
+                      <td>{named ? h.category : <em style={{ color: "var(--text-faint)" }}>Unnamed campaign</em>}</td>
+                      <td>
+                        {h.cancelled
+                          ? <span style={{ background: "#fef3c7", color: "#92400e", border: "1px solid #fde68a", fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 4 }}>Cancelled</span>
+                          : <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)" }}><span className="dash-dot is-green" />Delivered</span>}
+                      </td>
+                      <td className="dash-td-num" style={{ textAlign: "right", color: "var(--text)" }}>{h.sent || 0}</td>
+                      <td className="dash-td-num" style={{ textAlign: "right", color: h.failed ? "var(--red)" : "var(--text-faint)" }}>{h.failed || 0}</td>
+                      <td className="dash-td-num" style={{ textAlign: "right" }}>{timeAgo(h.date)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
           </div>
-        </>
+          {older.length > 8 && (
+            <div style={{ fontSize: 12, color: "var(--text-faint)", marginTop: 10 }}>
+              +{older.length - 8} more — see full history in Emails Sent.
+            </div>
+          )}
+        </div>
       )}
 
       {/* Email preview modal */}
