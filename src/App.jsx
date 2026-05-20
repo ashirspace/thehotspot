@@ -549,7 +549,7 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
         </div>
       )}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: `${accent}15`, display: "flex", alignItems: "center", justifyContent: "center", color: accent, marginBottom: 14 }}>{icon}</div>
+        <span style={{ color: "var(--text-soft)", display: "flex", marginBottom: 14 }}>{icon}</span>
         {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
       </div>
       <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
@@ -785,11 +785,10 @@ function TotalContactsPage({ onBack, user }) {
 
       {/* Contact list */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 14, border: "1px dashed var(--border)" }}>
-          <LuUsers size={32} style={{ marginBottom: 12, color: "var(--text-muted)" }} />
-          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)", marginBottom: 6 }}>{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
-          <div style={{ fontSize: 13, color: "#64748B", marginBottom: 20 }}>{contacts.length === 0 ? "Add your first contact to get started." : "Try a different search or filter."}</div>
-          {contacts.length === 0 && <button onClick={openAdd} style={{ padding: "10px 20px", borderRadius: 10, border: "none", background: "#6366f1", color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Add Contact</button>}
+        <div className="dash-empty">
+          <div className="dash-empty-title">{contacts.length === 0 ? "No contacts yet" : "No results"}</div>
+          <div className="dash-empty-text">{contacts.length === 0 ? "Add your first contact to get started." : "Try a different search or filter."}</div>
+          {contacts.length === 0 && <button onClick={openAdd} className="dash-btn dash-btn-primary dash-btn-sm">Add contact</button>}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -999,10 +998,9 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
           </div>
 
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
-              <LuMailbox size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No emails sent yet</div>
-              <div style={{ fontSize: 13, color: "#64748B" }}>Start a campaign from the chat — say "send emails".</div>
+            <div className="dash-empty">
+              <div className="dash-empty-title">No emails sent yet</div>
+              <div className="dash-empty-text">Sent campaigns appear here once you start sending.</div>
             </div>
           ) : (
             <>
@@ -1077,10 +1075,9 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
       {tab === "history" && (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {history.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
-              <LuMailbox size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
-              <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No campaigns yet</div>
-              <div style={{ fontSize: 13, color: "#64748B" }}>Your sent campaigns will appear here.</div>
+            <div className="dash-empty">
+              <div className="dash-empty-title">No campaigns yet</div>
+              <div className="dash-empty-text">Your sent campaigns will appear here.</div>
             </div>
           ) : [...history].reverse().map(h => {
             const isOpen = expandedId === h.id;
@@ -1298,7 +1295,7 @@ function SuccessRatePage({ onBack, user }) {
 
   const FlowNode = ({ icon, label, value, sub, color, dim = false }) => (
     <div style={{ background: dim ? "var(--bg-alt)" : "var(--bg)", border: `1px solid ${color}25`, borderRadius: 14, padding: "16px 18px", textAlign: "center", minWidth: 120, opacity: dim ? 0.5 : 1 }}>
-      <div style={{ width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center", color, margin: "0 auto 10px" }}>{icon}</div>
+      <div style={{ color: "var(--text-soft)", display: "flex", justifyContent: "center", margin: "0 auto 10px" }}>{icon}</div>
       <div style={{ fontSize: 22, fontWeight: 800, color: "var(--text)", letterSpacing: -0.8, marginBottom: 2 }}>{value}</div>
       <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text)", marginBottom: 2 }}>{label}</div>
       {sub && <div style={{ fontSize: 10, color: "#64748B" }}>{sub}</div>}
@@ -1323,10 +1320,9 @@ function SuccessRatePage({ onBack, user }) {
       </div>
 
       {totalCampaigns === 0 ? (
-        <div style={{ textAlign: "center", padding: "48px 24px", background: "var(--bg)", borderRadius: 16, border: "1px dashed var(--border)" }}>
-          <LuChartBar size={32} style={{ marginBottom: 12, color: "var(--text-faint)" }} />
-          <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>No pipeline data yet</div>
-          <div style={{ fontSize: 13, color: "#64748B" }}>Run a campaign to see your outreach funnel here.</div>
+        <div className="dash-empty">
+          <div className="dash-empty-title">No pipeline data yet</div>
+          <div className="dash-empty-text">Run a campaign to see your outreach funnel here.</div>
         </div>
       ) : (
         <>
@@ -2490,13 +2486,10 @@ function CreateDatabasePage({ onBack, showToast }) {
 
         {/* Empty */}
         {databases.length === 0 && !showNewDb && (
-          <div style={{ textAlign: "center", padding: "80px 20px" }}>
-            <div style={{ width: 56, height: 56, borderRadius: 14, background: T.acBg, display: "inline-flex", alignItems: "center", justifyContent: "center", marginBottom: 16 }}>
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke={T.ac} strokeWidth="1.5"><rect x="3" y="3" width="18" height="18" rx="2" /><line x1="3" y1="9" x2="21" y2="9" /><line x1="9" y1="9" x2="9" y2="21" /></svg>
-            </div>
-            <div style={{ fontSize: 17, fontWeight: 600, color: T.tx, marginBottom: 6 }}>No databases yet</div>
-            <div style={{ fontSize: 14, color: T.tx2, marginBottom: 20 }}>Create your first database to start organizing contacts.</div>
-            <button onClick={() => setShowNewDb(true)} style={{ padding: "9px 24px", borderRadius: 8, border: "none", background: T.ac, color: "#fff", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>+ Create Database</button>
+          <div className="dash-empty">
+            <div className="dash-empty-title">No databases yet</div>
+            <div className="dash-empty-text">Create your first database to start organizing contacts.</div>
+            <button onClick={() => setShowNewDb(true)} className="dash-btn dash-btn-primary dash-btn-sm">Create database</button>
           </div>
         )}
 
@@ -3841,7 +3834,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
             onMouseEnter={e => { e.currentTarget.style.borderColor = t.color; e.currentTarget.style.boxShadow = `0 6px 24px ${t.color}22`; e.currentTarget.style.transform = "translateY(-2px)"; }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.boxShadow = "0 1px 4px rgba(15,23,42,0.05)"; e.currentTarget.style.transform = "none"; }}
           >
-            <div style={{ width: 44, height: 44, borderRadius: 12, background: `${t.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: t.color, marginBottom: 14 }}>{t.icon}</div>
+            <div style={{ color: "var(--text-soft)", display: "flex", marginBottom: 14 }}>{t.icon}</div>
             <div style={{ fontSize: 15, fontWeight: 700, color: T.tx, marginBottom: 5 }}>{t.label}</div>
             <div style={{ fontSize: 13, color: T.tx2, lineHeight: 1.5, marginBottom: 14 }}>{t.desc}</div>
             <div style={{ fontSize: 12, color: t.color, fontWeight: 500, display: "flex", alignItems: "center", gap: 4 }}>
@@ -3861,7 +3854,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
       </button>
       {/* Template badge */}
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24 }}>
-        <div style={{ width: 44, height: 44, borderRadius: 12, background: `${template.color}15`, display: "flex", alignItems: "center", justifyContent: "center", color: template.color }}>{template.icon}</div>
+        <div style={{ color: "var(--text-soft)", display: "flex" }}>{template.icon}</div>
         <div>
           <div style={{ fontSize: 16, fontWeight: 700, color: T.tx }}>{template.label} Email</div>
           <div style={{ fontSize: 13, color: T.tx2 }}>{template.desc}</div>
