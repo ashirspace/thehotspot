@@ -972,11 +972,11 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
       </div>
 
       {gmailConnected
-        ? <div style={{ background: "#0a2a1a", border: "1px solid #10b98130", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, color: "#10b981", display: "flex", alignItems: "center", gap: 8 }}>
+        ? <div style={{ background: "var(--teal-tint)", border: "1px solid var(--teal-light)", borderRadius: 10, padding: "11px 16px", marginBottom: 18, fontSize: 12, color: "#047857", display: "flex", alignItems: "center", gap: 8 }}>
             <LuCheck size={14} style={{ flexShrink: 0 }} />
             <span>Sending from <strong style={{ color: "#34d399" }}>{user?.email || "your Gmail"}</strong></span>
           </div>
-        : <div style={{ background: "#1a140a", border: "1px solid #f59e0b30", borderRadius: 10, padding: "11px 14px", marginBottom: 18, fontSize: 12, color: "#f59e0b", display: "flex", alignItems: "center", gap: 8 }}>
+        : <div style={{ background: "#fffbeb", border: "1px solid #fde68a", borderRadius: 10, padding: "11px 14px", marginBottom: 18, fontSize: 12, color: "#b45309", display: "flex", alignItems: "center", gap: 8 }}>
             <LuTriangleAlert size={14} style={{ flexShrink: 0 }} /> Connect Gmail to sync your live sent count.
           </div>
       }
@@ -1367,10 +1367,10 @@ function SuccessRatePage({ onBack, user }) {
 
               {/* Two outcome nodes */}
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, width: "100%" }}>
-                <div style={{ background: "#0d1f0f", border: "1px solid #10b98125", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", margin: "0 auto 10px" }}><LuCheck size={16} /></div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "#10b981", letterSpacing: -1, marginBottom: 2 }}>{totalSent}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#10b981", marginBottom: 4 }}>Delivered</div>
+                <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
+                  <LuCheck size={16} strokeWidth={1.5} style={{ color: "var(--text-soft)", margin: "0 auto 10px", display: "block" }} />
+                  <div style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: -1, marginBottom: 2 }}>{totalSent}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-soft)", marginBottom: 4 }}>Delivered</div>
                   <div style={{ fontSize: 10, color: "#64748B" }}>{rate}% of attempted</div>
                   {/* Mini bar */}
                   <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
@@ -1378,10 +1378,10 @@ function SuccessRatePage({ onBack, user }) {
                   </div>
                 </div>
 
-                <div style={{ background: "#1f0d0d", border: "1px solid #f8717125", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
-                  <div style={{ width: 36, height: 36, borderRadius: 10, background: "#f8717118", display: "flex", alignItems: "center", justifyContent: "center", color: "#f87171", margin: "0 auto 10px" }}><LuX size={16} /></div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: "#f87171", letterSpacing: -1, marginBottom: 2 }}>{totalFailed}</div>
-                  <div style={{ fontSize: 12, fontWeight: 600, color: "#f87171", marginBottom: 4 }}>Failed</div>
+                <div style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "18px 16px", textAlign: "center" }}>
+                  <LuX size={16} strokeWidth={1.5} style={{ color: "var(--text-soft)", margin: "0 auto 10px", display: "block" }} />
+                  <div style={{ fontSize: 28, fontWeight: 800, color: "var(--text)", fontFamily: "var(--font-display)", letterSpacing: -1, marginBottom: 2 }}>{totalFailed}</div>
+                  <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-soft)", marginBottom: 4 }}>Failed</div>
                   <div style={{ fontSize: 10, color: "#64748B" }}>{totalAttempted > 0 ? 100 - rate : 0}% of attempted</div>
                   {/* Mini bar */}
                   <div style={{ height: 4, background: "var(--border)", borderRadius: 2, marginTop: 10, overflow: "hidden" }}>
@@ -1595,12 +1595,12 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
         </div>
 
         {saveError && (
-          <div style={{ background: "#2d1a1a", border: "1px solid #ef444440", borderRadius: 10, padding: "10px 14px", marginBottom: 14, color: "#f87171", fontSize: 13, fontFamily: "'DM Sans',sans-serif", wordBreak: "break-word" }}>
+          <div style={{ background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", marginBottom: 14, color: "#b91c1c", fontSize: 13, fontFamily: "var(--font-sans)", wordBreak: "break-word" }}>
             {saveError}
           </div>
         )}
 
-        <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ width: "100%", padding: "13px", borderRadius: 12, border: "none", background: canSubmit ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24", color: canSubmit ? "#fff" : "#475569", fontSize: 15, fontWeight: 700, fontFamily: "'DM Sans',sans-serif", cursor: canSubmit ? "pointer" : "default", transition: "all .2s", boxShadow: canSubmit ? "0 4px 16px rgba(16,185,129,0.28)" : "none" }}>
+        <button onClick={handleSubmit} disabled={saving || !canSubmit} style={{ width: "100%", padding: "13px", borderRadius: 10, border: "none", background: canSubmit ? "var(--teal)" : "var(--bg-section)", color: canSubmit ? "#fff" : "var(--text-faint)", fontSize: 15, fontWeight: 700, fontFamily: "var(--font-sans)", cursor: canSubmit ? "pointer" : "default", transition: "all .2s" }}>
           {saving ? "Saving…" : "Save & Continue →"}
         </button>
       </div>
@@ -2357,7 +2357,7 @@ function PixelPet() {
                 <div style={{
                   maxWidth: '82%', padding: '7px 11px',
                   borderRadius: m.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
-                  background: m.role === 'user' ? '#10b981' : '#1a1a24',
+                  background: m.role === 'user' ? 'var(--teal)' : 'var(--bg-alt)',
                   color: m.role === 'user' ? '#fff' : '#cbd5e1',
                   fontSize: 12.5, lineHeight: 1.5, fontFamily: "'DM Sans',sans-serif",
                 }}>
@@ -2367,7 +2367,7 @@ function PixelPet() {
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: '#1a1a24', color: '#64748b', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>...</div>
+                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: 'var(--bg-alt)', color: 'var(--text-soft)', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>...</div>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -3004,8 +3004,8 @@ function ContactsPage({ onBack, showToast, user }) {
       <div className="rsp-contact-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
         {[{ n: emailStats.total, l: "Total Companies", c: "#10b981" }, { n: emailStats.withEmail, l: "With Email", c: "#4ade80" }, { n: emailStats.withoutEmail, l: "Missing Email", c: "#f87171" }].map(s => (
           <div key={s.l} style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 12, padding: "14px", textAlign: "center", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
-            <div style={{ fontSize: 22, fontWeight: 700, color: s.c, fontFamily: "'JetBrains Mono',monospace" }}>{s.n}</div>
-            <div style={{ fontSize: 11, color: "#64748B" }}>{s.l}</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)", fontFamily: "var(--font-mono)" }}>{s.n}</div>
+            <div style={{ fontSize: 11, color: "var(--text-soft)" }}>{s.l}</div>
           </div>
         ))}
       </div>
@@ -3371,7 +3371,7 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
       <Card title="Integrations">
         <Row label="Gmail" sub={gmailConnected ? (user?.gmailEmail || user?.email || "Connected via Google") : "Used to send outreach emails"}>
           {gmailConnected
-            ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#0a2a1a", color: "#10b981", border: "1px solid #10b98133" }}>
+            ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, background: "#ecfdf5", color: "#047857", border: "1px solid #a7f3d0" }}>
                 <LuCheck size={12} /> Connected
               </span>
             : <button onClick={connectGmail} style={{ padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", border: "none", background: "#FFF7ED", color: "#ea580c" }}>
