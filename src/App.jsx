@@ -7,7 +7,8 @@ import {
   LuChartBar, LuZap, LuDollarSign, LuGlobe, LuLink, LuCheck, LuX,
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
-  LuMenu,
+  LuMenu, LuInbox, LuCreditCard, LuCircleHelp, LuBookOpen,
+  LuMessageCircle, LuStar, LuArchive, LuReply,
 } from "react-icons/lu";
 
 /* ───────── CONFIG ───────── */
@@ -4073,6 +4074,235 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   );
 }
 
+/* ───────── INBOX PAGE ───────── */
+function InboxPage() {
+  const folders = [
+    { id: "inbox",   label: "Inbox",   icon: <LuInbox size={16} />,   count: 6 },
+    { id: "starred", label: "Starred", icon: <LuStar size={16} />,    count: 2 },
+    { id: "sent",    label: "Sent",    icon: <LuReply size={16} />,   count: 0 },
+    { id: "archive", label: "Archive", icon: <LuArchive size={16} />, count: 0 },
+  ];
+  const threads = [
+    { name: "Marcus Chen", company: "Brightpath Media", subject: "Re: Partnership proposal", snippet: "Thanks for reaching out — this genuinely looks like a strong fit for our Q3 roadmap. Could we set up a call next week to walk through the numbers?", time: "9:42 AM", state: "green", label: "Interested", unread: true },
+    { name: "Priya Nair", company: "Northwind Labs", subject: "Re: Quick question on your campaigns", snippet: "Appreciate the note. We're not actively looking right now, but circle back in the autumn and we can revisit.", time: "8:15 AM", state: "amber", label: "Later", unread: true },
+    { name: "Daniel Osei", company: "Coastline CPA", subject: "Re: Outreach for affiliate network", snippet: "Out of office until the 28th with limited access to email. I'll respond on my return.", time: "Yesterday", state: "amber", label: "Out of office", unread: false },
+    { name: "Lena Hoff", company: "Vela Mobile", subject: "Re: Mobile CPA placements", snippet: "This isn't a priority for our team — please remove us from the list. Thanks for understanding.", time: "Yesterday", state: "red", label: "Not interested", unread: false },
+    { name: "Tomás Reyes", company: "Aurora CPL", subject: "Re: Lead-gen partnership", snippet: "Numbers look reasonable. Send across the contract draft and we'll get legal to review it this week.", time: "Mon", state: "green", label: "Interested", unread: false },
+    { name: "Sara Kovač", company: "Meridian Group", subject: "Re: Following up", snippet: "Got your message — forwarding internally to the person who owns this. Expect a reply shortly.", time: "Mon", state: "teal", label: "Forwarded", unread: false },
+  ];
+  const [folder, setFolder] = useState("inbox");
+  const [sel, setSel] = useState(0);
+  const t = threads[sel];
+
+  return (
+    <div style={{ display: "flex", height: "calc(100dvh - 160px)", minHeight: 460, border: "1px solid var(--border)", borderRadius: "var(--r-md)", overflow: "hidden", background: "var(--bg)" }}>
+      {/* Column 1 — folders */}
+      <div style={{ flex: "0 0 184px", borderRight: "1px solid var(--border)", background: "var(--bg-alt)", padding: "16px 0", display: "flex", flexDirection: "column" }}>
+        <div className="dash-sidebar-section"><span className="dash-sidebar-eyebrow">Mailboxes</span></div>
+        {folders.map(f => (
+          <button key={f.id} onClick={() => setFolder(f.id)}
+            className={`dash-nav-item${folder === f.id ? " is-active" : ""}`}>
+            {f.icon}
+            <span style={{ flex: 1 }}>{f.label}</span>
+            {f.count > 0 && <span className="dash-num" style={{ fontSize: 11, color: "var(--text-faint)" }}>{f.count}</span>}
+          </button>
+        ))}
+        <div className="dash-sidebar-footer" style={{ marginTop: "auto" }}>
+          <div className="dash-eyebrow" style={{ marginBottom: 6 }}>Reply rate</div>
+          <div className="dash-stat-value" style={{ fontSize: 24 }}>62%</div>
+          <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: 2 }}>last 30 days</div>
+        </div>
+      </div>
+
+      {/* Column 2 — thread list */}
+      <div style={{ flex: "0 0 320px", borderRight: "1px solid var(--border)", overflowY: "auto" }}>
+        <div style={{ padding: "14px 16px", borderBottom: "1px solid var(--border)", display: "flex", alignItems: "baseline", justifyContent: "space-between" }}>
+          <span style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)" }}>Inbox</span>
+          <span className="dash-num" style={{ fontSize: 12, color: "var(--text-faint)" }}>{threads.length} threads</span>
+        </div>
+        {threads.map((th, i) => (
+          <button key={i} onClick={() => setSel(i)} style={{
+            display: "block", width: "100%", textAlign: "left", padding: "13px 16px",
+            border: "none", borderBottom: "1px solid var(--border)", cursor: "pointer",
+            background: i === sel ? "var(--teal-tint)" : "var(--bg)",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 3 }}>
+              <span className={`dash-dot is-${th.state}`} />
+              <span style={{ fontSize: 13, fontWeight: th.unread ? 700 : 600, color: "var(--text)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{th.name}</span>
+              <span className="dash-num" style={{ fontSize: 11, color: "var(--text-faint)" }}>{th.time}</span>
+            </div>
+            <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{th.subject}</div>
+            <div style={{ fontSize: 11.5, color: "var(--text-faint)", lineHeight: 1.45, display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{th.snippet}</div>
+          </button>
+        ))}
+      </div>
+
+      {/* Column 3 — reading pane */}
+      <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column" }}>
+        <div style={{ padding: "20px 24px", borderBottom: "1px solid var(--border)" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 10 }}>
+            <span className={`dash-chip is-${t.state}`}>{t.label}</span>
+            <span className="dash-num" style={{ fontSize: 12, color: "var(--text-faint)" }}>{t.time}</span>
+          </div>
+          <h2 className="dash-h2" style={{ marginBottom: 8 }}>{t.subject}</h2>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <span className="dash-avatar" style={{ width: 34, height: 34 }}>{t.name[0]}</span>
+            <div>
+              <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{t.name}</div>
+              <div style={{ fontSize: 12, color: "var(--text-faint)" }}>{t.company}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px", fontSize: 14, lineHeight: 1.7, color: "var(--text-muted)" }}>
+          <p style={{ marginBottom: 14 }}>Hi,</p>
+          <p style={{ marginBottom: 14 }}>{t.snippet}</p>
+          <p>— {t.name.split(" ")[0]}</p>
+        </div>
+        <div style={{ padding: "14px 24px", borderTop: "1px solid var(--border)", display: "flex", gap: 10 }}>
+          <button className="dash-btn dash-btn-primary"><LuReply size={14} /> Reply</button>
+          <button className="dash-btn dash-btn-outline"><LuArchive size={14} /> Archive</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── BILLING PAGE ───────── */
+function BillingPage({ onBack }) {
+  const invoices = [
+    { id: "INV-0042", date: "May 01, 2026", amount: "$49.00", status: "Paid" },
+    { id: "INV-0038", date: "Apr 01, 2026", amount: "$49.00", status: "Paid" },
+    { id: "INV-0034", date: "Mar 01, 2026", amount: "$49.00", status: "Paid" },
+    { id: "INV-0029", date: "Feb 01, 2026", amount: "$29.00", status: "Paid" },
+  ];
+  const usage = [
+    { label: "Emails sent", used: 1280, cap: 2000 },
+    { label: "Contacts stored", used: 640, cap: 5000 },
+    { label: "AI generations", used: 410, cap: 1000 },
+  ];
+  return (
+    <div style={{ maxWidth: 880, margin: "0 auto" }}>
+      <BackButton onClick={onBack} />
+      <div className="dash-page-head">
+        <span className="dash-eyebrow">Account — Billing</span>
+        <h1 className="dash-h1">Plan &amp; <span className="dash-h1-light">billing</span></h1>
+        <div style={{ fontSize: 14, color: "var(--text-muted)" }}>Manage your subscription, usage, and payment history.</div>
+      </div>
+
+      {/* Plan + usage — asymmetric 60/40 */}
+      <div style={{ display: "grid", gridTemplateColumns: "1.4fr 1fr", gap: 16, marginBottom: 28 }}>
+        <div className="dash-card is-feature pad-lg">
+          <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", marginBottom: 14 }}>
+            <span className="dash-eyebrow"><em>Current plan</em></span>
+            <span className="dash-chip is-teal">Active</span>
+          </div>
+          <div style={{ display: "flex", alignItems: "baseline", gap: 8 }}>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: 38, fontWeight: 700, letterSpacing: "-0.03em", color: "var(--text)" }}>Pro</span>
+            <span className="dash-num" style={{ fontSize: 15, color: "var(--text-soft)" }}>$49<span style={{ color: "var(--text-faint)" }}>/mo</span></span>
+          </div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)", margin: "8px 0 18px", lineHeight: 1.6 }}>
+            Renews on <span className="dash-num">Jun 01, 2026</span>. Includes 2,000 sends/mo, unlimited campaigns, and all 12 AI agents.
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <button className="dash-btn dash-btn-primary">Upgrade plan</button>
+            <button className="dash-btn dash-btn-ghost">Cancel</button>
+          </div>
+        </div>
+        <div className="dash-card pad-md">
+          <div className="dash-eyebrow" style={{ marginBottom: 14 }}>Usage this cycle</div>
+          {usage.map(u => {
+            const pct = Math.round(u.used / u.cap * 100);
+            return (
+              <div key={u.label} style={{ marginBottom: 14 }}>
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 12, marginBottom: 5 }}>
+                  <span style={{ color: "var(--text-muted)" }}>{u.label}</span>
+                  <span className="dash-num" style={{ color: "var(--text-soft)" }}>{u.used} / {u.cap}</span>
+                </div>
+                <div style={{ height: 6, background: "var(--bg-section)", borderRadius: 3, overflow: "hidden" }}>
+                  <div style={{ width: `${pct}%`, height: "100%", background: pct > 85 ? "var(--amber)" : "var(--teal)", borderRadius: 3 }} />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Invoices */}
+      <div className="dash-section">
+        <div className="dash-section-head">
+          <span className="dash-eyebrow">Payment history</span>
+          <span className="dash-savestate">Synced just now</span>
+        </div>
+        <div className="dash-card" style={{ padding: 0, overflow: "hidden" }}>
+          <table className="dash-table">
+            <thead><tr><th>Invoice</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              {invoices.map(inv => (
+                <tr key={inv.id}>
+                  <td className="dash-num" style={{ fontWeight: 600 }}>{inv.id}</td>
+                  <td className="dash-td-num">{inv.date}</td>
+                  <td className="dash-td-num">{inv.amount}</td>
+                  <td><span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)" }}><span className="dash-dot is-green" />{inv.status}</span></td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ───────── HELP PAGE ───────── */
+function HelpPage({ onBack }) {
+  const topics = [
+    { icon: <LuBookOpen size={18} />,       title: "Getting started", desc: "Set up your account, connect Gmail, and import your first contacts." },
+    { icon: <LuRadio size={18} />,          title: "Running campaigns", desc: "Build sequences, schedule sends, and track delivery in real time." },
+    { icon: <LuUsers size={18} />,          title: "Managing contacts", desc: "Import from Sheets, organize by category, and keep data clean." },
+    { icon: <LuSparkles size={18} />,       title: "AI agents", desc: "How the 12 autonomous agents work and when to use each one." },
+    { icon: <LuCreditCard size={18} />,     title: "Billing & plans", desc: "Change plan, read invoices, and understand usage limits." },
+    { icon: <LuCircleHelp size={18} />,     title: "Troubleshooting", desc: "Fix Gmail token errors, sync issues, and delivery problems." },
+  ];
+  return (
+    <div style={{ maxWidth: 880, margin: "0 auto" }}>
+      <BackButton onClick={onBack} />
+      <div className="dash-page-head">
+        <span className="dash-eyebrow">Account — Help</span>
+        <h1 className="dash-h1">How can we <span className="dash-h1-light">help?</span></h1>
+        <div style={{ fontSize: 14, color: "var(--text-muted)" }}>Search the guides or browse a topic below.</div>
+      </div>
+
+      <label className="dash-search" style={{ width: "100%", height: 44, marginBottom: 28 }}>
+        <LuSearch size={15} style={{ flexShrink: 0 }} />
+        <input placeholder="Search help articles…" readOnly />
+        <span className="dash-kbd">⌘K</span>
+      </label>
+
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 14, marginBottom: 28 }}>
+        {topics.map(t => (
+          <div key={t.title} className="dash-card is-liftable" style={{ display: "flex", gap: 14, padding: 20, cursor: "pointer" }}>
+            <div style={{ width: 38, height: 38, flexShrink: 0, borderRadius: "var(--r)", background: "var(--bg-alt)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-soft)" }}>{t.icon}</div>
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 3 }}>{t.title}</div>
+              <div style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.55 }}>{t.desc}</div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <div className="dash-card is-feature pad-lg" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 20, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 4 }}>Still stuck?</div>
+          <div style={{ fontSize: 13, color: "var(--text-muted)" }}>Our team typically replies within a few hours on weekdays.</div>
+        </div>
+        <a href="mailto:support@thehotspot.app" className="dash-btn dash-btn-primary" style={{ textDecoration: "none" }}>
+          <LuMessageCircle size={14} /> Contact support
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout, onUserUpdate }) {
   // URL ↔ page mapping
@@ -4087,6 +4317,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     emailsSent:     "/emails-sent",
     categories:     "/categories",
     successRate:    "/success-rate",
+    inbox:          "/inbox",
+    billing:        "/billing",
+    help:           "/help",
     profile:        "/profile",
     settings:       "/settings",
   };
@@ -4453,6 +4686,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     { id: "emailsSent",     label: "Emails Sent",       icon: <LuMail size={18} />,            desc: "View sent emails",           accent: "#ec4899" },
     { id: "categories",     label: "Categories",        icon: <LuFolder size={18} />,          desc: "Network, CPS, CPL…",         accent: "#14b8a6" },
     { id: "successRate",    label: "Success Rate",      icon: <LuTrendingUp size={18} />,      desc: "Campaign performance",       accent: "#f59e0b" },
+    { id: "inbox",          label: "Inbox",             icon: <LuInbox size={18} />,           desc: "Replies & threads",          accent: "#0d9488" },
+    { id: "billing",        label: "Billing",           icon: <LuCreditCard size={18} />,      desc: "Plan & payment history",     accent: "#64748B" },
+    { id: "help",           label: "Help",              icon: <LuCircleHelp size={18} />,      desc: "Guides & support",           accent: "#64748B" },
     { id: "profile",        label: "Settings",          icon: <LuSettings size={18} />,        desc: "Account & preferences",     accent: "#64748B" },
   ];
 
@@ -4527,9 +4763,12 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             { eyebrow: "Intelligence", items: [
               { id: "emailSender",    label: "Email Sender", icon: <LuSend size={18} /> },
               { id: "emailTemplates", label: "Templates",    icon: <LuFilePen size={18} /> },
+              { id: "inbox",          label: "Inbox",        icon: <LuInbox size={18} /> },
             ] },
             { eyebrow: "Account", items: [
               { id: "settings",       label: "Settings",     icon: <LuSettings size={18} /> },
+              { id: "billing",        label: "Billing",      icon: <LuCreditCard size={18} /> },
+              { id: "help",           label: "Help",         icon: <LuCircleHelp size={18} /> },
             ] },
           ].map(section => (
             <div key={section.eyebrow}>
@@ -4596,6 +4835,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             {page === "emailsSent"     && <EmailsSentPage onBack={() => setPage(null)} sentCount={sentCount} gmailConnected={gmailConnected} user={user} />}
             {page === "categories"     && <CategoriesPage onBack={() => setPage(null)} />}
             {page === "successRate"    && <SuccessRatePage onBack={() => setPage(null)} user={user} />}
+            {page === "inbox"          && <InboxPage />}
+            {page === "billing"        && <BillingPage onBack={() => setPage(null)} />}
+            {page === "help"           && <HelpPage onBack={() => setPage(null)} />}
             {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
             {page === "settings"       && <SettingsPage onBack={() => setPage(null)} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
           </div>
