@@ -2883,9 +2883,7 @@ function ContactsPage({ onBack, showToast, user }) {
     <div>
       <div onClick={() => setView("hub")} style={{ display: "flex", alignItems: "center", gap: 6, color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, marginBottom: 24 }}>← Back to Data Sources</div>
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-        <div style={{ width: 40, height: 40, borderRadius: 12, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#10b981" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
-        </div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" /><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" /></svg>
         <div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>Connect Data Source</div>
           <div style={{ fontSize: 13, color: "#64748B" }}>Choose where your contact data lives</div>
@@ -2894,9 +2892,7 @@ function ContactsPage({ onBack, showToast, user }) {
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
         <div style={{ background: "var(--bg)", border: "1px solid #10b98133", borderRadius: 14, padding: "20px", boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#10b98118", display: "flex", alignItems: "center", justifyContent: "center" }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="#0d9668"><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
-            </div>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="var(--text-soft)" style={{ flexShrink: 0 }}><path d="M19.5 3h-15A1.5 1.5 0 003 4.5v15A1.5 1.5 0 004.5 21h15a1.5 1.5 0 001.5-1.5v-15A1.5 1.5 0 0019.5 3zM9 17H6v-3h3v3zm0-5H6V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3zm5 5h-3v-3h3v3zm0-5h-3V9h3v3z" /></svg>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>Google Sheets</div>
               <div style={{ fontSize: 12, color: "#64748B" }}>Paste your sheet URL to import all rows</div>
@@ -2910,8 +2906,8 @@ function ContactsPage({ onBack, showToast, user }) {
               onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
             <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
               padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
-              background: sheetUrl ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "var(--bg-hover)",
-              color: sheetUrl ? "#fff" : "#94A3B8", fontSize: 13, fontWeight: 600, fontFamily: "'DM Sans',sans-serif", whiteSpace: "nowrap",
+              background: sheetUrl ? "var(--teal)" : "var(--bg-hover)",
+              color: sheetUrl ? "#fff" : "var(--text-faint)", fontSize: 13, fontWeight: 600, fontFamily: "var(--font-sans)", whiteSpace: "nowrap",
             }}>{loading ? "Connecting..." : "Connect"}</button>
           </div>
           <div style={{ fontSize: 11, color: "#94A3B8", marginTop: 10, lineHeight: 1.6 }}>Auto-maps columns: Affiliate → Company, Mail ID → Email, CountryName → Country, Category → Category.</div>
@@ -2923,9 +2919,7 @@ function ContactsPage({ onBack, showToast, user }) {
         ].map(src => (
           <div key={src.name} style={{ background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 14, padding: "20px", opacity: .5, boxShadow: "0 1px 4px rgba(15,23,42,0.05)" }}>
             <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 36, height: 36, borderRadius: 10, background: `${src.color}18`, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={src.color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" dangerouslySetInnerHTML={{ __html: src.icon }} />
-              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--text-soft)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0 }} dangerouslySetInnerHTML={{ __html: src.icon }} />
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 15, fontWeight: 600, color: "var(--text)" }}>{src.name}</div>
                 <div style={{ fontSize: 12, color: "#64748B" }}>{src.desc}</div>
