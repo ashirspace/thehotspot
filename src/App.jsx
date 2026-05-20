@@ -735,17 +735,13 @@ function TotalContactsPage({ onBack, user }) {
     <div>
       {/* Header */}
       <div className="rsp-tc-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)" }}>Total Contacts</div>
-          <div style={{ fontSize: 13, color: "#64748B", marginTop: 2 }}>{contacts.length} contact{contacts.length !== 1 ? "s" : ""} total</div>
-        </div>
-        <button onClick={openAdd} style={{
-          display: "flex", alignItems: "center", gap: 7, padding: "10px 18px", borderRadius: 10, border: "none",
-          background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff",
-          fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-          boxShadow: "0 4px 12px #6366f140",
-        }}>
-          + Add Contact
+        <header className="dash-page-head" style={{ marginBottom: 0 }}>
+          <span className="dash-eyebrow">03 — Contacts</span>
+          <h1 className="dash-page-title">Total <em>contacts</em></h1>
+          <p className="dash-page-stats"><strong>{contacts.length}</strong>&nbsp;{contacts.length !== 1 ? "contacts" : "contact"} total</p>
+        </header>
+        <button onClick={openAdd} className="dash-btn dash-btn-primary" style={{ flexShrink: 0 }}>
+          Add contact
         </button>
       </div>
 
@@ -954,19 +950,20 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
     <div>
       {/* Header */}
       <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", letterSpacing: -0.5, marginBottom: 3 }}>Emails Sent</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>{history.length} campaign{history.length !== 1 ? "s" : ""} · {totalSent + totalFailed} attempted</div>
-        </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ background: "#6366f118", border: "1px solid #6366f130", borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
-            <div style={{ fontSize: 26, fontWeight: 900, color: "#6366f1", letterSpacing: -1 }}>{totalSent.toLocaleString()}</div>
-            <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Delivered</div>
-          </div>
-          <div style={{ display: "flex", background: "var(--bg-hover)", borderRadius: 10, padding: 3, gap: 2 }}>
-            <button style={tabBtn("overview")} onClick={() => setTab("overview")}>Overview</button>
-            <button style={tabBtn("history")} onClick={() => setTab("history")}>History</button>
-          </div>
+        <header className="dash-page-head" style={{ marginBottom: 0 }}>
+          <span className="dash-eyebrow">04 — Activity</span>
+          <h1 className="dash-page-title">Emails <em>sent</em></h1>
+          <p className="dash-page-stats">
+            <strong>{history.length}</strong>&nbsp;campaigns
+            <span className="sep">·</span>
+            <strong>{totalSent.toLocaleString()}</strong>&nbsp;delivered
+            <span className="sep">·</span>
+            <strong>{totalSent + totalFailed}</strong>&nbsp;attempted
+          </p>
+        </header>
+        <div style={{ display: "flex", background: "var(--bg-hover)", borderRadius: 10, padding: 3, gap: 2, flexShrink: 0 }}>
+          <button style={tabBtn("overview")} onClick={() => setTab("overview")}>Overview</button>
+          <button style={tabBtn("history")} onClick={() => setTab("history")}>History</button>
         </div>
       </div>
 
@@ -1187,14 +1184,11 @@ function CategoriesPage({ onBack }) {
 
       {/* Header */}
       <div className="rsp-page-header" style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 28 }}>
-        <div>
-          <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", letterSpacing: -0.5, marginBottom: 3 }}>Contact Categories</div>
-          <div style={{ fontSize: 12, color: "#64748B" }}>{total} total contacts across 5 categories</div>
-        </div>
-        <div style={{ background: "#f9731618", border: "1px solid #f9731630", borderRadius: 14, padding: "10px 18px", textAlign: "center" }}>
-          <div style={{ fontSize: 26, fontWeight: 900, color: "#f97316", letterSpacing: -1 }}>5</div>
-          <div style={{ fontSize: 10, color: "#64748B", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.8 }}>Categories</div>
-        </div>
+        <header className="dash-page-head" style={{ marginBottom: 0 }}>
+          <span className="dash-eyebrow">05 — Segments</span>
+          <h1 className="dash-page-title">Contact <em>categories</em></h1>
+          <p className="dash-page-stats"><strong>{total}</strong>&nbsp;contacts across&nbsp;<strong>5</strong>&nbsp;categories</p>
+        </header>
       </div>
 
       {/* Distribution bar */}
@@ -3198,12 +3192,15 @@ function ProfilePage({ user, onBack, onLogout }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: 32 }}>
-        <div style={{ width: 80, height: 80, borderRadius: "50%", background: "linear-gradient(135deg,#10b981,#0ea5e9)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, fontWeight: 800, color: "#fff", marginBottom: 16 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 32 }}>
+        <div style={{ width: 64, height: 64, borderRadius: "var(--r-lg)", background: "var(--teal)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 24, fontWeight: 800, fontFamily: "var(--font-display)", color: "#fff", flexShrink: 0 }}>
           {user?.username?.[0]?.toUpperCase() || "U"}
         </div>
-        <div style={{ fontSize: 22, fontWeight: 700, color: "var(--text)" }}>{user?.username}</div>
-        <div style={{ fontSize: 12, color: "#64748B", marginTop: 4 }}>Logged in via {user?.method === "google" ? "Google" : "Password"}</div>
+        <div>
+          <span className="dash-eyebrow">08 — Profile</span>
+          <h1 className="dash-page-title" style={{ fontSize: 32 }}>{user?.username}</h1>
+          <p className="dash-page-stats" style={{ marginTop: 2 }}>Signed in via&nbsp;<strong>{user?.method === "google" ? "Google" : "Password"}</strong></p>
+        </div>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -3290,7 +3287,10 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
   return (
     <div>
       <BackButton onClick={onBack} />
-      <div style={{ fontSize: 20, fontWeight: 700, color: "var(--text)", marginBottom: 24 }}>{c("sp_title", "Settings")}</div>
+      <header className="dash-page-head">
+        <span className="dash-eyebrow">06 — Account</span>
+        <h1 className="dash-page-title">{c("sp_title", "Settings")}</h1>
+      </header>
 
       <Card title="Email Preferences">
         <Row label="Default email length" sub="Characters per email body">
@@ -3814,10 +3814,11 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   /* ── STEP 1: PICK TEMPLATE ── */
   if (step === "pick") return (
     <div>
-      <div style={{ marginBottom: 24 }}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: T.tx, marginBottom: 6 }}>{c("tp_title", "Email Templates")}</div>
-        <div style={{ fontSize: 14, color: T.tx2 }}>Pick a template category, fill in the details, and get a professional email ready to send.</div>
-      </div>
+      <header className="dash-page-head">
+        <span className="dash-eyebrow">07 — Compose</span>
+        <h1 className="dash-page-title">Email <em>templates</em></h1>
+        <p style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 520 }}>Pick a template category, fill in the details, and get a professional email ready to send.</p>
+      </header>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
         {TEMPLATES.map(t => (
           <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: pickAngle(t.id) })); setStep("fill"); }} style={{
