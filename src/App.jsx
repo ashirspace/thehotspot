@@ -1756,29 +1756,9 @@ function DashboardPage({ user, contactCount, setPage }) {
   const recentCampaigns = campaigns.slice(-3).reverse();
 
   const [statsRef, statsVisible] = useReveal(0.1);
-  const [col1Ref, col1Visible] = useReveal(0.1);
-  const [col2Ref, col2Visible] = useReveal(0.1);
-  const [col3Ref, col3Visible] = useReveal(0.1);
   const [actRef, actVisible] = useReveal(0.1);
 
-  const hour = new Date().getHours();
-  const greeting = hour < 12 ? "morning" : hour < 17 ? "afternoon" : "evening";
-  const dateStr = new Date().toLocaleDateString("en", { weekday: "long", month: "long", day: "numeric" });
-
-  const ToolBtn = ({ id, icon, label, desc }) => (
-    <button onClick={() => setPage(id)} className="dash-card is-liftable" style={{
-      padding: 16, cursor: "pointer", textAlign: "left", width: "100%", display: "block",
-    }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 8 }}>
-        <span style={{ color: "var(--text-soft)", display: "flex" }}>{icon}</span>
-        <span style={{ fontSize: 14, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", letterSpacing: "-0.01em" }}>{label}</span>
-      </div>
-      <div style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.55, marginBottom: 10 }}>{desc}</div>
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 3, fontSize: 11, fontWeight: 600, color: "var(--teal)" }}>
-        Open <LuChevronRight size={12} />
-      </span>
-    </button>
-  );
+  const dateEyebrow = new Date().toLocaleDateString("en", { weekday: "long", day: "numeric", month: "long" }).toUpperCase();
 
   const revealStyle = (visible, delay = 0) => ({
     opacity: visible ? 1 : 0,
@@ -1788,79 +1768,64 @@ function DashboardPage({ user, contactCount, setPage }) {
 
   return (
     <>
-      {/* Greeting */}
-      <div className="dash-page-head">
-        <span className="dash-eyebrow">{dateStr}</span>
-        <h1 className="dash-h1">Good {greeting}, <span className="dash-h1-light">{user?.username?.split(" ")[0] || "there"}</span></h1>
-        <div style={{ fontSize: 14, color: "var(--text-muted)" }}>{c("dp_tagline", "Here's your outreach hub.")}</div>
-      </div>
+      {/* Editorial header */}
+      <header className="dash-page-head">
+        <span className="dash-eyebrow">{dateEyebrow}</span>
+        <h1 className="dash-page-title">Outreach <em>command</em> center.</h1>
+        <p className="dash-page-stats">
+          <strong>{emailsSent}</strong>&nbsp;emails sent
+          <span className="sep">·</span>
+          <strong>5</strong>&nbsp;categories
+          <span className="sep">·</span>
+          <strong>{successRate}</strong>&nbsp;delivery
+        </p>
+      </header>
 
-      {/* Stat cards — asymmetric grid, mono numbers, one sparkline */}
-      <div ref={statsRef} className="rsp-stat-grid" style={{ display: "grid", gridTemplateColumns: "1.5fr 1fr 1fr 1fr", gap: 14, marginBottom: 32 }}>
-        {[
-          { label: c("dp_stat1_label", "Contacts"), value: contactCount || user?.contactsCount || 0, page: "contacts", icon: <LuUsers size={16} />, sub: c("dp_stat1_sub", "in database"), spark: true },
-          { label: c("dp_stat2_label", "Emails Sent"), value: emailsSent, page: "emailsSent", icon: <LuMail size={16} />, sub: c("dp_stat2_sub", "total delivered") },
-          { label: c("dp_stat3_label", "Categories"), value: 5, page: "categories", icon: <LuFolder size={16} />, sub: c("dp_stat3_sub", "active groups") },
-          { label: c("dp_stat4_label", "Success Rate"), value: successRate, page: "successRate", icon: <LuTrendingUp size={16} />, sub: c("dp_stat4_sub", "delivery rate") },
-        ].map((s, i) => (
-          <button key={s.label} onClick={() => setPage(s.page)} className="dash-card is-liftable" style={{
-            ...revealStyle(statsVisible, i * 0.07),
-            padding: s.spark ? 24 : 20, cursor: "pointer", textAlign: "left", display: "block",
-            transition: `border-color .2s, box-shadow .2s, opacity 0.6s ease ${i * 0.07}s, transform 0.6s ease ${i * 0.07}s`,
-          }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
-              <span className="dash-stat-label">{s.label}</span>
-              <span style={{ color: "var(--text-faint)", display: "flex" }}>{s.icon}</span>
+      {/* Stat split — 60/40 asymmetric, mono numbers, one sparkline */}
+      <section ref={statsRef} className="dash-stat-split" style={{ marginBottom: 20, ...revealStyle(statsVisible) }}>
+        <button onClick={() => setPage("contacts")} className="dash-stat-hero" style={{ cursor: "pointer", textAlign: "left", font: "inherit" }}>
+          <div className="dash-stat-hero-num">{(contactCount || user?.contactsCount || 0).toLocaleString()}</div>
+          <div className="dash-sparkline" style={{ marginTop: 16, maxWidth: 200 }}>
+            {[40, 52, 34, 61, 48, 72, 55, 80, 46, 68, 58, 90].map((h, j) => (
+              <span key={j} className={h >= 80 ? "is-peak" : ""} style={{ height: `${h}%` }} />
+            ))}
+          </div>
+          <span className="dash-stat-hero-label">contacts in database</span>
+        </button>
+        <div className="dash-stat-stack">
+          {[
+            { label: "Emails sent", value: emailsSent, page: "emailsSent" },
+            { label: "Categories", value: 5, page: "categories" },
+            { label: "Delivery rate", value: successRate, page: "successRate" },
+          ].map(r => (
+            <div key={r.label} className="dash-stat-row" onClick={() => setPage(r.page)} style={{ cursor: "pointer" }}>
+              <span className="dash-stat-row-label">{r.label}</span>
+              <span className="dash-stat-row-val">{r.value}</span>
             </div>
-            <div className="dash-stat-value">{s.value}</div>
-            {s.spark && (
-              <div className="dash-sparkline" style={{ marginTop: 14 }}>
-                {[40, 52, 34, 61, 48, 72, 55, 80, 46, 68, 58, 90].map((h, j) => (
-                  <span key={j} className={h >= 80 ? "is-peak" : ""} style={{ height: `${h}%` }} />
-                ))}
-              </div>
-            )}
-            <div style={{ fontSize: 11, color: "var(--text-faint)", marginTop: s.spark ? 10 : 6 }}>{s.sub}</div>
+          ))}
+        </div>
+      </section>
+
+      {/* Bento — varied destinations, whole card clickable */}
+      <section className="dash-bento" style={{ marginBottom: 20 }}>
+        {[
+          { id: "emailSender",    n: "01", cls: "wide", icon: <LuSend size={18} strokeWidth={1.5} />,          title: "Email Sender",    desc: "Bulk-send AI-generated campaigns to your whole list or one category." },
+          { id: "emailTemplates", n: "02",              icon: <LuFilePen size={18} strokeWidth={1.5} />,       title: "Email Templates", desc: "Pick a template, enter a company, generate one targeted email." },
+          { id: "contacts",       n: "03",              icon: <LuClipboardList size={18} strokeWidth={1.5} />, title: "Contacts DB",     desc: "Add, edit and import the contacts behind every campaign." },
+          { id: "campaignStatus", n: "04",              icon: <LuRadio size={18} strokeWidth={1.5} />,         title: "Campaign Status", desc: "Watch active and completed campaigns update in real time." },
+          { id: "categories",     n: "05",              icon: <LuFolder size={18} strokeWidth={1.5} />,        title: "Categories",      desc: "Browse contacts across Network, CPS, CPL, CPA and Mobile." },
+          { id: "totalContacts",  n: "06",              icon: <LuUsers size={18} strokeWidth={1.5} />,         title: "Total Contacts",  desc: "A full overview of every contact and its current status." },
+          { id: "emailsSent",     n: "07",              icon: <LuMail size={18} strokeWidth={1.5} />,          title: "Emails Sent",     desc: "The full history of delivered email, with dates and stats." },
+          { id: "successRate",    n: "08",              icon: <LuTrendingUp size={18} strokeWidth={1.5} />,    title: "Success Rate",    desc: "Delivery, open and reply performance across campaigns." },
+        ].map(card => (
+          <button key={card.id} onClick={() => setPage(card.id)} className={`dash-bento-card${card.cls ? ` ${card.cls}` : ""}`}>
+            <span className="dash-bento-num">{card.n}</span>
+            {card.icon}
+            <span className="dash-bento-title">{card.title}</span>
+            <span className="dash-bento-desc">{card.desc}</span>
           </button>
         ))}
-      </div>
-
-      {/* Three tool groups */}
-      <div className="rsp-tool-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 16, marginBottom: 20 }}>
-        {[
-          { eyebrow: "Outreach", icon: <LuSend size={15} />, desc: "Write and send personalized cold emails to your contact list at scale.",
-            tools: [
-              { id: "emailSender", icon: <LuSend size={18} />, label: "Email Sender", desc: "Bulk send AI-generated campaigns to your entire contact list or a specific category." },
-              { id: "emailTemplates", icon: <LuFilePen size={18} />, label: "Email Templates", desc: "Pick a category template, enter a company, and generate a targeted single email." },
-            ] },
-          { eyebrow: "Contacts & Data", icon: <LuClipboardList size={15} />, desc: "Manage your prospect database across all five outreach categories.",
-            tools: [
-              { id: "contacts", icon: <LuClipboardList size={18} />, label: "Contacts DB", desc: "Add, edit, import and manage all your outreach contacts in one place." },
-              { id: "totalContacts", icon: <LuUsers size={18} />, label: "Total Contacts", desc: "See a full overview of every contact across all categories and statuses." },
-              { id: "categories", icon: <LuFolder size={18} />, label: "Categories", desc: "Browse contacts by Network, CPS, CPL, CPA, and Mobile groups." },
-            ] },
-          { eyebrow: "Analytics", icon: <LuTrendingUp size={15} />, desc: "Track campaign performance, reply rates, and delivery results over time.",
-            tools: [
-              { id: "campaignStatus", icon: <LuRadio size={18} />, label: "Campaign Status", desc: "Monitor active and completed campaigns in real time with live progress." },
-              { id: "emailsSent", icon: <LuMail size={18} />, label: "Emails Sent", desc: "View the full history of every email sent, including delivery stats and dates." },
-              { id: "successRate", icon: <LuTrendingUp size={18} />, label: "Success Rate", desc: "Measure open rates, click-through, and overall campaign performance scores." },
-            ] },
-        ].map((group, gi) => (
-          <div key={group.eyebrow}
-            ref={gi === 0 ? col1Ref : gi === 1 ? col2Ref : col3Ref}
-            className="dash-card pad-lg"
-            style={{ ...revealStyle(gi === 0 ? col1Visible : gi === 1 ? col2Visible : col3Visible, gi * 0.1) }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6, color: "var(--text-soft)" }}>
-              {group.icon}
-              <span className="dash-eyebrow" style={{ color: "var(--text-soft)" }}>{group.eyebrow}</span>
-            </div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 18, lineHeight: 1.6 }}>{group.desc}</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-              {group.tools.map(t => <ToolBtn key={t.id} {...t} />)}
-            </div>
-          </div>
-        ))}
-      </div>
+      </section>
 
       {/* AI Agents */}
       <div className="dash-card pad-lg" style={{ marginBottom: 20 }}>
@@ -4692,7 +4657,14 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     { id: "profile",        label: "Settings",          icon: <LuSettings size={18} />,        desc: "Account & preferences",     accent: "#64748B" },
   ];
 
-  const pageLabel = navItems.find(n => n.id === page)?.label || "Page";
+  // Breadcrumb titles — explicit per page, so home/dashboard never fall back to "Page"
+  const PAGE_TITLES = {
+    dashboard: "Dashboard", emailSender: "Email Sender", emailTemplates: "Templates",
+    contacts: "Contacts", campaignStatus: "Campaigns", totalContacts: "Total Contacts",
+    emailsSent: "Emails Sent", categories: "Categories", successRate: "Success Rate",
+    inbox: "Inbox", billing: "Billing", help: "Help", profile: "Settings", settings: "Settings",
+  };
+  const pageLabel = PAGE_TITLES[page] || "Dashboard";
   const pageIcon  = navItems.find(n => n.id === page)?.icon  || "";
 
   return (
