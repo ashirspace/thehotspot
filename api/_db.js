@@ -13,8 +13,15 @@ export async function initDb(sql) {
   await sql`CREATE TABLE IF NOT EXISTS scheduled_campaigns (id SERIAL PRIMARY KEY, user_id TEXT, scheduled_for TIMESTAMPTZ, category TEXT, offer_context TEXT, max_chars INTEGER, status TEXT DEFAULT 'pending', sent_count INTEGER DEFAULT 0, failed_count INTEGER DEFAULT 0, created_at TIMESTAMPTZ DEFAULT NOW())`;
   await sql`CREATE TABLE IF NOT EXISTS email_events (id SERIAL PRIMARY KEY, track_id TEXT, type TEXT, contact_email TEXT, clicked_url TEXT, timestamp TIMESTAMPTZ DEFAULT NOW())`;
   await sql`CREATE TABLE IF NOT EXISTS sequences (id SERIAL PRIMARY KEY, contact_email TEXT, company TEXT, campaign_id TEXT, thread_id TEXT, step INTEGER DEFAULT 1, sent_at TIMESTAMPTZ DEFAULT NOW(), next_send_at TIMESTAMPTZ, last_sent_at TIMESTAMPTZ, replied_at TIMESTAMPTZ, status TEXT DEFAULT 'active')`;
-  // Role-based access for the admin console (admin | manager | user)
-  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user'`;
+  // Column migrations — safe to run on existing tables
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role         TEXT    NOT NULL DEFAULT 'user'`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS phone        TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS full_name    TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS company      TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role_title   TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS website      TEXT`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS profile_complete BOOLEAN DEFAULT FALSE`;
+  await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS gmail_refresh_token TEXT`;
   // Editable site content (one row per key, e.g. key='login')
   await sql`CREATE TABLE IF NOT EXISTS content (key TEXT PRIMARY KEY, data JSONB NOT NULL DEFAULT '{}'::jsonb, updated_at TIMESTAMPTZ DEFAULT NOW(), updated_by TEXT)`;
   // Admin console audit log
