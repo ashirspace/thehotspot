@@ -1,3 +1,5 @@
+import { useLandingContent } from "../hooks/useLandingContent.js";
+
 const TwitterIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path
@@ -41,17 +43,18 @@ const COLUMNS = [
 ];
 
 export default function Footer({ onGetStarted }) {
+  const c = useLandingContent();
   return (
     <footer className="lp-footer" id="changelog">
       <div className="lp-container">
         <div className="lp-footer-top">
-          <h2 className="lp-footer-h">Ready to grow connections?</h2>
+          <h2 className="lp-footer-h">{c.footer_cta_heading}</h2>
           <button
             type="button"
             className="lp-btn lp-btn-primary"
             onClick={onGetStarted}
           >
-            Start free trial &rarr;
+            {c.footer_cta_btn}
           </button>
         </div>
 
@@ -61,10 +64,7 @@ export default function Footer({ onGetStarted }) {
               <span className="lp-nav-logo-dot" aria-hidden="true" />
               thehotspot
             </span>
-            <p className="lp-footer-tag">
-              AI-powered cold outreach automation. Send emails that read like
-              you wrote each one by hand — and actually get replies.
-            </p>
+            <p className="lp-footer-tag">{c.footer_tagline}</p>
           </div>
 
           {COLUMNS.map((col) => (
@@ -80,8 +80,8 @@ export default function Footer({ onGetStarted }) {
         </div>
 
         <div className="lp-footer-bottom">
-          <span>&copy; 2026 Ibra Digitals · All rights reserved</span>
-          <span className="lp-footer-credit">Made with care in India 🇮🇳</span>
+          <span>{c.footer_copyright}</span>
+          <span className="lp-footer-credit">{c.footer_made_in}</span>
           <div className="lp-footer-socials">
             <a href="#top" aria-label="thehotspot on X"><TwitterIcon /></a>
             <a href="#top" aria-label="thehotspot on LinkedIn"><LinkedInIcon /></a>

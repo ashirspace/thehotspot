@@ -1,3 +1,5 @@
+import { useLandingContent } from "../hooks/useLandingContent.js";
+
 const CheckIcon = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
     <path
@@ -10,55 +12,26 @@ const CheckIcon = () => (
   </svg>
 );
 
-const PLANS = [
-  {
-    name: "Starter",
-    price: 0,
-    unit: "/month",
-    desc: "For founders sending their first campaigns.",
-    cta: "Start free",
-    variant: "lp-btn-outline",
-    features: [
-      "200 emails / month",
-      "1 sending inbox",
-      "AI draft generation",
-      "Open & reply tracking",
-    ],
-  },
-  {
-    name: "Growth",
-    price: 49,
-    unit: "/month",
-    desc: "For SDRs and small teams scaling outreach.",
-    cta: "Start free trial",
-    variant: "lp-btn-primary",
-    popular: true,
-    features: [
-      "10,000 emails / month",
-      "5 sending inboxes",
-      "AI personalization from live signals",
-      "Inbox warm-up & throttling",
-      "Pipeline & campaign analytics",
-    ],
-  },
-  {
-    name: "Scale",
-    price: 149,
-    unit: "/month",
-    desc: "For agencies running outreach at volume.",
-    cta: "Talk to sales",
-    variant: "lp-btn-outline",
-    features: [
-      "Unlimited emails",
-      "Unlimited inboxes",
-      "Dedicated deliverability manager",
-      "Team workspaces & roles",
-      "Priority support",
-    ],
-  },
+const PLAN_META = [
+  { key: "01", variant: "lp-btn-outline",  popular: false },
+  { key: "02", variant: "lp-btn-primary",  popular: true  },
+  { key: "03", variant: "lp-btn-outline",  popular: false },
 ];
 
 export default function Pricing({ onGetStarted }) {
+  const c = useLandingContent();
+
+  const plans = PLAN_META.map(({ key, variant, popular }) => ({
+    key,
+    variant,
+    popular,
+    name:     c[`plan_${key}_name`],
+    price:    Number(c[`plan_${key}_price`]) || 0,
+    desc:     c[`plan_${key}_desc`],
+    cta:      c[`plan_${key}_cta`],
+    features: (c[`plan_${key}_features`] || "").split("\n").filter(Boolean),
+  }));
+
   return (
     <section className="lp-pricing" id="pricing">
       <div className="lp-container">
@@ -72,9 +45,9 @@ export default function Pricing({ onGetStarted }) {
         </div>
 
         <div className="lp-pricing-grid">
-          {PLANS.map((p) => (
+          {plans.map((p) => (
             <article
-              key={p.name}
+              key={p.key}
               className={`lp-price-card${p.popular ? " is-popular" : ""}`}
             >
               {p.popular && (
@@ -88,7 +61,7 @@ export default function Pricing({ onGetStarted }) {
 
               <div className="lp-price-amount">
                 <span className="lp-price-amount-num">${p.price}</span>
-                <span className="lp-price-amount-unit">{p.unit}</span>
+                <span className="lp-price-amount-unit">/month</span>
               </div>
 
               <p className="lp-price-desc">{p.desc}</p>

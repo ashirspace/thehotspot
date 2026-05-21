@@ -1,3 +1,5 @@
+import { useLandingContent } from "../hooks/useLandingContent.js";
+
 const CHART = [38, 52, 44, 67, 58, 79, 71, 88, 94];
 
 const REPLIES = [
@@ -7,28 +9,26 @@ const REPLIES = [
 ];
 
 export default function Hero({ onGetStarted, onSignIn }) {
+  const c = useLandingContent();
   return (
     <header className="lp-hero" id="top">
       <div className="lp-hero-grid" aria-hidden="true" />
       <div className="lp-hero-inner">
         <div className="lp-hero-copy">
-          <span className="lp-eyebrow">Outreach Automation · Built for 2026</span>
+          <span className="lp-eyebrow">{c.hero_eyebrow}</span>
 
           <h1 className="lp-hero-h1">
-            Cold outreach that<br />
+            {c.hero_headline_line1}<br />
             <span className="lp-italic">actually</span>{" "}
-            <span className="lp-highlight">gets replies</span>.
+            <span className="lp-highlight">{c.hero_headline_accent}</span>.
           </h1>
 
-          <p className="lp-lead">
-            Automated email campaigns powered by AI personalization. Send
-            1,000 cold emails a day that read like you wrote each one by hand.
-          </p>
+          <p className="lp-lead">{c.hero_subheadline}</p>
 
           <div className="lp-hero-proof">
-            <span>Trusted by 500+ teams</span>
+            <span>{c.hero_social_proof.split(" · ")[0]}</span>
             <span className="lp-hero-proof-sep" aria-hidden="true" />
-            <span>4.9 &#9733; on Product Hunt</span>
+            <span>{c.hero_social_proof.split(" · ")[1] || ""}</span>
           </div>
 
           <div className="lp-hero-ctas">
@@ -37,20 +37,18 @@ export default function Hero({ onGetStarted, onSignIn }) {
               className="lp-btn lp-btn-primary"
               onClick={onGetStarted}
             >
-              Start free trial
+              {c.hero_cta_primary}
             </button>
             <button
               type="button"
               className="lp-btn lp-btn-ghost"
               onClick={onSignIn}
             >
-              Watch 2-min demo &rarr;
+              {c.hero_cta_secondary}
             </button>
           </div>
 
-          <p className="lp-hero-fineprint">
-            No credit card · 14-day trial · Setup in 3 min
-          </p>
+          <p className="lp-hero-fineprint">{c.hero_disclaimer}</p>
         </div>
 
         <div className="lp-mock">
