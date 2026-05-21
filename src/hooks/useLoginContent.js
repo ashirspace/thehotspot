@@ -16,7 +16,7 @@ export function useLoginContent() {
   useEffect(() => {
     if (__cache) { setContent(__cache); return; }
     if (!__promise) {
-      __promise = fetch("/api/content?key=login")
+      __promise = fetch("/api/db?entity=content&key=login")
         .then(r => (r.ok ? r.json() : null))
         .then(j => {
           __cache = { ...LOGIN_DEFAULTS, ...(j && j.data ? j.data : {}) };

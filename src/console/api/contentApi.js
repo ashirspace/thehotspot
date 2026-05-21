@@ -1,9 +1,10 @@
-// Client for the /api/content endpoint (editable site copy).
+// Client for editable site copy. Content routes live on /api/db
+// (entity:"content") to stay under Vercel's Hobby-plan function limit.
 
 // Returns { key, data, updated_at, updated_by } or null on failure.
 export async function fetchLoginContent() {
   try {
-    const res = await fetch("/api/content?key=login");
+    const res = await fetch("/api/db?entity=content&key=login");
     if (!res.ok) return null;
     return await res.json();
   } catch (e) {
@@ -14,10 +15,10 @@ export async function fetchLoginContent() {
 
 // Upserts the login content row. Throws on failure.
 export async function saveLoginContent(data, updatedBy) {
-  const res = await fetch("/api/content", {
+  const res = await fetch("/api/db", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "set", key: "login", data, updatedBy }),
+    body: JSON.stringify({ entity: "content", action: "set", key: "login", data, updatedBy }),
   });
   let json = {};
   try { json = await res.json(); } catch { /* ignore */ }
