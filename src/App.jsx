@@ -392,12 +392,36 @@ function LoginPage({ onLogin }) {
 
   const overlay = { position: "fixed", inset: 0, background: "rgba(15,23,42,0.45)", zIndex: 100, backdropFilter: "blur(8px)", animation: "fadeIn .2s ease" };
 
-  // Login — centered wide rectangle, split layout
-  const LoginModal = () => (
+  const Req = () => <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>;
+  const signupReady = fullName && email && phone && company && username && password;
+
+  const loginPanelRight = (
+    <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
+      <div style={{ fontSize: 19, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.35, marginBottom: 28 }}>Cold outreach<br />that gets replies.</div>
+      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+        {MODAL_FEATURES.map((f, i) => (
+          <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+            <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(16,185,129,0.13)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0 }}>{f.icon}</div>
+            <span style={{ fontSize: 13, color: "#334155", lineHeight: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", paddingTop: 6 }}>{f.text}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop: 28, padding: "14px 16px", background: "rgba(255,255,255,0.75)", borderRadius: 10, border: "1px solid rgba(16,185,129,0.15)" }}>
+        <div style={{ fontSize: 12, color: "#475569", fontStyle: "italic", lineHeight: 1.55, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>"First campaign was live in under five minutes. The replies proved it wasn't templated."</div>
+        <div style={{ fontSize: 11, color: "#10b981", fontWeight: 600, marginTop: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>— Verified user</div>
+      </div>
+    </div>
+  );
+
+  return (
     <>
-      <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
-      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
-        <div style={{ width: "min(860px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", display: "grid", gridTemplateColumns: "1fr 340px" }}>
+      {/* ── Login / Forgot password modal ── */}
+      {showLogin && (authMode === "login" || authMode === "forgot") && (
+        <>
+          <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
+            <div style={{ width: "min(860px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", display: "grid", gridTemplateColumns: "1fr 340px" }}>
           {/* Left: form */}
           <div style={{ padding: "44px 48px 48px", display: "flex", flexDirection: "column" }}>
             <button onClick={() => { setShowLogin(false); goBack(); }} style={{ alignSelf: "flex-end", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, marginBottom: 16, lineHeight: 1 }}>
@@ -505,37 +529,18 @@ function LoginPage({ onLogin }) {
               </div>
             )}
           </div>
-          {/* Right: feature panel */}
-          <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
-            <div style={{ fontSize: 19, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.35, marginBottom: 28 }}>Cold outreach<br />that gets replies.</div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-              {MODAL_FEATURES.map((f, i) => (
-                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
-                  <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(16,185,129,0.13)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0 }}>{f.icon}</div>
-                  <span style={{ fontSize: 13, color: "#334155", lineHeight: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", paddingTop: 6 }}>{f.text}</span>
-                </div>
-              ))}
-            </div>
-            <div style={{ marginTop: 28, padding: "14px 16px", background: "rgba(255,255,255,0.75)", borderRadius: 10, border: "1px solid rgba(16,185,129,0.15)" }}>
-              <div style={{ fontSize: 12, color: "#475569", fontStyle: "italic", lineHeight: 1.55, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>"First campaign was live in under five minutes. The replies proved it wasn't templated."</div>
-              <div style={{ fontSize: 11, color: "#10b981", fontWeight: 600, marginTop: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>— Verified user</div>
+          {loginPanelRight}
             </div>
           </div>
-        </div>
-      </div>
-    </>
-  );
+        </>
+      )}
 
-  const Req = () => <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>;
-  const signupReady = fullName && email && phone && company && username && password;
-
-  // Signup — centered popup with full profile fields
-  const SignupModal = () => (
-    <>
-      <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
-      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
-        <div style={{ width: "min(600px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", padding: "40px 44px 48px" }}>
+      {/* ── Signup modal ── */}
+      {showLogin && authMode === "signup" && (
+        <>
+          <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
+          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
+            <div style={{ width: "min(600px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", padding: "40px 44px 48px" }}>
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
             <div>
               <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 8 }}>thehotspot</div>
@@ -617,15 +622,11 @@ function LoginPage({ onLogin }) {
               Sign in
             </button>
           </div>
-        </div>
-      </div>
-    </>
-  );
+            </div>
+          </div>
+        </>
+      )}
 
-  return (
-    <>
-      {showLogin && (authMode === "login" || authMode === "forgot") && <LoginModal />}
-      {showLogin && authMode === "signup" && <SignupModal />}
       <Home
         onSignIn={() => { setAuthMode("login"); setShowLogin(true); }}
         onGetStarted={() => { setAuthMode("signup"); setShowLogin(true); }}
