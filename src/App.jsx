@@ -314,6 +314,7 @@ function LoginPage({ onLogin }) {
             name:        existingUser?.name || gName,
             company:     existingUser?.company || "",
             role_title:  existingUser?.role_title || "",
+            role:        existingUser?.role || "user",
             website:     existingUser?.website || "",
             phone:       existingUser?.phone || "",
             profileComplete: existingUser?.profileComplete || false,
