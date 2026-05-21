@@ -129,7 +129,7 @@ function useCms() {
   useEffect(() => {
     if (__cmsCache) { setCms(__cmsCache); return; }
     if (!__cmsPromise) {
-      __cmsPromise = fetch("/api/admin").then(r => r.json()).then(d => { __cmsCache = d.content || {}; return __cmsCache; }).catch(() => { __cmsCache = {}; return {}; });
+      __cmsPromise = fetch("/api/db?entity=content&key=site").then(r => r.json()).then(d => { __cmsCache = d.data || {}; return __cmsCache; }).catch(() => { __cmsCache = {}; return {}; });
     }
     __cmsPromise.then(c => setCms(c));
   }, []);

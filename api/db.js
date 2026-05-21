@@ -196,6 +196,47 @@ export default async function handler(req, res) {
       return res.status(200).json({ token: rows[0]?.gmail_refresh_token || null });
     }
 
+    // ── Admin console: users, roles, stats, audit ──────────────────────────
+    if (action === "listUsers") {
+      const q = (body.search || "").trim();
+      const rows = q
+        ? await sql`SELECT id, username, email, full_name, role, created_at FROM users WHERE username ILIKE ${"%" + q + "%"} OR email ILIKE ${"%" + q + "%"} ORDER BY created_at DESC LIMIT 200`
+        : await sql`SELECT id, username, email, full_name, role, created_at FROM users ORDER BY created_at DESC LIMIT 200`;
+      return res.status(200).json({ users: rows });
+    }
+
+    if (action === "setRole") {
+      const { id, role } = body;
+      if (!["user", "manager", "admin"].includes(role)) return res.status(400).json({ error: "Invalid role" });
+      const rows = await sql`UPDATE users SET role = ${role} WHERE id = ${id} RETURNING id, username, role`;
+      if (!rows.length) return res.status(200).json({ ok: false, error: "User not found" });
+      return res.status(200).json({ ok: true, user: rows[0] });
+    }
+
+    if (action === "consoleStats") {
+      const u = await sql`SELECT COUNT(*)::int AS n FROM users`;
+      const staff = await sql`SELECT COUNT(*)::int AS n FROM users WHERE role IN ('admin','manager')`;
+      const camp = await sql`SELECT COUNT(*)::int AS n FROM campaigns`;
+      const sent = await sql`SELECT COALESCE(SUM(sent_count),0)::int AS n FROM campaigns`;
+      const contacts = await sql`SELECT COUNT(*)::int AS n FROM contacts`;
+      const recent = await sql`SELECT id, username, email, role, created_at FROM users ORDER BY created_at DESC LIMIT 6`;
+      return res.status(200).json({
+        users: u[0].n, staff: staff[0].n, campaigns: camp[0].n,
+        emailsSent: sent[0].n, contacts: contacts[0].n, recent,
+      });
+    }
+
+    if (action === "logAudit") {
+      const { actor, auditAction, target, detail } = body;
+      await sql`INSERT INTO audit (actor, action, target, detail) VALUES (${actor || "unknown"}, ${auditAction || ""}, ${target || ""}, ${detail || ""})`;
+      return res.status(200).json({ ok: true });
+    }
+
+    if (action === "listAudit") {
+      const rows = await sql`SELECT id, actor, action, target, detail, created_at FROM audit ORDER BY created_at DESC LIMIT 80`;
+      return res.status(200).json({ entries: rows });
+    }
+
     // One-time first-admin bootstrap: promotes a user to admin ONLY while no
     // admin exists yet. Refuses once any admin exists, so it cannot be abused.
     if (action === "bootstrapAdmin") {
