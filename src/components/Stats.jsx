@@ -1,24 +1,59 @@
+import { useEffect, useRef, useState } from "react";
 import { useLandingContent } from "../hooks/useLandingContent.js";
 
 const STATS = [
-  { num: "10+",   key: "stat_01" },
-  { num: "98%",   key: "stat_02" },
-  { num: "5+",    key: "stat_03" },
-  { num: "3 min", key: "stat_04" },
+  { value: 10,  suffix: "+",    key: "stat_01" },
+  { value: 98,  suffix: "%",    key: "stat_02" },
+  { value: 5,   suffix: "+",    key: "stat_03" },
+  { value: 3,   suffix: " min", key: "stat_04" },
 ];
+
+function StatItem({ stat, label, run }) {
+  const [val, setVal] = useState(0);
+
+  useEffect(() => {
+    if (!run) return;
+    let raf;
+    const start = performance.now();
+    const tick = (now) => {
+      const p = Math.min((now - start) / 1600, 1);
+      setVal(Math.round(stat.value * (1 - Math.pow(1 - p, 3))));
+      if (p < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [run, stat.value]);
+
+  return (
+    <div>
+      <div className="lp-stat-num">{val}{stat.suffix}</div>
+      <div className="lp-stat-label">{label}</div>
+    </div>
+  );
+}
 
 export default function Stats() {
   const c = useLandingContent();
+  const ref = useRef(null);
+  const [run, setRun] = useState(false);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setRun(true); io.disconnect(); } },
+      { threshold: 0.4 }
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
 
   return (
-    <section className="lp-stats">
+    <section className="lp-stats" ref={ref}>
       <div className="lp-container">
         <div className="lp-stats-grid">
           {STATS.map((s) => (
-            <div key={s.key}>
-              <div className="lp-stat-num">{s.num}</div>
-              <div className="lp-stat-label">{c[`${s.key}_label`]}</div>
-            </div>
+            <StatItem key={s.key} stat={s} label={c[`${s.key}_label`]} run={run} />
           ))}
         </div>
       </div>
