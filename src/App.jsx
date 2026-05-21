@@ -182,10 +182,14 @@ function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [fullName, setFullName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [middleName, setMiddleName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
   const [jobRole, setJobRole] = useState("");
+  const [signupStep, setSignupStep] = useState(0);
+  const [slideDir, setSlideDir] = useState("right");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -224,7 +228,8 @@ function LoginPage({ onLogin }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
-    if (!fullName || !email || !phone || !company || !username || !password) { setError("Please fill in all required fields"); return; }
+    const fullName = [firstName, middleName, lastName].filter(Boolean).join(" ");
+    if (!firstName || !lastName || !email || !phone || !company || !username || !password) { setError("Please fill in all required fields"); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
 
@@ -338,7 +343,7 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
-  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFullName(""); setPhone(""); setCompany(""); setJobRole(""); setForgotEmail(""); setForgotSent(false); setError(""); setShowPass(false); };
+  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFirstName(""); setMiddleName(""); setLastName(""); setPhone(""); setCompany(""); setJobRole(""); setSignupStep(0); setSlideDir("right"); setForgotEmail(""); setForgotSent(false); setError(""); setShowPass(false); };
   const goBack = () => { setAuthMode("landing"); resetForm(); };
 
   const handleForgotPassword = async (e) => {
@@ -391,9 +396,6 @@ function LoginPage({ onLogin }) {
   ];
 
   const overlay = { position: "fixed", inset: 0, background: "rgba(15,23,42,0.45)", zIndex: 100, backdropFilter: "blur(8px)", animation: "fadeIn .2s ease" };
-
-  const Req = () => <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>;
-  const signupReady = fullName && email && phone && company && username && password;
 
   const loginPanelRight = (
     <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
@@ -535,97 +537,196 @@ function LoginPage({ onLogin }) {
         </>
       )}
 
-      {/* ── Signup modal ── */}
-      {showLogin && authMode === "signup" && (
-        <>
-          <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
-          <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
-            <div style={{ width: "min(600px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", padding: "40px 44px 48px" }}>
-          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 8 }}>thehotspot</div>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 4 }}>{t("signup_title", "Create your account")}</div>
-              <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No credit card. Up and running in 3 minutes.</div>
-            </div>
-            <button onClick={() => { setShowLogin(false); goBack(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1, flexShrink: 0 }}>
-              <LuX size={18} />
-            </button>
-          </div>
+      {/* ── Signup — full-page slide wizard ── */}
+      {showLogin && authMode === "signup" && (() => {
+        const STEPS = [
+          { q: "What's your name?",            hint: "First and last are required — middle name is optional." },
+          { q: "What's your email address?",    hint: "You'll use this to sign in and receive updates." },
+          { q: "What's your phone number?",     hint: "For account security and important notices." },
+          { q: "What company are you with?",    hint: "Helps us personalise your outreach experience." },
+          { q: "Choose a username",             hint: "This is how you'll sign in every time." },
+          { q: "Create a password",             hint: "Minimum 6 characters. Keep it secure." },
+          { q: "What's your job role?",         hint: "Optional — press Next to skip." },
+        ];
+        const stepValid = [
+          !!(firstName.trim() && lastName.trim()),
+          /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
+          phone.trim().length >= 6,
+          !!company.trim(),
+          username.trim().length >= 3,
+          password.length >= 6,
+          true,
+        ];
+        const isLast = signupStep === STEPS.length - 1;
+        const canNext = stepValid[signupStep];
 
-          <GBtn />
-          <OR />
+        const advance = () => {
+          if (!canNext && !isLast) { setError("Please fill in the required field(s)"); return; }
+          setError("");
+          if (isLast) { handleSignup({ preventDefault: () => {} }); return; }
+          setSlideDir("right");
+          setSignupStep(s => s + 1);
+        };
+        const retreat = () => { setError(""); setSlideDir("left"); setSignupStep(s => s - 1); };
 
-          <form onSubmit={handleSignup}>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 16px" }}>
-              <div>
-                <label style={lightLbl}>Full Name<Req /></label>
-                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+        const inp = { ...lightInp, fontSize: 16, padding: "14px 16px", borderRadius: 12, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc" };
+        const handleKey = (e) => { if (e.key === "Enter") { e.preventDefault(); advance(); } };
+
+        return (
+          <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", gridTemplateColumns: "1fr 380px", animation: "fadeIn .25s ease" }}>
+            {/* Left — question panel */}
+            <div style={{ background: "#fff", display: "flex", flexDirection: "column", padding: "32px 48px 40px", overflow: "hidden" }}>
+              {/* Top bar */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>thehotspot</div>
+                <button onClick={() => { setShowLogin(false); goBack(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1 }}>
+                  <LuX size={18} />
+                </button>
               </div>
-              <div>
-                <label style={lightLbl}>Email<Req /></label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-              </div>
-              <div>
-                <label style={lightLbl}>Phone Number<Req /></label>
-                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-              </div>
-              <div>
-                <label style={lightLbl}>Company<Req /></label>
-                <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company name" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-              </div>
-              <div>
-                <label style={lightLbl}>Create Username<Req /></label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Choose a username" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-              </div>
-              <div>
-                <label style={lightLbl}>Create Password<Req /></label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 characters"
-                    style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+
+              {/* Slide content — key forces remount & animation replay on step change */}
+              <div key={signupStep} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", animation: `${slideDir === "right" ? "slideInFromRight" : "slideInFromLeft"} .32s cubic-bezier(.4,0,.2,1)`, maxWidth: 480, paddingTop: 20 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 12, letterSpacing: 0.5 }}>
+                  Step {signupStep + 1} of {STEPS.length}
+                </div>
+                <div style={{ fontSize: 32, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.2, marginBottom: 8 }}>
+                  {STEPS[signupStep].q}
+                </div>
+                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 36, lineHeight: 1.5 }}>
+                  {STEPS[signupStep].hint}
+                </div>
+
+                {/* Step 0: Name */}
+                {signupStep === 0 && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+                    <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                      <div>
+                        <label style={{ ...lightLbl, marginBottom: 8 }}>First Name <span style={{ color: "#ef4444" }}>*</span></label>
+                        <input autoFocus type="text" value={firstName} onChange={e => setFirstName(e.target.value)} onKeyDown={handleKey} placeholder="First name" style={inp}
+                          onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                      </div>
+                      <div>
+                        <label style={{ ...lightLbl, marginBottom: 8 }}>Surname <span style={{ color: "#ef4444" }}>*</span></label>
+                        <input type="text" value={lastName} onChange={e => setLastName(e.target.value)} onKeyDown={handleKey} placeholder="Last name" style={inp}
+                          onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                      </div>
+                    </div>
+                    <div>
+                      <label style={{ ...lightLbl, marginBottom: 8 }}>Middle Name <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span></label>
+                      <input type="text" value={middleName} onChange={e => setMiddleName(e.target.value)} onKeyDown={handleKey} placeholder="Middle name" style={inp}
+                        onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                    </div>
+                  </div>
+                )}
+
+                {/* Step 1: Email */}
+                {signupStep === 1 && (
+                  <input autoFocus type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKey} placeholder="you@company.com" style={inp}
                     onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
-                    {showPass ? <I.EyeOff /> : <I.Eye />}
+                )}
+
+                {/* Step 2: Phone */}
+                {signupStep === 2 && (
+                  <input autoFocus type="tel" value={phone} onChange={e => setPhone(e.target.value)} onKeyDown={handleKey} placeholder="+1 555 000 0000" style={inp}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                )}
+
+                {/* Step 3: Company */}
+                {signupStep === 3 && (
+                  <input autoFocus type="text" value={company} onChange={e => setCompany(e.target.value)} onKeyDown={handleKey} placeholder="Your company name" style={inp}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                )}
+
+                {/* Step 4: Username */}
+                {signupStep === 4 && (
+                  <input autoFocus type="text" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={handleKey} placeholder="Pick a username" style={inp}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                )}
+
+                {/* Step 5: Password */}
+                {signupStep === 5 && (
+                  <div style={{ position: "relative" }}>
+                    <input autoFocus type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKey} placeholder="Minimum 6 characters"
+                      style={{ ...inp, padding: "14px 48px 14px 16px" }}
+                      onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                    <button type="button" onClick={() => setShowPass(v => !v)} style={{ position: "absolute", right: 14, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
+                      {showPass ? <I.EyeOff /> : <I.Eye />}
+                    </button>
+                  </div>
+                )}
+
+                {/* Step 6: Job Role */}
+                {signupStep === 6 && (
+                  <input autoFocus type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} onKeyDown={handleKey} placeholder="e.g. Founder, SDR, Marketing Manager" style={inp}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                )}
+
+                {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "11px 14px", borderRadius: 10, fontSize: 13, marginTop: 16, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{error}</div>}
+
+                {/* Nav buttons */}
+                <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
+                  {signupStep > 0 && (
+                    <button onClick={retreat} style={{ padding: "13px 24px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.1)", background: "#fff", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "border-color .15s" }}
+                      onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"} onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(0,0,0,0.1)"}>
+                      Back
+                    </button>
+                  )}
+                  <button onClick={advance} disabled={loading} style={{
+                    flex: 1, padding: "13px 24px", borderRadius: 10, border: "none",
+                    background: (canNext || isLast) ? "#10b981" : "#e2e8f0",
+                    color: (canNext || isLast) ? "#fff" : "#94a3b8",
+                    fontSize: 14, fontWeight: 600, cursor: "pointer",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
+                  }}>
+                    {loading
+                      ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
+                      : isLast ? "Create Account" : "Next →"
+                    }
+                  </button>
+                </div>
+
+                <div style={{ marginTop: 24, fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  Already have an account?{" "}
+                  <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                    Sign in
                   </button>
                 </div>
               </div>
             </div>
 
-            <div style={{ marginTop: 14 }}>
-              <label style={lightLbl}>Job Role <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span></label>
-              <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} placeholder="e.g. Founder, SDR, Marketing Manager" style={lightInp}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+            {/* Right — branding + progress */}
+            <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "40px 36px 48px", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
+              <div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 32 }}>thehotspot</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3, marginBottom: 12 }}>Set up your account.</div>
+                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.6 }}>Takes about 2 minutes. No credit card needed.</div>
+              </div>
+
+              {/* Progress dots */}
+              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                {STEPS.map((s, i) => (
+                  <div key={i} style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                    <div style={{ width: 28, height: 28, borderRadius: "50%", background: i < signupStep ? "#10b981" : i === signupStep ? "#0f172a" : "rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background .3s" }}>
+                      {i < signupStep
+                        ? <LuCheck size={13} color="#fff" />
+                        : <span style={{ fontSize: 11, fontWeight: 700, color: i === signupStep ? "#fff" : "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{i + 1}</span>
+                      }
+                    </div>
+                    <span style={{ fontSize: 13, color: i === signupStep ? "#0f172a" : i < signupStep ? "#10b981" : "#94a3b8", fontWeight: i === signupStep ? 600 : 400, fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "color .3s" }}>
+                      {s.q.replace(/\?$/, "")}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                Trusted by 500+ teams
+              </div>
             </div>
-
-            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginTop: 14 }}>{error}</div>}
-
-            <button type="submit" disabled={loading || !signupReady} style={{
-              width: "100%", padding: "13px", borderRadius: 10, border: "none",
-              background: signupReady ? "#10b981" : "#e2e8f0",
-              color: signupReady ? "#fff" : "#94a3b8",
-              fontSize: 14, fontWeight: 600, cursor: signupReady ? "pointer" : "default",
-              fontFamily: "'Plus Jakarta Sans', sans-serif",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              marginTop: 20, transition: "background .15s",
-            }}>
-              {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signup_btn", "Create Account")}
-            </button>
-          </form>
-
-          <div style={{ marginTop: 18, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-            Already have an account?{" "}
-            <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
-              Sign in
-            </button>
           </div>
-            </div>
-          </div>
-        </>
-      )}
+        );
+      })()}
 
       <Home
         onSignIn={() => { setAuthMode("login"); setShowLogin(true); }}
@@ -4972,6 +5073,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         @keyframes slideUp { from{transform:translateX(-50%) translateY(100%);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
         @keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
         @keyframes slideFromRight { from{opacity:0;transform:translateY(-50%) translateX(60px)} to{opacity:1;transform:translateY(-50%) translateX(0)} }
+        @keyframes slideInFromRight { from{opacity:0;transform:translateX(48px)} to{opacity:1;transform:translateX(0)} }
+        @keyframes slideInFromLeft  { from{opacity:0;transform:translateX(-48px)} to{opacity:1;transform:translateX(0)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
         @keyframes splashFloat { from{transform:translateY(0px) scale(1);opacity:0.8} to{transform:translateY(-8px) scale(1.06);opacity:1} }
