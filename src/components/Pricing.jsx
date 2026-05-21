@@ -13,17 +13,16 @@ const CheckIcon = () => (
 );
 
 const PLAN_META = [
-  { key: "01", variant: "lp-btn-outline",  popular: false },
-  { key: "02", variant: "lp-btn-primary",  popular: true  },
-  { key: "03", variant: "lp-btn-outline",  popular: false },
+  { key: "01", popular: false },
+  { key: "02", popular: true  },
+  { key: "03", popular: false },
 ];
 
 export default function Pricing({ onGetStarted }) {
   const c = useLandingContent();
 
-  const plans = PLAN_META.map(({ key, variant, popular }) => ({
+  const plans = PLAN_META.map(({ key, popular }) => ({
     key,
-    variant,
     popular,
     name:     c[`plan_${key}_name`],
     price:    Number(c[`plan_${key}_price`]) || 0,
@@ -79,7 +78,7 @@ export default function Pricing({ onGetStarted }) {
 
               <button
                 type="button"
-                className={`lp-btn ${p.variant} lp-btn-block`}
+                className="lp-btn lp-btn-primary lp-btn-block"
                 onClick={onGetStarted}
               >
                 {p.cta}
