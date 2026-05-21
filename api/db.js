@@ -16,6 +16,38 @@ export default async function handler(req, res) {
 
   const { entity, action, ...body } = req.body || {};
 
+  // ── Content routes (editable site copy) ────────────────────────────────────
+  // Folded into /api/db to stay under the Hobby-plan 12-function limit.
+  if (entity === "content" || (req.method === "GET" && req.query?.entity === "content")) {
+    try {
+      if (req.method === "GET") {
+        const key = req.query?.key || "login";
+        const rows = await sql`SELECT key, data, updated_at, updated_by FROM content WHERE key = ${key} LIMIT 1`;
+        if (!rows.length) return res.status(200).json({ key, data: {}, updated_at: null, updated_by: null });
+        return res.status(200).json(rows[0]);
+      }
+      if (action === "set") {
+        // TODO: server-side role validation in v2 — this write is currently unauthenticated.
+        const { key, data, updatedBy } = body;
+        if (!key || typeof data !== "object" || data === null) {
+          return res.status(400).json({ error: "Missing or invalid key/data" });
+        }
+        const rows = await sql`
+          INSERT INTO content (key, data, updated_at, updated_by)
+          VALUES (${key}, ${JSON.stringify(data)}::jsonb, NOW(), ${updatedBy || null})
+          ON CONFLICT (key) DO UPDATE
+            SET data = EXCLUDED.data, updated_at = NOW(), updated_by = EXCLUDED.updated_by
+          RETURNING key, data, updated_at, updated_by
+        `;
+        return res.status(200).json({ ok: true, ...rows[0] });
+      }
+      return res.status(400).json({ error: "Unknown content action: " + action });
+    } catch (err) {
+      console.error("db content error:", err.message);
+      return res.status(500).json({ error: err.message });
+    }
+  }
+
   // ── Contact routes ─────────────────────────────────────────────────────────
   if (req.method === "GET" || entity === "contact") {
     try {
