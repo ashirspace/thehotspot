@@ -11,8 +11,8 @@ const STEPS = [
   },
   {
     num: "03",
-    title: "Send and watch replies come in",
-    desc: "Campaigns go out on a safe schedule. Replies land in one place so you spend time on warm leads, not your inbox.",
+    title: "Send, track, and reply",
+    desc: "Hit send and your campaign runs automatically. Every reply lands in your thehotspot inbox — no inbox chaos, no leads slipping through.",
   },
 ];
 
