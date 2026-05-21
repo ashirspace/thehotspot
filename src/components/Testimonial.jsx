@@ -9,16 +9,6 @@ export default function Testimonial() {
         <blockquote className="lp-quote">
           &ldquo;{c.testimonial_quote}&rdquo;
         </blockquote>
-        <div className="lp-quote-attr">
-          <span className="lp-quote-avatar">
-            {(c.testimonial_name || "P")[0]}{(c.testimonial_name || "PV").split(" ")[1]?.[0] || ""}
-          </span>
-          <span className="lp-quote-name">{c.testimonial_name}</span>
-          <span className="lp-quote-sep">·</span>
-          <span>{c.testimonial_role}</span>
-          <span className="lp-quote-sep">·</span>
-          <span>{c.testimonial_company}</span>
-        </div>
       </div>
     </section>
   );

@@ -23,7 +23,7 @@ export default function Home({ onSignIn, onGetStarted }) {
         <HowItWorks />
         <Stats />
         <Testimonial />
-        <Pricing />
+        <Pricing onGetStarted={onGetStarted} />
         <FAQ />
         <CTA onGetStarted={onGetStarted} />
         <Footer onGetStarted={onGetStarted} />

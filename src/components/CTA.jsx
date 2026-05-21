@@ -3,7 +3,7 @@ export default function CTA({ onGetStarted }) {
     <section className="lp-cta">
       <div className="lp-container">
         <div className="lp-cta-inner">
-          <span className="lp-eyebrow">Get started</span>
+          <span className="lp-eyebrow lp-cta-eyebrow">Get started</span>
           <h2 className="lp-cta-h2">Stop sending emails into the void.</h2>
           <p className="lp-cta-sub">
             Launch your first campaign today and watch the replies come in
@@ -11,12 +11,12 @@ export default function CTA({ onGetStarted }) {
           </p>
           <button
             type="button"
-            className="lp-btn lp-btn-primary"
+            className="lp-btn lp-btn-primary lp-cta-btn"
             onClick={onGetStarted}
           >
             Start free trial
           </button>
-          <p className="lp-hero-fineprint">
+          <p className="lp-hero-fineprint lp-cta-fineprint">
             No credit card · Cancel anytime · 14-day trial
           </p>
         </div>
