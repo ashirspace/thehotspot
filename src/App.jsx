@@ -335,160 +335,187 @@ function LoginPage({ onLogin }) {
   const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setError(""); setShowPass(false); };
   const goBack = () => { setAuthMode("landing"); resetForm(); };
 
+  const lightInp = { width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc", color: "#0f172a", fontSize: 14, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" };
+  const lightLbl = { fontSize: 12, color: "#64748b", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: 0.3 };
+
   const GBtn = () => (
     <button onClick={handleGoogleLogin} disabled={googleLoading} style={{
-      width: "100%", padding: "11px", borderRadius: 10, border: "1px solid #ffffff12",
-      background: "#1a1a24", color: "#E2E8F0", fontSize: 14, fontWeight: 500,
+      width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.1)",
+      background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 500,
       cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-      gap: 10, fontFamily: "'DM Sans',sans-serif", transition: "all .2s", marginBottom: 18, opacity: googleLoading ? 0.6 : 1,
+      gap: 10, fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "background .15s", opacity: googleLoading ? 0.6 : 1,
     }}
-      onMouseEnter={e => { if (!googleLoading) { e.currentTarget.style.borderColor = "#4285F450"; e.currentTarget.style.background = "#1f2030"; } }}
-      onMouseLeave={e => { e.currentTarget.style.borderColor = "#ffffff12"; e.currentTarget.style.background = "#1a1a24"; }}
+      onMouseEnter={e => { if (!googleLoading) e.currentTarget.style.background = "#f1f5f9"; }}
+      onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
     >
       {googleLoading
-        ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#64748B", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
+        ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#94a3b8", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</>
         : <><svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>{t("google_btn", "Continue with Google")}</>
       }
     </button>
   );
 
   const OR = () => (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
-      <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
-      <span style={{ fontSize: 11, color: "#475569", fontWeight: 500, textTransform: "uppercase", letterSpacing: 1 }}>{t("divider_text", "or")}</span>
-      <div style={{ flex: 1, height: 1, background: "#ffffff0d" }} />
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "16px 0" }}>
+      <div style={{ flex: 1, height: 1, background: "rgba(0,0,0,0.08)" }} />
+      <span style={{ fontSize: 11, color: "#94a3b8", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1.2 }}>or</span>
+      <div style={{ flex: 1, height: 1, background: "rgba(0,0,0,0.08)" }} />
     </div>
   );
 
-  const inpStyle = { width: "100%", padding: "10px 12px", borderRadius: 8, border: "1px solid #ffffff10", background: "#0d0d12", color: "#E2E8F0", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
-  const lblStyle = { fontSize: 11, color: "#64748B", fontWeight: 600, display: "block", marginBottom: 5, textTransform: "uppercase", letterSpacing: 0.6 };
+  const MODAL_FEATURES = [
+    { icon: <LuUsers size={15} />, text: "Import leads from any CSV in seconds" },
+    { icon: <LuSparkles size={15} />, text: "AI writes a personalised email per contact" },
+    { icon: <LuInbox size={15} />, text: "All replies land in one unified inbox" },
+    { icon: <LuTrendingUp size={15} />, text: "Live campaign analytics from day one" },
+  ];
 
+  const overlay = { position: "fixed", inset: 0, background: "rgba(15,23,42,0.45)", zIndex: 100, backdropFilter: "blur(8px)", animation: "fadeIn .2s ease" };
+
+  // Login — centered wide rectangle, split layout
   const LoginModal = () => (
     <>
-      <div onClick={() => { setShowLogin(false); goBack(); }} style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.7)", zIndex: 100, backdropFilter: "blur(6px)", animation: "fadeIn .2s ease" }} />
-      <div style={{ position: "fixed", bottom: 0, left: "50%", transform: "translateX(-50%)", width: "100%", maxWidth: 460, background: "#111116", border: "1px solid #ffffff10", borderBottom: "none", borderRadius: "20px 20px 0 0", zIndex: 101, padding: "24px 28px 36px", boxShadow: "0 -16px 60px rgba(0,0,0,0.5)", animation: "slideUp .3s cubic-bezier(.4,0,.2,1)" }}>
-        <div style={{ width: 36, height: 3, borderRadius: 2, background: "#ffffff18", margin: "0 auto 22px" }} />
-
-        {/* ── LANDING: choose Sign In or Get Started ── */}
-        {authMode === "landing" && (
-          <>
-            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>{t("landing_title", "Welcome to thehotspot")}</div>
-            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>{t("landing_subtitle", "Your AI-powered outreach dashboard")}</div>
+      <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
+        <div style={{ width: "min(860px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", display: "grid", gridTemplateColumns: "1fr 340px" }}>
+          {/* Left: form */}
+          <div style={{ padding: "44px 48px 48px", display: "flex", flexDirection: "column" }}>
+            <button onClick={() => { setShowLogin(false); goBack(); }} style={{ alignSelf: "flex-end", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, marginBottom: 16, lineHeight: 1 }}>
+              <LuX size={18} />
+            </button>
+            <div style={{ marginBottom: 26 }}>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("login_title", "Welcome back")}</div>
+              <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
+            </div>
             <GBtn />
             <OR />
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-              <button onClick={() => { setAuthMode("login"); setError(""); }} style={{
-                padding: "13px", borderRadius: 10, border: "1px solid #ffffff14", background: "#0d0d12",
-                color: "#E2E8F0", fontSize: 14, fontWeight: 600, cursor: "pointer",
-                fontFamily: "'DM Sans',sans-serif", transition: "all .18s",
-              }}
-                onMouseEnter={e => { e.currentTarget.style.background = "#14141c"; e.currentTarget.style.borderColor = "#10b98130"; }}
-                onMouseLeave={e => { e.currentTarget.style.background = "#0d0d12"; e.currentTarget.style.borderColor = "#ffffff14"; }}
-              >{t("landing_signin_btn", "Sign In")}</button>
-              <button onClick={() => { setAuthMode("signup"); setError(""); }} style={{
-                padding: "13px", borderRadius: 10, border: "none",
-                background: "linear-gradient(135deg,#10b981,#0ea5e9)", color: "#fff",
-                fontSize: 14, fontWeight: 600, cursor: "pointer",
-                fontFamily: "'DM Sans',sans-serif", boxShadow: "0 4px 14px #10b98135",
-              }}>{t("landing_getstarted_btn", "Get Started")}</button>
-            </div>
-          </>
-        )}
-
-        {/* ── SIGN IN form ── */}
-        {authMode === "login" && (
-          <>
-            <button onClick={goBack} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 16, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>← Back</button>
-            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>{t("login_title", "Welcome back")}</div>
-            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
-            <GBtn /><OR />
             <form onSubmit={handleLogin}>
-              <div style={{ marginBottom: 12 }}>
-                <label style={lblStyle}>{t("username_label", "Username")}</label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("username_ph_login", "Enter username")} style={inpStyle}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
+              <div style={{ marginBottom: 14 }}>
+                <label style={lightLbl}>{t("username_label", "Username")}</label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" style={lightInp}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
               </div>
-              <div style={{ marginBottom: 18 }}>
-                <label style={lblStyle}>{t("password_label", "Password")}</label>
+              <div style={{ marginBottom: 20 }}>
+                <label style={lightLbl}>{t("password_label", "Password")}</label>
                 <div style={{ position: "relative" }}>
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("password_ph_login", "Enter password")}
-                    style={{ ...inpStyle, padding: "10px 40px 10px 12px" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
+                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password"
+                    style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
                     {showPass ? <I.EyeOff /> : <I.Eye />}
                   </button>
                 </div>
               </div>
-              {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, marginBottom: 14, textAlign: "center" }}>{error}</div>}
+              {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14 }}>{error}</div>}
               <button type="submit" disabled={loading || !username || !password} style={{
-                width: "100%", padding: "12px", borderRadius: 10, border: "none",
-                background: (username && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
-                color: (username && password) ? "#fff" : "#475569",
+                width: "100%", padding: "13px", borderRadius: 10, border: "none",
+                background: (username && password) ? "#10b981" : "#e2e8f0",
+                color: (username && password) ? "#fff" : "#94a3b8",
                 fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-                fontFamily: "'DM Sans',sans-serif", boxShadow: (username && password) ? "0 0 24px #10b98130" : "none",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+                fontFamily: "'Plus Jakarta Sans', sans-serif",
+                display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
               }}>
                 {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signin_btn", "Sign In")}
               </button>
             </form>
-          </>
-        )}
-
-        {/* ── GET STARTED / SIGN UP form ── */}
-        {authMode === "signup" && (
-          <>
-            <button onClick={goBack} style={{ background: "none", border: "none", color: "#64748B", fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 16, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>← Back</button>
-            <div style={{ fontSize: 19, fontWeight: 700, color: "#F1F5F9", marginBottom: 3 }}>{t("signup_title", "Create your account")}</div>
-            <div style={{ fontSize: 12, color: "#64748B", marginBottom: 22 }}>{t("signup_subtitle", "Join thehotspot and start automating your outreach")}</div>
-            <GBtn /><OR />
-            <form onSubmit={handleSignup}>
-              <div style={{ marginBottom: 12 }}>
-                <label style={lblStyle}>{t("username_label", "Username")}</label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder={t("username_ph_signup", "Choose a username")} style={inpStyle}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-              </div>
-              <div style={{ marginBottom: 12 }}>
-                <label style={lblStyle}>{t("email_label", "Email")}</label>
-                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder={t("email_ph", "Enter your email")} style={inpStyle}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-              </div>
-              <div style={{ marginBottom: 18 }}>
-                <label style={lblStyle}>{t("password_label", "Password")}</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder={t("password_ph_signup", "Min 6 characters")}
-                    style={{ ...inpStyle, padding: "10px 40px 10px 12px" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "#ffffff10"} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#475569", cursor: "pointer", padding: 4 }}>
-                    {showPass ? <I.EyeOff /> : <I.Eye />}
-                  </button>
-                </div>
-              </div>
-              {error && <div style={{ background: "#2d0f0f", border: "1px solid #EF444433", color: "#f87171", padding: "9px 12px", borderRadius: 8, fontSize: 12, marginBottom: 14, textAlign: "center" }}>{error}</div>}
-              <button type="submit" disabled={loading || !username || !email || !password} style={{
-                width: "100%", padding: "12px", borderRadius: 10, border: "none",
-                background: (username && email && password) ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "#1a1a24",
-                color: (username && email && password) ? "#fff" : "#475569",
-                fontSize: 14, fontWeight: 600, cursor: (username && email && password) ? "pointer" : "default",
-                fontFamily: "'DM Sans',sans-serif", boxShadow: (username && email && password) ? "0 0 24px #10b98130" : "none",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
-              }}>
-                {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signup_btn", "Create Account")}
+            <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              No account?{" "}
+              <button onClick={() => { setAuthMode("signup"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                Get started free
               </button>
-            </form>
-          </>
-        )}
+            </div>
+          </div>
+          {/* Right: feature panel */}
+          <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
+            <div style={{ fontSize: 19, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.35, marginBottom: 28 }}>Cold outreach<br />that gets replies.</div>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {MODAL_FEATURES.map((f, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
+                  <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(16,185,129,0.13)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0 }}>{f.icon}</div>
+                  <span style={{ fontSize: 13, color: "#334155", lineHeight: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", paddingTop: 6 }}>{f.text}</span>
+                </div>
+              ))}
+            </div>
+            <div style={{ marginTop: 28, padding: "14px 16px", background: "rgba(255,255,255,0.75)", borderRadius: 10, border: "1px solid rgba(16,185,129,0.15)" }}>
+              <div style={{ fontSize: 12, color: "#475569", fontStyle: "italic", lineHeight: 1.55, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>"First campaign was live in under five minutes. The replies proved it wasn't templated."</div>
+              <div style={{ fontSize: 11, color: "#10b981", fontWeight: 600, marginTop: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>— Verified user</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </>
+  );
+
+  // Signup — slides in from the right
+  const SignupModal = () => (
+    <>
+      <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
+      <div style={{ position: "fixed", top: "50%", right: "max(5vw, 24px)", transform: "translateY(-50%)", zIndex: 101 }}>
+        <div style={{ width: "min(440px, 92vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)", animation: "slideFromRight .35s cubic-bezier(.4,0,.2,1)", padding: "36px 40px 48px" }}>
+          <button onClick={() => { setShowLogin(false); goBack(); }} style={{ float: "right", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1 }}>
+            <LuX size={18} />
+          </button>
+          <div style={{ clear: "both", marginBottom: 26 }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
+            <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("signup_title", "Start for free")}</div>
+            <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No credit card. Up in 3 minutes.</div>
+          </div>
+          <GBtn />
+          <OR />
+          <form onSubmit={handleSignup}>
+            <div style={{ marginBottom: 14 }}>
+              <label style={lightLbl}>{t("username_label", "Username")}</label>
+              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Choose a username" style={lightInp}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+            </div>
+            <div style={{ marginBottom: 14 }}>
+              <label style={lightLbl}>{t("email_label", "Email")}</label>
+              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={lightInp}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+            </div>
+            <div style={{ marginBottom: 22 }}>
+              <label style={lightLbl}>{t("password_label", "Password")}</label>
+              <div style={{ position: "relative" }}>
+                <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimum 6 characters"
+                  style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
+                  {showPass ? <I.EyeOff /> : <I.Eye />}
+                </button>
+              </div>
+            </div>
+            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14 }}>{error}</div>}
+            <button type="submit" disabled={loading || !username || !email || !password} style={{
+              width: "100%", padding: "13px", borderRadius: 10, border: "none",
+              background: (username && email && password) ? "#10b981" : "#e2e8f0",
+              color: (username && email && password) ? "#fff" : "#94a3b8",
+              fontSize: 14, fontWeight: 600, cursor: (username && email && password) ? "pointer" : "default",
+              fontFamily: "'Plus Jakarta Sans', sans-serif",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
+            }}>
+              {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signup_btn", "Create Account")}
+            </button>
+          </form>
+          <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+            Already have an account?{" "}
+            <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+              Sign in
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
 
   return (
     <>
-      {showLogin && <LoginModal />}
+      {showLogin && authMode === "login" && <LoginModal />}
+      {showLogin && authMode === "signup" && <SignupModal />}
       <Home
         onSignIn={() => { setAuthMode("login"); setShowLogin(true); }}
         onGetStarted={() => { setAuthMode("signup"); setShowLogin(true); }}
       />
-
     </>
   );
 }
@@ -4826,6 +4853,10 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
       <style>{`
         @keyframes pulse { 0%,100%{opacity:.3;transform:scale(.9)} 50%{opacity:1;transform:scale(1.1)} }
+        @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+        @keyframes slideUp { from{transform:translateX(-50%) translateY(100%);opacity:0} to{transform:translateX(-50%) translateY(0);opacity:1} }
+        @keyframes modalIn { from{opacity:0;transform:scale(.96)} to{opacity:1;transform:scale(1)} }
+        @keyframes slideFromRight { from{opacity:0;transform:translateY(-50%) translateX(60px)} to{opacity:1;transform:translateY(-50%) translateX(0)} }
         @keyframes slideIn { from{transform:translateX(100px);opacity:0} to{transform:translateX(0);opacity:1} }
         @keyframes ringPulse { 0%,100%{box-shadow:0 0 0 0 #10b98140} 50%{box-shadow:0 0 0 8px #10b98110} }
         @keyframes splashFloat { from{transform:translateY(0px) scale(1);opacity:0.8} to{transform:translateY(-8px) scale(1.06);opacity:1} }
