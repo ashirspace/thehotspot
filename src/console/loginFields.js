@@ -2,26 +2,45 @@
 // LOGIN_DEFAULTS are also the fallback strings the live LoginModal uses.
 
 export const LOGIN_DEFAULTS = {
-  landing_title:         "Welcome to thehotspot",
-  landing_subtitle:      "Your AI-powered outreach dashboard",
-  landing_signin_btn:    "Sign In",
-  landing_getstarted_btn:"Get Started",
-  login_title:           "Welcome back",
-  login_subtitle:        "Sign in to your outreach dashboard",
-  signup_title:          "Create your account",
-  signup_subtitle:       "Join thehotspot and start automating your outreach",
-  username_label:        "Username",
-  username_ph_login:     "Enter username",
-  username_ph_signup:    "Choose a username",
-  email_label:           "Email",
-  email_ph:              "Enter your email",
-  password_label:        "Password",
-  password_ph_login:     "Enter password",
-  password_ph_signup:    "Min 6 characters",
-  google_btn:            "Continue with Google",
-  divider_text:          "or",
-  signin_btn:            "Sign In",
-  signup_btn:            "Create Account",
+  // Branding
+  login_tagline:          "Grow Connections Easily",
+
+  // Landing view (choose sign-in or sign-up)
+  landing_title:          "Welcome to thehotspot",
+  landing_subtitle:       "Your AI-powered outreach dashboard",
+  landing_signin_btn:     "Sign In",
+  landing_getstarted_btn: "Get Started",
+
+  // Sign-in view
+  login_title:            "Welcome back",
+  login_subtitle:         "Sign in to your outreach dashboard",
+
+  // Sign-up view
+  signup_title:           "Create your account",
+  signup_subtitle:        "Join thehotspot and start automating your outreach",
+
+  // Form labels & placeholders
+  username_label:         "Username",
+  username_ph_login:      "Enter username",
+  username_ph_signup:     "Choose a username",
+  email_label:            "Email",
+  email_ph:               "Enter your email",
+  password_label:         "Password",
+  password_ph_login:      "Enter password",
+  password_ph_signup:     "Min 6 characters",
+
+  // Buttons
+  google_btn:             "Continue with Google",
+  divider_text:           "or",
+  signin_btn:             "Sign In",
+  signup_btn:             "Create Account",
+
+  // Toggle links
+  login_have_account_q:   "Already have an account?",
+  login_have_account_a:   "Sign In",
+  login_no_account_q:     "Don't have an account?",
+  login_no_account_a:     "Sign Up",
+  login_footer:           "Protected by thehotspot security",
 };
 
 export const MAX_SINGLE = 80;
