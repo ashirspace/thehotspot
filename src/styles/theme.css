@@ -1648,7 +1648,23 @@
   .lp-mock { max-width: 100%; justify-self: stretch; }
 
   .lp-how-grid { grid-template-columns: 1fr; }
-  .lp-how-card { height: auto; min-height: 220px; }
+
+  .lp-how-card {
+    height: auto;
+    min-height: 0;
+    justify-content: flex-start;
+    gap: 12px;
+    padding: 28px;
+  }
+
+  .lp-how-num {
+    position: static;
+    font-size: 72px;
+    display: block;
+    line-height: 1;
+  }
+
+  .lp-how-desc { margin-top: 0; }
 
   .lp-bento {
     grid-template-columns: repeat(2, 1fr);
@@ -1716,9 +1732,6 @@
   }
   .lp-bento-card-wide,
   .lp-bento-card-full { grid-column: span 1; }
-
-  .lp-how-grid { grid-template-columns: 1fr; }
-  .lp-how-card { height: auto; min-height: 220px; }
 
   .lp-stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
 
