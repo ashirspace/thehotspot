@@ -1708,7 +1708,8 @@
 
   .lp-footer-top {
     grid-template-columns: 1fr;
-    text-align: left;
+    text-align: center;
+    justify-items: center;
   }
 
   .lp-footer-cols {
