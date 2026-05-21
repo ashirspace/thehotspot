@@ -17,4 +17,6 @@ export async function initDb(sql) {
   await sql`ALTER TABLE users ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'user'`;
   // Editable site content (one row per key, e.g. key='login')
   await sql`CREATE TABLE IF NOT EXISTS content (key TEXT PRIMARY KEY, data JSONB NOT NULL DEFAULT '{}'::jsonb, updated_at TIMESTAMPTZ DEFAULT NOW(), updated_by TEXT)`;
+  // Admin console audit log
+  await sql`CREATE TABLE IF NOT EXISTS audit (id SERIAL PRIMARY KEY, actor TEXT, action TEXT, target TEXT, detail TEXT, created_at TIMESTAMPTZ DEFAULT NOW())`;
 }

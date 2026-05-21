@@ -4,10 +4,8 @@ import ConsoleSidebar from "./ConsoleSidebar.jsx";
 
 const CRUMBS = {
   "/console/login-editor": "Login Editor",
-  "/console/landing": "Landing Page",
-  "/console/email-templates": "Email Templates",
+  "/console/site-editor": "Site Copy",
   "/console/users": "User Management",
-  "/console/roles": "Roles & Permissions",
   "/console/analytics": "Analytics",
   "/console/audit": "Audit Log",
 };
