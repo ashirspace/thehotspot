@@ -1669,6 +1669,13 @@
 }
 
 @media (max-width: 768px) {
+  .lp-nav-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0;
+  }
+
   .lp-nav-links { display: none; }
   .lp-nav-right .lp-btn-ghost { display: none; }
   .lp-nav-burger { display: inline-flex; }
@@ -1719,6 +1726,16 @@
 
   .lp-hero-h1 { font-size: clamp(36px, 9vw, 56px); }
   .lp-cta-h2  { font-size: clamp(32px, 8vw, 48px); }
+
+  .lp-marquee-item { font-size: 18px; }
+  .lp-marquee-track { gap: 36px; }
+
+  .lp-container { padding-inline: 16px; }
+
+  .lp-section-head { margin-bottom: 36px; }
+
+  .lp-pricing-grid { gap: 14px; }
+  .lp-price-card { padding: 24px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
