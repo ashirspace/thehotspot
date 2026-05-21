@@ -182,6 +182,10 @@ function LoginPage({ onLogin }) {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [fullName, setFullName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [company, setCompany] = useState("");
+  const [jobRole, setJobRole] = useState("");
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -218,14 +222,14 @@ function LoginPage({ onLogin }) {
   const handleSignup = async (e) => {
     e.preventDefault();
     setError("");
-    if (!username || !email || !password) { setError("All fields are required"); return; }
+    if (!fullName || !email || !phone || !company || !username || !password) { setError("Please fill in all required fields"); return; }
     if (password.length < 6) { setError("Password must be at least 6 characters"); return; }
     setLoading(true);
 
     try {
-      const data = await dbUsers({ action: "signup", username, email, password });
+      const data = await dbUsers({ action: "signup", username, email, password, name: fullName, phone, company, role_title: jobRole });
       if (!data.created) { setError(data.error || "Signup failed. Please try again."); setLoading(false); return; }
-      const userData = { username, email, dbId: data.id, profileComplete: false };
+      const userData = { username, email, name: fullName, phone, company, role_title: jobRole, dbId: data.id, profileComplete: false };
       localStorage.setItem("thehotspot_user", JSON.stringify(userData));
       onLogin(userData);
     } catch (err) {
@@ -332,7 +336,7 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
-  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setError(""); setShowPass(false); };
+  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFullName(""); setPhone(""); setCompany(""); setJobRole(""); setError(""); setShowPass(false); };
   const goBack = () => { setAuthMode("landing"); resetForm(); };
 
   const lightInp = { width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc", color: "#0f172a", fontSize: 14, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" };
@@ -447,57 +451,91 @@ function LoginPage({ onLogin }) {
     </>
   );
 
-  // Signup — slides in from the right
+  const Req = () => <span style={{ color: "#ef4444", marginLeft: 2 }}>*</span>;
+  const signupReady = fullName && email && phone && company && username && password;
+
+  // Signup — centered popup with full profile fields
   const SignupModal = () => (
     <>
       <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
-      <div style={{ position: "fixed", top: "50%", right: "max(5vw, 24px)", transform: "translateY(-50%)", zIndex: 101 }}>
-        <div style={{ width: "min(440px, 92vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 24px 60px rgba(0,0,0,0.18), 0 0 0 1px rgba(0,0,0,0.06)", animation: "slideFromRight .35s cubic-bezier(.4,0,.2,1)", padding: "36px 40px 48px" }}>
-          <button onClick={() => { setShowLogin(false); goBack(); }} style={{ float: "right", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1 }}>
-            <LuX size={18} />
-          </button>
-          <div style={{ clear: "both", marginBottom: 26 }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
-            <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("signup_title", "Start for free")}</div>
-            <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No credit card. Up in 3 minutes.</div>
+      <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
+        <div style={{ width: "min(600px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", padding: "40px 44px 48px" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 24 }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 8 }}>thehotspot</div>
+              <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 4 }}>{t("signup_title", "Create your account")}</div>
+              <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>No credit card. Up and running in 3 minutes.</div>
+            </div>
+            <button onClick={() => { setShowLogin(false); goBack(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1, flexShrink: 0 }}>
+              <LuX size={18} />
+            </button>
           </div>
+
           <GBtn />
           <OR />
+
           <form onSubmit={handleSignup}>
-            <div style={{ marginBottom: 14 }}>
-              <label style={lightLbl}>{t("username_label", "Username")}</label>
-              <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Choose a username" style={lightInp}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-            </div>
-            <div style={{ marginBottom: 14 }}>
-              <label style={lightLbl}>{t("email_label", "Email")}</label>
-              <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={lightInp}
-                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-            </div>
-            <div style={{ marginBottom: 22 }}>
-              <label style={lightLbl}>{t("password_label", "Password")}</label>
-              <div style={{ position: "relative" }}>
-                <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Minimum 6 characters"
-                  style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 16px" }}>
+              <div>
+                <label style={lightLbl}>Full Name<Req /></label>
+                <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} placeholder="Your full name" style={lightInp}
                   onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-                <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
-                  {showPass ? <I.EyeOff /> : <I.Eye />}
-                </button>
+              </div>
+              <div>
+                <label style={lightLbl}>Email<Req /></label>
+                <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="you@company.com" style={lightInp}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+              </div>
+              <div>
+                <label style={lightLbl}>Phone Number<Req /></label>
+                <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+1 555 000 0000" style={lightInp}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+              </div>
+              <div>
+                <label style={lightLbl}>Company<Req /></label>
+                <input type="text" value={company} onChange={e => setCompany(e.target.value)} placeholder="Company name" style={lightInp}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+              </div>
+              <div>
+                <label style={lightLbl}>Create Username<Req /></label>
+                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Choose a username" style={lightInp}
+                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+              </div>
+              <div>
+                <label style={lightLbl}>Create Password<Req /></label>
+                <div style={{ position: "relative" }}>
+                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Min 6 characters"
+                    style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
+                    {showPass ? <I.EyeOff /> : <I.Eye />}
+                  </button>
+                </div>
               </div>
             </div>
-            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14 }}>{error}</div>}
-            <button type="submit" disabled={loading || !username || !email || !password} style={{
+
+            <div style={{ marginTop: 14 }}>
+              <label style={lightLbl}>Job Role <span style={{ color: "#94a3b8", fontWeight: 400 }}>(optional)</span></label>
+              <input type="text" value={jobRole} onChange={e => setJobRole(e.target.value)} placeholder="e.g. Founder, SDR, Marketing Manager" style={lightInp}
+                onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+            </div>
+
+            {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginTop: 14 }}>{error}</div>}
+
+            <button type="submit" disabled={loading || !signupReady} style={{
               width: "100%", padding: "13px", borderRadius: 10, border: "none",
-              background: (username && email && password) ? "#10b981" : "#e2e8f0",
-              color: (username && email && password) ? "#fff" : "#94a3b8",
-              fontSize: 14, fontWeight: 600, cursor: (username && email && password) ? "pointer" : "default",
+              background: signupReady ? "#10b981" : "#e2e8f0",
+              color: signupReady ? "#fff" : "#94a3b8",
+              fontSize: 14, fontWeight: 600, cursor: signupReady ? "pointer" : "default",
               fontFamily: "'Plus Jakarta Sans', sans-serif",
-              display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              marginTop: 20, transition: "background .15s",
             }}>
               {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signup_btn", "Create Account")}
             </button>
           </form>
-          <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+
+          <div style={{ marginTop: 18, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
             Already have an account?{" "}
             <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
               Sign in
