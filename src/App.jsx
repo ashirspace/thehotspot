@@ -191,6 +191,8 @@ function LoginPage({ onLogin }) {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotSent, setForgotSent] = useState(false);
   const isSignup = authMode === "signup";
   const c = useCms();
   // Editable login copy (admin console). Always falls back to the defaults.
@@ -336,8 +338,22 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
-  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFullName(""); setPhone(""); setCompany(""); setJobRole(""); setError(""); setShowPass(false); };
+  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFullName(""); setPhone(""); setCompany(""); setJobRole(""); setForgotEmail(""); setForgotSent(false); setError(""); setShowPass(false); };
   const goBack = () => { setAuthMode("landing"); resetForm(); };
+
+  const handleForgotPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotEmail) { setError("Please enter your email address"); return; }
+    setLoading(true);
+    try {
+      await dbUsers({ action: "forgotPassword", email: forgotEmail });
+      setForgotSent(true);
+      setError("");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    }
+    setLoading(false);
+  };
 
   const lightInp = { width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc", color: "#0f172a", fontSize: 14, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" };
   const lightLbl = { fontSize: 12, color: "#64748b", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: 0.3 };
@@ -387,47 +403,107 @@ function LoginPage({ onLogin }) {
             <button onClick={() => { setShowLogin(false); goBack(); }} style={{ alignSelf: "flex-end", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, marginBottom: 16, lineHeight: 1 }}>
               <LuX size={18} />
             </button>
-            <div style={{ marginBottom: 26 }}>
-              <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("login_title", "Welcome back")}</div>
-              <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
-            </div>
-            <GBtn />
-            <OR />
-            <form onSubmit={handleLogin}>
-              <div style={{ marginBottom: 14 }}>
-                <label style={lightLbl}>{t("username_label", "Username")}</label>
-                <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" style={lightInp}
-                  onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+
+            {/* ── Forgot password view ── */}
+            {authMode === "forgot" && (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                {forgotSent ? (
+                  <div style={{ textAlign: "center", padding: "20px 0" }}>
+                    <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(16,185,129,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#10b981" }}>
+                      <LuCheck size={24} />
+                    </div>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 8 }}>Check your inbox</div>
+                    <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.5, marginBottom: 24 }}>
+                      If an account exists for <strong>{forgotEmail}</strong>, a reset link is on its way.
+                    </div>
+                    <button onClick={() => { setAuthMode("login"); setForgotSent(false); setForgotEmail(""); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                      Back to sign in
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <button onClick={() => { setAuthMode("login"); setError(""); setForgotEmail(""); }} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 13, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 6, alignSelf: "flex-start" }}>
+                      ← Back
+                    </button>
+                    <div style={{ marginBottom: 26 }}>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>Reset your password</div>
+                      <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Enter the email on your account and we'll send a reset link.</div>
+                    </div>
+                    <form onSubmit={handleForgotPassword}>
+                      <div style={{ marginBottom: 20 }}>
+                        <label style={lightLbl}>Email address</label>
+                        <input type="email" value={forgotEmail} onChange={e => setForgotEmail(e.target.value)} placeholder="you@company.com" style={lightInp}
+                          onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                      </div>
+                      {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14 }}>{error}</div>}
+                      <button type="submit" disabled={loading || !forgotEmail} style={{
+                        width: "100%", padding: "13px", borderRadius: 10, border: "none",
+                        background: forgotEmail ? "#10b981" : "#e2e8f0",
+                        color: forgotEmail ? "#fff" : "#94a3b8",
+                        fontSize: 14, fontWeight: 600, cursor: forgotEmail ? "pointer" : "default",
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
+                      }}>
+                        {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : "Send reset link"}
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
-              <div style={{ marginBottom: 20 }}>
-                <label style={lightLbl}>{t("password_label", "Password")}</label>
-                <div style={{ position: "relative" }}>
-                  <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password"
-                    style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-                  <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
-                    {showPass ? <I.EyeOff /> : <I.Eye />}
+            )}
+
+            {/* ── Sign in view ── */}
+            {authMode === "login" && (
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
+                <div style={{ marginBottom: 26 }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("login_title", "Welcome back")}</div>
+                  <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
+                </div>
+                <GBtn />
+                <OR />
+                <form onSubmit={handleLogin}>
+                  <div style={{ marginBottom: 14 }}>
+                    <label style={lightLbl}>{t("username_label", "Username")}</label>
+                    <input type="text" value={username} onChange={e => setUsername(e.target.value)} placeholder="Enter your username" style={lightInp}
+                      onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                  </div>
+                  <div style={{ marginBottom: 6 }}>
+                    <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
+                      <label style={lightLbl}>{t("password_label", "Password")}</label>
+                      <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                        Forgot password?
+                      </button>
+                    </div>
+                    <div style={{ position: "relative" }}>
+                      <input type={showPass ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} placeholder="Enter your password"
+                        style={{ ...lightInp, padding: "11px 42px 11px 14px" }}
+                        onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
+                      <button type="button" onClick={() => setShowPass(!showPass)} style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", background: "none", border: "none", color: "#94a3b8", cursor: "pointer", padding: 2, lineHeight: 1 }}>
+                        {showPass ? <I.EyeOff /> : <I.Eye />}
+                      </button>
+                    </div>
+                  </div>
+                  {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14, marginTop: 8 }}>{error}</div>}
+                  <button type="submit" disabled={loading || !username || !password} style={{
+                    width: "100%", padding: "13px", borderRadius: 10, border: "none",
+                    background: (username && password) ? "#10b981" : "#e2e8f0",
+                    color: (username && password) ? "#fff" : "#94a3b8",
+                    fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
+                    marginTop: 20,
+                  }}>
+                    {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signin_btn", "Sign In")}
+                  </button>
+                </form>
+                <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                  No account?{" "}
+                  <button onClick={() => { setAuthMode("signup"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                    Get started free
                   </button>
                 </div>
               </div>
-              {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "10px 14px", borderRadius: 8, fontSize: 13, marginBottom: 14 }}>{error}</div>}
-              <button type="submit" disabled={loading || !username || !password} style={{
-                width: "100%", padding: "13px", borderRadius: 10, border: "none",
-                background: (username && password) ? "#10b981" : "#e2e8f0",
-                color: (username && password) ? "#fff" : "#94a3b8",
-                fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-                fontFamily: "'Plus Jakarta Sans', sans-serif",
-                display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
-              }}>
-                {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signin_btn", "Sign In")}
-              </button>
-            </form>
-            <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
-              No account?{" "}
-              <button onClick={() => { setAuthMode("signup"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
-                Get started free
-              </button>
-            </div>
+            )}
           </div>
           {/* Right: feature panel */}
           <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
@@ -548,7 +624,7 @@ function LoginPage({ onLogin }) {
 
   return (
     <>
-      {showLogin && authMode === "login" && <LoginModal />}
+      {showLogin && (authMode === "login" || authMode === "forgot") && <LoginModal />}
       {showLogin && authMode === "signup" && <SignupModal />}
       <Home
         onSignIn={() => { setAuthMode("login"); setShowLogin(true); }}

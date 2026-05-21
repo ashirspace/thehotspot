@@ -139,14 +139,24 @@ export default async function handler(req, res) {
     }
 
     if (action === "signup") {
-      const { username, email, password } = body;
+      const { username, email, password, name, phone, company, role_title } = body;
       const existing = await sql`SELECT id FROM users WHERE username = ${username} LIMIT 1`;
       if (existing.length) return res.status(200).json({ created: false, error: "Username already taken" });
+      const emailExists = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+      if (emailExists.length) return res.status(200).json({ created: false, error: "An account with that email already exists" });
       const rows = await sql`
-        INSERT INTO users (username, email, password) VALUES (${username}, ${email}, ${password})
+        INSERT INTO users (username, email, password, full_name, phone, company, role_title)
+        VALUES (${username}, ${email}, ${password}, ${name || ""}, ${phone || ""}, ${company || ""}, ${role_title || ""})
         RETURNING id
       `;
       return res.status(200).json({ created: true, id: rows[0].id });
+    }
+
+    if (action === "forgotPassword") {
+      const { email } = body;
+      const rows = await sql`SELECT id FROM users WHERE email = ${email} LIMIT 1`;
+      // Always return ok — don't reveal whether email exists
+      return res.status(200).json({ ok: true, exists: rows.length > 0 });
     }
 
     if (action === "find") {
