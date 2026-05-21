@@ -1,18 +1,18 @@
 const STEPS = [
   {
     num: "01",
-    title: "Import your list",
-    desc: "Drop in a CSV or sync from your CRM. thehotspot enriches every contact with live company signals automatically.",
+    title: "Import your contacts",
+    desc: "Upload a CSV of leads in seconds. Tag them by category, industry, or campaign — your list is ready to go immediately.",
   },
   {
     num: "02",
-    title: "Let AI write the first draft",
-    desc: "Each email is generated from real context — recent news, role, industry. Edit a few, approve the rest in bulk.",
+    title: "AI writes every email",
+    desc: "thehotspot drafts a personalised email for each contact based on their role and company. Review, edit, or approve in bulk.",
   },
   {
     num: "03",
-    title: "Send, track, and reply",
-    desc: "Campaigns send on a safe schedule. Opens and replies stream into one inbox so you only touch the warm ones.",
+    title: "Send and watch replies come in",
+    desc: "Campaigns go out on a safe schedule. Replies land in one place so you spend time on warm leads, not your inbox.",
   },
 ];
 
