@@ -6,12 +6,14 @@ import './styles/theme.css'
 import App from './App.jsx'
 import AgentsLayout from './agents/AgentsLayout.jsx'
 import AdminApp from './admin/AdminApp.jsx'
+import ConsoleApp from './console/ConsoleApp.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/admin/*" element={<AdminApp />} />
+        <Route path="/console/*" element={<ConsoleApp />} />
         <Route path="/agents" element={<Navigate to="/agents/lead-finder" replace />} />
         <Route path="/agents/:agentId" element={<AgentsLayout />} />
         <Route path="/*" element={<App />} />
