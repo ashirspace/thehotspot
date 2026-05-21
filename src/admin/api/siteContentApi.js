@@ -46,10 +46,10 @@ export const LANDING_DEFAULTS = {
   stat_04_label:         "Avg setup time",
 
   // Testimonial
-  testimonial_quote:     "We switched from a legacy tool and our reply rate jumped from 2% to 11% in the first month. The AI personalization is genuinely different.",
-  testimonial_name:      "Priya Verma",
-  testimonial_role:      "Head of Growth",
-  testimonial_company:   "Lumina Labs",
+  testimonial_quote:     "We sent our first outreach campaign in under five minutes. The AI-drafted emails felt personal, not templated — and the replies proved it.",
+  testimonial_name:      "",
+  testimonial_role:      "",
+  testimonial_company:   "",
 
   // Pricing
   plan_01_name:          "Starter",

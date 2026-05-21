@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useLandingContent } from "../hooks/useLandingContent.js";
 
-const STAT_NUMS = [
-  { value: 500, prefix: "", suffix: "+",   key: "stat_01" },
-  { value: 98,  prefix: "", suffix: "%",   key: "stat_02" },
-  { value: 40,  prefix: "", suffix: "+",   key: "stat_03" },
-  { value: 3,   prefix: "", suffix: " min",key: "stat_04" },
-];
-
 function StatItem({ stat, label, run }) {
   const [val, setVal] = useState(0);
 
@@ -38,22 +31,36 @@ export default function Stats() {
   const c = useLandingContent();
   const ref = useRef(null);
   const [run, setRun] = useState(false);
+  const [liveStats, setLiveStats] = useState({ campaigns: null, companies: null });
+
+  useEffect(() => {
+    fetch("/api/db?entity=stats")
+      .then(r => (r.ok ? r.json() : null))
+      .then(j => {
+        if (j) setLiveStats({ campaigns: j.campaigns, companies: j.companies });
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const io = new IntersectionObserver(
       ([e]) => {
-        if (e.isIntersecting) {
-          setRun(true);
-          io.disconnect();
-        }
+        if (e.isIntersecting) { setRun(true); io.disconnect(); }
       },
       { threshold: 0.4 }
     );
     io.observe(el);
     return () => io.disconnect();
   }, []);
+
+  const STAT_NUMS = [
+    { value: liveStats.campaigns ?? 0, prefix: "", suffix: "+",    key: "stat_01" },
+    { value: 98,                        prefix: "", suffix: "%",    key: "stat_02" },
+    { value: liveStats.companies ?? 0,  prefix: "", suffix: "+",   key: "stat_03" },
+    { value: 3,                         prefix: "", suffix: " min", key: "stat_04" },
+  ];
 
   return (
     <section className="lp-stats" ref={ref}>

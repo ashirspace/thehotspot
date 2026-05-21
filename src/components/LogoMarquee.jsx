@@ -1,10 +1,9 @@
 const NAMES = [
-  "Razorpay", "CRED", "Zerodha", "Swiggy", "Unacademy",
-  "Postman", "Freshworks", "Zoho", "Groww", "Meesho",
+  "Ibra Digital Branding Services", "GBuzz", "FictionFuel",
 ];
 
 export default function LogoMarquee() {
-  const loop = [...NAMES, ...NAMES];
+  const loop = [...NAMES, ...NAMES, ...NAMES, ...NAMES, ...NAMES, ...NAMES];
 
   return (
     <section className="lp-marquee" id="customers">

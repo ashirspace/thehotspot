@@ -1054,35 +1054,30 @@
   padding: var(--section-y) 0;
 }
 
-.lp-how-track-wrap {
-  position: relative;
-}
-
-.lp-how-track {
-  display: flex;
+.lp-how-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
-  padding-bottom: 24px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scroll-behavior: smooth;
-  scrollbar-width: none;
 }
-
-.lp-how-track::-webkit-scrollbar { display: none; }
 
 .lp-how-card {
   position: relative;
-  flex: 0 0 480px;
-  height: 320px;
+  height: 300px;
   background: #fff;
   border: 1px solid var(--border);
   border-radius: var(--radius-md);
   padding: 36px;
-  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
   overflow: hidden;
+  transition: border-color 200ms ease, box-shadow 200ms ease, transform 200ms ease;
+}
+
+.lp-how-card:hover {
+  border-color: var(--teal);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
 }
 
 .lp-how-num {
@@ -1114,21 +1109,6 @@
   max-width: 360px;
 }
 
-.lp-how-progress {
-  position: relative;
-  height: 2px;
-  background: var(--border);
-  margin-top: 12px;
-  max-width: 240px;
-}
-
-.lp-how-progress-bar {
-  position: absolute;
-  inset-block: 0;
-  left: 0;
-  background: var(--teal);
-  transition: width 200ms ease;
-}
 
 /* === STATS ============================================== */
 .lp-stats {
@@ -1443,12 +1423,24 @@
 
 /* === CTA ================================================ */
 .lp-cta {
-  background: #fff;
+  background: var(--bg-dark);
   padding: var(--section-y) 0;
   text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lp-cta::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(rgba(13, 148, 136, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
 }
 
 .lp-cta-inner {
+  position: relative;
   max-width: 720px;
   margin-inline: auto;
   display: flex;
@@ -1457,19 +1449,32 @@
   gap: 24px;
 }
 
+.lp-cta-eyebrow {
+  color: var(--teal) !important;
+}
+
 .lp-cta-h2 {
   font-family: var(--font-display);
   font-size: clamp(40px, 5.4vw, 64px);
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.04;
-  color: var(--text);
+  color: #fff;
 }
 
 .lp-cta-sub {
   font-size: 17px;
-  color: var(--text-muted);
+  color: #94a3b8;
   max-width: 520px;
+}
+
+.lp-cta-btn {
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  box-shadow: 0 0 0 1px rgba(13, 148, 136, 0.4);
+}
+
+.lp-cta-fineprint {
+  color: #475569 !important;
 }
 
 /* === FOOTER ============================================= */
@@ -1630,6 +1635,9 @@
   }
   .lp-mock { max-width: 100%; justify-self: stretch; }
 
+  .lp-how-grid { grid-template-columns: 1fr; }
+  .lp-how-card { height: auto; min-height: 220px; }
+
   .lp-bento {
     grid-template-columns: repeat(2, 1fr);
     grid-auto-rows: minmax(260px, auto);
@@ -1690,7 +1698,8 @@
   .lp-bento-card-wide,
   .lp-bento-card-full { grid-column: span 1; }
 
-  .lp-how-card { flex: 0 0 86vw; }
+  .lp-how-grid { grid-template-columns: 1fr; }
+  .lp-how-card { height: auto; min-height: 220px; }
 
   .lp-stats-grid { grid-template-columns: 1fr 1fr; gap: 24px; }
 

@@ -48,6 +48,17 @@ export default async function handler(req, res) {
     }
   }
 
+  // ── Public stats (campaigns count + unique companies) ─────────────────────
+  if (req.method === "GET" && req.query?.entity === "stats") {
+    try {
+      const [camp] = await sql`SELECT COUNT(*)::int AS n FROM campaigns`;
+      const [companies] = await sql`SELECT COUNT(DISTINCT company)::int AS n FROM users WHERE company IS NOT NULL AND company != ''`;
+      return res.status(200).json({ campaigns: camp.n, companies: companies.n });
+    } catch (err) {
+      return res.status(200).json({ campaigns: 0, companies: 0 });
+    }
+  }
+
   // ── Contact routes ─────────────────────────────────────────────────────────
   if (req.method === "GET" || entity === "contact") {
     try {
