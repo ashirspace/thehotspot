@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
+import { useLandingContent } from "../hooks/useLandingContent.js";
 
-const STATS = [
-  { value: 500, prefix: "", suffix: "+", label: "Campaigns launched" },
-  { value: 98, prefix: "", suffix: "%", label: "Delivery rate" },
-  { value: 40, prefix: "", suffix: "+", label: "Industries served" },
-  { value: 3, prefix: "", suffix: " min", label: "Avg setup time" },
+const STAT_NUMS = [
+  { value: 500, prefix: "", suffix: "+",   key: "stat_01" },
+  { value: 98,  prefix: "", suffix: "%",   key: "stat_02" },
+  { value: 40,  prefix: "", suffix: "+",   key: "stat_03" },
+  { value: 3,   prefix: "", suffix: " min",key: "stat_04" },
 ];
 
-function StatItem({ stat, run }) {
+function StatItem({ stat, label, run }) {
   const [val, setVal] = useState(0);
 
   useEffect(() => {
@@ -28,12 +29,13 @@ function StatItem({ stat, run }) {
       <div className="lp-stat-num">
         {stat.prefix}{val}{stat.suffix}
       </div>
-      <div className="lp-stat-label">{stat.label}</div>
+      <div className="lp-stat-label">{label}</div>
     </div>
   );
 }
 
 export default function Stats() {
+  const c = useLandingContent();
   const ref = useRef(null);
   const [run, setRun] = useState(false);
 
@@ -57,8 +59,8 @@ export default function Stats() {
     <section className="lp-stats" ref={ref}>
       <div className="lp-container">
         <div className="lp-stats-grid">
-          {STATS.map((s) => (
-            <StatItem key={s.label} stat={s} run={run} />
+          {STAT_NUMS.map((s) => (
+            <StatItem key={s.key} stat={s} label={c[`${s.key}_label`]} run={run} />
           ))}
         </div>
       </div>

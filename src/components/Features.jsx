@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useLandingContent } from "../hooks/useLandingContent.js";
 
 function TypingVisual() {
   return (
@@ -127,50 +128,6 @@ function ScheduleVisual() {
   );
 }
 
-const CARDS = [
-  {
-    num: "01",
-    cls: "lp-bento-card-wide",
-    visual: <TypingVisual />,
-    title: "AI that writes like you, not like a robot",
-    desc: "Every email is personalized from real signals — funding, hiring, product launches. No mail-merge tokens.",
-  },
-  {
-    num: "02",
-    cls: "lp-bento-card-tall",
-    visual: <InboxVisual />,
-    title: "Replies land in one inbox",
-    desc: "Track opens and responses across every campaign without leaving the dashboard.",
-  },
-  {
-    num: "03",
-    cls: "",
-    visual: <ChipsVisual />,
-    title: "Segment by what matters",
-    desc: "Tag and target by industry, role, or stage.",
-  },
-  {
-    num: "04",
-    cls: "",
-    visual: <CounterVisual />,
-    title: "Send at scale, safely",
-    desc: "Warm-up and throttling keep you out of spam.",
-  },
-  {
-    num: "05",
-    cls: "lp-bento-card-full",
-    visual: <KanbanVisual />,
-    title: "See every campaign as a pipeline",
-    desc: "Move cohorts from queued to replied — know exactly where each list stands.",
-  },
-  {
-    num: "06",
-    cls: "",
-    visual: <ScheduleVisual />,
-    title: "Schedule around time zones",
-    desc: "Emails arrive when prospects are at their desks.",
-  },
-];
 
 function BentoCard({ card }) {
   const ref = useRef(null);
@@ -208,19 +165,24 @@ function BentoCard({ card }) {
 }
 
 export default function Features() {
+  const lc = useLandingContent();
+
+  const CARDS = [
+    { num: "01", cls: "lp-bento-card-wide", visual: <TypingVisual />, title: lc.feature_01_title, desc: lc.feature_01_desc },
+    { num: "02", cls: "lp-bento-card-tall", visual: <InboxVisual />,  title: lc.feature_02_title, desc: lc.feature_02_desc },
+    { num: "03", cls: "",                   visual: <ChipsVisual />,  title: lc.feature_03_title, desc: lc.feature_03_desc },
+    { num: "04", cls: "",                   visual: <CounterVisual />,title: lc.feature_04_title, desc: lc.feature_04_desc },
+    { num: "05", cls: "lp-bento-card-full", visual: <KanbanVisual />, title: lc.feature_05_title, desc: lc.feature_05_desc },
+    { num: "06", cls: "",                   visual: <ScheduleVisual />,title: lc.feature_06_title, desc: lc.feature_06_desc },
+  ];
+
   return (
     <section className="lp-features" id="features">
       <div className="lp-container">
         <div className="lp-section-head">
-          <span className="lp-eyebrow">Features</span>
-          <h2 className="lp-h2">
-            Everything you need to run<br />
-            outreach that converts.
-          </h2>
-          <p className="lp-lead" style={{ maxWidth: 560 }}>
-            From the first draft to the booked meeting — one workspace,
-            no spreadsheet duct tape.
-          </p>
+          <span className="lp-eyebrow">{lc.features_eyebrow}</span>
+          <h2 className="lp-h2">{lc.features_headline}</h2>
+          <p className="lp-lead" style={{ maxWidth: 560 }}>{lc.features_subheadline}</p>
         </div>
 
         <div className="lp-bento">

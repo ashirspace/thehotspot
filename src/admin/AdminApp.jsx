@@ -1,134 +1,71 @@
-import { useState, useEffect } from "react";
-import { Routes, Route, NavLink, useNavigate, Navigate } from "react-router-dom";
-import {
-  LuLayoutDashboard, LuUsers, LuRadio, LuMail,
-  LuDollarSign, LuSettings, LuLogOut, LuMenu, LuX,
-  LuShield,
-} from "react-icons/lu";
-import "./AdminApp.css";
-import AdminLogin from "./pages/AdminLogin";
-import AdminDashboard from "./pages/AdminDashboard";
-import AdminUsers from "./pages/AdminUsers";
-import AdminCampaigns from "./pages/AdminCampaigns";
-import AdminEmailLogs from "./pages/AdminEmailLogs";
-import AdminPayments from "./pages/AdminPayments";
-import AdminSettings from "./pages/AdminSettings";
+import { lazy, Suspense } from "react";
+import { Routes, Route, Navigate } from "react-router-dom";
+import "./admin.css";
+import AdminGuard from "./AdminGuard.jsx";
+import AdminLayout from "./AdminLayout.jsx";
 
-const NAV = [
-  { to: "/admin/dashboard", label: "Dashboard",   Icon: LuLayoutDashboard },
-  { to: "/admin/users",     label: "Users",        Icon: LuUsers },
-  { to: "/admin/campaigns", label: "Campaigns",    Icon: LuRadio },
-  { to: "/admin/email-logs",label: "Email Logs",   Icon: LuMail },
-  { to: "/admin/payments",  label: "Payments",     Icon: LuDollarSign },
-  { to: "/admin/settings",  label: "Settings",     Icon: LuSettings },
-];
+// Landing editors
+const AnnouncementEditor = lazy(() => import("./pages/landing/AnnouncementEditor.jsx"));
+const HeroEditor         = lazy(() => import("./pages/landing/HeroEditor.jsx"));
+const FeaturesEditor     = lazy(() => import("./pages/landing/FeaturesEditor.jsx"));
+const StatsEditor        = lazy(() => import("./pages/landing/StatsEditor.jsx"));
+const TestimonialEditor  = lazy(() => import("./pages/landing/TestimonialEditor.jsx"));
+const PricingEditor      = lazy(() => import("./pages/landing/PricingEditor.jsx"));
+const FooterEditor       = lazy(() => import("./pages/landing/FooterEditor.jsx"));
 
-function AdminShell({ admin, onLogout }) {
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+// Login editors
+const BrandingEditor     = lazy(() => import("./pages/login/BrandingEditor.jsx"));
+const WelcomeEditor      = lazy(() => import("./pages/login/WelcomeEditor.jsx"));
+const FormLabelsEditor   = lazy(() => import("./pages/login/FormLabelsEditor.jsx"));
+const ButtonsEditor      = lazy(() => import("./pages/login/ButtonsEditor.jsx"));
+const ToggleLinksEditor  = lazy(() => import("./pages/login/ToggleLinksEditor.jsx"));
 
-  function closeSidebar() { setSidebarOpen(false); }
+// Settings stubs
+const SettingsUsers      = lazy(() => import("./pages/settings/SettingsUsers.jsx"));
+const SettingsAudit      = lazy(() => import("./pages/settings/SettingsAudit.jsx"));
+const SettingsIntegrations = lazy(() => import("./pages/settings/SettingsIntegrations.jsx"));
 
+function EditorSuspense({ children }) {
   return (
-    <div className="admin-shell">
-      <button className="admin-hamburger" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">
-        {sidebarOpen ? <LuX size={20} /> : <LuMenu size={20} />}
-      </button>
-
-      <div className={`admin-sidebar-backdrop ${sidebarOpen ? "open" : ""}`} onClick={closeSidebar} />
-
-      <aside className={`admin-sidebar ${sidebarOpen ? "open" : ""}`}>
-        <div className="admin-sidebar__brand">
-          <div className="admin-sidebar__logo">HS</div>
-          <div>
-            <div className="admin-sidebar__title">thehotspot</div>
-            <div className="admin-sidebar__subtitle">Admin Panel</div>
-          </div>
-        </div>
-
-        <nav className="admin-sidebar__nav">
-          <div className="admin-nav-label">Menu</div>
-          {NAV.map(({ to, label, Icon }) => (
-            <NavLink
-              key={to}
-              to={to}
-              className={({ isActive }) => `admin-nav-item${isActive ? " active" : ""}`}
-              onClick={closeSidebar}
-            >
-              <Icon />
-              {label}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="admin-sidebar__footer">
-          <div className="admin-sidebar__admin-info" style={{ padding: "0 10px 10px", fontSize: 12, color: "var(--text-muted)" }}>
-            <LuShield size={12} style={{ verticalAlign: "middle", marginRight: 5 }} />
-            {admin?.full_name || admin?.email}
-          </div>
-          <button className="admin-logout-btn" onClick={onLogout}>
-            <LuLogOut />
-            Logout
-          </button>
-        </div>
-      </aside>
-
-      <main className="admin-main">
-        <div className="admin-content">
-          <Routes>
-            <Route index element={<Navigate to="/admin/dashboard" replace />} />
-            <Route path="dashboard"  element={<AdminDashboard />} />
-            <Route path="users"      element={<AdminUsers />} />
-            <Route path="campaigns"  element={<AdminCampaigns />} />
-            <Route path="email-logs" element={<AdminEmailLogs />} />
-            <Route path="payments"   element={<AdminPayments />} />
-            <Route path="settings"   element={<AdminSettings admin={admin} />} />
-            <Route path="*"          element={<Navigate to="/admin/dashboard" replace />} />
-          </Routes>
-        </div>
-      </main>
-    </div>
+    <Suspense fallback={<div className="cms-loading">Loading editor…</div>}>
+      {children}
+    </Suspense>
   );
 }
 
 export default function AdminApp() {
-  const [admin, setAdmin] = useState(null);
-  const [checking, setChecking] = useState(true);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    const stored = localStorage.getItem("thehotspot_admin");
-    if (stored) {
-      try { setAdmin(JSON.parse(stored)); } catch { localStorage.removeItem("thehotspot_admin"); }
-    }
-    setChecking(false);
-  }, []);
-
-  function handleLogin(adminData) {
-    setAdmin(adminData);
-    localStorage.setItem("thehotspot_admin", JSON.stringify(adminData));
-    navigate("/admin/dashboard", { replace: true });
-  }
-
-  function handleLogout() {
-    localStorage.removeItem("thehotspot_admin");
-    setAdmin(null);
-    navigate("/admin/login", { replace: true });
-  }
-
-  if (checking) return null;
-
   return (
-    <div className="admin-root">
-      <Routes>
-        <Route
-          path="login"
-          element={admin ? <Navigate to="/admin/dashboard" replace /> : <AdminLogin onLogin={handleLogin} />}
-        />
-        <Route
-          path="*"
-          element={admin ? <AdminShell admin={admin} onLogout={handleLogout} /> : <Navigate to="/admin/login" replace />}
-        />
-      </Routes>
-    </div>
+    <AdminGuard>
+      {(user, isAdmin) => (
+        <Routes>
+          <Route element={<AdminLayout user={user} isAdmin={isAdmin} />}>
+            <Route index element={<Navigate to="/admin/landing/hero" replace />} />
+
+            {/* Landing editors */}
+            <Route path="landing/announcement" element={<EditorSuspense><AnnouncementEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/hero"         element={<EditorSuspense><HeroEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/features"     element={<EditorSuspense><FeaturesEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/stats"        element={<EditorSuspense><StatsEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/testimonial"  element={<EditorSuspense><TestimonialEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/pricing"      element={<EditorSuspense><PricingEditor user={user} /></EditorSuspense>} />
+            <Route path="landing/footer"       element={<EditorSuspense><FooterEditor user={user} /></EditorSuspense>} />
+
+            {/* Login editors */}
+            <Route path="login/branding"    element={<EditorSuspense><BrandingEditor user={user} /></EditorSuspense>} />
+            <Route path="login/welcome"     element={<EditorSuspense><WelcomeEditor user={user} /></EditorSuspense>} />
+            <Route path="login/form-labels" element={<EditorSuspense><FormLabelsEditor user={user} /></EditorSuspense>} />
+            <Route path="login/buttons"     element={<EditorSuspense><ButtonsEditor user={user} /></EditorSuspense>} />
+            <Route path="login/toggle-links"element={<EditorSuspense><ToggleLinksEditor user={user} /></EditorSuspense>} />
+
+            {/* Settings (admin only) */}
+            <Route path="settings/users"        element={isAdmin ? <EditorSuspense><SettingsUsers /></EditorSuspense> : <Navigate to="/" replace />} />
+            <Route path="settings/integrations" element={isAdmin ? <EditorSuspense><SettingsIntegrations /></EditorSuspense> : <Navigate to="/" replace />} />
+            <Route path="settings/audit"        element={isAdmin ? <EditorSuspense><SettingsAudit /></EditorSuspense> : <Navigate to="/" replace />} />
+
+            <Route path="*" element={<Navigate to="/admin/landing/hero" replace />} />
+          </Route>
+        </Routes>
+      )}
+    </AdminGuard>
   );
 }

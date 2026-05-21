@@ -1777,6 +1777,11 @@
   --r-lg:          16px;
 }
 
+/* === ADMIN CMS =========================================== */
+/* Styles for the CMS admin panel at /admin.
+   All CMS component classes live in src/admin/admin.css —
+   this section is reserved for theme-level CMS overrides. */
+
 /* === DASHBOARD · SHELL ================================== */
 .dash-shell {
   display: flex;
