@@ -1,0 +1,16 @@
+.campaigns-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.reply-rate {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+@media (max-width: 600px) {
+  .campaigns-actions {
+    flex-direction: column;
+  }
+}
