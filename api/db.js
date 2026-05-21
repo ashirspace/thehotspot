@@ -196,6 +196,26 @@ export default async function handler(req, res) {
       return res.status(200).json({ token: rows[0]?.gmail_refresh_token || null });
     }
 
+    // One-time first-admin bootstrap: promotes a user to admin ONLY while no
+    // admin exists yet. Refuses once any admin exists, so it cannot be abused.
+    if (action === "bootstrapAdmin") {
+      const { username, email } = body;
+      const admins = await sql`SELECT COUNT(*)::int AS n FROM users WHERE role = 'admin'`;
+      if (admins[0].n > 0) {
+        return res.status(200).json({ ok: false, error: "An admin already exists." });
+      }
+      let rows;
+      if (email) {
+        rows = await sql`UPDATE users SET role = 'admin' WHERE email = ${email} RETURNING id, username, email, role`;
+      } else if (username) {
+        rows = await sql`UPDATE users SET role = 'admin' WHERE username = ${username} RETURNING id, username, email, role`;
+      } else {
+        return res.status(400).json({ error: "Provide username or email" });
+      }
+      if (!rows.length) return res.status(200).json({ ok: false, error: "No user matched" });
+      return res.status(200).json({ ok: true, promoted: rows });
+    }
+
     return res.status(400).json({ error: "Unknown action: " + action });
   } catch (err) {
     console.error("db users error:", err.message);
