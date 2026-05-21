@@ -1474,15 +1474,15 @@
   max-width: 520px;
 }
 
-.lp-cta-btn {
-  border: 2px solid rgba(255, 255, 255, 0.75) !important;
-  transition: none !important;
-}
-
-.lp-cta-btn:hover {
+.lp-cta-btn,
+.lp-cta-btn:hover,
+.lp-cta-btn:focus,
+.lp-cta-btn:active {
   background: var(--teal) !important;
+  border: 2px solid rgba(255, 255, 255, 0.75) !important;
   transform: none !important;
   box-shadow: none !important;
+  transition: none !important;
 }
 
 .lp-cta-fineprint {
