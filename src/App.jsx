@@ -581,7 +581,11 @@ function LoginPage({ onLogin }) {
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", animation: "fadeIn .25s ease" }}>
             {/* Left — question panel */}
-            <div style={{ background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", padding: isMobile ? "24px 20px 32px" : "32px 48px 40px", overflow: "hidden" }}>
+            <div style={{ background: "linear-gradient(145deg, #f8fffe 0%, #f0fdf9 50%, #f0f9ff 100%)", display: "flex", flexDirection: "column", alignItems: "center", padding: isMobile ? "24px 20px 32px" : "32px 48px 40px", overflow: "hidden", position: "relative" }}>
+              {/* Decorative background blobs */}
+              <div style={{ position: "absolute", top: -80, left: -80, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", bottom: -60, right: -40, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />
+              <div style={{ position: "absolute", top: "45%", left: "60%", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
               {/* Top bar */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0, width: "100%" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>thehotspot</div>
