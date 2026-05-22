@@ -4571,7 +4571,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
   const [page, setPageRaw] = useState(() => pageFromPath());
   const [pageLoading, setPageLoading] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1025);
 
   const setPage = (p) => {
     const path = PAGE_TO_PATH[p] ?? "/";
@@ -4993,7 +4993,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
 
         {/* SIDEBAR BACKDROP */}
-        {sidebarOpen && (
+        {sidebarOpen && window.innerWidth <= 1024 && (
           <div className="dash-backdrop" onClick={() => setSidebarOpen(false)} />
         )}
 
