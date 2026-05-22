@@ -2094,10 +2094,12 @@ function HomePage({ user, contactCount, setPage }) {
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-      <div className="lp-section-head" style={{ marginBottom: 40 }}>
-        <span className="lp-eyebrow">01 — Overview</span>
-        <h1 className="lp-h2" style={{ fontSize: "clamp(28px, 3.5vw, 44px)" }}>{greeting}, {firstName}.</h1>
-        <p className="lp-lead" style={{ fontSize: 16 }}>B2B outreach — leads, emails, sequences, replies.</p>
+      <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #0c2340 55%, #0d3d2e 100%)", borderRadius: 14, padding: "40px 44px", marginBottom: 28, position: "relative", overflow: "hidden" }}>
+        <div style={{ position: "absolute", top: -70, right: -70, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: -40, left: "35%", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#10b981", letterSpacing: "0.14em", marginBottom: 14, position: "relative" }}>01 — OVERVIEW</div>
+        <h1 style={{ margin: 0, fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 700, fontFamily: "var(--font-display)", color: "#f1f5f9", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 10, position: "relative" }}>{greeting}, {firstName}.</h1>
+        <p style={{ margin: 0, fontSize: 15, color: "#64748b", lineHeight: 1.6, position: "relative" }}>B2B outreach — leads, emails, sequences, replies.</p>
       </div>
       <div className="lp-bento">
         {CARDS.map(card => <HpBentoCard key={card.num} {...card} />)}
