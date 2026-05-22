@@ -8,7 +8,7 @@ import {
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
   LuMenu, LuInbox, LuCreditCard, LuCircleHelp, LuBookOpen,
-  LuMessageCircle, LuStar, LuArchive, LuReply, LuShield,
+  LuMessageCircle, LuStar, LuArchive, LuReply, LuShield, LuArrowRight,
 } from "react-icons/lu";
 import { useLoginContent } from "./hooks/useLoginContent.js";
 
@@ -1889,125 +1889,119 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
 
 /* ───────── HOME PAGE ───────── */
 function HomePage({ user, contactCount, setPage }) {
-  const c = useCms();
-  const firstName = user?.username?.split(" ")[0] || user?.name?.split(" ")[0] || "there";
+  const firstName = user?.name?.split(" ")[0] || user?.username || "there";
+  const [campaigns, setCampaigns] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
 
-  const Feature = ({ label, status, href }) => (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, padding: "8px 0", borderBottom: "1px solid var(--border)" }}>
-      <span style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.4 }}>{label}</span>
-      {href
-        ? <a href={href} className="dash-chip is-teal" style={{ textDecoration: "none", flexShrink: 0 }}>Agent</a>
-        : <span style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 12, color: "var(--text-soft)", flexShrink: 0 }}>
-            <span className={`dash-dot ${status === "live" ? "is-green" : ""}`} />
-            {status === "live" ? "Live" : "Soon"}
-          </span>
-      }
-    </div>
-  );
+  useEffect(() => {
+    const uid = encodeURIComponent(user?.username || user?.email || "");
+    fetch(`/api/campaigns${uid ? `?userId=${uid}` : ""}`)
+      .then(r => r.json())
+      .then(d => { if (d.configured && d.campaigns?.length) { setCampaigns(d.campaigns); localStorage.setItem("thehotspot_campaigns", JSON.stringify(d.campaigns)); } })
+      .catch(() => {});
+  }, []);
 
-  const PillarCard = ({ icon, title, desc, accent, features, ctaLabel, ctaAction }) => (
-    <div className="dash-card is-liftable" style={{ display: "flex", flexDirection: "column", padding: 24 }}>
-      <div style={{ width: 40, height: 40, borderRadius: "var(--r)", background: "var(--bg-alt)", border: "1px solid var(--border)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--text-soft)", marginBottom: 16 }}>
-        {icon}
-      </div>
-      <div style={{ fontSize: 16, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", marginBottom: 6, letterSpacing: "-0.015em" }}>{title}</div>
-      <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6, marginBottom: 14 }}>{desc}</div>
-      <div style={{ flex: 1 }}>
-        {features.map((f, i) => <Feature key={i} label={f.label} status={f.status} href={f.href} />)}
-      </div>
-      <button onClick={ctaAction} className="dash-btn dash-btn-outline" style={{ marginTop: 16, width: "100%" }}>
-        {ctaLabel}
-      </button>
-    </div>
-  );
+  const emailsSent = campaigns.reduce((s, c) => s + (c.sent || 0), 0);
+  const totalSent  = campaigns.reduce((s, c) => s + (c.sent || 0), 0);
+  const totalFail  = campaigns.reduce((s, c) => s + (c.failed || 0), 0);
+  const successRate = totalSent + totalFail > 0 ? Math.round(totalSent / (totalSent + totalFail) * 100) + "%" : "—";
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }).toUpperCase();
+  const hour = now.getHours();
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+
+  const MODULES = [
+    { name: "Lead Input",         desc: "CSV import · Apollo · manual entry",        status: "live",    page: "contacts" },
+    { name: "AI Engine",          desc: "GPT-4o-mini · templates · variables",        status: "live",    page: "emailTemplates" },
+    { name: "Outreach",           desc: "Gmail API · SMTP · scheduling",              status: "live",    page: "emailSender" },
+    { name: "Sequences",          desc: "Day 1 → 3 → 7 follow-up · auto-stop",       status: "live",    page: "campaignStatus" },
+    { name: "Reply Detection",    desc: "Gmail polling · classify interested / OOO",  status: "partial", page: "inbox" },
+    { name: "LinkedIn / SMS",     desc: "Phantombuster · Twilio",                     status: "soon",    page: null },
+  ];
+
+  const ACTIONS = [
+    { label: "New campaign",    icon: <LuSend size={14} />,         page: "emailSender" },
+    { label: "Add contacts",    icon: <LuUsers size={14} />,        page: "contacts" },
+    { label: "Templates",       icon: <LuSparkles size={14} />,     page: "emailTemplates" },
+    { label: "Campaigns",       icon: <LuRadio size={14} />,        page: "campaignStatus" },
+    { label: "Inbox",           icon: <LuMailbox size={14} />,      page: "inbox" },
+  ];
+
+  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div className="rsp-hp-wrap" style={{ maxWidth: 1200, margin: "0 auto" }}>
-      {/* Header */}
-      <div className="dash-page-head">
-        <span className="dash-eyebrow">01 — Overview</span>
-        <h1 className="dash-h1">Welcome back, <span className="dash-h1-light">{firstName}</span></h1>
-        <div style={{ fontSize: 14, color: "var(--text-muted)", maxWidth: 580 }}>
-          {c("hp_subtitle", "Your B2B outreach platform — find leads, write emails, run campaigns, and detect replies at scale.")}
+    <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 4px" }}>
+
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 32, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 10 }}>01 — OVERVIEW</div>
+          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
+            {greeting}, {firstName}.
+          </h1>
+          <p style={{ margin: "8px 0 0", fontSize: 14, color: "var(--text-muted)", lineHeight: 1.5 }}>
+            B2B outreach — leads, emails, sequences, replies.
+          </p>
+        </div>
+        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.1em", paddingTop: 4, whiteSpace: "nowrap" }}>{dateStr}</div>
+      </div>
+
+      {/* ── Stats strip ───────────────────────────────────────── */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)", marginBottom: 32 }}>
+        {[
+          { n: emailsSent.toLocaleString(), label: "emails sent" },
+          { n: (contactCount || 0).toLocaleString(), label: "contacts" },
+          { n: campaigns.length, label: "campaigns" },
+          { n: successRate, label: "success rate" },
+        ].map(({ n, label }) => (
+          <div key={label} style={{ padding: "18px 20px", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
+            <div style={{ ...mono, fontSize: 26, fontWeight: 700, color: "var(--text)", lineHeight: 1, marginBottom: 6 }}>{n}</div>
+            <div style={{ fontSize: 11, color: "var(--text-faint)", ...mono, letterSpacing: "0.08em" }}>{label}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Quick actions ─────────────────────────────────────── */}
+      <div style={{ marginBottom: 36 }}>
+        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 12 }}>QUICK START</div>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+          {ACTIONS.map(a => (
+            <button key={a.label} onClick={() => a.page && setPage(a.page)}
+              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text-soft)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "border-color 120ms, color 120ms" }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--teal)"; e.currentTarget.style.color = "var(--teal)"; }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-soft)"; }}>
+              {a.icon}{a.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Top row: 3 pillars */}
-      <div className="rsp-pillars-top" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 16, marginBottom: 16 }}>
-        <PillarCard
-          icon={<LuDatabase size={20} />}
-          title={c("hp_p1_title", "Lead Input")}
-          desc={c("hp_p1_desc", "Import leads from spreadsheets, connect CRM tools, or add contacts manually.")}
-          accent="#10b981"
-          features={[
-            { label: "CSV / Spreadsheet upload",    href: "/agents/csv-import-export" },
-            { label: "CRM integration (Apollo.io)", href: "/agents/lead-finder" },
-            { label: "CRM integration (HubSpot)",   status: "soon" },
-            { label: "Manual entry",                status: "live" },
-          ]}
-          ctaLabel={c("hp_p1_cta", "Manage Contacts")}
-          ctaAction={() => setPage("contacts")}
-        />
-        <PillarCard
-          icon={<LuSparkles size={20} />}
-          title={c("hp_p2_title", "AI Engine")}
-          desc={c("hp_p2_desc", "GPT-4o-mini writes personalized outreach using templates and contact variables.")}
-          accent="#6366f1"
-          features={[
-            { label: "LLM (GPT-4o-mini)",              status: "live" },
-            { label: "Prompt templates per category",   status: "live" },
-            { label: "Personalization variables",       status: "live" },
-            { label: "Email sequence builder",          href: "/agents/email-sequence-builder" },
-          ]}
-          ctaLabel={c("hp_p2_cta", "Open Templates")}
-          ctaAction={() => setPage("emailTemplates")}
-        />
-        <PillarCard
-          icon={<LuSend size={20} />}
-          title={c("hp_p3_title", "Outreach Channels")}
-          desc={c("hp_p3_desc", "Send emails via Gmail today. LinkedIn, WhatsApp, and SMS are on the roadmap.")}
-          accent="#0ea5e9"
-          features={[
-            { label: "Email (Gmail API / SMTP)",  status: "live" },
-            { label: "LinkedIn (Phantombuster)",  status: "soon" },
-            { label: "WhatsApp (Twilio)",         status: "soon" },
-            { label: "SMS (Twilio)",              status: "soon" },
-          ]}
-          ctaLabel={c("hp_p3_cta", "Send Emails")}
-          ctaAction={() => setPage("emailSender")}
-        />
+      {/* ── Module table ──────────────────────────────────────── */}
+      <div>
+        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 12 }}>PLATFORM</div>
+        <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
+          {MODULES.map((m, i) => (
+            <div key={m.name}
+              onClick={() => m.page && setPage(m.page)}
+              style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center", gap: 16, padding: "14px 18px", borderBottom: i < MODULES.length - 1 ? "1px solid var(--border)" : "none", cursor: m.page ? "pointer" : "default", transition: "background 120ms" }}
+              onMouseEnter={e => { if (m.page) e.currentTarget.style.background = "var(--bg-hover)"; }}
+              onMouseLeave={e => { e.currentTarget.style.background = ""; }}>
+              <div>
+                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginRight: 12 }}>{m.name}</span>
+                <span style={{ fontSize: 12, color: "var(--text-faint)", ...mono }}>{m.desc}</span>
+              </div>
+              <span style={{ ...mono, fontSize: 11, letterSpacing: "0.08em", display: "inline-flex", alignItems: "center", gap: 6, color: m.status === "live" ? "var(--teal)" : m.status === "partial" ? "#f59e0b" : "var(--text-faint)", whiteSpace: "nowrap" }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: m.status === "live" ? "var(--teal)" : m.status === "partial" ? "#f59e0b" : "var(--border)", display: "inline-block", flexShrink: 0 }} />
+                {m.status === "live" ? "live" : m.status === "partial" ? "partial" : "soon"}
+              </span>
+              {m.page
+                ? <LuArrowRight size={14} style={{ color: "var(--text-faint)", flexShrink: 0 }} />
+                : <span style={{ width: 14, flexShrink: 0 }} />}
+            </div>
+          ))}
+        </div>
       </div>
 
-      {/* Bottom row: 2 pillars */}
-      <div className="rsp-pillars-bot" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
-        <PillarCard
-          icon={<LuRadio size={20} />}
-          title={c("hp_p4_title", "Sequence / Campaign Manager")}
-          desc={c("hp_p4_desc", "Multi-step follow-up sequences that stop automatically when a reply is detected.")}
-          accent="#f59e0b"
-          features={[
-            { label: "Multi-step follow-up (Day 1 → 3 → 7)", status: "live" },
-            { label: "Stop sequence on reply",               status: "live" },
-            { label: "Campaign scheduling",                  status: "live" },
-            { label: "Sequence builder agent",               href: "/agents/email-sequence-builder" },
-          ]}
-          ctaLabel={c("hp_p4_cta", "View Campaigns")}
-          ctaAction={() => setPage("campaignStatus")}
-        />
-        <PillarCard
-          icon={<LuMailbox size={20} />}
-          title={c("hp_p5_title", "Reply Detection & Inbox")}
-          desc={c("hp_p5_desc", "Detect and classify replies as interested, not interested, or out of office — automatically.")}
-          accent="#ec4899"
-          features={[
-            { label: "Gmail reply polling",              status: "live" },
-            { label: "Webhook reply detection",          status: "soon" },
-            { label: "Classify: Interested / OOO / No", href: "/agents/reply-detector" },
-          ]}
-          ctaLabel={c("hp_p5_cta", "Check Replies")}
-          ctaAction={() => setPage("campaignStatus")}
-        />
-      </div>
     </div>
   );
 }
