@@ -581,9 +581,9 @@ function LoginPage({ onLogin }) {
         return (
           <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", animation: "fadeIn .25s ease" }}>
             {/* Left — question panel */}
-            <div style={{ background: "#fff", display: "flex", flexDirection: "column", padding: isMobile ? "24px 20px 32px" : "32px 48px 40px", overflow: "hidden" }}>
+            <div style={{ background: "#fff", display: "flex", flexDirection: "column", alignItems: "center", padding: isMobile ? "24px 20px 32px" : "32px 48px 40px", overflow: "hidden" }}>
               {/* Top bar */}
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0 }}>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0, width: "100%" }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>thehotspot</div>
                 <button onClick={() => { setShowLogin(false); goBack(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1 }}>
                   <LuX size={18} />
@@ -591,7 +591,7 @@ function LoginPage({ onLogin }) {
               </div>
 
               {/* Slide content — key forces remount & animation replay on step change */}
-              <div key={signupStep} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", animation: `${slideDir === "right" ? "slideInFromRight" : "slideInFromLeft"} .32s cubic-bezier(.4,0,.2,1)`, maxWidth: 480, paddingTop: 20 }}>
+              <div key={signupStep} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", animation: `${slideDir === "right" ? "slideInFromRight" : "slideInFromLeft"} .32s cubic-bezier(.4,0,.2,1)`, width: "100%", maxWidth: 480, paddingTop: 20 }}>
                 <div style={{ fontSize: 12, fontWeight: 600, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 12, letterSpacing: 0.5 }}>
                   Step {signupStep + 1} of {STEPS.length}
                 </div>
