@@ -197,6 +197,12 @@ function LoginPage({ onLogin }) {
   const [showLogin, setShowLogin] = useState(false);
   const [forgotEmail, setForgotEmail] = useState("");
   const [forgotSent, setForgotSent] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 640);
+  useEffect(() => {
+    const handler = () => setIsMobile(window.innerWidth < 640);
+    window.addEventListener("resize", handler);
+    return () => window.removeEventListener("resize", handler);
+  }, []);
   const isSignup = authMode === "signup";
   const c = useCms();
   // Editable login copy (admin console). Always falls back to the defaults.
@@ -423,9 +429,9 @@ function LoginPage({ onLogin }) {
         <>
           <div onClick={() => { setShowLogin(false); goBack(); }} style={overlay} />
           <div style={{ position: "fixed", top: "50%", left: "50%", transform: "translate(-50%,-50%)", zIndex: 101 }}>
-            <div style={{ width: "min(860px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", display: "grid", gridTemplateColumns: "1fr 340px" }}>
+            <div style={{ width: isMobile ? "min(480px, 96vw)" : "min(860px, 96vw)", maxHeight: "92vh", overflowY: "auto", background: "#fff", borderRadius: 20, boxShadow: "0 32px 80px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.06)", animation: "modalIn .3s cubic-bezier(.34,1.1,.64,1)", display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 340px" }}>
           {/* Left: form */}
-          <div style={{ padding: "44px 48px 48px", display: "flex", flexDirection: "column" }}>
+          <div style={{ padding: isMobile ? "28px 24px 32px" : "44px 48px 48px", display: "flex", flexDirection: "column" }}>
             <button onClick={() => { setShowLogin(false); goBack(); }} style={{ alignSelf: "flex-end", background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, marginBottom: 16, lineHeight: 1 }}>
               <LuX size={18} />
             </button>
@@ -531,7 +537,7 @@ function LoginPage({ onLogin }) {
               </div>
             )}
           </div>
-          {loginPanelRight}
+          {!isMobile && loginPanelRight}
             </div>
           </div>
         </>
@@ -573,9 +579,9 @@ function LoginPage({ onLogin }) {
         const handleKey = (e) => { if (e.key === "Enter") { e.preventDefault(); advance(); } };
 
         return (
-          <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", gridTemplateColumns: "1fr 380px", animation: "fadeIn .25s ease" }}>
+          <div style={{ position: "fixed", inset: 0, zIndex: 100, display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 380px", animation: "fadeIn .25s ease" }}>
             {/* Left — question panel */}
-            <div style={{ background: "#fff", display: "flex", flexDirection: "column", padding: "32px 48px 40px", overflow: "hidden" }}>
+            <div style={{ background: "#fff", display: "flex", flexDirection: "column", padding: isMobile ? "24px 20px 32px" : "32px 48px 40px", overflow: "hidden" }}>
               {/* Top bar */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0 }}>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>thehotspot</div>
@@ -696,7 +702,7 @@ function LoginPage({ onLogin }) {
             </div>
 
             {/* Right — branding + progress */}
-            <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "40px 36px 48px", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
+            {!isMobile && <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "40px 36px 48px", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
               <div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 32 }}>thehotspot</div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3, marginBottom: 12 }}>Set up your account.</div>
@@ -723,7 +729,7 @@ function LoginPage({ onLogin }) {
               <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
                 Trusted by 500+ teams
               </div>
-            </div>
+            </div>}
           </div>
         );
       })()}
@@ -2633,14 +2639,10 @@ export default function App() {
   const [user, setUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem("thehotspot_user")); } catch { return null; }
   });
-  const [showOnboarding, setShowOnboarding] = useState(() => {
-    try { const u = JSON.parse(localStorage.getItem("thehotspot_user")); return !!(u && !u.profileComplete); } catch { return false; }
-  });
 
   const handleLogin = (userData) => {
     window.history.replaceState({}, "", "/");
     setUser(userData);
-    if (!userData.profileComplete) setShowOnboarding(true);
   };
 
   if (!user) return <AppErrorBoundary><LoginPage onLogin={handleLogin} /></AppErrorBoundary>;
@@ -2648,7 +2650,6 @@ export default function App() {
   return (
     <AppErrorBoundary>
       <Dashboard user={user} onLogout={() => { localStorage.removeItem("thehotspot_user"); setUser(null); }} onUserUpdate={(updated) => { setUser(updated); localStorage.setItem("thehotspot_user", JSON.stringify(updated)); }} />
-      {showOnboarding && <OnboardingModal user={user} onComplete={(updated) => { setUser(updated); setShowOnboarding(false); }} onDismiss={() => { localStorage.removeItem("thehotspot_user"); setUser(null); setShowOnboarding(false); }} />}
     </AppErrorBoundary>
   );
 }
