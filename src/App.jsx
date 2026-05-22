@@ -5001,17 +5001,6 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             </div>
           ))}
 
-          {(user?.role === "admin" || user?.role === "manager") && (
-            <>
-              <div className="dash-sidebar-section">
-                <span className="dash-sidebar-eyebrow">Admin</span>
-              </div>
-              <a href="/console" className="dash-nav-item" style={{ textDecoration: "none" }}>
-                <LuShield size={18} />
-                Admin Console
-              </a>
-            </>
-          )}
 
           <div className="dash-sidebar-footer">
             <button className="dash-user-card"
