@@ -8,7 +8,7 @@ import {
   LuTarget, LuTriangleAlert, LuMailbox, LuSparkles, LuPartyPopper,
   LuClock, LuChevronRight, LuSearch, LuFlaskConical, LuDatabase,
   LuMenu, LuInbox, LuCreditCard, LuCircleHelp, LuBookOpen,
-  LuMessageCircle, LuStar, LuArchive, LuReply, LuShield, LuArrowRight,
+  LuMessageCircle, LuStar, LuArchive, LuReply, LuShield,
 } from "react-icons/lu";
 import { useLoginContent } from "./hooks/useLoginContent.js";
 
@@ -1888,6 +1888,139 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
 }
 
 /* ───────── HOME PAGE ───────── */
+/* ── HomePage bento visuals (defined outside to keep stable references) ── */
+function HpTypingVisual() {
+  return (
+    <div className="lp-bento-typing">
+      <div className="lp-bento-typing-meta">Draft · personalized</div>
+      <div className="lp-bento-typing-line">Hi {"{name}"} — saw your team just raised a Series B…</div>
+    </div>
+  );
+}
+
+function HpInboxVisual({ contactCount }) {
+  const rows = [
+    { name: "Aria S.", tag: "Replied" },
+    { name: "Dev K.", tag: "Opened" },
+    { name: "Sara L.", tag: "Replied" },
+    { name: "Arjun M.", tag: "Opened" },
+  ];
+  return (
+    <div style={{ width: "100%" }}>
+      <div style={{ fontFamily: "var(--font-mono)", fontSize: 32, fontWeight: 700, color: "var(--text)", letterSpacing: "-0.03em", lineHeight: 1, marginBottom: 14 }}>
+        {(contactCount || 0).toLocaleString()}
+        <span style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.08em", fontWeight: 400, marginLeft: 10 }}>contacts</span>
+      </div>
+      <div className="lp-bento-inbox">
+        {rows.map(r => (
+          <div className="lp-bento-inbox-row" key={r.name}>
+            <span className="lp-bento-inbox-dot" />
+            <span className="lp-bento-inbox-name">{r.name}</span>
+            <span className="lp-bento-inbox-tag">{r.tag}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function HpChipsVisual() {
+  const chips = [["Network", true], ["CPS", false], ["CPA", false], ["CPL", true], ["Mobile", false]];
+  return (
+    <div className="lp-chips">
+      {chips.map(([label, teal]) => (
+        <span key={label} className={`lp-chip${teal ? " lp-chip-teal" : ""}`}>{label}</span>
+      ))}
+    </div>
+  );
+}
+
+function HpCounterVisual({ target }) {
+  const ref = useRef(null);
+  const [val, setVal] = useState(0);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let raf;
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      io.disconnect();
+      const t = Math.max(target, 1);
+      const start = performance.now();
+      const tick = (now) => {
+        const p = Math.min((now - start) / 1400, 1);
+        setVal(Math.round(t * (1 - Math.pow(1 - p, 3))));
+        if (p < 1) raf = requestAnimationFrame(tick);
+      };
+      raf = requestAnimationFrame(tick);
+    }, { threshold: 0.5 });
+    io.observe(el);
+    return () => { io.disconnect(); cancelAnimationFrame(raf); };
+  }, [target]);
+  return (
+    <div ref={ref} style={{ textAlign: "center" }}>
+      <div className="lp-counter">{val.toLocaleString()}</div>
+      <div className="lp-counter-tick">emails sent</div>
+    </div>
+  );
+}
+
+function HpKanbanVisual({ campaigns }) {
+  const queued   = campaigns.filter(c => c.status === "pending" || c.status === "running").map(c => c.category || "Campaign").slice(0, 2);
+  const sent     = campaigns.filter(c => c.status === "done" || (c.sent || 0) > 0).map(c => c.category || "Campaign").slice(0, 2);
+  const replied  = campaigns.filter(c => (c.replied || 0) > 0).map(c => c.category || "Campaign").slice(0, 2);
+  const cols = [
+    { head: "Queued",  cards: queued.length  ? queued  : ["Cohort A", "Cohort B"] },
+    { head: "Sent",    cards: sent.length    ? sent    : ["Fintech Q2"] },
+    { head: "Replied", cards: replied.length ? replied : ["Agencies", "Founders"] },
+  ];
+  return (
+    <div className="lp-kanban">
+      {cols.map(col => (
+        <div className="lp-kanban-col" key={col.head}>
+          <div className="lp-kanban-head">{col.head}</div>
+          {col.cards.map(card => <div className="lp-kanban-card" key={card}>{card}</div>)}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function HpScheduleVisual() {
+  const active = new Set([1, 2, 3, 8, 9, 10, 15, 16, 17, 22, 23, 24]);
+  const mid    = new Set([4, 11, 18, 25]);
+  return (
+    <div className="lp-schedule">
+      {Array.from({ length: 28 }, (_, i) => (
+        <div key={i} className={"lp-schedule-cell" + (active.has(i) ? " is-active" : mid.has(i) ? " is-mid" : "")} />
+      ))}
+    </div>
+  );
+}
+
+function HpBentoCard({ num, cls, visual, title, desc, onClick }) {
+  const ref = useRef(null);
+  const [shown, setShown] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setShown(true); io.disconnect(); } }, { threshold: 0.1 });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return (
+    <article ref={ref} className={`lp-bento-card lp-reveal${cls ? " " + cls : ""}${shown ? " in-view" : ""}`}
+      onClick={onClick} style={{ cursor: onClick ? "pointer" : "default" }}>
+      <span className="lp-bento-num">{num}</span>
+      <div className="lp-bento-visual">{visual}</div>
+      <div className="lp-bento-body">
+        <h3 className="lp-h3">{title}</h3>
+        <p className="lp-bento-desc">{desc}</p>
+      </div>
+    </article>
+  );
+}
+
 function HomePage({ user, contactCount, setPage }) {
   const firstName = user?.name?.split(" ")[0] || user?.username || "there";
   const [campaigns, setCampaigns] = useState(() => { try { return JSON.parse(localStorage.getItem("thehotspot_campaigns") || "[]"); } catch { return []; } });
@@ -1901,107 +2034,28 @@ function HomePage({ user, contactCount, setPage }) {
   }, []);
 
   const emailsSent = campaigns.reduce((s, c) => s + (c.sent || 0), 0);
-  const totalSent  = campaigns.reduce((s, c) => s + (c.sent || 0), 0);
-  const totalFail  = campaigns.reduce((s, c) => s + (c.failed || 0), 0);
-  const successRate = totalSent + totalFail > 0 ? Math.round(totalSent / (totalSent + totalFail) * 100) + "%" : "—";
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }).toUpperCase();
-  const hour = now.getHours();
+  const hour = new Date().getHours();
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
-  const MODULES = [
-    { name: "Lead Input",         desc: "CSV import · Apollo · manual entry",        status: "live",    page: "contacts" },
-    { name: "AI Engine",          desc: "GPT-4o-mini · templates · variables",        status: "live",    page: "emailTemplates" },
-    { name: "Outreach",           desc: "Gmail API · SMTP · scheduling",              status: "live",    page: "emailSender" },
-    { name: "Sequences",          desc: "Day 1 → 3 → 7 follow-up · auto-stop",       status: "live",    page: "campaignStatus" },
-    { name: "Reply Detection",    desc: "Gmail polling · classify interested / OOO",  status: "partial", page: "inbox" },
-    { name: "LinkedIn / SMS",     desc: "Phantombuster · Twilio",                     status: "soon",    page: null },
+  const CARDS = [
+    { num: "01", cls: "lp-bento-card-wide", visual: <HpTypingVisual />,                         title: "Write emails in seconds",   desc: "GPT-4o-mini personalizes every email from your templates and contact data.",      onClick: () => setPage("emailTemplates") },
+    { num: "02", cls: "lp-bento-card-tall", visual: <HpInboxVisual contactCount={contactCount} />, title: "Your contacts",             desc: "Import from CSV, connect Apollo, or add leads manually.",                        onClick: () => setPage("contacts") },
+    { num: "03", cls: "",                   visual: <HpChipsVisual />,                           title: "Target by category",        desc: "Segment by Network, CPS, CPA, CPL, or Mobile and tailor the angle per niche.",   onClick: () => setPage("contacts") },
+    { num: "04", cls: "",                   visual: <HpCounterVisual target={emailsSent} />,     title: "Sent at scale",             desc: "Warm-up, throttling, and scheduling keep you out of spam folders.",               onClick: () => setPage("campaignStatus") },
+    { num: "05", cls: "lp-bento-card-wide", visual: <HpKanbanVisual campaigns={campaigns} />,    title: "Campaign pipeline",         desc: "Multi-step sequences stop automatically the moment a reply lands.",               onClick: () => setPage("campaignStatus") },
+    { num: "06", cls: "",                   visual: <HpScheduleVisual />,                        title: "Smart scheduling",          desc: "Send when prospects are at their desks — across every time zone.",                onClick: () => setPage("emailSender") },
   ];
-
-  const ACTIONS = [
-    { label: "New campaign",    icon: <LuSend size={14} />,         page: "emailSender" },
-    { label: "Add contacts",    icon: <LuUsers size={14} />,        page: "contacts" },
-    { label: "Templates",       icon: <LuSparkles size={14} />,     page: "emailTemplates" },
-    { label: "Campaigns",       icon: <LuRadio size={14} />,        page: "campaignStatus" },
-    { label: "Inbox",           icon: <LuMailbox size={14} />,      page: "inbox" },
-  ];
-
-  const mono = { fontFamily: "var(--font-mono)" };
 
   return (
-    <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 4px" }}>
-
-      {/* ── Header ─────────────────────────────────────────────── */}
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 32, flexWrap: "wrap" }}>
-        <div>
-          <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 10 }}>01 — OVERVIEW</div>
-          <h1 style={{ margin: 0, fontSize: 28, fontWeight: 700, fontFamily: "var(--font-display)", color: "var(--text)", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
-            {greeting}, {firstName}.
-          </h1>
-          <p style={{ margin: "8px 0 0", fontSize: 14, color: "var(--text-muted)", lineHeight: 1.5 }}>
-            B2B outreach — leads, emails, sequences, replies.
-          </p>
-        </div>
-        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.1em", paddingTop: 4, whiteSpace: "nowrap" }}>{dateStr}</div>
+    <div style={{ maxWidth: 1100, margin: "0 auto" }}>
+      <div className="lp-section-head" style={{ marginBottom: 40 }}>
+        <span className="lp-eyebrow">01 — Overview</span>
+        <h1 className="lp-h2" style={{ fontSize: "clamp(28px, 3.5vw, 44px)" }}>{greeting}, {firstName}.</h1>
+        <p className="lp-lead" style={{ fontSize: 16 }}>B2B outreach — leads, emails, sequences, replies.</p>
       </div>
-
-      {/* ── Stats strip ───────────────────────────────────────── */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", borderTop: "1px solid var(--border)", borderLeft: "1px solid var(--border)", marginBottom: 32 }}>
-        {[
-          { n: emailsSent.toLocaleString(), label: "emails sent" },
-          { n: (contactCount || 0).toLocaleString(), label: "contacts" },
-          { n: campaigns.length, label: "campaigns" },
-          { n: successRate, label: "success rate" },
-        ].map(({ n, label }) => (
-          <div key={label} style={{ padding: "18px 20px", borderRight: "1px solid var(--border)", borderBottom: "1px solid var(--border)" }}>
-            <div style={{ ...mono, fontSize: 26, fontWeight: 700, color: "var(--text)", lineHeight: 1, marginBottom: 6 }}>{n}</div>
-            <div style={{ fontSize: 11, color: "var(--text-faint)", ...mono, letterSpacing: "0.08em" }}>{label}</div>
-          </div>
-        ))}
+      <div className="lp-bento">
+        {CARDS.map(card => <HpBentoCard key={card.num} {...card} />)}
       </div>
-
-      {/* ── Quick actions ─────────────────────────────────────── */}
-      <div style={{ marginBottom: 36 }}>
-        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 12 }}>QUICK START</div>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-          {ACTIONS.map(a => (
-            <button key={a.label} onClick={() => a.page && setPage(a.page)}
-              style={{ display: "inline-flex", alignItems: "center", gap: 7, padding: "8px 14px", borderRadius: 6, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text-soft)", fontSize: 13, fontWeight: 500, cursor: "pointer", transition: "border-color 120ms, color 120ms" }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--teal)"; e.currentTarget.style.color = "var(--teal)"; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border)"; e.currentTarget.style.color = "var(--text-soft)"; }}>
-              {a.icon}{a.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* ── Module table ──────────────────────────────────────── */}
-      <div>
-        <div style={{ ...mono, fontSize: 11, color: "var(--text-faint)", letterSpacing: "0.12em", marginBottom: 12 }}>PLATFORM</div>
-        <div style={{ border: "1px solid var(--border)", borderRadius: 8, overflow: "hidden" }}>
-          {MODULES.map((m, i) => (
-            <div key={m.name}
-              onClick={() => m.page && setPage(m.page)}
-              style={{ display: "grid", gridTemplateColumns: "1fr auto auto", alignItems: "center", gap: 16, padding: "14px 18px", borderBottom: i < MODULES.length - 1 ? "1px solid var(--border)" : "none", cursor: m.page ? "pointer" : "default", transition: "background 120ms" }}
-              onMouseEnter={e => { if (m.page) e.currentTarget.style.background = "var(--bg-hover)"; }}
-              onMouseLeave={e => { e.currentTarget.style.background = ""; }}>
-              <div>
-                <span style={{ fontSize: 14, fontWeight: 600, color: "var(--text)", marginRight: 12 }}>{m.name}</span>
-                <span style={{ fontSize: 12, color: "var(--text-faint)", ...mono }}>{m.desc}</span>
-              </div>
-              <span style={{ ...mono, fontSize: 11, letterSpacing: "0.08em", display: "inline-flex", alignItems: "center", gap: 6, color: m.status === "live" ? "var(--teal)" : m.status === "partial" ? "#f59e0b" : "var(--text-faint)", whiteSpace: "nowrap" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: m.status === "live" ? "var(--teal)" : m.status === "partial" ? "#f59e0b" : "var(--border)", display: "inline-block", flexShrink: 0 }} />
-                {m.status === "live" ? "live" : m.status === "partial" ? "partial" : "soon"}
-              </span>
-              {m.page
-                ? <LuArrowRight size={14} style={{ color: "var(--text-faint)", flexShrink: 0 }} />
-                : <span style={{ width: 14, flexShrink: 0 }} />}
-            </div>
-          ))}
-        </div>
-      </div>
-
     </div>
   );
 }
