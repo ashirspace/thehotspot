@@ -190,6 +190,7 @@ function LoginPage({ onLogin }) {
   const [jobRole, setJobRole] = useState("");
   const [signupStep, setSignupStep] = useState(0);
   const [slideDir, setSlideDir] = useState("right");
+  const [usernameStatus, setUsernameStatus] = useState("idle"); // idle | checking | available | taken
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -349,7 +350,7 @@ function LoginPage({ onLogin }) {
     client.requestAccessToken();
   };
 
-  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFirstName(""); setMiddleName(""); setLastName(""); setPhone(""); setCompany(""); setJobRole(""); setSignupStep(0); setSlideDir("right"); setForgotEmail(""); setForgotSent(false); setError(""); setShowPass(false); };
+  const resetForm = () => { setUsername(""); setEmail(""); setPassword(""); setFirstName(""); setMiddleName(""); setLastName(""); setPhone(""); setCompany(""); setJobRole(""); setSignupStep(0); setSlideDir("right"); setForgotEmail(""); setForgotSent(false); setError(""); setShowPass(false); setUsernameStatus("idle"); };
   const goBack = () => { setAuthMode("landing"); resetForm(); };
 
   const handleForgotPassword = async (e) => {
@@ -559,7 +560,7 @@ function LoginPage({ onLogin }) {
           /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email),
           phone.trim().length >= 6,
           !!company.trim(),
-          username.trim().length >= 3,
+          username.trim().length >= 3 && /^[a-zA-Z0-9_]+$/.test(username) && usernameStatus === "available",
           password.length >= 6,
           true,
         ];
@@ -648,10 +649,40 @@ function LoginPage({ onLogin }) {
                 )}
 
                 {/* Step 4: Username */}
-                {signupStep === 4 && (
-                  <input autoFocus type="text" value={username} onChange={e => setUsername(e.target.value)} onKeyDown={handleKey} placeholder="Pick a username" style={inp}
-                    onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
-                )}
+                {signupStep === 4 && (() => {
+                  const handleUsernameChange = (e) => {
+                    const clean = e.target.value.replace(/[^a-zA-Z0-9_]/g, "");
+                    setUsername(clean);
+                    setUsernameStatus("idle");
+                    if (clean.length < 3) return;
+                    setUsernameStatus("checking");
+                    clearTimeout(window.__uCheck);
+                    window.__uCheck = setTimeout(async () => {
+                      try {
+                        const res = await fetch("/api/db", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "find", username: clean }) });
+                        const d = await res.json();
+                        setUsernameStatus(d.found ? "taken" : "available");
+                      } catch { setUsernameStatus("idle"); }
+                    }, 500);
+                  };
+                  const borderColor = usernameStatus === "available" ? "#10b981" : usernameStatus === "taken" ? "#ef4444" : "rgba(0,0,0,0.12)";
+                  return (
+                    <div>
+                      <input autoFocus type="text" value={username} onChange={handleUsernameChange} onKeyDown={handleKey} placeholder="Pick a username (letters, numbers, _)"
+                        style={{ ...inp, borderColor }}
+                        onFocus={e => e.target.style.borderColor = borderColor}
+                        onBlur={e => e.target.style.borderColor = borderColor} />
+                      {username.length > 0 && (
+                        <div style={{ marginTop: 8, fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", color: usernameStatus === "available" ? "#10b981" : usernameStatus === "taken" ? "#ef4444" : "#94a3b8" }}>
+                          {usernameStatus === "checking" && "Checking availability…"}
+                          {usernameStatus === "available" && "Username is available"}
+                          {usernameStatus === "taken" && "Username is already taken"}
+                          {usernameStatus === "idle" && username.length < 3 && "Must be at least 3 characters"}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })()}
 
                 {/* Step 5: Password */}
                 {signupStep === 5 && (
