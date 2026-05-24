@@ -3,181 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Blog — thehotspot</title>
+  <title>Blog - thehotspot</title>
   <link rel="icon" type="image/png" href="/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
-
-    nav { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff0d; background: #09090dcc; backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
-    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo { width: 28px; height: 28px; object-fit: contain; }
-    .nav-name { font-size: 16px; font-weight: 700; color: #F1F5F9; letter-spacing: -0.3px; }
-    .nav-back { padding: 8px 20px; border-radius: 20px; border: 1px solid #ffffff15; background: transparent; color: #94A3B8; font-size: 13px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; text-decoration: none; transition: all .2s; }
-    .nav-back:hover { border-color: #10b98140; color: #10b981; }
-
-    .hero { max-width: 760px; margin: 0 auto; padding: 72px 32px 48px; text-align: center; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: #10b98112; border: 1px solid #10b98130; border-radius: 20px; padding: 5px 16px; margin-bottom: 24px; }
-    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; }
-    .badge-text { font-size: 11px; color: #10b981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-    .hero h1 { font-size: clamp(28px, 4vw, 44px); font-weight: 900; letter-spacing: -1.5px; margin-bottom: 14px; }
-    .hero p { font-size: 15px; color: #94A3B8; line-height: 1.75; }
-
-    .container { max-width: 960px; margin: 0 auto; padding: 0 32px 80px; }
-
-    .posts-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-    .post-card { background: #111116; border: 1px solid #ffffff0d; border-radius: 16px; overflow: hidden; cursor: pointer; transition: border-color .2s, transform .2s; }
-    .post-card:hover { border-color: #10b98140; transform: translateY(-3px); }
-    .post-thumb { height: 160px; display: flex; align-items: center; justify-content: center; }
-    .post-body { padding: 20px; }
-    .post-tag { display: inline-block; font-size: 10px; font-weight: 700; color: #10b981; background: #10b98112; border: 1px solid #10b98130; border-radius: 20px; padding: 3px 10px; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 10px; }
-    .post-title { font-size: 14px; font-weight: 700; color: #F1F5F9; line-height: 1.45; margin-bottom: 8px; }
-    .post-desc { font-size: 12px; color: #64748B; line-height: 1.65; margin-bottom: 14px; }
-    .post-meta { display: flex; align-items: center; justify-content: space-between; }
-    .post-date { font-size: 11px; color: #475569; }
-    .post-read { font-size: 11px; color: #10b981; font-weight: 600; }
-
-    .coming-soon { text-align: center; padding: 80px 32px; }
-    .coming-soon-icon { font-size: 48px; margin-bottom: 20px; }
-    .coming-soon h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
-    .coming-soon p { font-size: 14px; color: #64748B; }
-
-    footer { border-top: 1px solid #ffffff0d; padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-    .footer-copy { font-size: 12px; color: #94A3B8; }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a { font-size: 12px; color: #64748B; text-decoration: none; transition: color .15s; }
-    .footer-links a:hover { color: #10b981; }
-
-    .glow1 { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle,#10b98110,transparent 70%); top: -150px; left: -150px; pointer-events: none; z-index: 0; }
-    .glow2 { position: fixed; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle,#0ea5e90c,transparent 70%); bottom: -100px; right: -100px; pointer-events: none; z-index: 0; }
-
-    @media (max-width: 700px) {
-      nav { padding: 14px 20px; }
-      .hero { padding: 48px 20px 32px; }
-      .container { padding: 0 20px 60px; }
-      .posts-grid { grid-template-columns: 1fr; }
-      footer { padding: 20px; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static-page-theme.css" />
 </head>
 <body>
-  <!-- Splash -->
-  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
-    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+  <div class="sp-shell">
+    <nav class="sp-nav" aria-label="Main navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span>thehotspot</span>
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+        </a>
+        <div class="sp-nav-links" aria-label="Site links">
+          <a class="sp-nav-link" href="/#features">Features</a>
+          <a class="sp-nav-link" href="/#pricing">Pricing</a>
+          <a class="sp-nav-link" href="/faq.html">FAQ</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/privacy.html">Privacy</a>
+          <a class="sp-btn sp-btn-primary" href="/">Back to app</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="sp-hero">
+      <div class="sp-container sp-hero-inner">
+        <div>
+          <p class="sp-eyebrow">Field Notes</p>
+          <h1 class="sp-h1">Modern outreach, written from the <em>inside.</em></h1>
+          <p class="sp-hero-copy">
+            Practical essays on cold email, pipeline automation, inbox reputation, and the small operating details that make outbound feel precise instead of noisy.
+          </p>
+        </div>
+        <aside class="sp-hero-card" aria-label="Editorial note">
+          <div class="sp-meta-list">
+            <div class="sp-meta-item">
+              <div class="sp-meta-k">LATEST DISPATCH</div>
+              <div class="sp-meta-v">May 10, 2026</div>
+            </div>
+            <div class="sp-meta-item">
+              <div class="sp-meta-k">EDITORIAL FOCUS</div>
+              <div class="sp-meta-v">AI outreach</div>
+            </div>
+            <div class="sp-meta-item">
+              <div class="sp-meta-k">READING STYLE</div>
+              <div class="sp-meta-v">Short, tactical</div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </header>
+
+    <main class="sp-container blog-main">
+      <article class="blog-feature" aria-labelledby="featured-title">
+        <div class="blog-feature-card">
+          <div>
+            <p class="blog-kicker">FEATURED ESSAY</p>
+            <h2 id="featured-title">How AI is Replacing Manual Cold Email in 2026</h2>
+            <p>
+              Learn how automated AI agents write, personalise, and send cold emails at scale without losing the human touch that keeps replies honest.
+            </p>
+          </div>
+          <div class="blog-meta">
+            <span>AI Outreach</span>
+            <span>May 10, 2026</span>
+            <span>5 min read</span>
+          </div>
+        </div>
+        <div class="blog-feature-visual" aria-hidden="true">
+          <div class="blog-visual-row">
+            <div class="blog-kicker">OUTBOUND BRIEF</div>
+            <div class="blog-visual-line"></div>
+            <div class="blog-visual-line is-short"></div>
+          </div>
+          <div class="blog-visual-row">
+            <div class="blog-kicker">REPLY SIGNALS</div>
+            <div class="blog-visual-line"></div>
+            <div class="blog-visual-line is-short"></div>
+          </div>
+          <div class="blog-visual-chart">
+            <span style="height: 42%"></span>
+            <span style="height: 70%"></span>
+            <span style="height: 56%"></span>
+            <span style="height: 86%"></span>
+            <span style="height: 64%"></span>
+          </div>
+        </div>
+      </article>
+
+      <section class="blog-grid" aria-label="Latest articles">
+        <article class="blog-card">
+          <span class="blog-card-tag">Cold Email</span>
+          <h3>The Perfect Cold Email Structure That Gets Replies</h3>
+          <p>Break down the anatomy of a high-converting cold email: subject line, opener, value prop, proof, and CTA.</p>
+          <div class="blog-card-foot">
+            <span>May 6, 2026</span>
+            <span class="blog-read">4 min read</span>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <span class="blog-card-tag">Analytics</span>
+          <h3>What Your Open Rate Is Actually Telling You</h3>
+          <p>Open rates alone do not tell the full story. Here is how to interpret campaign data and decide what to change.</p>
+          <div class="blog-card-foot">
+            <span>Apr 28, 2026</span>
+            <span class="blog-read">6 min read</span>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <span class="blog-card-tag">Automation</span>
+          <h3>5 Workflows You Should Automate Before Scaling</h3>
+          <p>Before you pour fuel on a campaign, make sure these five sales processes are already running cleanly.</p>
+          <div class="blog-card-foot">
+            <span>Apr 20, 2026</span>
+            <span class="blog-read">7 min read</span>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <span class="blog-card-tag">Lead Gen</span>
+          <h3>Finding Quality Leads with AI in Under 10 Minutes</h3>
+          <p>A practical guide to using AI lead agents to surface high-intent prospects for a specific niche or offer.</p>
+          <div class="blog-card-foot">
+            <span>Apr 14, 2026</span>
+            <span class="blog-read">5 min read</span>
+          </div>
+        </article>
+
+        <article class="blog-card">
+          <span class="blog-card-tag">Integrations</span>
+          <h3>Why Sending From Your Own Gmail Changes Everything</h3>
+          <p>Deliverability, trust, and reply rates all improve when outreach comes from the same inbox people can recognize.</p>
+          <div class="blog-card-foot">
+            <span>Apr 8, 2026</span>
+            <span class="blog-read">4 min read</span>
+          </div>
+        </article>
+      </section>
+    </main>
+
+    <footer class="sp-footer">
+      <div class="sp-container">
+        <div class="sp-footer-top">
+          <div class="sp-footer-title">Better systems for better outbound.</div>
+          <a class="sp-btn sp-btn-primary" href="/">Open the dashboard</a>
+        </div>
+        <div class="sp-footer-bottom">
+          <div>&copy; 2026 thehotspot. All rights reserved.</div>
+          <div class="sp-footer-links">
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/terms.html">Terms of Service</a>
+            <a href="mailto:support@thehotspot.in">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-  <style>
-    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
-    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
-  </style>
-  <script>
-    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
-  </script>
-
-  <div class="glow1"></div>
-  <div class="glow2"></div>
-
-  <nav>
-    <a href="/" class="nav-brand">
-      <img src="/logo.png" alt="thehotspot" class="nav-logo" />
-      <span class="nav-name">thehotspot</span>
-    </a>
-    <a href="/" class="nav-back">← Back</a>
-  </nav>
-
-  <div class="hero">
-    <div class="badge"><span class="badge-dot"></span><span class="badge-text">Insights & Guides</span></div>
-    <h1>The <span style="background:linear-gradient(135deg,#10b981,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">thehotspot</span> Blog</h1>
-    <p>Tips, strategies, and deep-dives on AI outreach, cold email, and scaling your sales pipeline.</p>
-  </div>
-
-  <div class="container">
-    <div class="posts-grid">
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#10b98115,#0d1f14);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="10" rx="2"/><circle cx="12" cy="5" r="2"/><path d="M12 7v4"/><line x1="8" y1="16" x2="8.01" y2="16"/><line x1="16" y1="16" x2="16.01" y2="16"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag">AI Outreach</span>
-          <div class="post-title">How AI is Replacing Manual Cold Email in 2026</div>
-          <div class="post-desc">Learn how automated AI agents write, personalise, and send cold emails at scale — without losing the human touch.</div>
-          <div class="post-meta">
-            <span class="post-date">May 10, 2026</span>
-            <span class="post-read">5 min read →</span>
-          </div>
-        </div>
-      </div>
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#0ea5e915,#0d1827);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag" style="color:#0ea5e9;background:#0ea5e912;border-color:#0ea5e930;">Cold Email</span>
-          <div class="post-title">The Perfect Cold Email Structure That Gets Replies</div>
-          <div class="post-desc">Break down the anatomy of a high-converting cold email — subject line, opener, value prop, and CTA.</div>
-          <div class="post-meta">
-            <span class="post-date">May 6, 2026</span>
-            <span class="post-read">4 min read →</span>
-          </div>
-        </div>
-      </div>
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#6366f115,#111);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag" style="color:#6366f1;background:#6366f112;border-color:#6366f130;">Analytics</span>
-          <div class="post-title">What Your Open Rate Is Actually Telling You</div>
-          <div class="post-desc">Open rates alone don't tell the full story. Here's how to interpret campaign data and act on it.</div>
-          <div class="post-meta">
-            <span class="post-date">Apr 28, 2026</span>
-            <span class="post-read">6 min read →</span>
-          </div>
-        </div>
-      </div>
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#f59e0b15,#1a1200);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag" style="color:#f59e0b;background:#f59e0b12;border-color:#f59e0b30;">Automation</span>
-          <div class="post-title">5 Workflows You Should Automate Before Scaling</div>
-          <div class="post-desc">Before you pour fuel on the fire, make sure these five sales processes are already running on autopilot.</div>
-          <div class="post-meta">
-            <span class="post-date">Apr 20, 2026</span>
-            <span class="post-read">7 min read →</span>
-          </div>
-        </div>
-      </div>
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#ec489915,#1a001a);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag" style="color:#ec4899;background:#ec489912;border-color:#ec489930;">Lead Gen</span>
-          <div class="post-title">Finding Quality Leads with AI in Under 10 Minutes</div>
-          <div class="post-desc">Step-by-step guide to using AI lead agents to surface high-intent prospects for any niche.</div>
-          <div class="post-meta">
-            <span class="post-date">Apr 14, 2026</span>
-            <span class="post-read">5 min read →</span>
-          </div>
-        </div>
-      </div>
-      <div class="post-card">
-        <div class="post-thumb" style="background:linear-gradient(135deg,#14b8a615,#001a18);"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg></div>
-        <div class="post-body">
-          <span class="post-tag" style="color:#14b8a6;background:#14b8a612;border-color:#14b8a630;">Integrations</span>
-          <div class="post-title">Why Sending From Your Own Gmail Changes Everything</div>
-          <div class="post-desc">Deliverability, trust, and reply rates all improve dramatically when outreach comes from your real inbox.</div>
-          <div class="post-meta">
-            <span class="post-date">Apr 8, 2026</span>
-            <span class="post-read">4 min read →</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <footer>
-    <span class="footer-copy">© 2026 thehotspot. All rights reserved.</span>
-    <div class="footer-links">
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms of Service</a>
-    </div>
-  </footer>
 </body>
 </html>

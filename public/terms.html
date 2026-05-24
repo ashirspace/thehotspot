@@ -1,255 +1,275 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Terms of Service — thehotspot</title>
+  <title>Terms of Service - thehotspot</title>
+  <meta name="description" content="Terms of Service for thehotspot, including accounts, acceptable use, user content, Google integrations, and liability." />
   <link rel="icon" type="image/png" href="/logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #09090d;
-      color: #c0c0d0;
-      line-height: 1.75;
-      min-height: 100vh;
-    }
-    a { color: #10b981; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    header {
-      border-bottom: 1px solid #1a1a24;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo { display: flex; align-items: center; flex-shrink: 0; }
-    .brand { font-size: 17px; font-weight: 700; color: #f0f0f5; }
-    .back {
-      margin-left: auto;
-      font-size: 13px; color: #6b6b80;
-      border: 1px solid #2a2a3a; border-radius: 8px;
-      padding: 6px 14px; cursor: pointer; transition: border-color .2s;
-    }
-    .back:hover { border-color: #10b981; color: #10b981; text-decoration: none; }
-
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 56px 24px 80px;
-    }
-    .tag {
-      display: inline-block;
-      background: #0a1a2a;
-      color: #0ea5e9;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid #0ea5e933;
-      margin-bottom: 18px;
-    }
-    h1 {
-      font-size: 34px;
-      font-weight: 700;
-      color: #f0f0f5;
-      letter-spacing: -.5px;
-      margin-bottom: 10px;
-    }
-    .meta { font-size: 13px; color: #6b6b80; margin-bottom: 48px; }
-
-    section { margin-bottom: 40px; }
-    h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #e0e0f0;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #1a1a24;
-    }
-    p { margin-bottom: 12px; font-size: 15px; color: #a0a0b8; }
-    ul { padding-left: 20px; margin-bottom: 12px; }
-    li { font-size: 15px; color: #a0a0b8; margin-bottom: 6px; }
-
-    .highlight {
-      background: #111116;
-      border: 1px solid #1e1e28;
-      border-left: 3px solid #0ea5e9;
-      border-radius: 0 10px 10px 0;
-      padding: 14px 18px;
-      margin: 16px 0;
-      font-size: 14px;
-      color: #c0c0d0;
-    }
-
-    footer {
-      border-top: 1px solid #1a1a24;
-      padding: 28px 24px;
-      text-align: center;
-      font-size: 12px;
-      color: #4a4a5a;
-    }
-    footer a { color: #6b6b80; }
-    footer a:hover { color: #10b981; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static-page-theme.css" />
 </head>
 <body>
-  <!-- Splash -->
-  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
-    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+  <div class="sp-shell">
+    <nav class="sp-nav" aria-label="Primary navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+          thehotspot
+        </a>
+        <div class="sp-nav-links" aria-label="Page links">
+          <a class="sp-nav-link" href="/blog.html">Blog</a>
+          <a class="sp-nav-link" href="/faq.html">FAQ</a>
+          <a class="sp-nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/privacy.html">Privacy</a>
+          <a class="sp-btn sp-btn-primary" href="/">Back to app</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="sp-hero">
+      <div class="sp-container">
+        <div class="sp-hero-inner">
+          <div>
+            <span class="sp-eyebrow">Legal</span>
+            <h1 class="sp-h1">Terms of <em>Service</em>.</h1>
+            <p class="sp-hero-copy">The operating agreement for using thehotspot responsibly: accounts, outreach rules, content rights, integrations, and platform limits.</p>
+          </div>
+          <aside class="sp-hero-card" aria-label="Terms details">
+            <div class="sp-meta-list">
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">LAST UPDATED</div>
+                <div class="sp-meta-v">May 10, 2026</div>
+              </div>
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">EFFECTIVE</div>
+                <div class="sp-meta-v">May 10, 2026</div>
+              </div>
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">SUPPORT</div>
+                <div class="sp-meta-v"><a href="mailto:support@thehotspot.in">support@thehotspot.in</a></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </header>
+
+    <main class="sp-container">
+      <div class="sp-layout">
+        <aside class="sp-index" aria-label="Terms sections">
+          <div class="sp-index-title">SECTIONS</div>
+          <a href="#acceptance">Acceptance</a>
+          <a href="#service">Service</a>
+          <a href="#eligibility">Eligibility</a>
+          <a href="#accounts">Accounts</a>
+          <a href="#acceptable-use">Acceptable use</a>
+          <a href="#content">Your content</a>
+          <a href="#google">Google services</a>
+          <a href="#privacy">Privacy</a>
+          <a href="#ip">Intellectual property</a>
+          <a href="#warranties">Warranties</a>
+          <a href="#liability">Liability</a>
+          <a href="#indemnification">Indemnification</a>
+          <a href="#termination">Termination</a>
+          <a href="#law">Governing law</a>
+          <a href="#changes">Changes</a>
+          <a href="#contact">Contact</a>
+        </aside>
+
+        <article class="sp-content">
+          <section class="sp-section" id="acceptance">
+            <div class="sp-section-num">01</div>
+            <div>
+              <h2>Acceptance of terms</h2>
+              <p>By accessing or using <strong>thehotspot</strong> ("Service"), operated by thehotspot ("we", "us", or "our") at <strong>thehotspot.in</strong>, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Service.</p>
+              <p>We reserve the right to update these Terms at any time. Continued use of the Service after changes are posted constitutes your acceptance of the revised Terms.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="service">
+            <div class="sp-section-num">02</div>
+            <div>
+              <h2>Description of service</h2>
+              <p>thehotspot is an outreach automation platform that helps users manage contacts, organize outreach campaigns, and track email communication. The Service includes:</p>
+              <ul>
+                <li>A contact database manager for organizing outreach leads</li>
+                <li>Campaign tracking and status monitoring</li>
+                <li>Google account integration for sign-in</li>
+                <li>An AI-powered outreach assistant</li>
+                <li>Email outreach tools, where available</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="sp-section" id="eligibility">
+            <div class="sp-section-num">03</div>
+            <div>
+              <h2>Eligibility</h2>
+              <p>You must be at least 13 years of age to use thehotspot. By using the Service, you represent that you meet this requirement. If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="accounts">
+            <div class="sp-section-num">04</div>
+            <div>
+              <h2>User accounts</h2>
+              <p>You may create an account using a username and password or by signing in with your Google account. You are responsible for:</p>
+              <ul>
+                <li>Maintaining the confidentiality of your login credentials</li>
+                <li>All activities that occur under your account</li>
+                <li>Providing accurate and current information</li>
+                <li>Notifying us immediately of any unauthorized access to your account</li>
+              </ul>
+              <p>We reserve the right to suspend or terminate accounts that violate these Terms.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="acceptable-use">
+            <div class="sp-section-num">05</div>
+            <div>
+              <h2>Acceptable use</h2>
+              <p>You agree to use thehotspot only for lawful purposes. You must not:</p>
+              <ul>
+                <li>Use the Service to send unsolicited bulk email (spam)</li>
+                <li>Violate any applicable laws or regulations, including anti-spam laws such as CAN-SPAM and GDPR</li>
+                <li>Upload or transmit content that is illegal, harmful, or infringes on third-party rights</li>
+                <li>Attempt to gain unauthorized access to any part of the Service or its infrastructure</li>
+                <li>Reverse engineer, decompile, or attempt to extract source code from the Service</li>
+                <li>Use the Service to harass, threaten, or harm others</li>
+                <li>Impersonate any person or entity</li>
+                <li>Interfere with or disrupt the integrity or performance of the Service</li>
+              </ul>
+              <div class="sp-note">thehotspot is designed for legitimate, permission-based outreach only. You are solely responsible for ensuring your use of the platform complies with all applicable email marketing laws and regulations in your jurisdiction.</div>
+            </div>
+          </section>
+
+          <section class="sp-section" id="content">
+            <div class="sp-section-num">06</div>
+            <div>
+              <h2>Your content</h2>
+              <p>You retain ownership of all contact data, campaign content, and other information you upload or create through the Service ("Your Content"). By using thehotspot, you grant us a limited, non-exclusive license to store and process Your Content solely to provide the Service to you.</p>
+              <p>You represent and warrant that:</p>
+              <ul>
+                <li>You have the right to use and share all content you submit</li>
+                <li>Your Content does not violate any third-party rights or applicable laws</li>
+                <li>You have obtained proper consent to store and contact the individuals in your contact lists where required by law</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="sp-section" id="google">
+            <div class="sp-section-num">07</div>
+            <div>
+              <h2>Google services integration</h2>
+              <p>thehotspot integrates with Google services (Google Sign-In, Google Sheets, Gmail) subject to Google's Terms of Service. By connecting your Google account, you also agree to <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Google's Terms of Service</a>.</p>
+              <p>You may revoke thehotspot's access to your Google account at any time through your <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account settings</a>.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="privacy">
+            <div class="sp-section-num">08</div>
+            <div>
+              <h2>Privacy</h2>
+              <p>Your use of thehotspot is also governed by our <a href="/privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="ip">
+            <div class="sp-section-num">09</div>
+            <div>
+              <h2>Intellectual property</h2>
+              <p>The Service, including its design, features, and underlying code, is owned by thehotspot and protected by intellectual property laws. You may not copy, modify, distribute, or create derivative works from any part of the Service without our express written permission.</p>
+              <p>The thehotspot name, logo, and branding are our trademarks. Nothing in these Terms grants you any right to use our trademarks.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="warranties">
+            <div class="sp-section-num">10</div>
+            <div>
+              <h2>Disclaimer of warranties</h2>
+              <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+              <p>We do not warrant that the Service will be uninterrupted, error-free, or that defects will be corrected. We make no warranty regarding the results that may be obtained from the use of the Service.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="liability">
+            <div class="sp-section-num">11</div>
+            <div>
+              <h2>Limitation of liability</h2>
+              <p>TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THEHOTSPOT SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE, INCLUDING LOSS OF DATA, LOST PROFITS, OR BUSINESS INTERRUPTION.</p>
+              <p>Our total liability to you for any claims arising from your use of the Service shall not exceed the amount you paid us in the twelve months preceding the claim, or $10 USD, whichever is greater.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="indemnification">
+            <div class="sp-section-num">12</div>
+            <div>
+              <h2>Indemnification</h2>
+              <p>You agree to indemnify and hold harmless thehotspot and its affiliates, officers, and employees from any claims, damages, or expenses (including reasonable attorneys' fees) arising from your use of the Service, violation of these Terms, or infringement of any third-party rights.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="termination">
+            <div class="sp-section-num">13</div>
+            <div>
+              <h2>Termination</h2>
+              <p>We may suspend or terminate your access to the Service at any time, with or without notice, for any reason including violation of these Terms. Upon termination, your right to use the Service will immediately cease.</p>
+              <p>You may stop using the Service and request account deletion at any time by contacting us at <a href="mailto:support@thehotspot.in">support@thehotspot.in</a>.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="law">
+            <div class="sp-section-num">14</div>
+            <div>
+              <h2>Governing law</h2>
+              <p>These Terms are governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in India.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="changes">
+            <div class="sp-section-num">15</div>
+            <div>
+              <h2>Changes to terms</h2>
+              <p>We may modify these Terms at any time by posting the revised Terms on this page with an updated date. We will make reasonable efforts to notify you of significant changes. Your continued use of the Service after changes are posted constitutes acceptance.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="contact">
+            <div class="sp-section-num">16</div>
+            <div>
+              <h2>Contact us</h2>
+              <p>If you have questions about these Terms of Service, please contact us:</p>
+              <ul>
+                <li>Email: <a href="mailto:support@thehotspot.in">support@thehotspot.in</a></li>
+                <li>Website: <a href="https://thehotspot.in">thehotspot.in</a></li>
+              </ul>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
+
+    <footer class="sp-footer">
+      <div class="sp-container">
+        <div class="sp-footer-top">
+          <div class="sp-footer-title">Clear rules for serious outreach.</div>
+          <a class="sp-btn sp-btn-primary" href="/">Open the dashboard</a>
+        </div>
+        <div class="sp-footer-bottom">
+          <div>&copy; 2026 thehotspot. All rights reserved.</div>
+          <div class="sp-footer-links">
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/terms.html">Terms of Service</a>
+            <a href="/contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-  <style>
-    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
-    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
-  </style>
-  <script>
-    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
-  </script>
-
-<header>
-  <div class="logo"><img src="/logo.png" width="28" height="28" alt="thehotspot logo" style="object-fit:contain;" /></div>
-  <span class="brand">thehotspot</span>
-  <a href="/" class="back">← Back to app</a>
-</header>
-
-<main>
-  <div class="tag">Legal</div>
-  <h1>Terms of Service</h1>
-  <p class="meta">Last updated: May 10, 2026 &nbsp;·&nbsp; Effective: May 10, 2026</p>
-
-  <section>
-    <h2>1. Acceptance of Terms</h2>
-    <p>By accessing or using <strong style="color:#e0e0f0">thehotspot</strong> ("Service"), operated by thehotspot ("we", "us", or "our") at <strong style="color:#e0e0f0">thehotspot.in</strong>, you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, please do not use the Service.</p>
-    <p>We reserve the right to update these Terms at any time. Continued use of the Service after changes are posted constitutes your acceptance of the revised Terms.</p>
-  </section>
-
-  <section>
-    <h2>2. Description of Service</h2>
-    <p>thehotspot is an outreach automation platform that helps users manage contacts, organize outreach campaigns, and track email communication. The Service includes:</p>
-    <ul>
-      <li>A contact database manager for organizing outreach leads</li>
-      <li>Campaign tracking and status monitoring</li>
-      <li>Google account integration for sign-in</li>
-      <li>An AI-powered outreach assistant</li>
-      <li>Email outreach tools (where available)</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>3. Eligibility</h2>
-    <p>You must be at least 13 years of age to use thehotspot. By using the Service, you represent that you meet this requirement. If you are using the Service on behalf of an organization, you represent that you have authority to bind that organization to these Terms.</p>
-  </section>
-
-  <section>
-    <h2>4. User Accounts</h2>
-    <p>You may create an account using a username and password or by signing in with your Google account. You are responsible for:</p>
-    <ul>
-      <li>Maintaining the confidentiality of your login credentials</li>
-      <li>All activities that occur under your account</li>
-      <li>Providing accurate and current information</li>
-      <li>Notifying us immediately of any unauthorized access to your account</li>
-    </ul>
-    <p>We reserve the right to suspend or terminate accounts that violate these Terms.</p>
-  </section>
-
-  <section>
-    <h2>5. Acceptable Use</h2>
-    <p>You agree to use thehotspot only for lawful purposes. You must not:</p>
-    <ul>
-      <li>Use the Service to send unsolicited bulk email (spam)</li>
-      <li>Violate any applicable laws or regulations, including anti-spam laws (CAN-SPAM, GDPR, etc.)</li>
-      <li>Upload or transmit content that is illegal, harmful, or infringes on third-party rights</li>
-      <li>Attempt to gain unauthorized access to any part of the Service or its infrastructure</li>
-      <li>Reverse engineer, decompile, or attempt to extract source code from the Service</li>
-      <li>Use the Service to harass, threaten, or harm others</li>
-      <li>Impersonate any person or entity</li>
-      <li>Interfere with or disrupt the integrity or performance of the Service</li>
-    </ul>
-    <div class="highlight">
-      thehotspot is designed for legitimate, permission-based outreach only. You are solely responsible for ensuring your use of the platform complies with all applicable email marketing laws and regulations in your jurisdiction.
-    </div>
-  </section>
-
-  <section>
-    <h2>6. Your Content</h2>
-    <p>You retain ownership of all contact data, campaign content, and other information you upload or create through the Service ("Your Content"). By using thehotspot, you grant us a limited, non-exclusive license to store and process Your Content solely to provide the Service to you.</p>
-    <p>You represent and warrant that:</p>
-    <ul>
-      <li>You have the right to use and share all content you submit</li>
-      <li>Your Content does not violate any third-party rights or applicable laws</li>
-      <li>You have obtained proper consent to store and contact the individuals in your contact lists where required by law</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>7. Google Services Integration</h2>
-    <p>thehotspot integrates with Google services (Google Sign-In, Google Sheets, Gmail) subject to Google's Terms of Service. By connecting your Google account, you also agree to <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Google's Terms of Service</a>.</p>
-    <p>You may revoke thehotspot's access to your Google account at any time through your <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account settings</a>.</p>
-  </section>
-
-  <section>
-    <h2>8. Privacy</h2>
-    <p>Your use of thehotspot is also governed by our <a href="/privacy.html">Privacy Policy</a>, which is incorporated into these Terms by reference. Please review our Privacy Policy to understand our practices.</p>
-  </section>
-
-  <section>
-    <h2>9. Intellectual Property</h2>
-    <p>The Service, including its design, features, and underlying code, is owned by thehotspot and protected by intellectual property laws. You may not copy, modify, distribute, or create derivative works from any part of the Service without our express written permission.</p>
-    <p>The thehotspot name, logo, and branding are our trademarks. Nothing in these Terms grants you any right to use our trademarks.</p>
-  </section>
-
-  <section>
-    <h2>10. Disclaimer of Warranties</h2>
-    <p>THE SERVICE IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED. TO THE FULLEST EXTENT PERMITTED BY LAW, WE DISCLAIM ALL WARRANTIES, INCLUDING IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
-    <p>We do not warrant that the Service will be uninterrupted, error-free, or that defects will be corrected. We make no warranty regarding the results that may be obtained from the use of the Service.</p>
-  </section>
-
-  <section>
-    <h2>11. Limitation of Liability</h2>
-    <p>TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THEHOTSPOT SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES ARISING OUT OF OR RELATED TO YOUR USE OF THE SERVICE, INCLUDING LOSS OF DATA, LOST PROFITS, OR BUSINESS INTERRUPTION.</p>
-    <p>Our total liability to you for any claims arising from your use of the Service shall not exceed the amount you paid us in the twelve months preceding the claim, or $10 USD, whichever is greater.</p>
-  </section>
-
-  <section>
-    <h2>12. Indemnification</h2>
-    <p>You agree to indemnify and hold harmless thehotspot and its affiliates, officers, and employees from any claims, damages, or expenses (including reasonable attorneys' fees) arising from your use of the Service, violation of these Terms, or infringement of any third-party rights.</p>
-  </section>
-
-  <section>
-    <h2>13. Termination</h2>
-    <p>We may suspend or terminate your access to the Service at any time, with or without notice, for any reason including violation of these Terms. Upon termination, your right to use the Service will immediately cease.</p>
-    <p>You may stop using the Service and request account deletion at any time by contacting us at <a href="mailto:support@thehotspot.in">support@thehotspot.in</a>.</p>
-  </section>
-
-  <section>
-    <h2>14. Governing Law</h2>
-    <p>These Terms are governed by and construed in accordance with the laws of India, without regard to its conflict of law provisions. Any disputes arising under these Terms shall be subject to the exclusive jurisdiction of the courts located in India.</p>
-  </section>
-
-  <section>
-    <h2>15. Changes to Terms</h2>
-    <p>We may modify these Terms at any time by posting the revised Terms on this page with an updated date. We will make reasonable efforts to notify you of significant changes. Your continued use of the Service after changes are posted constitutes acceptance.</p>
-  </section>
-
-  <section>
-    <h2>16. Contact Us</h2>
-    <p>If you have questions about these Terms of Service, please contact us:</p>
-    <ul>
-      <li>Email: <a href="mailto:support@thehotspot.in">support@thehotspot.in</a></li>
-      <li>Website: <a href="https://thehotspot.in">thehotspot.in</a></li>
-    </ul>
-  </section>
-</main>
-
-<footer>
-  <p>&copy; 2026 thehotspot. All rights reserved. &nbsp;·&nbsp; <a href="/privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html">Terms of Service</a></p>
-</footer>
-
 </body>
 </html>

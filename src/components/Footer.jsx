@@ -30,15 +30,30 @@ const GitHubIcon = () => (
 const COLUMNS = [
   {
     head: "Product",
-    links: ["Features", "Pricing", "Changelog", "Roadmap"],
+    links: [
+      { label: "Features", href: "#features" },
+      { label: "Pricing", href: "#pricing" },
+      { label: "Changelog", href: "#changelog" },
+      { label: "Roadmap", href: "#top" },
+    ],
   },
   {
     head: "Company",
-    links: ["About", "Blog", "Careers", "Contact"],
+    links: [
+      { label: "About", href: "#top" },
+      { label: "Blog", href: "/blog.html" },
+      { label: "Careers", href: "#top" },
+      { label: "Contact", href: "/contact.html" },
+    ],
   },
   {
     head: "Legal",
-    links: ["Privacy", "Terms", "Security", "GDPR"],
+    links: [
+      { label: "Privacy", href: "/privacy.html" },
+      { label: "Terms", href: "/terms.html" },
+      { label: "Security", href: "#top" },
+      { label: "GDPR", href: "#top" },
+    ],
   },
 ];
 
@@ -71,8 +86,8 @@ export default function Footer({ onGetStarted }) {
             <div key={col.head}>
               <div className="lp-footer-col-h">{col.head}</div>
               <div className="lp-footer-col-links">
-                {col.links.map((l) => (
-                  <a key={l} href="#top">{l}</a>
+                {col.links.map((link) => (
+                  <a key={link.label} href={link.href}>{link.label}</a>
                 ))}
               </div>
             </div>

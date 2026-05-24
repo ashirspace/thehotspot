@@ -1,267 +1,271 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Privacy Policy — thehotspot</title>
+  <title>Privacy Policy - thehotspot</title>
+  <meta name="description" content="Privacy Policy for thehotspot, including account data, Google integrations, outreach data, retention, and user rights." />
   <link rel="icon" type="image/png" href="/logo.png" />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'DM Sans', sans-serif;
-      background: #09090d;
-      color: #c0c0d0;
-      line-height: 1.75;
-      min-height: 100vh;
-    }
-    a { color: #10b981; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-
-    header {
-      border-bottom: 1px solid #1a1a24;
-      padding: 18px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-    .logo { display: flex; align-items: center; flex-shrink: 0; }
-    .brand { font-size: 17px; font-weight: 700; color: #f0f0f5; }
-    .back {
-      margin-left: auto;
-      font-size: 13px; color: #6b6b80;
-      border: 1px solid #2a2a3a; border-radius: 8px;
-      padding: 6px 14px; cursor: pointer; transition: border-color .2s;
-    }
-    .back:hover { border-color: #10b981; color: #10b981; text-decoration: none; }
-
-    main {
-      max-width: 760px;
-      margin: 0 auto;
-      padding: 56px 24px 80px;
-    }
-    .tag {
-      display: inline-block;
-      background: #0a2a1a;
-      color: #10b981;
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: .8px;
-      text-transform: uppercase;
-      padding: 4px 12px;
-      border-radius: 20px;
-      border: 1px solid #10b98133;
-      margin-bottom: 18px;
-    }
-    h1 {
-      font-size: 34px;
-      font-weight: 700;
-      color: #f0f0f5;
-      letter-spacing: -.5px;
-      margin-bottom: 10px;
-    }
-    .meta { font-size: 13px; color: #6b6b80; margin-bottom: 48px; }
-
-    section { margin-bottom: 40px; }
-    h2 {
-      font-size: 18px;
-      font-weight: 700;
-      color: #e0e0f0;
-      margin-bottom: 12px;
-      padding-bottom: 10px;
-      border-bottom: 1px solid #1a1a24;
-    }
-    p { margin-bottom: 12px; font-size: 15px; color: #a0a0b8; }
-    ul { padding-left: 20px; margin-bottom: 12px; }
-    li { font-size: 15px; color: #a0a0b8; margin-bottom: 6px; }
-
-    .highlight {
-      background: #111116;
-      border: 1px solid #1e1e28;
-      border-left: 3px solid #10b981;
-      border-radius: 0 10px 10px 0;
-      padding: 14px 18px;
-      margin: 16px 0;
-      font-size: 14px;
-      color: #c0c0d0;
-    }
-
-    footer {
-      border-top: 1px solid #1a1a24;
-      padding: 28px 24px;
-      text-align: center;
-      font-size: 12px;
-      color: #4a4a5a;
-    }
-    footer a { color: #6b6b80; }
-    footer a:hover { color: #10b981; }
-  </style>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static-page-theme.css" />
 </head>
 <body>
-  <!-- Splash -->
-  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
-    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+  <div class="sp-shell">
+    <nav class="sp-nav" aria-label="Primary navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+          thehotspot
+        </a>
+        <div class="sp-nav-links" aria-label="Page links">
+          <a class="sp-nav-link" href="/blog.html">Blog</a>
+          <a class="sp-nav-link" href="/faq.html">FAQ</a>
+          <a class="sp-nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/terms.html">Terms</a>
+          <a class="sp-btn sp-btn-primary" href="/">Back to app</a>
+        </div>
+      </div>
+    </nav>
+
+    <header class="sp-hero">
+      <div class="sp-container">
+        <div class="sp-hero-inner">
+          <div>
+            <span class="sp-eyebrow">Legal</span>
+            <h1 class="sp-h1">Privacy <em>Policy</em>.</h1>
+            <p class="sp-hero-copy">How thehotspot collects, uses, stores, and protects account, Google, contact, campaign, and usage data.</p>
+          </div>
+          <aside class="sp-hero-card" aria-label="Policy details">
+            <div class="sp-meta-list">
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">LAST UPDATED</div>
+                <div class="sp-meta-v">May 10, 2026</div>
+              </div>
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">EFFECTIVE</div>
+                <div class="sp-meta-v">May 10, 2026</div>
+              </div>
+              <div class="sp-meta-item">
+                <div class="sp-meta-k">CONTACT</div>
+                <div class="sp-meta-v"><a href="mailto:privacy@thehotspot.in">privacy@thehotspot.in</a></div>
+              </div>
+            </div>
+          </aside>
+        </div>
+      </div>
+    </header>
+
+    <main class="sp-container">
+      <div class="sp-layout">
+        <aside class="sp-index" aria-label="Privacy policy sections">
+          <div class="sp-index-title">SECTIONS</div>
+          <a href="#introduction">Introduction</a>
+          <a href="#information">Information we collect</a>
+          <a href="#use">How we use information</a>
+          <a href="#google">Google API services</a>
+          <a href="#storage">Storage and security</a>
+          <a href="#retention">Data retention</a>
+          <a href="#sharing">Sharing</a>
+          <a href="#rights">Your rights</a>
+          <a href="#local-storage">Cookies and local storage</a>
+          <a href="#children">Children's privacy</a>
+          <a href="#changes">Changes</a>
+          <a href="#contact">Contact</a>
+        </aside>
+
+        <article class="sp-content">
+          <section class="sp-section" id="introduction">
+            <div class="sp-section-num">01</div>
+            <div>
+              <h2>Introduction</h2>
+              <p>Welcome to <strong>thehotspot</strong> ("we", "our", or "us"). We operate the outreach automation platform available at <strong>thehotspot.in</strong>.</p>
+              <p>This Privacy Policy explains how we collect, use, disclose, and protect your information when you use our service. By using thehotspot, you agree to the collection and use of information as described in this policy.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="information">
+            <div class="sp-section-num">02</div>
+            <div>
+              <h2>Information we collect</h2>
+              <p>We collect information you provide directly to us and information received from third-party services you connect.</p>
+
+              <h3>Account information</h3>
+              <ul>
+                <li>Username and password for password-based accounts</li>
+                <li>Email address</li>
+                <li>Profile name and profile picture for Google Sign-In accounts</li>
+              </ul>
+
+              <h3>Google account data, when you sign in with Google</h3>
+              <ul>
+                <li>Your Google account email address and display name</li>
+                <li>Your Google profile picture</li>
+                <li>An access token used to authenticate your requests during your session</li>
+              </ul>
+              <div class="sp-note">We only request your basic Google profile (<code>email</code> and <code>profile</code> scopes) during sign-in. We do not access your Gmail messages, contacts, or any other Google data without your explicit, separate consent when you choose to connect those features.</div>
+
+              <h3>Contact and outreach data</h3>
+              <ul>
+                <li>Contact information you import, including company names, email addresses, websites, and categories</li>
+                <li>Notes and metadata you add to contacts</li>
+                <li>Campaign and outreach activity data</li>
+              </ul>
+
+              <h3>Usage data</h3>
+              <ul>
+                <li>Pages visited within the application</li>
+                <li>Features used and actions taken</li>
+                <li>Session data stored in your browser's local storage</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="sp-section" id="use">
+            <div class="sp-section-num">03</div>
+            <div>
+              <h2>How we use your information</h2>
+              <p>We use the information we collect to:</p>
+              <ul>
+                <li>Create and manage your account</li>
+                <li>Provide, operate, and improve the thehotspot platform</li>
+                <li>Authenticate you when you sign in</li>
+                <li>Store and display your contact and campaign data within the app</li>
+                <li>Send transactional communications, such as account notifications</li>
+                <li>Respond to your support requests</li>
+                <li>Ensure the security and integrity of our service</li>
+              </ul>
+              <p>We do not sell your personal information to third parties. We do not use your data for advertising purposes.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="google">
+            <div class="sp-section-num">04</div>
+            <div>
+              <h2>Google API services</h2>
+              <p>thehotspot uses Google Sign-In (OAuth 2.0) for authentication. Our use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+              <p>Specifically:</p>
+              <ul>
+                <li>We only use Google user data for the purposes described in this Privacy Policy</li>
+                <li>We do not transfer Google user data to third parties except as necessary to provide our service</li>
+                <li>We do not use Google user data for serving advertisements</li>
+                <li>We do not allow humans to read your Google data unless you have explicitly granted permission, or we are required to do so by law</li>
+              </ul>
+              <p>The access token we receive from Google is stored only in your browser's local storage and is never sent to or stored on our servers in a way that would allow us to access your Google account independently.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="storage">
+            <div class="sp-section-num">05</div>
+            <div>
+              <h2>Data storage and security</h2>
+              <p>Your account data (username, email, login method) is stored in Airtable, a third-party database service. Your contact and campaign data is stored in your browser's local storage on your device.</p>
+              <p>We implement reasonable security measures to protect your information, including:</p>
+              <ul>
+                <li>HTTPS encryption for all data transmitted between your browser and our services</li>
+                <li>Secure OAuth 2.0 authentication for Google Sign-In</li>
+                <li>No storage of Google access tokens on our servers</li>
+              </ul>
+              <p>However, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="retention">
+            <div class="sp-section-num">06</div>
+            <div>
+              <h2>Data retention</h2>
+              <p>We retain your account information for as long as your account is active or as needed to provide you services. Contact and campaign data stored in your browser's local storage persists until you clear it or log out.</p>
+              <p>You may request deletion of your account and associated data at any time by contacting us at the email below.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="sharing">
+            <div class="sp-section-num">07</div>
+            <div>
+              <h2>Sharing of information</h2>
+              <p>We do not sell, trade, or rent your personal information. We may share your information only in the following limited circumstances:</p>
+              <ul>
+                <li><strong>Service Providers:</strong> We use Airtable to store user account data. These providers are bound by confidentiality obligations.</li>
+                <li><strong>Legal Requirements:</strong> We may disclose information if required by law or in response to a valid legal request.</li>
+                <li><strong>Business Transfers:</strong> In the event of a merger or acquisition, your information may be transferred as part of that transaction.</li>
+              </ul>
+            </div>
+          </section>
+
+          <section class="sp-section" id="rights">
+            <div class="sp-section-num">08</div>
+            <div>
+              <h2>Your rights</h2>
+              <p>You have the right to:</p>
+              <ul>
+                <li><strong>Access</strong> the personal data we hold about you</li>
+                <li><strong>Correct</strong> inaccurate or incomplete data</li>
+                <li><strong>Delete</strong> your account and associated data</li>
+                <li><strong>Revoke</strong> Google's access to your account at any time via <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account Permissions</a></li>
+                <li><strong>Export</strong> your contact data from the app</li>
+              </ul>
+              <p>To exercise any of these rights, contact us at <a href="mailto:privacy@thehotspot.in">privacy@thehotspot.in</a>.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="local-storage">
+            <div class="sp-section-num">09</div>
+            <div>
+              <h2>Cookies and local storage</h2>
+              <p>thehotspot does not use cookies for tracking. We use browser <strong>local storage</strong> to persist your session and application data, such as contact lists and settings, between visits. This data stays on your device and is not transmitted to our servers.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="children">
+            <div class="sp-section-num">10</div>
+            <div>
+              <h2>Children's privacy</h2>
+              <p>thehotspot is not directed at children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="changes">
+            <div class="sp-section-num">11</div>
+            <div>
+              <h2>Changes to this policy</h2>
+              <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page with an updated date. Continued use of thehotspot after changes constitutes acceptance of the updated policy.</p>
+            </div>
+          </section>
+
+          <section class="sp-section" id="contact">
+            <div class="sp-section-num">12</div>
+            <div>
+              <h2>Contact us</h2>
+              <p>If you have questions about this Privacy Policy or your data, please contact us:</p>
+              <ul>
+                <li>Email: <a href="mailto:privacy@thehotspot.in">privacy@thehotspot.in</a></li>
+                <li>Website: <a href="https://thehotspot.in">thehotspot.in</a></li>
+              </ul>
+            </div>
+          </section>
+        </article>
+      </div>
+    </main>
+
+    <footer class="sp-footer">
+      <div class="sp-container">
+        <div class="sp-footer-top">
+          <div class="sp-footer-title">Built for responsible outreach.</div>
+          <a class="sp-btn sp-btn-primary" href="/">Open the dashboard</a>
+        </div>
+        <div class="sp-footer-bottom">
+          <div>&copy; 2026 thehotspot. All rights reserved.</div>
+          <div class="sp-footer-links">
+            <a href="/privacy.html">Privacy Policy</a>
+            <a href="/terms.html">Terms of Service</a>
+            <a href="/contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-  <style>
-    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
-    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
-  </style>
-  <script>
-    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
-  </script>
-
-<header>
-  <div class="logo"><img src="/logo.png" width="28" height="28" alt="thehotspot logo" style="object-fit:contain;" /></div>
-  <span class="brand">thehotspot</span>
-  <a href="/" class="back">← Back to app</a>
-</header>
-
-<main>
-  <div class="tag">Legal</div>
-  <h1>Privacy Policy</h1>
-  <p class="meta">Last updated: May 10, 2026 &nbsp;·&nbsp; Effective: May 10, 2026</p>
-
-  <section>
-    <h2>1. Introduction</h2>
-    <p>Welcome to <strong style="color:#e0e0f0">thehotspot</strong> ("we", "our", or "us"). We operate the outreach automation platform available at <strong style="color:#e0e0f0">thehotspot.in</strong>.</p>
-    <p>This Privacy Policy explains how we collect, use, disclose, and protect your information when you use our service. By using thehotspot, you agree to the collection and use of information as described in this policy.</p>
-  </section>
-
-  <section>
-    <h2>2. Information We Collect</h2>
-    <p>We collect information you provide directly to us and information received from third-party services you connect:</p>
-
-    <h3 style="font-size:15px;font-weight:600;color:#d0d0e0;margin:16px 0 8px">a) Account Information</h3>
-    <ul>
-      <li>Username and password (for password-based accounts)</li>
-      <li>Email address</li>
-      <li>Profile name and profile picture (for Google Sign-In accounts)</li>
-    </ul>
-
-    <h3 style="font-size:15px;font-weight:600;color:#d0d0e0;margin:16px 0 8px">b) Google Account Data (when you sign in with Google)</h3>
-    <ul>
-      <li>Your Google account email address and display name</li>
-      <li>Your Google profile picture</li>
-      <li>An access token used to authenticate your requests during your session</li>
-    </ul>
-    <div class="highlight">
-      We only request your basic Google profile (<code>email</code> and <code>profile</code> scopes) during sign-in. We do not access your Gmail messages, contacts, or any other Google data without your explicit, separate consent when you choose to connect those features.
-    </div>
-
-    <h3 style="font-size:15px;font-weight:600;color:#d0d0e0;margin:16px 0 8px">c) Contact and Outreach Data</h3>
-    <ul>
-      <li>Contact information you import (company names, email addresses, websites, categories)</li>
-      <li>Notes and metadata you add to contacts</li>
-      <li>Campaign and outreach activity data</li>
-    </ul>
-
-    <h3 style="font-size:15px;font-weight:600;color:#d0d0e0;margin:16px 0 8px">d) Usage Data</h3>
-    <ul>
-      <li>Pages visited within the application</li>
-      <li>Features used and actions taken</li>
-      <li>Session data stored in your browser's local storage</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>3. How We Use Your Information</h2>
-    <p>We use the information we collect to:</p>
-    <ul>
-      <li>Create and manage your account</li>
-      <li>Provide, operate, and improve the thehotspot platform</li>
-      <li>Authenticate you when you sign in</li>
-      <li>Store and display your contact and campaign data within the app</li>
-      <li>Send transactional communications (e.g., account notifications)</li>
-      <li>Respond to your support requests</li>
-      <li>Ensure the security and integrity of our service</li>
-    </ul>
-    <p>We do not sell your personal information to third parties. We do not use your data for advertising purposes.</p>
-  </section>
-
-  <section>
-    <h2>4. Google API Services</h2>
-    <p>thehotspot uses Google Sign-In (OAuth 2.0) for authentication. Our use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy" target="_blank" rel="noopener">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
-    <p>Specifically:</p>
-    <ul>
-      <li>We only use Google user data for the purposes described in this Privacy Policy</li>
-      <li>We do not transfer Google user data to third parties except as necessary to provide our service</li>
-      <li>We do not use Google user data for serving advertisements</li>
-      <li>We do not allow humans to read your Google data unless you have explicitly granted permission, or we are required to do so by law</li>
-    </ul>
-    <p>The access token we receive from Google is stored only in your browser's local storage and is never sent to or stored on our servers in a way that would allow us to access your Google account independently.</p>
-  </section>
-
-  <section>
-    <h2>5. Data Storage and Security</h2>
-    <p>Your account data (username, email, login method) is stored in Airtable, a third-party database service. Your contact and campaign data is stored in your browser's local storage on your device.</p>
-    <p>We implement reasonable security measures to protect your information, including:</p>
-    <ul>
-      <li>HTTPS encryption for all data transmitted between your browser and our services</li>
-      <li>Secure OAuth 2.0 authentication for Google Sign-In</li>
-      <li>No storage of Google access tokens on our servers</li>
-    </ul>
-    <p>However, no method of transmission over the Internet or electronic storage is 100% secure. We cannot guarantee absolute security.</p>
-  </section>
-
-  <section>
-    <h2>6. Data Retention</h2>
-    <p>We retain your account information for as long as your account is active or as needed to provide you services. Contact and campaign data stored in your browser's local storage persists until you clear it or log out.</p>
-    <p>You may request deletion of your account and associated data at any time by contacting us at the email below.</p>
-  </section>
-
-  <section>
-    <h2>7. Sharing of Information</h2>
-    <p>We do not sell, trade, or rent your personal information. We may share your information only in the following limited circumstances:</p>
-    <ul>
-      <li><strong style="color:#d0d0e0">Service Providers:</strong> We use Airtable to store user account data. These providers are bound by confidentiality obligations.</li>
-      <li><strong style="color:#d0d0e0">Legal Requirements:</strong> We may disclose information if required by law or in response to a valid legal request.</li>
-      <li><strong style="color:#d0d0e0">Business Transfers:</strong> In the event of a merger or acquisition, your information may be transferred as part of that transaction.</li>
-    </ul>
-  </section>
-
-  <section>
-    <h2>8. Your Rights</h2>
-    <p>You have the right to:</p>
-    <ul>
-      <li><strong style="color:#d0d0e0">Access</strong> the personal data we hold about you</li>
-      <li><strong style="color:#d0d0e0">Correct</strong> inaccurate or incomplete data</li>
-      <li><strong style="color:#d0d0e0">Delete</strong> your account and associated data</li>
-      <li><strong style="color:#d0d0e0">Revoke</strong> Google's access to your account at any time via <a href="https://myaccount.google.com/permissions" target="_blank" rel="noopener">Google Account Permissions</a></li>
-      <li><strong style="color:#d0d0e0">Export</strong> your contact data from the app</li>
-    </ul>
-    <p>To exercise any of these rights, contact us at <a href="mailto:privacy@thehotspot.in">privacy@thehotspot.in</a>.</p>
-  </section>
-
-  <section>
-    <h2>9. Cookies and Local Storage</h2>
-    <p>thehotspot does not use cookies for tracking. We use browser <strong style="color:#d0d0e0">local storage</strong> to persist your session and application data (such as contact lists and settings) between visits. This data stays on your device and is not transmitted to our servers.</p>
-  </section>
-
-  <section>
-    <h2>10. Children's Privacy</h2>
-    <p>thehotspot is not directed at children under 13 years of age. We do not knowingly collect personal information from children under 13. If you believe we have inadvertently collected such information, please contact us immediately.</p>
-  </section>
-
-  <section>
-    <h2>11. Changes to This Policy</h2>
-    <p>We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page with an updated date. Continued use of thehotspot after changes constitutes acceptance of the updated policy.</p>
-  </section>
-
-  <section>
-    <h2>12. Contact Us</h2>
-    <p>If you have questions about this Privacy Policy or your data, please contact us:</p>
-    <ul>
-      <li>Email: <a href="mailto:privacy@thehotspot.in">privacy@thehotspot.in</a></li>
-      <li>Website: <a href="https://thehotspot.in">thehotspot.in</a></li>
-    </ul>
-  </section>
-</main>
-
-<footer>
-  <p>&copy; 2026 thehotspot. All rights reserved. &nbsp;·&nbsp; <a href="/privacy.html">Privacy Policy</a> &nbsp;·&nbsp; <a href="/terms.html">Terms of Service</a></p>
-</footer>
-
 </body>
 </html>
