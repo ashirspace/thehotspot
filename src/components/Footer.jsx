@@ -31,18 +31,18 @@ const COLUMNS = [
   {
     head: "Product",
     links: [
-      { label: "Features", href: "#features" },
-      { label: "Pricing", href: "#pricing" },
-      { label: "Changelog", href: "#changelog" },
-      { label: "Roadmap", href: "#top" },
+      { label: "Features", href: "/features.html" },
+      { label: "Pricing", href: "/pricing.html" },
+      { label: "Changelog", href: "/changelog.html" },
+      { label: "Roadmap", href: "/roadmap.html" },
     ],
   },
   {
     head: "Company",
     links: [
-      { label: "About", href: "#top" },
+      { label: "About", href: "/about.html" },
       { label: "Blog", href: "/blog.html" },
-      { label: "Careers", href: "#top" },
+      { label: "Careers", href: "/careers.html" },
       { label: "Contact", href: "/contact.html" },
     ],
   },
@@ -51,8 +51,8 @@ const COLUMNS = [
     links: [
       { label: "Privacy", href: "/privacy.html" },
       { label: "Terms", href: "/terms.html" },
-      { label: "Security", href: "#top" },
-      { label: "GDPR", href: "#top" },
+      { label: "Security", href: "/security.html" },
+      { label: "GDPR", href: "/gdpr.html" },
     ],
   },
 ];

@@ -415,6 +415,185 @@ svg {
   color: var(--text-muted);
 }
 
+.sp-page-band {
+  padding: 8px 0 96px;
+}
+
+.sp-card-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.sp-page-card {
+  background: rgba(255, 255, 255, 0.78);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 26px;
+  min-height: 230px;
+}
+
+.sp-page-card h2,
+.sp-page-card h3 {
+  font-family: var(--font-display);
+  color: var(--text);
+  letter-spacing: -0.025em;
+  line-height: 1.12;
+}
+
+.sp-page-card h2 {
+  font-size: clamp(26px, 3.4vw, 40px);
+  margin-bottom: 14px;
+}
+
+.sp-page-card h3 {
+  font-size: 22px;
+  margin-bottom: 12px;
+}
+
+.sp-page-card p {
+  color: var(--text-muted);
+  font-size: 15px;
+}
+
+.sp-card-kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--teal);
+  margin-bottom: 16px;
+  text-transform: uppercase;
+}
+
+.sp-split-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.82fr) minmax(280px, 0.58fr);
+  gap: 24px;
+  align-items: stretch;
+  margin-bottom: 28px;
+}
+
+.sp-timeline {
+  display: grid;
+  gap: 14px;
+}
+
+.sp-timeline-row {
+  display: grid;
+  grid-template-columns: 92px minmax(0, 1fr);
+  gap: 18px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.sp-timeline-date {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--teal);
+}
+
+.sp-timeline-row strong {
+  display: block;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.sp-timeline-row span {
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+.sp-price {
+  font-family: var(--font-display);
+  font-size: 42px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.sp-form {
+  display: grid;
+  gap: 18px;
+}
+
+.sp-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.sp-field {
+  display: grid;
+  gap: 7px;
+}
+
+.sp-field-full {
+  grid-column: 1 / -1;
+}
+
+.sp-field label {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-soft);
+}
+
+.sp-field input,
+.sp-field select,
+.sp-field textarea {
+  width: 100%;
+  min-height: 46px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--text);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  padding: 11px 13px;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+
+.sp-field textarea {
+  min-height: 138px;
+  resize: vertical;
+}
+
+.sp-field input:focus,
+.sp-field select:focus,
+.sp-field textarea:focus {
+  border-color: var(--teal);
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.12);
+}
+
+.sp-field input::placeholder,
+.sp-field textarea::placeholder {
+  color: var(--text-faint);
+}
+
+.sp-contact-methods {
+  display: grid;
+  gap: 14px;
+}
+
+.sp-contact-method {
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.sp-contact-method span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-bottom: 3px;
+}
+
+.sp-contact-method strong {
+  color: var(--text);
+}
+
 .sp-footer {
   background: var(--bg-dark);
   color: #cbd5e1;
@@ -637,7 +816,8 @@ svg {
 
   .sp-hero-inner,
   .sp-layout,
-  .blog-feature {
+  .blog-feature,
+  .sp-split-panel {
     grid-template-columns: 1fr;
   }
 
@@ -655,7 +835,8 @@ svg {
     grid-column: 1 / -1;
   }
 
-  .blog-grid {
+  .blog-grid,
+  .sp-card-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
@@ -679,6 +860,7 @@ svg {
   }
 
   .sp-hero-card,
+  .sp-page-card,
   .blog-feature-card,
   .blog-feature-visual,
   .blog-card {
@@ -695,12 +877,23 @@ svg {
     font-size: 11px;
   }
 
+  .sp-form-grid,
   .sp-footer-top,
   .sp-footer-bottom {
     grid-template-columns: 1fr;
   }
 
-  .blog-grid {
+  .sp-field-full {
+    grid-column: auto;
+  }
+
+  .blog-grid,
+  .sp-card-grid {
     grid-template-columns: 1fr;
+  }
+
+  .sp-timeline-row {
+    grid-template-columns: 1fr;
+    gap: 4px;
   }
 }
