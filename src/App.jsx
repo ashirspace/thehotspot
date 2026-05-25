@@ -850,12 +850,9 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
 /* ───────── DETAIL PAGES ───────── */
 function BackButton({ onClick, label }) {
   return (
-    <button onClick={onClick} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", color: "#64748B", cursor: "pointer", fontSize: 13, fontWeight: 500, fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, transition: "color .2s" }}
-      onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
-      onMouseLeave={e => e.currentTarget.style.color = "#64748B"}
-    >
+    <button onClick={onClick} className="dash-back">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-      Back to Dashboard
+      {label || "Back to home"}
     </button>
   );
 }
@@ -2094,13 +2091,22 @@ function HomePage({ user, contactCount, setPage }) {
 
   return (
     <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-      <div style={{ background: "linear-gradient(135deg, #0f172a 0%, #0c2340 55%, #0d3d2e 100%)", borderRadius: 14, padding: "40px 44px", marginBottom: 28, position: "relative", overflow: "hidden" }}>
-        <div style={{ position: "absolute", top: -70, right: -70, width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.14) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ position: "absolute", bottom: -40, left: "35%", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
-        <div style={{ fontFamily: "var(--font-mono)", fontSize: 11, color: "#10b981", letterSpacing: "0.14em", marginBottom: 14, position: "relative" }}>01 — OVERVIEW</div>
-        <h1 style={{ margin: 0, fontSize: "clamp(28px, 3.5vw, 44px)", fontWeight: 700, fontFamily: "var(--font-display)", color: "#f1f5f9", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 10, position: "relative" }}>{greeting}, {firstName}.</h1>
-        <p style={{ margin: 0, fontSize: 15, color: "#64748b", lineHeight: 1.6, position: "relative" }}>B2B outreach — leads, emails, sequences, replies.</p>
-      </div>
+      <section className="dash-home-hero">
+        <div>
+          <span className="dash-eyebrow">01 - Overview</span>
+          <h1 className="dash-page-title" style={{ marginTop: 14 }}>
+            {greeting}, <em>{firstName}</em>.
+          </h1>
+          <p className="dash-home-hero-copy">
+            B2B outreach, leads, emails, sequences, and replies tracked in one calm workspace.
+          </p>
+        </div>
+        <aside className="dash-home-hero-card" aria-label="Email activity summary">
+          <span className="dash-eyebrow"><em>Today</em></span>
+          <strong>{emailsSent.toLocaleString()}</strong>
+          <span>emails sent from recent campaigns</span>
+        </aside>
+      </section>
       <div className="lp-bento">
         {CARDS.map(card => <HpBentoCard key={card.num} {...card} />)}
       </div>
@@ -2146,7 +2152,7 @@ function DashboardPage({ user, contactCount, setPage }) {
       {/* Editorial header */}
       <header className="dash-page-head">
         <span className="dash-eyebrow">{dateEyebrow}</span>
-        <h1 className="dash-page-title">Outreach <em>command</em> center.</h1>
+        <h1 className="dash-page-title">Outreach <em>command center</em>.</h1>
         <p className="dash-page-stats">
           <strong>{emailsSent}</strong>&nbsp;emails sent
           <span className="sep">·</span>
@@ -3533,10 +3539,10 @@ function CampaignStatusPage({ onBack, user }) {
                 </tr>
               </thead>
               <tbody>
-                {older.slice(0, 8).map(h => {
+                {older.slice(0, 8).map((h, i) => {
                   const named = h.category && h.category !== "all";
                   return (
-                    <tr key={h.id}>
+                    <tr key={h.id || `${h.date || "campaign"}-${i}`}>
                       <td>{named ? h.category : <em style={{ color: "var(--text-faint)" }}>Unnamed campaign</em>}</td>
                       <td>
                         {h.cancelled
@@ -3865,30 +3871,36 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
   const sentCount = sendProgress.results.filter(r => r.status === "sent").length;
   const failedCount = sendProgress.results.filter(r => r.status === "failed").length;
 
-  const card = { background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "24px", marginBottom: 20, boxShadow: "0 2px 8px rgba(15,23,42,0.05)" };
-  const btn = (color) => ({ padding: "10px 20px", borderRadius: 10, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13 });
+  const card = { background: "rgba(255,255,255,0.8)", border: "1px solid var(--border)", borderRadius: "var(--r-md)", padding: "24px", marginBottom: 20, boxShadow: "var(--shadow-sm)" };
+  const btn = () => ({ padding: "10px 20px", borderRadius: "var(--r)", border: "none", cursor: "pointer", fontFamily: "var(--font-sans)", fontWeight: 600, fontSize: 13 });
 
   /* ── CONFIGURE ── */
   if (step === "configure") return (
     <div>
+      <BackButton onClick={onBack} />
+      <div className="dash-page-head">
+        <span className="dash-eyebrow">03 - Send campaign</span>
+        <h1 className="dash-page-title">Email <em>sender</em></h1>
+        <div style={{ fontSize: 14, color: "var(--text-muted)" }}>Choose contacts, add offer context, and generate reviewable drafts.</div>
+      </div>
       <div style={card}>
         <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 16 }}>1. Select Contacts</div>
         {/* Category filter */}
         <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 16 }}>
           {["All", "Network", "CPS", "CPL", "CPA", "Mobile"].map(cat => (
             <button key={cat} onClick={() => { setSelectedCategory(cat); setSelectedIds(new Set((cat === "All" ? allContacts : allContacts.filter(c => c.category === cat)).map((_, i) => i))); }} style={{
-              padding: "6px 14px", borderRadius: 20, border: "1px solid", fontSize: 12, fontWeight: 600, cursor: "pointer",
-              background: selectedCategory === cat ? "#6366f120" : "var(--bg-alt)",
-              color: selectedCategory === cat ? "#818cf8" : "#64748B",
-              borderColor: selectedCategory === cat ? "#6366f1" : "var(--border)",
-              fontFamily: "'DM Sans',sans-serif",
+              padding: "6px 14px", borderRadius: "var(--r)", border: "1px solid", fontSize: 12, fontWeight: 600, cursor: "pointer",
+              background: selectedCategory === cat ? "var(--teal-tint)" : "rgba(255,255,255,0.72)",
+              color: selectedCategory === cat ? "var(--teal-dark)" : "var(--text-soft)",
+              borderColor: selectedCategory === cat ? "var(--teal-light)" : "var(--border)",
+              fontFamily: "var(--font-sans)",
             }}>{cat}</button>
           ))}
         </div>
         {/* Select all / none */}
         <div style={{ display: "flex", gap: 8, marginBottom: 12 }}>
-          <button onClick={selectAll} style={{ ...btn(), background: "var(--bg-alt)", color: "#818cf8", border: "1px solid var(--border)" }}>Select All</button>
-          <button onClick={selectNone} style={{ ...btn(), background: "var(--bg-alt)", color: "#64748B", border: "1px solid var(--border)" }}>Clear</button>
+          <button onClick={selectAll} style={{ ...btn(), background: "var(--teal-tint)", color: "var(--teal-dark)", border: "1px solid var(--teal-light)" }}>Select All</button>
+          <button onClick={selectNone} style={{ ...btn(), background: "rgba(255,255,255,0.72)", color: "var(--text-soft)", border: "1px solid var(--border)" }}>Clear</button>
           <span style={{ marginLeft: "auto", fontSize: 12, color: "#64748B", alignSelf: "center" }}>{selectedIds.size} selected</span>
         </div>
         {/* Contact list */}
@@ -3903,8 +3915,8 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
               transition: "background .1s",
             }}>
               <div style={{
-                width: 18, height: 18, borderRadius: 4, border: `2px solid ${selectedIds.has(i) ? "#4F46E5" : "var(--text-muted)"}`,
-                background: selectedIds.has(i) ? "#4F46E5" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
+                width: 18, height: 18, borderRadius: 4, border: `2px solid ${selectedIds.has(i) ? "var(--teal)" : "var(--text-faint)"}`,
+                background: selectedIds.has(i) ? "var(--teal)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
               }}>
                 {selectedIds.has(i) && <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12" /></svg>}
               </div>
@@ -3925,8 +3937,8 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
           onChange={e => setOfferContext(e.target.value)}
           placeholder="e.g. We offer 30% commission on all sales, top-tier creatives, weekly payouts..."
           rows={3}
-          style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "12px 14px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }}
-          onFocus={e => { e.target.style.borderColor = "#4F46E5"; e.target.style.boxShadow = "0 0 0 3px #4F46E515"; }}
+          style={{ width: "100%", background: "rgba(255,255,255,0.78)", border: "1px solid var(--border)", borderRadius: "var(--r)", padding: "12px 14px", fontSize: 13, color: "var(--text)", fontFamily: "var(--font-sans)", outline: "none", resize: "vertical" }}
+          onFocus={e => { e.target.style.borderColor = "var(--border-teal)"; e.target.style.boxShadow = "0 0 0 3px var(--teal-tint)"; }}
           onBlur={e => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; }}
         />
       </div>
@@ -3938,13 +3950,13 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
             <div style={{ fontSize: 13, fontWeight: 600, color: "#9A3412" }}>Gmail not connected</div>
             <div style={{ fontSize: 12, color: "#C2410C" }}>You need to connect Gmail to send emails</div>
           </div>
-          <button onClick={connectGmail} style={{ ...btn("#EA580C"), background: "#EA580C", color: "#fff" }}>Connect Gmail</button>
+          <button onClick={connectGmail} style={{ ...btn(), background: "var(--teal)", color: "#fff" }}>Connect Gmail</button>
         </div>
       )}
 
       <button
         onClick={generateDrafts}
-        style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "linear-gradient(135deg,#10b981,#0ea5e9)" : "var(--text)", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 4px 16px rgba(16,185,129,0.3)" : "none", transition: "all .2s" }}
+        style={{ width: "100%", padding: "14px", borderRadius: "var(--r)", border: "none", cursor: selectedIds.size > 0 ? "pointer" : "default", fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 14, background: selectedIds.size > 0 ? "var(--teal)" : "var(--bg-hover)", color: selectedIds.size > 0 ? "#fff" : "#94A3B8", boxShadow: selectedIds.size > 0 ? "0 8px 18px rgba(13,148,136,0.16)" : "none", transition: "all .2s" }}
       >
         <LuSparkles size={16} /> Generate {selectedIds.size} Draft{selectedIds.size !== 1 ? "s" : ""} with AI
       </button>
@@ -3958,7 +3970,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         <LuSparkles size={16} /> Generating personalized drafts...
       </div>
       <div style={{ background: "var(--border-strong)", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
-        <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#10b981,#0ea5e9)", width: `${genProgress.total ? (genProgress.current / genProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
+        <div style={{ height: "100%", borderRadius: 10, background: "var(--teal)", width: `${genProgress.total ? (genProgress.current / genProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
       </div>
       <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 24 }}>{genProgress.current} / {genProgress.total} drafts created</div>
       {drafts.length > 0 && (
@@ -4018,7 +4030,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         <button
           onClick={sendEmails}
           disabled={approvedCount === 0}
-          style={{ width: "100%", padding: "14px", borderRadius: 12, border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "linear-gradient(135deg,#4F46E5,#0ea5e9)" : "var(--bg-hover)", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 4px 16px rgba(79,70,229,0.3)" : "none", transition: "all .2s" }}
+          style={{ width: "100%", padding: "14px", borderRadius: "var(--r)", border: "none", cursor: approvedCount > 0 ? "pointer" : "default", fontFamily: "var(--font-sans)", fontWeight: 700, fontSize: 14, background: approvedCount > 0 ? "var(--teal)" : "var(--bg-hover)", color: approvedCount > 0 ? "#fff" : "#94A3B8", boxShadow: approvedCount > 0 ? "0 8px 18px rgba(13,148,136,0.16)" : "none", transition: "all .2s" }}
         >
           <LuSend size={15} /> Send {approvedCount} Email{approvedCount !== 1 ? "s" : ""}
         </button>
@@ -4031,7 +4043,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
     <div style={card}>
       <div style={{ fontSize: 15, fontWeight: 700, color: "var(--text)", marginBottom: 20, textAlign: "center", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}><LuSend size={16} /> Sending emails...</div>
       <div style={{ background: "var(--border-strong)", borderRadius: 10, height: 8, marginBottom: 12, overflow: "hidden" }}>
-        <div style={{ height: "100%", borderRadius: 10, background: "linear-gradient(90deg,#4F46E5,#0ea5e9)", width: `${sendProgress.total ? (sendProgress.current / sendProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
+        <div style={{ height: "100%", borderRadius: 10, background: "var(--teal)", width: `${sendProgress.total ? (sendProgress.current / sendProgress.total) * 100 : 0}%`, transition: "width .4s ease" }} />
       </div>
       <div style={{ textAlign: "center", fontSize: 13, color: "#64748B", marginBottom: 20 }}>{sendProgress.current} / {sendProgress.total} sent</div>
       <div style={{ maxHeight: 300, overflowY: "auto", display: "flex", flexDirection: "column", gap: 6 }}>
@@ -4056,7 +4068,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
         {failedCount > 0 && <> · <span style={{ color: "#EF4444", fontWeight: 700 }}>{failedCount} failed</span></>}
       </div>
       <div style={{ display: "flex", gap: 10, justifyContent: "center" }}>
-        <button onClick={() => { setStep("configure"); setDrafts([]); setSelectedIds(new Set(allContacts.map((_, i) => i))); }} style={{ ...btn(), background: "#6366f120", color: "#818cf8", border: "1px solid #6366f130" }}>Send Another Campaign</button>
+        <button onClick={() => { setStep("configure"); setDrafts([]); setSelectedIds(new Set(allContacts.map((_, i) => i))); }} style={{ ...btn(), background: "var(--teal-tint)", color: "var(--teal-dark)", border: "1px solid var(--teal-light)" }}>Send Another Campaign</button>
         <button onClick={onBack} style={{ ...btn(), background: "var(--bg-hover)", color: "#64748B", border: "1px solid var(--border)" }}>Back to Dashboard</button>
       </div>
     </div>
@@ -5160,8 +5172,8 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         )}
 
         {/* MAIN CONTENT */}
-        <div className="rsp-main-content" style={{ flex: 1, overflowY: "auto", padding: "32px", width: "100%", position: "relative", background: "var(--bg)" }}>
-          <div style={{ maxWidth: 1080, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
+        <div className="rsp-main-content" style={{ flex: 1, overflowY: "auto", padding: "32px", width: "100%", position: "relative", background: "transparent" }}>
+          <div style={{ maxWidth: 1160, margin: "0 auto", filter: pageLoading ? "blur(2px)" : "none", transition: "filter .15s" }}>
 
             {/* ── HOME ── */}
             {page === null && <HomePage user={user} contactCount={contactCount} setPage={setPage} />}
