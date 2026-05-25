@@ -11,7 +11,7 @@ const LINKS = [
 function Wordmark() {
   return (
     <span className="lp-nav-logo">
-      <span className="lp-nav-logo-dot" aria-hidden="true" />
+      <img className="lp-nav-logo-mark" src="/logo.png" alt="" aria-hidden="true" />
       thehotspot
     </span>
   );

@@ -3794,7 +3794,17 @@ function parseEmailSignature(body = "", fallback = {}) {
   };
 }
 
-function renderStructuredSignature(signature) {
+function getEmailLogoUrl(pixelUrl = "") {
+  try {
+    if (pixelUrl) return `${new URL(pixelUrl).origin}/logo.png`;
+  } catch {}
+  if (typeof window !== "undefined" && window.location?.origin) {
+    return `${window.location.origin}/logo.png`;
+  }
+  return "";
+}
+
+function renderStructuredSignature(signature, logoUrl = "") {
   const initials = (signature.name || "A")
     .split(/\s+/)
     .filter(Boolean)
@@ -3805,8 +3815,10 @@ function renderStructuredSignature(signature) {
   return `
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 0 0;padding-top:18px;border-top:1px solid #e5e7eb;">
       <tr>
-        <td style="width:44px;vertical-align:top;padding:2px 12px 0 0;">
-          <div style="width:36px;height:36px;border-radius:8px;background:#0d9488;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:36px;text-align:center;">${escapeEmailHtml(initials)}</div>
+        <td style="width:52px;vertical-align:top;padding:2px 12px 0 0;">
+          ${logoUrl
+            ? `<img src="${escapeEmailHtml(logoUrl)}" width="40" height="40" alt="thehotspot" style="display:block;width:40px;height:40px;border:0;object-fit:contain;" />`
+            : `<div style="width:40px;height:40px;border-radius:8px;background:#0d9488;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:40px;text-align:center;">${escapeEmailHtml(initials)}</div>`}
         </td>
         <td style="vertical-align:top;padding:0;">
           <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#111827;margin:0 0 2px 0;">${escapeEmailHtml(signature.signoff)}</div>
@@ -3820,6 +3832,7 @@ function renderStructuredSignature(signature) {
 
 function wrapEmailHtml(plainBody, pixelUrl = "", sender = {}) {
   const signature = parseEmailSignature(plainBody, sender);
+  const logoUrl = getEmailLogoUrl(pixelUrl);
   const paragraphs = signature.bodyText
     .split(/\n{2,}/)
     .map(p => p.trim())
@@ -3831,7 +3844,7 @@ function wrapEmailHtml(plainBody, pixelUrl = "", sender = {}) {
   const pixel = pixelUrl
     ? `<img src="${escapeEmailHtml(pixelUrl)}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;overflow:hidden;" />`
     : "";
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}${renderStructuredSignature(signature)}<p style="margin:22px 0 0 0;padding-top:14px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;line-height:1.5;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr>${pixel ? `<tr><td style="font-size:0;line-height:0;height:1px;">${pixel}</td></tr>` : ""}</table></td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}${renderStructuredSignature(signature, logoUrl)}<p style="margin:22px 0 0 0;padding-top:14px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;line-height:1.5;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr>${pixel ? `<tr><td style="font-size:0;line-height:0;height:1px;">${pixel}</td></tr>` : ""}</table></td></tr></table></body></html>`;
 }
 
 function makeGmailMessage({ to, subject, body, html = false }) {
@@ -5159,7 +5172,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
         </button>
         <button onClick={() => setPage(null)} className="dash-wordmark"
           style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-          <span className="dash-wordmark-dot" />
+          <img className="dash-wordmark-mark" src="/logo.png" alt="" aria-hidden="true" />
           thehotspot
         </button>
         {page !== null && (

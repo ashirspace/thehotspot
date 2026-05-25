@@ -62,12 +62,15 @@ function parseEmailSignature(body = "", fallback = {}) {
   };
 }
 
-function renderStructuredSignature(signature) {
+function renderStructuredSignature(signature, logoUrl = "") {
   const initials = (signature.name || "A").split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]?.toUpperCase()).join("") || "A";
-  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 0 0;padding-top:18px;border-top:1px solid #e5e7eb;"><tr><td style="width:44px;vertical-align:top;padding:2px 12px 0 0;"><div style="width:36px;height:36px;border-radius:8px;background:#0d9488;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:36px;text-align:center;">${escapeEmailHtml(initials)}</div></td><td style="vertical-align:top;padding:0;"><div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#111827;margin:0 0 2px 0;">${escapeEmailHtml(signature.signoff)}</div><div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#111827;font-weight:700;margin:0;">${escapeEmailHtml(signature.name)}</div>${signature.title ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#475569;margin:1px 0 0 0;">${escapeEmailHtml(signature.title)}</div>` : ""}<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#0d9488;font-weight:700;margin:1px 0 0 0;">${escapeEmailHtml(signature.company)}</div></td></tr></table>`;
+  const mark = logoUrl
+    ? `<img src="${escapeEmailHtml(logoUrl)}" width="40" height="40" alt="thehotspot" style="display:block;width:40px;height:40px;border:0;object-fit:contain;" />`
+    : `<div style="width:40px;height:40px;border-radius:8px;background:#0d9488;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:40px;text-align:center;">${escapeEmailHtml(initials)}</div>`;
+  return `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 0 0;padding-top:18px;border-top:1px solid #e5e7eb;"><tr><td style="width:52px;vertical-align:top;padding:2px 12px 0 0;">${mark}</td><td style="vertical-align:top;padding:0;"><div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#111827;margin:0 0 2px 0;">${escapeEmailHtml(signature.signoff)}</div><div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#111827;font-weight:700;margin:0;">${escapeEmailHtml(signature.name)}</div>${signature.title ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#475569;margin:1px 0 0 0;">${escapeEmailHtml(signature.title)}</div>` : ""}<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#0d9488;font-weight:700;margin:1px 0 0 0;">${escapeEmailHtml(signature.company)}</div></td></tr></table>`;
 }
 
-function wrapEmailHtml(plainBody, sender = {}) {
+function wrapEmailHtml(plainBody, sender = {}, logoUrl = "") {
   const signature = parseEmailSignature(plainBody, sender);
   const paragraphs = signature.bodyText
     .split(/\n{2,}/)
@@ -77,7 +80,7 @@ function wrapEmailHtml(plainBody, sender = {}) {
       return `<p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;">${escapeEmailHtml(p).replace(/\n/g, "<br>")}</p>`;
     })
     .join("");
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}${renderStructuredSignature(signature)}<p style="margin:22px 0 0 0;padding-top:14px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr></table></td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}${renderStructuredSignature(signature, logoUrl)}<p style="margin:22px 0 0 0;padding-top:14px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr></table></td></tr></table></body></html>`;
 }
 
 function buildGmailMessage(to, subject, htmlBody) {
@@ -98,8 +101,8 @@ function buildGmailMessage(to, subject, htmlBody) {
     .replace(/=+$/, "");
 }
 
-async function sendEmail(accessToken, to, subject, body) {
-  const raw = buildGmailMessage(to, subject, wrapEmailHtml(body));
+async function sendEmail(accessToken, to, subject, body, logoUrl = "") {
+  const raw = buildGmailMessage(to, subject, wrapEmailHtml(body, {}, logoUrl));
   const r = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
     method: "POST",
     headers: { Authorization: `Bearer ${accessToken}`, "Content-Type": "application/json" },
@@ -129,6 +132,7 @@ export default async function handler(req, res) {
 
   const proto = req.headers["x-forwarded-proto"] || "https";
   const host = req.headers.host;
+  const logoUrl = `${proto}://${host}/logo.png`;
   const results = { scheduled: 0, followups: 0, errors: [] };
 
   // Get all users with stored refresh tokens
@@ -172,7 +176,7 @@ export default async function handler(req, res) {
         for (const c of contacts) {
           try {
             const draft = await generateEmail(host, proto, c.company || c.name || c.email, c.category || category || "Network", offerContext, maxChars);
-            await sendEmail(accessToken, c.email, draft.subject, draft.body);
+            await sendEmail(accessToken, c.email, draft.subject, draft.body, logoUrl);
             sent++;
             results.scheduled++;
             await new Promise(r => setTimeout(r, 2500));
@@ -217,7 +221,7 @@ export default async function handler(req, res) {
             : "Last follow-up from me — wanted to make sure this didn't get lost. Happy to connect whenever timing works.";
 
           const draft = await generateEmail(host, proto, company || email.split("@")[0], "Network", followUpContext, 200);
-          await sendEmail(accessToken, email, `Re: ${draft.subject}`, draft.body);
+          await sendEmail(accessToken, email, `Re: ${draft.subject}`, draft.body, logoUrl);
 
           const stepDays = [0, 4, 7];
           const nextSendAt = new Date(Date.now() + (stepDays[step] || 7) * 86400000).toISOString();

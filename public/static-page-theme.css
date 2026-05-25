@@ -112,14 +112,15 @@ svg {
   color: var(--text);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .sp-wordmark-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--teal);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: url("/logo.png") center / contain no-repeat;
+  flex: 0 0 24px;
 }
 
 .sp-nav-links {

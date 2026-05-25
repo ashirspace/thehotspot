@@ -334,14 +334,22 @@
   color: var(--text);
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
 }
 
 .lp-nav-logo-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--teal);
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-sm);
+  background: url("/logo.png") center / contain no-repeat;
+  flex: 0 0 24px;
+}
+
+.lp-nav-logo-mark {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex: 0 0 24px;
 }
 
 .lp-nav-links {
@@ -1885,7 +1893,7 @@
 .dash-wordmark {
   display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   font-family: var(--font-display);
   font-weight: 700;
   font-size: 17px;
@@ -1894,11 +1902,18 @@
 }
 
 .dash-wordmark-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--teal);
-  flex: 0 0 6px;
+  width: 24px;
+  height: 24px;
+  border-radius: var(--r-sm);
+  background: url("/logo.png") center / contain no-repeat;
+  flex: 0 0 24px;
+}
+
+.dash-wordmark-mark {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  flex: 0 0 24px;
 }
 
 .dash-breadcrumb {
