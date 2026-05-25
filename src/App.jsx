@@ -3731,21 +3731,107 @@ function SettingsPage({ onBack, gmailConnected, connectGmail, user }) {
 }
 
 /* ───────── EMAIL SENDER ───────── */
-function wrapEmailHtml(plainBody, pixelUrl = "") {
-  const clean = (plainBody || "").replace(/—/g, "-");
-  const paragraphs = clean
+function escapeEmailHtml(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function htmlToPlainText(value = "") {
+  return String(value)
+    .replace(/<\s*br\s*\/?>/gi, "\n")
+    .replace(/<\/\s*(p|div|tr|table|li|h[1-6])\s*>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/&amp;/gi, "&")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'");
+}
+
+function normalizeEmailBody(body = "") {
+  return htmlToPlainText(body)
+    .replace(/—/g, "-")
+    .replace(/<img\b[^>]*>/gi, "")
+    .replace(/^[-_]{2,}\s*$/gm, "")
+    .replace(/^to unsubscribe,\s*reply\s+stop\.?$/gim, "")
+    .replace(/^.*\/api\/track\?.*$/gim, "")
+    .replace(/[ \t]+\n/g, "\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+}
+
+function parseEmailSignature(body = "", fallback = {}) {
+  const lines = normalizeEmailBody(body).split("\n");
+  let signoffIndex = -1;
+  for (let i = lines.length - 1; i >= 0; i -= 1) {
+    if (/^(best|regards|thanks|thank you|sincerely|cheers),?$/i.test(lines[i].trim())) {
+      signoffIndex = i;
+      break;
+    }
+  }
+
+  if (signoffIndex === -1) {
+    return {
+      bodyText: lines.join("\n").trim(),
+      signoff: "Best,",
+      name: fallback.name || fallback.username || "Ashir Ayaan",
+      title: fallback.role_title || fallback.role || "CEO",
+      company: fallback.company || "thehotspot",
+    };
+  }
+
+  const sigLines = lines.slice(signoffIndex).map(line => line.trim()).filter(Boolean);
+  return {
+    bodyText: lines.slice(0, signoffIndex).join("\n").trim(),
+    signoff: sigLines[0] || "Best,",
+    name: sigLines[1] || fallback.name || fallback.username || "Ashir Ayaan",
+    title: sigLines[2] || fallback.role_title || fallback.role || "",
+    company: sigLines[3] || fallback.company || "thehotspot",
+  };
+}
+
+function renderStructuredSignature(signature) {
+  const initials = (signature.name || "A")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map(part => part[0]?.toUpperCase())
+    .join("") || "A";
+
+  return `
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:24px 0 0 0;padding-top:18px;border-top:1px solid #e5e7eb;">
+      <tr>
+        <td style="width:44px;vertical-align:top;padding:2px 12px 0 0;">
+          <div style="width:36px;height:36px;border-radius:8px;background:#0d9488;color:#ffffff;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;line-height:36px;text-align:center;">${escapeEmailHtml(initials)}</div>
+        </td>
+        <td style="vertical-align:top;padding:0;">
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:14px;line-height:1.45;color:#111827;margin:0 0 2px 0;">${escapeEmailHtml(signature.signoff)}</div>
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.45;color:#111827;font-weight:700;margin:0;">${escapeEmailHtml(signature.name)}</div>
+          ${signature.title ? `<div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#475569;margin:1px 0 0 0;">${escapeEmailHtml(signature.title)}</div>` : ""}
+          <div style="font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.45;color:#0d9488;font-weight:700;margin:1px 0 0 0;">${escapeEmailHtml(signature.company)}</div>
+        </td>
+      </tr>
+    </table>`;
+}
+
+function wrapEmailHtml(plainBody, pixelUrl = "", sender = {}) {
+  const signature = parseEmailSignature(plainBody, sender);
+  const paragraphs = signature.bodyText
     .split(/\n{2,}/)
     .map(p => p.trim())
     .filter(Boolean)
     .map(p => {
-      const escaped = p.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-      return `<p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;">${escaped.replace(/\n/g, "<br>")}</p>`;
+      return `<p style="margin:0 0 16px 0;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.75;color:#1a1a1a;">${escapeEmailHtml(p).replace(/\n/g, "<br>")}</p>`;
     })
     .join("");
   const pixel = pixelUrl
-    ? `<img src="${pixelUrl}" width="1" height="1" alt="" style="display:none;width:1px;height:1px;border:0;" />`
+    ? `<img src="${escapeEmailHtml(pixelUrl)}" width="1" height="1" alt="" style="display:block;width:1px;height:1px;border:0;opacity:0;overflow:hidden;" />`
     : "";
-  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}<p style="margin:24px 0 0 0;padding-top:16px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;line-height:1.5;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr>${pixel ? `<tr><td>${pixel}</td></tr>` : ""}</table></td></tr></table></body></html>`;
+  return `<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head><body style="margin:0;padding:0;background:#ffffff;"><table width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ffffff;"><tr><td align="center" style="padding:24px 16px;"><table width="600" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;width:100%;"><tr><td style="padding:0;">${paragraphs}${renderStructuredSignature(signature)}<p style="margin:22px 0 0 0;padding-top:14px;border-top:1px solid #e5e7eb;font-family:Arial,Helvetica,sans-serif;font-size:12px;color:#9ca3af;line-height:1.5;">To unsubscribe, reply <strong>STOP</strong> to this email.</p></td></tr>${pixel ? `<tr><td style="font-size:0;line-height:0;height:1px;">${pixel}</td></tr>` : ""}</table></td></tr></table></body></html>`;
 }
 
 function makeGmailMessage({ to, subject, body, html = false }) {
@@ -3754,6 +3840,7 @@ function makeGmailMessage({ to, subject, body, html = false }) {
     `To: ${to}`,
     `Subject: ${encodedSubject}`,
     `Content-Type: ${html ? "text/html" : "text/plain"}; charset=utf-8`,
+    `Content-Transfer-Encoding: 8bit`,
     `MIME-Version: 1.0`,
     "",
     body,
@@ -3851,7 +3938,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
       const email = draft.contact.email;
       if (!email) { results.push({ ...draft, status: "failed", error: "No email address" }); setSendProgress({ current: i + 1, total: toSend.length, results: [...results] }); continue; }
       try {
-        const raw = makeGmailMessage({ to: email, subject: draft.subject, body: wrapEmailHtml(draft.body), html: true });
+        const raw = makeGmailMessage({ to: email, subject: draft.subject, body: wrapEmailHtml(draft.body, "", user), html: true });
         const r = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
           method: "POST",
           headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
@@ -4175,7 +4262,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
     if (!toEmail) { showToast("Enter recipient email address first"); return; }
     setSending(true);
     try {
-      const raw = makeGmailMessage({ to: toEmail, subject: email.subject, body: wrapEmailHtml(email.body), html: true });
+      const raw = makeGmailMessage({ to: toEmail, subject: email.subject, body: wrapEmailHtml(email.body, "", user), html: true });
       const sendRes = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
         method: "POST",
         headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
@@ -4804,7 +4891,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     const trackId = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
     const origin = window.location.origin;
     const pixelUrl = `${origin}/api/track?type=open&id=${trackId}&e=${encodeURIComponent(to)}`;
-    const raw = makeGmailMessage({ to, subject, body: wrapEmailHtml(body, pixelUrl), html: true });
+    const raw = makeGmailMessage({ to, subject, body: wrapEmailHtml(body, pixelUrl, user), html: true });
     const res = await fetch("https://gmail.googleapis.com/gmail/v1/users/me/messages/send", {
       method: "POST",
       headers: { Authorization: `Bearer ${gmailToken}`, "Content-Type": "application/json" },
