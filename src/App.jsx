@@ -3918,6 +3918,9 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
             website: contact.website || "",
             offerContext,
             senderName: user?.name || user?.username || "",
+            senderCompany: user?.company || "",
+            senderRole: user?.role_title || "",
+            maxChars: 640,
           }),
         });
         const data = await res.json();

@@ -113,11 +113,20 @@ async function sendEmail(accessToken, to, subject, body, logoUrl = "") {
   return { threadId: data.threadId };
 }
 
-async function generateEmail(host, proto, company, category, offerContext, maxChars) {
+async function generateEmail(host, proto, contact, category, offerContext, maxChars) {
+  const contactRecord = typeof contact === "string" ? { company: contact } : (contact || {});
   const r = await fetch(`${proto}://${host}/api/generate`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ company, category, offerContext, maxChars: maxChars || 400 }),
+    body: JSON.stringify({
+      company: contactRecord.company || contactRecord.company_name || contactRecord.name || contactRecord.email || "the company",
+      contactName: contactRecord.name || "",
+      email: contactRecord.email || contactRecord.contact_email || "",
+      category: contactRecord.category || category,
+      website: contactRecord.website || "",
+      offerContext,
+      maxChars: maxChars || 640,
+    }),
   });
   return r.json();
 }
@@ -175,7 +184,7 @@ export default async function handler(req, res) {
         let sent = 0, failed = 0;
         for (const c of contacts) {
           try {
-            const draft = await generateEmail(host, proto, c.company || c.name || c.email, c.category || category || "Network", offerContext, maxChars);
+            const draft = await generateEmail(host, proto, c, c.category || category || "Network", offerContext, maxChars);
             await sendEmail(accessToken, c.email, draft.subject, draft.body, logoUrl);
             sent++;
             results.scheduled++;
@@ -220,7 +229,7 @@ export default async function handler(req, res) {
             ? "Following up on my previous email — just checking if you had a chance to review it."
             : "Last follow-up from me — wanted to make sure this didn't get lost. Happy to connect whenever timing works.";
 
-          const draft = await generateEmail(host, proto, company || email.split("@")[0], "Network", followUpContext, 200);
+          const draft = await generateEmail(host, proto, { company: company || email.split("@")[0], email }, "Network", followUpContext, 320);
           await sendEmail(accessToken, email, `Re: ${draft.subject}`, draft.body, logoUrl);
 
           const stepDays = [0, 4, 7];
