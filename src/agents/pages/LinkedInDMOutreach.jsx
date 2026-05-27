@@ -118,10 +118,10 @@ function autoCategory(person) {
 }
 
 async function runLinkedInAgent(payload) {
-  const res = await fetch("/api/linkedin-dm", {
+  const res = await fetch("/api/db", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({ entity: "linkedin-dm", ...payload }),
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "LinkedIn DM generation failed");
@@ -217,10 +217,11 @@ export default function LinkedInDMOutreach() {
   const updateDraft = async (id, patch) => {
     const next = drafts.map(draft => draft.id === id ? { ...draft, ...patch } : draft);
     saveDrafts(next);
-    fetch("/api/linkedin-dm", {
+    fetch("/api/db", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        entity: "linkedin-dm",
         action: "updateStatus",
         draftId: id,
         campaignId,

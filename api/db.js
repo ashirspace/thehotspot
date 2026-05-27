@@ -1,10 +1,26 @@
 import { getDb, initDb } from "./_db.js";
+import { handleLinkedInDm } from "./_linkedin-dm.js";
 
 export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.setHeader("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") return res.status(200).end();
+
+  const { entity, action, ...body } = req.body || {};
+
+  // ── LinkedIn DM outreach routes ───────────────────────────────────────────
+  // Folded into /api/db to stay under the Hobby-plan 12-function limit.
+  if (entity === "linkedin-dm") {
+    if (req.method !== "POST") return res.status(405).json({ error: "Method not allowed" });
+    try {
+      const sql = getDb();
+      await initDb(sql);
+      return handleLinkedInDm(req, res, sql);
+    } catch {
+      return handleLinkedInDm(req, res, null);
+    }
+  }
 
   let sql;
   try {
@@ -13,8 +29,6 @@ export default async function handler(req, res) {
   } catch {
     return res.status(503).json({ error: "Database not configured. Add DATABASE_URL to environment variables." });
   }
-
-  const { entity, action, ...body } = req.body || {};
 
   // ── Content routes (editable site copy) ────────────────────────────────────
   // Folded into /api/db to stay under the Hobby-plan 12-function limit.
