@@ -11,8 +11,10 @@ export function useAgent(agentFn) {
     try {
       const out = await agentFn(...args);
       setResult(out);
+      return out;
     } catch (e) {
       setError(e?.response?.data?.error || e.message || "Something went wrong");
+      return null;
     } finally {
       setLoading(false);
     }

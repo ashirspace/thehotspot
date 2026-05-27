@@ -2,8 +2,7 @@ import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  Search, Target, Globe, Mail, FlaskConical, Inbox, FileText,
-  Swords, Link2, BarChart3, Users, ArrowUpDown,
+  MessageSquareText, Users,
   LayoutDashboard, House, Radio, FilePen, Settings,
   Sparkles, Menu, X, ChevronLeft,
 } from "lucide-react";
@@ -11,21 +10,26 @@ import {
 // ─── Agent registry ───────────────────────────────────────────────────────────
 
 const AGENTS = [
-  { id: "lead-finder",            label: "Lead Finder",            tagline: "Discover B2B companies at scale",     Icon: Search,       accent: "#10b981", page: "LeadFinder",            gradientFrom: "rgba(16,185,129,0.18)",  gradientMid: "rgba(16,185,129,0.06)" },
-  { id: "lead-scoring",           label: "Lead Scoring",           tagline: "Qualify every prospect with AI",      Icon: Target,       accent: "#f59e0b", page: "LeadScoring",           gradientFrom: "rgba(245,158,11,0.18)",  gradientMid: "rgba(245,158,11,0.06)" },
-  { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  tagline: "CRO audits in seconds",               Icon: Globe,        accent: "#0ea5e9", page: "LandingPageAnalyzer",   gradientFrom: "rgba(14,165,233,0.18)",  gradientMid: "rgba(14,165,233,0.06)" },
-  { id: "email-sequence-builder", label: "Email Sequence Builder", tagline: "Multi-step outreach, crafted by AI",  Icon: Mail,         accent: "#8b5cf6", page: "EmailSequenceBuilder",  gradientFrom: "rgba(139,92,246,0.18)",  gradientMid: "rgba(139,92,246,0.06)" },
-  { id: "ab-email-tester",        label: "A/B Email Tester",       tagline: "Pick the winner before you send",    Icon: FlaskConical, accent: "#ec4899", page: "ABEmailTester",         gradientFrom: "rgba(236,72,153,0.18)",  gradientMid: "rgba(236,72,153,0.06)" },
-  { id: "reply-detector",         label: "Reply Detector",         tagline: "Classify intent. Respond instantly.", Icon: Inbox,        accent: "#f97316", page: "ReplyDetector",         gradientFrom: "rgba(249,115,22,0.18)",  gradientMid: "rgba(249,115,22,0.06)" },
-  { id: "blog-generator",         label: "Blog Generator",         tagline: "SEO-ready content, on demand",        Icon: FileText,     accent: "#14b8a6", page: "BlogGenerator",         gradientFrom: "rgba(20,184,166,0.18)",  gradientMid: "rgba(20,184,166,0.06)" },
-  { id: "competitor-analyzer",    label: "Competitor Analyzer",    tagline: "Full SWOT. Clear positioning.",       Icon: Swords,       accent: "#6366f1", page: "CompetitorAnalyzer",    gradientFrom: "rgba(99,102,241,0.18)",  gradientMid: "rgba(99,102,241,0.06)" },
-  { id: "backlink-outreach",      label: "Backlink Outreach",      tagline: "Find prospects. Write the email.",   Icon: Link2,        accent: "#10b981", page: "BacklinkOutreach",      gradientFrom: "rgba(16,185,129,0.18)",  gradientMid: "rgba(16,185,129,0.06)" },
-  { id: "campaign-dashboard",     label: "Campaign Dashboard",     tagline: "Live metrics for every send",         Icon: BarChart3,    accent: "#0ea5e9", page: "CampaignDashboard",     gradientFrom: "rgba(14,165,233,0.18)",  gradientMid: "rgba(14,165,233,0.06)" },
-  { id: "crm-lite",               label: "CRM Lite",               tagline: "Your contacts, always in reach",     Icon: Users,        accent: "#8b5cf6", page: "CRMLite",               gradientFrom: "rgba(139,92,246,0.18)",  gradientMid: "rgba(139,92,246,0.06)" },
-  { id: "csv-import-export",      label: "CSV Import / Export",    tagline: "Bulk contacts in, data out",          Icon: ArrowUpDown,  accent: "#f59e0b", page: "CSVImportExport",       gradientFrom: "rgba(245,158,11,0.18)",  gradientMid: "rgba(245,158,11,0.06)" },
+  { id: "linkedin-dm-outreach", label: "LinkedIn DM Outreach", tagline: "Categorize prospects and draft personal DMs", Icon: MessageSquareText, accent: "#0ea5e9", page: "LinkedInDMOutreach", gradientFrom: "rgba(14,165,233,0.18)", gradientMid: "rgba(14,165,233,0.06)" },
 ];
 
 const AGENT_MAP = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+
+const AGENT_THEME = {
+  ink: "#0f172a",
+  soft: "#64748b",
+  faint: "#94a3b8",
+  line: "#e2e8f0",
+  surface: "#f8fafc",
+  card: "#ffffff",
+  teal: "#0d9488",
+  tealDark: "#0f766e",
+  tealTint: "#f0fdfa",
+  tealLight: "#ccfbf1",
+  pageBg: "radial-gradient(ellipse 84% 40% at 8% 2%, rgba(204,251,241,0.58) 0%, transparent 56%), radial-gradient(ellipse 60% 32% at 92% 10%, rgba(224,242,254,0.62) 0%, transparent 58%), #ffffff",
+  font: "var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)",
+  displayFont: "var(--font-display, 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif)",
+};
 
 // ─── Main nav items (mirrors dashboard sidebar) ────────────────────────────────
 
@@ -57,7 +61,7 @@ function LazyPage({ name }) {
 
 function SplashScreen({ cfg, onDone }) {
   const [phase, setPhase] = useState("in");
-  const { Icon, label, tagline, accent, gradientFrom, gradientMid } = cfg;
+  const { Icon, label, tagline, accent } = cfg;
 
   useEffect(() => {
     const t1 = setTimeout(() => setPhase("out"), 1600);
@@ -70,7 +74,7 @@ function SplashScreen({ cfg, onDone }) {
       style={{
         position: "fixed", inset: 0, zIndex: 9800,
         display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
-        background: `radial-gradient(ellipse at 50% 40%, ${gradientFrom} 0%, ${gradientMid} 45%, #09090d 75%)`,
+        background: `radial-gradient(ellipse at 50% 38%, ${accent}22 0%, rgba(240,253,250,0.9) 44%, #ffffff 76%)`,
         transition: "opacity 0.55s ease",
         opacity: phase === "out" ? 0 : 1,
         pointerEvents: phase === "out" ? "none" : "all",
@@ -82,8 +86,8 @@ function SplashScreen({ cfg, onDone }) {
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 80, height: 80, borderRadius: 20, background: `${accent}18`, border: `1.5px solid ${accent}35`, marginBottom: 24, animation: "splashIcon 0.6s cubic-bezier(0.34,1.56,0.64,1) forwards", opacity: 0 }}>
         <Icon size={36} style={{ color: accent }} />
       </div>
-      <p style={{ fontSize: 28, fontWeight: 700, color: "#f1f5f9", letterSpacing: "-0.5px", animation: "splashText 0.5s ease 0.25s forwards", opacity: 0 }}>{label}</p>
-      <p style={{ fontSize: 13, color: "#6b7280", marginTop: 8, animation: "splashText 0.5s ease 0.4s forwards", opacity: 0 }}>{tagline}</p>
+      <p style={{ fontSize: 28, fontWeight: 700, color: AGENT_THEME.ink, letterSpacing: "-0.2px", fontFamily: AGENT_THEME.displayFont, animation: "splashText 0.5s ease 0.25s forwards", opacity: 0 }}>{label}</p>
+      <p style={{ fontSize: 13, color: AGENT_THEME.soft, marginTop: 8, animation: "splashText 0.5s ease 0.4s forwards", opacity: 0 }}>{tagline}</p>
       <div style={{ display: "flex", gap: 6, marginTop: 36, animation: "splashText 0.5s ease 0.55s forwards", opacity: 0 }}>
         {[0, 1, 2].map(i => (
           <div key={i} style={{ width: 5, height: 5, borderRadius: "50%", background: accent, animation: `splashDot 1.2s ease ${i * 0.2}s infinite` }} />
@@ -108,19 +112,20 @@ function Sidebar({ currentAgentId, open, onClose }) {
       className={open ? "al-sidebar al-sidebar--open" : "al-sidebar"}
       style={{
         width: 224, flexShrink: 0, display: "flex", flexDirection: "column",
-        background: "#0d0d12", borderRight: "1px solid #1e1e26",
+        background: "rgba(248,250,252,0.94)", borderRight: `1px solid ${AGENT_THEME.line}`,
         height: "100vh", position: "sticky", top: 0, overflowY: "auto",
+        backdropFilter: "blur(18px)",
       }}
     >
       {/* Brand */}
-      <div style={{ padding: "18px 16px 14px", borderBottom: "1px solid #1e1e26" }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: "#f1f5f9", letterSpacing: "-0.3px" }}>thehotspot</div>
-        <div style={{ fontSize: 10, color: "#475569", marginTop: 1, letterSpacing: "0.06em" }}>outreach platform</div>
+      <div style={{ padding: "18px 16px 14px", borderBottom: `1px solid ${AGENT_THEME.line}` }}>
+        <div style={{ fontSize: 15, fontWeight: 800, color: AGENT_THEME.ink, fontFamily: AGENT_THEME.displayFont, letterSpacing: 0 }}>thehotspot</div>
+        <div style={{ fontSize: 10, color: AGENT_THEME.soft, marginTop: 1, letterSpacing: "0.06em" }}>outreach platform</div>
       </div>
 
       {/* Main nav */}
       <div style={{ padding: "8px 8px 0" }}>
-        <p style={{ fontSize: 9, fontWeight: 700, color: "#334155", letterSpacing: "0.1em", textTransform: "uppercase", padding: "8px 8px 4px" }}>Platform</p>
+        <p style={{ fontSize: 9, fontWeight: 700, color: AGENT_THEME.faint, letterSpacing: "0.1em", textTransform: "uppercase", padding: "8px 8px 4px" }}>Platform</p>
         {MAIN_NAV.map(({ label, href, Icon }) => (
           <a
             key={href}
@@ -128,12 +133,12 @@ function Sidebar({ currentAgentId, open, onClose }) {
             style={{
               display: "flex", alignItems: "center", gap: 9, width: "100%",
               padding: "8px 10px", marginBottom: 1, borderRadius: 7,
-              color: "#64748b", fontSize: 13, fontWeight: 400,
+              color: AGENT_THEME.soft, fontSize: 13, fontWeight: 500,
               textDecoration: "none", transition: "all .12s",
               borderLeft: "2px solid transparent",
             }}
-            onMouseEnter={e => { e.currentTarget.style.background = "#ffffff06"; e.currentTarget.style.color = "#94a3b8"; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b"; }}
+            onMouseEnter={e => { e.currentTarget.style.background = AGENT_THEME.tealTint; e.currentTarget.style.color = AGENT_THEME.tealDark; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = AGENT_THEME.soft; }}
           >
             <Icon size={14} style={{ flexShrink: 0 }} />
             {label}
@@ -142,13 +147,13 @@ function Sidebar({ currentAgentId, open, onClose }) {
       </div>
 
       {/* Divider */}
-      <div style={{ borderTop: "1px solid #1e1e26", margin: "10px 0 0" }} />
+      <div style={{ borderTop: `1px solid ${AGENT_THEME.line}`, margin: "10px 0 0" }} />
 
       {/* Agent list */}
       <div style={{ padding: "8px 8px", flex: 1 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 8px 6px" }}>
-          <Sparkles size={11} style={{ color: "#6366f1" }} />
-          <p style={{ fontSize: 9, fontWeight: 700, color: "#334155", letterSpacing: "0.1em", textTransform: "uppercase" }}>AI Agents</p>
+          <Sparkles size={11} style={{ color: AGENT_THEME.teal }} />
+          <p style={{ fontSize: 9, fontWeight: 700, color: AGENT_THEME.faint, letterSpacing: "0.1em", textTransform: "uppercase" }}>Intelligence</p>
         </div>
         {AGENTS.map(({ id, label, Icon, accent }) => {
           const isActive = id === currentAgentId;
@@ -159,16 +164,16 @@ function Sidebar({ currentAgentId, open, onClose }) {
               style={{
                 display: "flex", alignItems: "center", gap: 8, width: "100%",
                 padding: "7px 10px", marginBottom: 1, borderRadius: 7,
-                background: isActive ? `${accent}12` : "transparent",
+                background: isActive ? AGENT_THEME.tealTint : "transparent",
                 borderLeft: isActive ? `2px solid ${accent}` : "2px solid transparent",
-                color: isActive ? "#f1f5f9" : "#64748b",
+                color: isActive ? AGENT_THEME.ink : AGENT_THEME.soft,
                 fontWeight: isActive ? 600 : 400,
-                fontSize: 12, fontFamily: "ui-sans-serif, system-ui, sans-serif",
+                fontSize: 12, fontFamily: AGENT_THEME.font,
                 border: "none", cursor: "pointer", textAlign: "left",
                 transition: "all .12s",
               }}
-              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = "#ffffff06"; e.currentTarget.style.color = "#94a3b8"; } }}
-              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = "#64748b"; } }}
+              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = AGENT_THEME.tealTint; e.currentTarget.style.color = AGENT_THEME.tealDark; } }}
+              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = AGENT_THEME.soft; } }}
             >
               <Icon size={13} style={{ color: isActive ? accent : "inherit", flexShrink: 0 }} />
               <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
@@ -178,8 +183,8 @@ function Sidebar({ currentAgentId, open, onClose }) {
       </div>
 
       {/* Footer */}
-      <div style={{ borderTop: "1px solid #1e1e26", padding: "10px 16px 14px" }}>
-        <span style={{ fontSize: 10, color: "#334155" }}>© 2026 thehotspot</span>
+      <div style={{ borderTop: `1px solid ${AGENT_THEME.line}`, padding: "10px 16px 14px" }}>
+        <span style={{ fontSize: 10, color: AGENT_THEME.faint }}>© 2026 thehotspot</span>
       </div>
     </aside>
   );
@@ -203,10 +208,10 @@ export default function AgentsLayout() {
 
   if (!cfg) {
     return (
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: "#09090d" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", background: AGENT_THEME.pageBg }}>
         <div style={{ textAlign: "center" }}>
-          <p style={{ color: "#f1f5f9", marginBottom: 12 }}>Agent not found.</p>
-          <button onClick={() => navigate("/")} style={{ fontSize: 13, color: "#10b981", background: "none", border: "none", cursor: "pointer" }}>Back to dashboard</button>
+          <p style={{ color: AGENT_THEME.ink, marginBottom: 12 }}>Agent not found.</p>
+          <button onClick={() => navigate("/")} style={{ fontSize: 13, color: AGENT_THEME.teal, background: "none", border: "none", cursor: "pointer" }}>Back to dashboard</button>
         </div>
       </div>
     );
@@ -215,7 +220,7 @@ export default function AgentsLayout() {
   const { Icon: AgentIcon, accent } = cfg;
 
   return (
-    <div className="al-root" style={{ display: "flex", height: "100vh", background: "#09090d", color: "#f1f5f9", fontFamily: "ui-sans-serif, system-ui, sans-serif", overflow: "hidden" }}>
+    <div className="al-root" style={{ display: "flex", height: "100vh", background: AGENT_THEME.pageBg, color: AGENT_THEME.ink, fontFamily: AGENT_THEME.font, overflow: "hidden" }}>
       {/* Splash */}
       {!splashDone && <SplashScreen cfg={cfg} onDone={() => setSplashDone(true)} />}
 
@@ -224,7 +229,7 @@ export default function AgentsLayout() {
         <div
           className="al-overlay"
           onClick={() => setSidebarOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 9600, background: "rgba(0,0,0,0.6)" }}
+          style={{ position: "fixed", inset: 0, zIndex: 9600, background: "rgba(15,23,42,0.32)" }}
         />
       )}
 
@@ -236,11 +241,11 @@ export default function AgentsLayout() {
         {/* Mobile top bar */}
         <div
           className="al-topbar"
-          style={{ display: "none", alignItems: "center", gap: 10, padding: "0 14px", height: 52, borderBottom: "1px solid #1e1e26", background: "#0d0d12", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}
+          style={{ display: "none", alignItems: "center", gap: 10, padding: "0 14px", height: 52, borderBottom: `1px solid ${AGENT_THEME.line}`, background: "rgba(255,255,255,0.94)", backdropFilter: "blur(14px)", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}
         >
           <button
             onClick={() => setSidebarOpen(v => !v)}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: 8, background: "#ffffff08", border: "1px solid #ffffff10", color: "#94a3b8", cursor: "pointer", flexShrink: 0 }}
+            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: 8, background: AGENT_THEME.card, border: `1px solid ${AGENT_THEME.line}`, color: AGENT_THEME.soft, cursor: "pointer", flexShrink: 0 }}
           >
             {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
           </button>
@@ -248,9 +253,9 @@ export default function AgentsLayout() {
             <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: `${accent}18`, border: `1px solid ${accent}30`, flexShrink: 0 }}>
               <AgentIcon size={13} style={{ color: accent }} />
             </div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: "#f1f5f9", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cfg.label}</span>
+            <span style={{ fontSize: 13, fontWeight: 600, color: AGENT_THEME.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cfg.label}</span>
           </div>
-          <a href="/" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: "#475569", textDecoration: "none", flexShrink: 0 }}>
+          <a href="/" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: AGENT_THEME.soft, textDecoration: "none", flexShrink: 0 }}>
             <ChevronLeft size={14} />
             <span>Dashboard</span>
           </a>
@@ -289,7 +294,7 @@ export default function AgentsLayout() {
             z-index: 9700 !important;
             transform: translateX(-100%) !important;
             transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: 4px 0 24px rgba(0,0,0,0.5) !important;
+            box-shadow: 6px 0 26px rgba(15,23,42,0.12) !important;
           }
           .al-sidebar--open {
             transform: translateX(0) !important;

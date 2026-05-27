@@ -2199,31 +2199,20 @@ function DashboardPage({ user, contactCount, setPage }) {
         ))}
       </section>
 
-      {/* AI Agents */}
+      {/* Intelligence Agent */}
       <div className="dash-card pad-lg" style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", gap: 16, marginBottom: 18 }}>
           <div>
             <span className="dash-eyebrow">Intelligence</span>
-            <div className="dash-h2" style={{ marginTop: 4 }}>AI Agents</div>
+            <div className="dash-h2" style={{ marginTop: 4 }}>LinkedIn DM Outreach</div>
           </div>
           <span style={{ fontSize: 12, color: "var(--text-faint)" }}>
-            <span className="dash-num">12</span> autonomous agents
+            <span className="dash-num">1</span> active agent
           </span>
         </div>
-        <div className="rsp-agent-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10 }}>
+        <div className="rsp-agent-grid" style={{ display: "grid", gridTemplateColumns: "1fr", gap: 10 }}>
           {[
-            { id: "lead-finder",            label: "Lead Finder",            tagline: "Discover B2B companies at scale",        Icon: LuSearch,       color: "#10b981" },
-            { id: "lead-scoring",           label: "Lead Scoring",           tagline: "Qualify every prospect with AI",         Icon: LuTarget,       color: "#f59e0b" },
-            { id: "email-sequence-builder", label: "Email Sequence Builder", tagline: "Multi-step outreach, crafted by AI",     Icon: LuMailbox,      color: "#0ea5e9" },
-            { id: "ab-email-tester",        label: "A/B Email Tester",       tagline: "Pick the winner before you send",        Icon: LuFlaskConical, color: "#ec4899" },
-            { id: "reply-detector",         label: "Reply Detector",         tagline: "Classify intent. Respond instantly.",    Icon: LuRadio,        color: "#14b8a6" },
-            { id: "blog-generator",         label: "Blog Generator",         tagline: "SEO-ready content, on demand",           Icon: LuFilePen,      color: "#8b5cf6" },
-            { id: "competitor-analyzer",    label: "Competitor Analyzer",    tagline: "Full SWOT. Clear positioning.",          Icon: LuChartBar,     color: "#f97316" },
-            { id: "campaign-dashboard",     label: "Campaign Dashboard",     tagline: "Live metrics for every send",            Icon: LuTrendingUp,   color: "#6366f1" },
-            { id: "landing-page-analyzer",  label: "Landing Page Analyzer",  tagline: "CRO audits in seconds",                 Icon: LuGlobe,        color: "#10b981" },
-            { id: "backlink-outreach",      label: "Backlink Outreach",      tagline: "Find prospects. Write the email.",       Icon: LuLink,         color: "#0ea5e9" },
-            { id: "crm-lite",               label: "CRM Lite",               tagline: "Your contacts, always in reach",         Icon: LuDatabase,     color: "#f59e0b" },
-            { id: "csv-import-export",      label: "CSV Import / Export",    tagline: "Bulk contacts in, data out",             Icon: LuFolder,       color: "#64748B" },
+            { id: "linkedin-dm-outreach", label: "LinkedIn DM Outreach", tagline: "Categorize prospects and draft personal DMs", Icon: LuMessageCircle, color: "#0ea5e9" },
           ].map(agent => (
             <a
               key={agent.id}
@@ -2361,7 +2350,7 @@ function ppDraw(ctx, rows, yOff, flipX, canvasW) {
 }
 
 const PET_SEED = [
-  { role: "user", content: "You are Spot — a friendly AI assistant that lives on the thehotspot dashboard. Keep answers short (2-3 sentences), warm and casual. Help the user understand and use this B2B outreach platform. If asked about features, mention: contacts, campaigns, email templates, 12 AI agents, Gmail integration." },
+  { role: "user", content: "You are Spot — a friendly AI assistant that lives on the thehotspot dashboard. Keep answers short (2-3 sentences), warm and casual. Help the user understand and use this B2B outreach platform. If asked about features, mention: contacts, campaigns, email templates, LinkedIn DM Outreach, and Gmail integration." },
   { role: "assistant", content: "Hi, I'm Spot. Ask me anything about thehotspot — campaigns, contacts, agents, you name it." },
 ];
 
@@ -4642,7 +4631,7 @@ function BillingPage({ onBack }) {
             <span className="dash-num" style={{ fontSize: 15, color: "var(--text-soft)" }}>$49<span style={{ color: "var(--text-faint)" }}>/mo</span></span>
           </div>
           <div style={{ fontSize: 13, color: "var(--text-muted)", margin: "8px 0 18px", lineHeight: 1.6 }}>
-            Renews on <span className="dash-num">Jun 01, 2026</span>. Includes 2,000 sends/mo, unlimited campaigns, and all 12 AI agents.
+            Renews on <span className="dash-num">Jun 01, 2026</span>. Includes 2,000 sends/mo, unlimited campaigns, and LinkedIn DM Outreach.
           </div>
           <div style={{ display: "flex", gap: 10 }}>
             <button className="dash-btn dash-btn-primary">Upgrade plan</button>
@@ -4700,7 +4689,7 @@ function HelpPage({ onBack }) {
     { icon: <LuBookOpen size={18} />,       title: "Getting started", desc: "Set up your account, connect Gmail, and import your first contacts." },
     { icon: <LuRadio size={18} />,          title: "Running campaigns", desc: "Build sequences, schedule sends, and track delivery in real time." },
     { icon: <LuUsers size={18} />,          title: "Managing contacts", desc: "Import from Sheets, organize by category, and keep data clean." },
-    { icon: <LuSparkles size={18} />,       title: "AI agents", desc: "How the 12 autonomous agents work and when to use each one." },
+    { icon: <LuSparkles size={18} />,       title: "LinkedIn DM agent", desc: "How the LinkedIn outreach queue drafts and tracks manual DMs." },
     { icon: <LuCreditCard size={18} />,     title: "Billing & plans", desc: "Change plan, read invoices, and understand usage limits." },
     { icon: <LuCircleHelp size={18} />,     title: "Troubleshooting", desc: "Fix Gmail token errors, sync issues, and delivery problems." },
   ];
@@ -5209,6 +5198,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
               { id: "campaignStatus", label: "Campaigns",    icon: <LuRadio size={18} /> },
             ] },
             { eyebrow: "Intelligence", items: [
+              { href: "/agents/linkedin-dm-outreach", label: "LinkedIn DM", icon: <LuMessageCircle size={18} /> },
               { id: "emailSender",    label: "Email Sender", icon: <LuSend size={18} /> },
               { id: "emailTemplates", label: "Templates",    icon: <LuFilePen size={18} /> },
               { id: "inbox",          label: "Inbox",        icon: <LuInbox size={18} /> },
@@ -5224,9 +5214,13 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
                 <span className="dash-sidebar-eyebrow">{section.eyebrow}</span>
               </div>
               {section.items.map(item => (
-                <button key={String(item.id)}
+                <button key={item.href || String(item.id)}
                   className={`dash-nav-item${page === item.id ? " is-active" : ""}`}
-                  onClick={() => { setPage(item.id); setSidebarOpen(false); }}>
+                  onClick={() => {
+                    setSidebarOpen(false);
+                    if (item.href) window.location.href = item.href;
+                    else setPage(item.id);
+                  }}>
                   {item.icon}
                   {item.label}
                 </button>

@@ -10,7 +10,7 @@ export function Field({ label, children }) {
 export function TextInput({ value, onChange, placeholder = "", disabled = false }) {
   return (
     <input
-      className="bg-card border border-line rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-accent disabled:opacity-50"
+      className="bg-surface border border-line rounded-[8px] px-3 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(204,251,241,0.9)] disabled:opacity-50 font-sans"
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
@@ -22,7 +22,7 @@ export function TextInput({ value, onChange, placeholder = "", disabled = false 
 export function TextArea({ value, onChange, placeholder = "", rows = 4, disabled = false }) {
   return (
     <textarea
-      className="bg-card border border-line rounded-lg px-3 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-accent disabled:opacity-50 resize-none"
+      className="bg-surface border border-line rounded-[8px] px-3 py-2 text-sm text-foreground placeholder-muted focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(204,251,241,0.9)] disabled:opacity-50 resize-none font-sans"
       value={value}
       onChange={e => onChange(e.target.value)}
       placeholder={placeholder}
@@ -35,7 +35,7 @@ export function TextArea({ value, onChange, placeholder = "", rows = 4, disabled
 export function Select({ value, onChange, options = [], disabled = false }) {
   return (
     <select
-      className="bg-card border border-line rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent disabled:opacity-50"
+      className="bg-surface border border-line rounded-[8px] px-3 py-2 text-sm text-foreground focus:outline-none focus:border-accent focus:shadow-[0_0_0_3px_rgba(204,251,241,0.9)] disabled:opacity-50 font-sans"
       value={value}
       onChange={e => onChange(e.target.value)}
       disabled={disabled}
@@ -52,7 +52,8 @@ export function RunButton({ onClick, loading, label = "Run Agent" }) {
     <button
       onClick={onClick}
       disabled={loading}
-      className="flex items-center gap-2 bg-accent hover:bg-emerald-400 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-colors"
+      className="flex items-center gap-2 bg-accent hover:bg-[#0f766e] disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold px-5 py-2.5 rounded-[8px] transition-colors shadow-[0_8px_18px_rgba(13,148,136,0.16)]"
+      style={{ border: "none" }}
     >
       {loading ? (
         <>
