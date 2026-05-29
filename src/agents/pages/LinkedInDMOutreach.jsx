@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BriefcaseBusiness, Check, Copy, ExternalLink, FileUp,
   Send, SkipForward, Sparkles, Upload, Users,
@@ -109,7 +109,7 @@ function parsePeople(text) {
 function autoCategory(person) {
   const text = [person.title, person.department, person.seniority, person.notes].filter(Boolean).join(" ");
   if (/\b(founder|co-founder|ceo|chief executive|president|owner|managing director)\b/i.test(text)) return "Founder/Executive";
-  if (/\b(partnership|partner|alliance|business development|biz dev|affiliate|channel)\b/i.test(text)) return "Partnerships";
+  if (/\b(partnerships?|partner|alliance|business development|biz dev|affiliate|channel)\b/i.test(text)) return "Partnerships";
   if (/\b(marketing|growth|demand|performance|acquisition|brand|content|seo|paid media)\b/i.test(text)) return "Marketing/Growth";
   if (/\b(sales|revenue|commercial|account executive|sdr|bdr)\b/i.test(text)) return "Sales";
   if (/\b(hr|people|talent|recruit|human resources|hiring)\b/i.test(text)) return "HR";
@@ -164,6 +164,44 @@ export default function LinkedInDMOutreach() {
   const [campaignId, setCampaignId] = useState(() => localStorage.getItem("thehotspot_linkedin_campaign_id") || "");
   const [formError, setFormError] = useState("");
   const { loading, error, run } = useAgent(runLinkedInAgent);
+
+  useEffect(() => {
+    fetch("/api/db", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ entity: "linkedin-dm", action: "listCampaigns", userId: "dashboard-user" }),
+    })
+      .then(res => res.json())
+      .then(data => {
+        const campaigns = data.campaigns || [];
+        if (!campaigns.length) return;
+        const [latest] = campaigns;
+        const mappedHistory = campaigns.map(item => ({
+          id: String(item.id),
+          company: item.company,
+          goal: item.goal,
+          draftCount: item.draftCount || item.drafts?.length || 0,
+          approvedCount: item.approvedCount || 0,
+          sentCount: item.sentCount || 0,
+          skippedCount: item.skippedCount || 0,
+          updatedAt: item.updatedAt,
+        }));
+        setHistory(mappedHistory);
+        localStorage.setItem("thehotspot_linkedin_history", JSON.stringify(mappedHistory));
+        if (!drafts.length && latest.drafts?.length) {
+          setCompany(latest.company || "");
+          setWebsite(latest.website || "");
+          setGoal(latest.goal || "partnership");
+          setTone(latest.tone || "professional");
+          setOfferContext(latest.offerContext || "");
+          setCampaignId(String(latest.id));
+          setDrafts(latest.drafts);
+          localStorage.setItem("thehotspot_linkedin_campaign_id", String(latest.id));
+          localStorage.setItem("thehotspot_linkedin_drafts", JSON.stringify(latest.drafts));
+        }
+      })
+      .catch(() => {});
+  }, []);
 
   const stats = useMemo(() => ({
     total: drafts.length,

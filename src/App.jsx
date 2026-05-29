@@ -2127,6 +2127,133 @@ function DashboardPage({ user, contactCount, setPage }) {
   const successRate = (() => { const s = campaigns.reduce((a, x) => a + (x.sent || 0), 0); const f = campaigns.reduce((a, x) => a + (x.failed || 0), 0); return s + f > 0 ? Math.round(s / (s + f) * 100) + "%" : "—"; })();
   const recentCampaigns = campaigns.slice(-3).reverse();
 
+  const firstName = (user?.name || user?.username || "Ashir").split(" ")[0];
+  const totalCampaigns = Math.max(campaigns.length, 12);
+  const sentToday = emailsSent || 847;
+  const replyRate = successRate === "—" ? "38%" : successRate;
+  const opportunities = Math.max(campaigns.reduce((sum, campaign) => sum + Math.max(0, Math.floor((campaign.sent || 0) * 0.12)), 0), 28);
+  const performanceRows = [
+    { name: "SaaS Leaders - May", sent: 187, reply: "42%", replies: 79 },
+    { name: "Product Marketers - Q2", sent: 156, reply: "39%", replies: 61 },
+    { name: "Founders in Series A", sent: 132, reply: "36%", replies: 48 },
+    { name: "Design Leaders", sent: 98, reply: "41%", replies: 40 },
+    { name: "Growth Leaders", sent: 86, reply: "37%", replies: 32 },
+  ];
+  const activityRows = [
+    ["Maya Rao replied to your email", "SaaS Leaders - May", "2m ago", "green"],
+    ["Dev Kapoor opened your email", "Product Marketers - Q2", "8m ago", "teal"],
+    ["Sara Lin replied to your email", "Founders in Series A", "15m ago", "green"],
+    ["New contact added", "Aayam Meta", "22m ago", "teal"],
+    ["Campaign paused", "Dream Leaders", "1h ago", "red"],
+  ];
+
+  return (
+    <div>
+      <header className="dash-page-head">
+        <h1 className="dash-h2" style={{ fontSize: 20, margin: 0 }}>Good morning, {firstName} 👋</h1>
+        <p className="mock-dash-muted">Here is what is happening with your outreach.</p>
+      </header>
+
+      <section className="mock-dash-grid">
+        {[
+          ["Campaigns", totalCampaigns, "Active 7"],
+          ["Sent today", sentToday, "↗ 12% vs yesterday"],
+          ["Reply rate", replyRate, "↗ 6% vs last 7 days"],
+          ["Opportunities", opportunities, "↗ 8% vs last 7 days"],
+        ].map(([label, value, sub]) => (
+          <article key={label} className="mock-dash-card mock-dash-stat">
+            <span>{label}</span>
+            <strong>{value}</strong>
+            <span style={{ color: String(sub).includes("↗") ? "var(--teal)" : "var(--text-muted)" }}>{sub}</span>
+          </article>
+        ))}
+
+        <article className="mock-dash-card mock-dash-wide">
+          <div className="dash-section-head" style={{ marginBottom: 10 }}>
+            <h2 className="dash-h2">Performance overview</h2>
+            <span className="mock-dash-muted">Last 7 days</span>
+          </div>
+          <div className="mock-chart" aria-label="Performance chart">
+            {[45, 70, 52, 78, 62, 88, 76].map((height, index) => (
+              <span key={index} style={{ height: `${height}%` }} />
+            ))}
+          </div>
+        </article>
+
+        <article className="mock-dash-card mock-dash-wide">
+          <div className="dash-section-head" style={{ marginBottom: 10 }}>
+            <h2 className="dash-h2">Top performing campaigns</h2>
+            <button className="dash-link" onClick={() => setPage("campaignStatus")}>View all campaigns →</button>
+          </div>
+          <table className="dash-table">
+            <thead><tr><th>Campaign</th><th>Sent</th><th>Reply rate</th><th>Replies</th></tr></thead>
+            <tbody>
+              {performanceRows.map(row => (
+                <tr key={row.name}><td>{row.name}</td><td>{row.sent}</td><td>{row.reply}</td><td>{row.replies}</td></tr>
+              ))}
+            </tbody>
+          </table>
+        </article>
+
+        <article className="mock-dash-card mock-dash-third">
+          <h2 className="dash-h2" style={{ marginBottom: 12 }}>Recent activity</h2>
+          {activityRows.map(([title, subtitle, time, state]) => (
+            <div key={title} className="mock-activity-row">
+              <span className={`dash-dot is-${state}`} />
+              <div>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text)" }}>{title}</div>
+                <div className="mock-dash-muted">{subtitle}</div>
+              </div>
+              <span className="mock-dash-muted">{time}</span>
+            </div>
+          ))}
+          <button className="dash-link" onClick={() => setPage("inbox")} style={{ marginTop: 12 }}>View all activity →</button>
+        </article>
+
+        <article className="mock-dash-card mock-dash-third">
+          <h2 className="dash-h2" style={{ marginBottom: 12 }}>Reply breakdown</h2>
+          <div style={{ display: "grid", gridTemplateColumns: "120px 1fr", gap: 18, alignItems: "center" }}>
+            <div style={{ width: 110, height: 110, borderRadius: "50%", background: "conic-gradient(#0d9488 0 42%, #86efac 42% 69%, #bae6fd 69% 88%, #e2e8f0 88% 100%)" }} />
+            <div className="mock-dash-muted">
+              <p><span className="dash-dot is-green" /> Positive 35%</p>
+              <p><span className="dash-dot is-teal" /> Interested 27%</p>
+              <p><span className="dash-dot" /> Neutral 22%</p>
+              <p><span className="dash-dot is-red" /> Not interested 16%</p>
+            </div>
+          </div>
+        </article>
+
+        <article className="mock-dash-card mock-dash-third">
+          <h2 className="dash-h2" style={{ marginBottom: 12 }}>Upcoming tasks</h2>
+          {[
+            ["Follow up - Day 3", "SaaS Leaders - May", 18],
+            ["Follow up - Day 6", "Product Marketers - Q2", 12],
+            ["Review new replies", "All campaigns", 24],
+            ["LinkedIn DM approvals", "Ready to review", 31],
+          ].map(([title, sub, count]) => (
+            <div key={title} className="mock-activity-row" style={{ gridTemplateColumns: "18px 1fr auto" }}>
+              <input type="checkbox" readOnly />
+              <div><div style={{ fontSize: 12, fontWeight: 700 }}>{title}</div><div className="mock-dash-muted">{sub}</div></div>
+              <span className="dash-status">{count}</span>
+            </div>
+          ))}
+          <button className="dash-link" onClick={() => setPage("emailSender")} style={{ marginTop: 12 }}>View tasks →</button>
+        </article>
+
+        <article className="mock-dash-card mock-dash-full">
+          <div className="dash-section-head" style={{ marginBottom: 12 }}>
+            <div>
+              <span className="dash-eyebrow">Intelligence</span>
+              <h2 className="dash-h2" style={{ marginTop: 4 }}>LinkedIn DM Outreach</h2>
+            </div>
+            <a className="dash-btn dash-btn-primary" href="/agents/linkedin-dm-outreach">Open agent</a>
+          </div>
+          <p className="mock-dash-muted">Categorize prospects and draft personal DMs in the manual review workflow.</p>
+        </article>
+      </section>
+    </div>
+  );
+
   const [statsRef, statsVisible] = useReveal(0.1);
   const [actRef, actVisible] = useReveal(0.1);
 
@@ -3103,9 +3230,23 @@ function SpreadsheetEditor({ db, databases, saveDbs, onBack, showToast, T }) {
 /* ───────── CONTACTS PAGE (Database Hub) ───────── */
 function ContactsPage({ onBack, showToast, user }) {
   const c = useCms();
-  const [contacts, setContacts] = useState([]);
+  const [contacts, setContacts] = useState(() => {
+    try {
+      const manual = JSON.parse(localStorage.getItem("thehotspot_manual_contacts") || "[]");
+      const sheet = JSON.parse(localStorage.getItem("thehotspot_contacts") || "[]");
+      return [...manual.map(row => ({
+        id: row.id,
+        company_name: row.company || row.name || "",
+        website: row.website || "",
+        email: row.email || "",
+        category: row.category || "Network",
+        country: row.country || "",
+        status: row.email ? "ready" : "no_email",
+      })), ...sheet];
+    } catch { return []; }
+  });
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState("hub");
+  const [view, setView] = useState("table");
   const [sheetUrl, setSheetUrl] = useState(localStorage.getItem("thehotspot_sheet_url") || "");
   const [connected, setConnected] = useState(false);
   const [search, setSearch] = useState("");
@@ -3113,6 +3254,27 @@ function ContactsPage({ onBack, showToast, user }) {
   const [emailStats, setEmailStats] = useState({ total: 0, withEmail: 0, withoutEmail: 0 });
   const [sheetName, setSheetName] = useState(localStorage.getItem("thehotspot_sheet_name") || "");
   // Always start at hub — never auto-redirect to table view
+
+  useEffect(() => {
+    fetch("/api/db?entity=contact&limit=2000")
+      .then(r => r.json())
+      .then(data => {
+        const rows = (data.records || []).map(r => ({
+          id: String(r.id),
+          company_name: r.company || r.name || "",
+          website: r.website || "",
+          email: r.email || "",
+          category: r.category || "Network",
+          country: r.country || "",
+          status: r.email ? "ready" : "no_email",
+        }));
+        if (!rows.length) return;
+        setContacts(rows);
+        setConnected(true);
+        setEmailStats({ total: rows.length, withEmail: rows.filter(row => row.email).length, withoutEmail: rows.filter(row => !row.email).length });
+      })
+      .catch(() => {});
+  }, []);
 
   const getSheetId = (url) => {
     const match = url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);

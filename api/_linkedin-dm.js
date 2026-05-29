@@ -1,6 +1,6 @@
 const CATEGORY_RULES = [
   { category: "Founder/Executive", reason: "Owns company direction and high-level partnership decisions.", re: /\b(founder|co-founder|ceo|chief executive|president|owner|managing director|general manager)\b/i },
-  { category: "Partnerships", reason: "Owns partner, channel, affiliate, or business development conversations.", re: /\b(partnership|partner|alliance|business development|biz dev|affiliate|channel)\b/i },
+  { category: "Partnerships", reason: "Owns partner, channel, affiliate, or business development conversations.", re: /\b(partnerships?|partner|alliance|business development|biz dev|affiliate|channel)\b/i },
   { category: "Marketing/Growth", reason: "Owns demand generation, brand, performance, or growth channels.", re: /\b(marketing|growth|demand|performance|acquisition|brand|content|seo|paid media)\b/i },
   { category: "Sales", reason: "Owns revenue conversations, pipeline, and commercial expansion.", re: /\b(sales|revenue|commercial|account executive|business development representative|sdr|bdr)\b/i },
   { category: "HR", reason: "Owns people, hiring, talent, or employer-brand conversations.", re: /\b(hr|people|talent|recruit|human resources|hiring)\b/i },
@@ -170,9 +170,64 @@ async function updateDraftStatus(sql, body) {
   }
 }
 
+async function listCampaigns(sql, body) {
+  const userId = clean(body.userId, "dashboard-user");
+  const campaignRows = await sql`
+    SELECT * FROM linkedin_campaigns
+    WHERE user_id = ${userId} OR user_id = 'unknown'
+    ORDER BY updated_at DESC
+    LIMIT 10
+  `;
+  const campaigns = [];
+  for (const campaign of campaignRows) {
+    const drafts = await sql`
+      SELECT id, campaign_id, name, title, linkedin_url, department, seniority, notes, category, reason, message, approved, status, created_at, updated_at
+      FROM linkedin_dm_drafts
+      WHERE campaign_id = ${campaign.id}
+      ORDER BY id ASC
+    `;
+    campaigns.push({
+      id: campaign.id,
+      company: campaign.company,
+      website: campaign.website,
+      goal: campaign.goal,
+      offerContext: campaign.offer_context,
+      tone: campaign.tone,
+      status: campaign.status,
+      draftCount: campaign.draft_count,
+      approvedCount: campaign.approved_count,
+      sentCount: campaign.sent_count,
+      skippedCount: campaign.skipped_count,
+      updatedAt: campaign.updated_at,
+      drafts: drafts.map(draft => ({
+        id: String(draft.id),
+        campaignId: draft.campaign_id,
+        name: draft.name,
+        title: draft.title,
+        linkedinUrl: draft.linkedin_url,
+        department: draft.department,
+        seniority: draft.seniority,
+        notes: draft.notes,
+        category: draft.category,
+        reason: draft.reason,
+        message: draft.message,
+        approved: draft.approved,
+        status: draft.status,
+      })),
+    });
+  }
+  return campaigns;
+}
+
 export async function handleLinkedInDm(req, res, sql = null) {
   const body = req.body || {};
   try {
+    if (body.action === "listCampaigns") {
+      if (!sql) return res.status(200).json({ ok: true, persisted: false, campaigns: [] });
+      const campaigns = await listCampaigns(sql, body);
+      return res.status(200).json({ ok: true, persisted: true, campaigns });
+    }
+
     if (body.action === "updateStatus") {
       if (!sql) return res.status(200).json({ ok: true, persisted: false });
       await updateDraftStatus(sql, body);

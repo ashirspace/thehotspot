@@ -360,3 +360,76 @@
     font-size: 26px;
   }
 }
+
+/* === MOCKUP-FIDELITY LINKEDIN AGENT PASS ================= */
+.al-content main {
+  max-width: 1180px !important;
+  padding: 26px 28px 72px !important;
+}
+
+.li-page-header {
+  padding: 0 0 16px;
+  margin-bottom: 6px;
+}
+
+.li-page-title {
+  font-size: 24px;
+  line-height: 1.12;
+  margin: 6px 0 6px;
+}
+
+.li-page-copy {
+  max-width: 680px;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.li-layout {
+  grid-template-columns: 350px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.li-stack { gap: 10px; }
+
+.li-panel,
+.li-stat,
+.li-table,
+.li-empty,
+.li-draft,
+.li-note,
+.li-history {
+  border-radius: 7px;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  background: rgba(255, 255, 255, 0.92);
+}
+
+.li-panel-inner {
+  gap: 12px;
+  padding: 16px 16px 16px 18px;
+}
+
+.li-section-label,
+.li-kicker { font-size: 9px; }
+
+.li-stat-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.li-stat { padding: 12px; }
+.li-stat-label { font-size: 9px; }
+.li-stat-value { font-size: 22px; }
+
+.li-row {
+  grid-template-columns: minmax(0, 1fr) 170px;
+  padding: 12px 14px;
+}
+
+.li-draft { padding: 14px; }
+.li-draft-body textarea { min-height: 132px; }
+.li-draft-actions { gap: 14px; }
+
+@media (max-width: 900px) {
+  .li-layout { grid-template-columns: 1fr; }
+  .li-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
