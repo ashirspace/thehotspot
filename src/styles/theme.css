@@ -1783,6 +1783,420 @@
   }
 }
 
+/* === CONSOLIDATED LANDING SECTIONS ===================== */
+.lp-anchor-alias {
+  position: absolute;
+  display: block;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.lp-unified-section {
+  position: relative;
+  padding: clamp(72px, 9vw, 116px) 0;
+  border-bottom: 1px solid var(--border);
+  scroll-margin-top: 82px;
+}
+
+.lp-unified-section:nth-of-type(even) {
+  background:
+    radial-gradient(circle at 8% 20%, rgba(204, 251, 241, 0.34), transparent 34%),
+    transparent;
+}
+
+.lp-unified-head {
+  max-width: 640px;
+  margin-bottom: 38px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-about-card {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 0;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.lp-about-card article {
+  padding: clamp(28px, 4vw, 46px);
+}
+
+.lp-about-card article + article {
+  border-left: 1px solid var(--border);
+}
+
+.lp-about-card h3,
+.lp-product-card h3,
+.lp-service-card h3,
+.lp-resource-feature h3 {
+  font-size: 22px;
+  line-height: 1.18;
+  letter-spacing: -0.015em;
+  color: var(--text);
+  margin-bottom: 12px;
+}
+
+.lp-about-card p,
+.lp-product-card p,
+.lp-service-card p,
+.lp-resource-feature p {
+  color: var(--text-muted);
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.lp-about-card p + p {
+  margin-top: 16px;
+}
+
+.lp-founder-signature {
+  margin-top: 28px;
+  display: grid;
+  gap: 2px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.lp-founder-signature small {
+  color: var(--text-soft);
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.lp-principles {
+  display: grid;
+  gap: 18px;
+}
+
+.lp-principle-row {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.lp-principle-row > span {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  background: var(--teal-tint);
+  color: var(--teal);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lp-principle-row strong {
+  display: block;
+  color: var(--text);
+  font-size: 14px;
+  margin-bottom: 2px;
+}
+
+.lp-principle-row p {
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.lp-product-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.lp-product-card,
+.lp-service-card,
+.lp-resource-feature,
+.lp-resource-list {
+  background: rgba(255, 255, 255, 0.92);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+.lp-product-card {
+  min-height: 245px;
+  padding: clamp(24px, 3vw, 36px);
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  gap: 24px;
+  align-items: center;
+}
+
+.lp-product-card:not(.lp-product-card-large) {
+  grid-template-columns: 1fr;
+}
+
+.lp-product-card a,
+.lp-resource-row em {
+  display: inline-flex;
+  margin-top: 16px;
+  color: var(--teal);
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 700;
+}
+
+.lp-mini-panel {
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: #fff;
+  padding: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.lp-mini-panel-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: var(--text-soft);
+  font-size: 11px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.lp-mini-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--teal);
+}
+
+.lp-message-card,
+.lp-sequence-row,
+.lp-service-mini-row {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 11px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.45;
+  background: #fff;
+}
+
+.lp-message-card + .lp-message-card,
+.lp-sequence-row + .lp-sequence-row,
+.lp-service-mini-row + .lp-service-mini-row {
+  margin-top: 8px;
+}
+
+.lp-message-card.is-muted {
+  color: var(--text-soft);
+  background: var(--bg-alt);
+}
+
+.lp-mini-button {
+  margin-top: 10px;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-tint);
+  color: var(--teal);
+  font-size: 11px;
+  font-weight: 700;
+  float: right;
+}
+
+.lp-mini-bars {
+  height: 112px;
+  display: flex;
+  align-items: flex-end;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--border);
+}
+
+.lp-mini-bars span {
+  flex: 1;
+  min-width: 10px;
+  border-radius: 3px 3px 0 0;
+  background: linear-gradient(180deg, var(--teal-light), var(--teal));
+}
+
+.lp-sequence-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lp-sequence-row em {
+  color: var(--teal);
+  font-style: normal;
+  font-weight: 700;
+}
+
+.lp-services-list {
+  display: grid;
+  gap: 16px;
+}
+
+.lp-service-card {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 28px;
+  align-items: center;
+  padding: clamp(24px, 3vw, 34px);
+}
+
+.lp-service-index {
+  display: inline-block;
+  color: var(--teal);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  margin-bottom: 14px;
+}
+
+.lp-service-mini-row {
+  display: grid;
+  grid-template-columns: 12px 1fr;
+  align-items: center;
+  gap: 10px;
+}
+
+.lp-service-mini-row span {
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--teal);
+  border-radius: 2px;
+}
+
+.lp-service-mini-row p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.lp-resources-block {
+  background:
+    radial-gradient(circle at 90% 12%, rgba(204, 251, 241, 0.45), transparent 28%),
+    transparent;
+}
+
+.lp-resource-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 1.1fr;
+  gap: 18px;
+}
+
+.lp-resource-feature {
+  padding: clamp(26px, 3.2vw, 38px);
+}
+
+.lp-resource-feature h3 {
+  margin-top: 12px;
+  font-size: clamp(26px, 3vw, 38px);
+  max-width: 520px;
+}
+
+.lp-resource-meta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 22px 0;
+}
+
+.lp-resource-meta span {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--teal-tint);
+  color: var(--teal);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.lp-resource-list {
+  overflow: hidden;
+}
+
+.lp-resource-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 22px;
+  padding: 22px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.lp-resource-row:last-child {
+  border-bottom: 0;
+}
+
+.lp-resource-row strong {
+  display: block;
+  color: var(--text);
+  font-size: 16px;
+  margin-bottom: 5px;
+}
+
+.lp-resource-row small {
+  color: var(--text-soft);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+@media (max-width: 1120px) {
+  .lp-nav-links {
+    gap: 20px;
+  }
+
+  .lp-nav-link {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 900px) {
+  .lp-about-card,
+  .lp-product-grid,
+  .lp-service-card,
+  .lp-resource-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .lp-about-card article + article {
+    border-left: 0;
+    border-top: 1px solid var(--border);
+  }
+
+  .lp-product-card {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 540px) {
+  .lp-unified-section {
+    padding: 58px 0;
+    scroll-margin-top: 70px;
+  }
+
+  .lp-unified-head {
+    margin-bottom: 28px;
+  }
+
+  .lp-about-card article,
+  .lp-product-card,
+  .lp-service-card,
+  .lp-resource-feature,
+  .lp-resource-row {
+    padding: 22px;
+  }
+
+  .lp-resource-row {
+    gap: 12px;
+  }
+
+  .lp-resource-feature h3 {
+    font-size: 26px;
+  }
+}
+
 /* =========================================================
    === DASHBOARD ===
    Light editorial theme for the App.jsx dashboard (Phase 1).

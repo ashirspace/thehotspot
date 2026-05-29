@@ -31,8 +31,9 @@ const COLUMNS = [
   {
     head: "Product",
     links: [
-      { label: "Features", href: "/features.html" },
-      { label: "Pricing", href: "/pricing.html" },
+      { label: "Product Overview", href: "/#product-overview" },
+      { label: "What We Provide", href: "/#what-we-provide" },
+      { label: "Pricing", href: "/#pricing" },
       { label: "Changelog", href: "/changelog.html" },
       { label: "Roadmap", href: "/roadmap.html" },
     ],
@@ -40,8 +41,8 @@ const COLUMNS = [
   {
     head: "Company",
     links: [
-      { label: "About", href: "/about.html" },
-      { label: "Blog", href: "/blog.html" },
+      { label: "About", href: "/#about" },
+      { label: "Resources", href: "/#resources" },
       { label: "Careers", href: "/careers.html" },
       { label: "Contact", href: "/contact.html" },
     ],

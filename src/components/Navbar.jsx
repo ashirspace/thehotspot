@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 
 const LINKS = [
-  { label: "Features", href: "/features.html" },
-  { label: "Pricing", href: "/pricing.html" },
-  { label: "Blog", href: "/blog.html" },
-  { label: "Contact", href: "/contact.html" },
+  { label: "About", href: "/#about" },
+  { label: "Product", href: "/#product-overview" },
+  { label: "Services", href: "/#what-we-provide" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Resources", href: "/#resources" },
 ];
 
 function Wordmark() {
