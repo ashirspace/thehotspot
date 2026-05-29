@@ -4,7 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Lead Finder Agent — thehotspot</title>
-<style>
+  <link rel="stylesheet" href="/static-page-theme.css" />
+  <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   body { font-family: 'Roboto', -apple-system, sans-serif; background: #09090d; color: #F1F5F9; line-height: 1.6; }
   @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap');
@@ -60,18 +61,24 @@
   <script>
     setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
   </script>
-
-
-<nav class="nav">
-  <a href="/" class="nav-brand">
-    <div class="logo">HS</div>
-    <span style="font-size:16px;font-weight:700;letter-spacing:-0.3px;">thehotspot</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:10px;">
-    <a href="/agents" style="color:#94A3B8;text-decoration:none;font-size:13px;font-weight:500;">← All Agents</a>
-    <a href="/" class="nav-cta">Get Started</a>
-  </div>
-</nav>
+    <nav class="sp-nav" aria-label="Main navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+          thehotspot
+        </a>
+        <div class="sp-nav-links" aria-label="Site links">
+          <a class="sp-nav-link" href="/features.html">Features</a>
+          <a class="sp-nav-link" href="/pricing.html">Pricing</a>
+          <a class="sp-nav-link" href="/blog.html">Blog</a>
+          <a class="sp-nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/">Sign in</a>
+          <a class="sp-btn sp-btn-primary" href="/">Get Started</a>
+        </div>
+      </div>
+    </nav>
 
 <div class="hero">
   <div class="badge"><span class="badge-dot"></span><span class="badge-text">Agent 1 of 12</span></div>

@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react";
 
 const LINKS = [
-  { label: "Features", href: "#features" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Customers", href: "#customers" },
-  { label: "Docs", href: "#docs" },
-  { label: "Changelog", href: "#changelog" },
+  { label: "Features", href: "/features.html" },
+  { label: "Pricing", href: "/pricing.html" },
+  { label: "Blog", href: "/blog.html" },
+  { label: "Contact", href: "/contact.html" },
 ];
 
 function Wordmark() {
@@ -36,7 +35,7 @@ export default function Navbar({ onSignIn, onGetStarted }) {
     <>
       <nav className={`lp-nav${scrolled ? " is-scrolled" : ""}`}>
         <div className="lp-nav-inner">
-          <a href="#top" aria-label="thehotspot home">
+          <a href="/" aria-label="thehotspot home">
             <Wordmark />
           </a>
 

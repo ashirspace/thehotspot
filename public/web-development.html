@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/static-page-theme.css" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: 'Roboto', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
@@ -92,14 +93,24 @@
   </script>
 
   <div class="glow1"></div><div class="glow2"></div>
-
-  <nav>
-    <a href="/" class="nav-brand"><img src="/logo.png" class="nav-logo" alt="logo"/><span class="nav-name">thehotspot</span></a>
-    <div style="display:flex;gap:8px;align-items:center;">
-      <a href="/" class="nav-back">← Back</a>
-      <a href="/contact.html" class="nav-cta">Get Started</a>
-    </div>
-  </nav>
+    <nav class="sp-nav" aria-label="Main navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+          thehotspot
+        </a>
+        <div class="sp-nav-links" aria-label="Site links">
+          <a class="sp-nav-link" href="/features.html">Features</a>
+          <a class="sp-nav-link" href="/pricing.html">Pricing</a>
+          <a class="sp-nav-link" href="/blog.html">Blog</a>
+          <a class="sp-nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/">Sign in</a>
+          <a class="sp-btn sp-btn-primary" href="/">Get Started</a>
+        </div>
+      </div>
+    </nav>
 
   <div class="hero">
     <div class="badge"><span class="badge-dot"></span><span class="badge-text">Service</span></div>

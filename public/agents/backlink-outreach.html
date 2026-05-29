@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Backlink Outreach Agent — thehotspot</title>
-<style>
+  <link rel="stylesheet" href="/static-page-theme.css" />
+  <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'Roboto',-apple-system,sans-serif;background:#09090d;color:#F1F5F9;line-height:1.6}a{color:inherit}
 .nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid #ffffff0d;background:#09090dcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
 .logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#10b981,#0ea5e9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
@@ -53,17 +54,24 @@ h1{font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-2px;line-heigh
   <script>
     setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
   </script>
-
-<nav class="nav">
-  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none">
-    <div class="logo">HS</div>
-    <span style="font-size:16px;font-weight:700">thehotspot</span>
-  </a>
-  <div style="display:flex;align-items:center;gap:10px">
-    <a href="/agents" style="color:#94A3B8;text-decoration:none;font-size:13px;font-weight:500">← All Agents</a>
-    <a href="/" class="nav-cta">Get Started</a>
-  </div>
-</nav>
+    <nav class="sp-nav" aria-label="Main navigation">
+      <div class="sp-nav-inner">
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
+          <span class="sp-wordmark-dot" aria-hidden="true"></span>
+          thehotspot
+        </a>
+        <div class="sp-nav-links" aria-label="Site links">
+          <a class="sp-nav-link" href="/features.html">Features</a>
+          <a class="sp-nav-link" href="/pricing.html">Pricing</a>
+          <a class="sp-nav-link" href="/blog.html">Blog</a>
+          <a class="sp-nav-link" href="/contact.html">Contact</a>
+        </div>
+        <div class="sp-nav-right">
+          <a class="sp-btn sp-btn-ghost" href="/">Sign in</a>
+          <a class="sp-btn sp-btn-primary" href="/">Get Started</a>
+        </div>
+      </div>
+    </nav>
 
 <div class="hero">
   <div class="badge"><span class="badge-dot"></span><span class="badge-text">Agent 9 of 12</span></div>
