@@ -2,8 +2,8 @@ import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  MessageSquareText, Search, Mail, House, LayoutDashboard, Users, Radio,
-  Send, FilePen, Inbox, Settings, Menu, X,
+  MessageSquareText, Search, Mail, House, Users, Radio,
+  Send, FilePen, Inbox, Settings, CreditCard, BarChart2, Menu, X,
 } from "lucide-react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
@@ -14,16 +14,20 @@ const AGENTS = [
 
 const AGENT_MAP = Object.fromEntries(AGENTS.map(a => [a.id, a]));
 
-const DASHBOARD_NAV = [
-  { label: "Home", href: "/", Icon: House },
-  { label: "Dashboard", href: "/dashboard", Icon: LayoutDashboard },
-  { label: "Contacts", href: "/contacts", Icon: Users },
-  { label: "Campaigns", href: "/campaign-status", Icon: Radio },
-  { label: "LinkedIn DM", href: "/agents/linkedin-dm-outreach", Icon: MessageSquareText, active: true },
-  { label: "Email Sender", href: "/email-sender", Icon: Send },
-  { label: "Templates", href: "/email-templates", Icon: FilePen },
-  { label: "Inbox", href: "/inbox", Icon: Inbox },
+const DASHBOARD_NAV_MAIN = [
+  { label: "Home",          href: "/",                            Icon: House },
+  { label: "Contacts",      href: "/contacts",                    Icon: Users },
+  { label: "Campaigns",     href: "/campaign-status",             Icon: Radio },
+  { label: "Inbox",         href: "/inbox",                       Icon: Inbox, badge: 12 },
+  { label: "Templates",     href: "/email-templates",             Icon: FilePen },
+  { label: "Email Senders", href: "/email-sender",                Icon: Send },
+  { label: "LinkedIn (DM)", href: "/agents/linkedin-dm-outreach", Icon: MessageSquareText, active: true },
+  { label: "Reports",       href: "/reports",                     Icon: BarChart2 },
+];
+
+const DASHBOARD_NAV_FOOTER = [
   { label: "Settings", href: "/settings", Icon: Settings },
+  { label: "Billing",  href: "/billing",  Icon: CreditCard },
 ];
 
 const AGENT_THEME = {
@@ -127,40 +131,25 @@ function DashboardSidebar({ open, onClose }) {
       aria-label="Dashboard navigation"
       aria-hidden={!open}
     >
-      <div className="dash-sidebar-section">
-        <span className="dash-sidebar-eyebrow">Workspace</span>
+      <div style={{ flex: 1, paddingTop: 8 }}>
+        {DASHBOARD_NAV_MAIN.map(({ label, href, Icon, active, badge }) => (
+          <a key={href} href={href}
+            className={`dash-nav-item agent-sidebar-link${active ? " is-active" : ""}`}
+            onClick={onClose}>
+            <Icon size={18} />
+            <span style={{ flex: 1 }}>{label}</span>
+            {badge && <span className="dash-nav-badge">{badge}</span>}
+          </a>
+        ))}
       </div>
-      {DASHBOARD_NAV.slice(0, 4).map(({ label, href, Icon }) => (
-        <a key={href} href={href} className="dash-nav-item agent-sidebar-link" onClick={onClose}>
-          <Icon size={18} />
-          {label}
-        </a>
-      ))}
-
-      <div className="dash-sidebar-section">
-        <span className="dash-sidebar-eyebrow">Intelligence</span>
+      <div className="dash-sidebar-footer">
+        {DASHBOARD_NAV_FOOTER.map(({ label, href, Icon }) => (
+          <a key={href} href={href} className="dash-nav-item agent-sidebar-link" onClick={onClose}>
+            <Icon size={18} />
+            {label}
+          </a>
+        ))}
       </div>
-      {DASHBOARD_NAV.slice(4, 8).map(({ label, href, Icon, active }) => (
-        <a
-          key={href}
-          href={href}
-          className={`dash-nav-item agent-sidebar-link${active ? " is-active" : ""}`}
-          onClick={onClose}
-        >
-          <Icon size={18} />
-          {label}
-        </a>
-      ))}
-
-      <div className="dash-sidebar-section">
-        <span className="dash-sidebar-eyebrow">Account</span>
-      </div>
-      {DASHBOARD_NAV.slice(8).map(({ label, href, Icon }) => (
-        <a key={href} href={href} className="dash-nav-item agent-sidebar-link" onClick={onClose}>
-          <Icon size={18} />
-          {label}
-        </a>
-      ))}
     </aside>
   );
 }

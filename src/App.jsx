@@ -4895,6 +4895,18 @@ function HelpPage({ onBack }) {
   );
 }
 
+/* ───────── REPORTS PAGE ───────── */
+function ReportsPage({ onBack }) {
+  return (
+    <div style={{ padding: "40px 0" }}>
+      <div className="dash-page-head">
+        <h1 className="dash-h1">Reports</h1>
+        <p style={{ color: "var(--text-muted)", marginTop: 6 }}>Campaign analytics and performance reporting — coming soon.</p>
+      </div>
+    </div>
+  );
+}
+
 /* ───────── DASHBOARD ───────── */
 function Dashboard({ user, onLogout, onUserUpdate }) {
   // URL ↔ page mapping
@@ -5290,6 +5302,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
     contacts: "Contacts", campaignStatus: "Campaigns", totalContacts: "Total Contacts",
     emailsSent: "Emails Sent", categories: "Categories", successRate: "Success Rate",
     inbox: "Inbox", billing: "Billing", help: "Help", profile: "Settings", settings: "Settings",
+    reports: "Reports",
   };
   const pageLabel = PAGE_TITLES[page] || "Dashboard";
   const pageIcon  = navItems.find(n => n.id === page)?.icon  || "";
@@ -5352,46 +5365,43 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
         {/* LEFT SIDEBAR — persistent on desktop, drawer below 1024px */}
         <aside className={`dash-sidebar${sidebarOpen ? " is-open" : ""}`}>
-          {[
-            { eyebrow: "Workspace", items: [
-              { id: null,             label: "Home",         icon: <LuHouse size={18} /> },
-              { id: "dashboard",      label: "Dashboard",    icon: <LuLayoutDashboard size={18} /> },
-              { id: "contacts",       label: "Contacts",     icon: <LuUsers size={18} /> },
-              { id: "campaignStatus", label: "Campaigns",    icon: <LuRadio size={18} /> },
-            ] },
-            { eyebrow: "Intelligence", items: [
-              { href: "/agents/linkedin-dm-outreach", label: "LinkedIn DM", icon: <LuMessageCircle size={18} /> },
-              { id: "emailSender",    label: "Email Sender", icon: <LuSend size={18} /> },
-              { id: "emailTemplates", label: "Templates",    icon: <LuFilePen size={18} /> },
-              { id: "inbox",          label: "Inbox",        icon: <LuInbox size={18} /> },
-            ] },
-            { eyebrow: "Account", items: [
-              { id: "settings",       label: "Settings",     icon: <LuSettings size={18} /> },
-              { id: "billing",        label: "Billing",      icon: <LuCreditCard size={18} /> },
-              { id: "help",           label: "Help",         icon: <LuCircleHelp size={18} /> },
-            ] },
-          ].map(section => (
-            <div key={section.eyebrow}>
-              <div className="dash-sidebar-section">
-                <span className="dash-sidebar-eyebrow">{section.eyebrow}</span>
-              </div>
-              {section.items.map(item => (
-                <button key={item.href || String(item.id)}
-                  className={`dash-nav-item${page === item.id ? " is-active" : ""}`}
-                  onClick={() => {
-                    setSidebarOpen(false);
-                    if (item.href) window.location.href = item.href;
-                    else setPage(item.id);
-                  }}>
-                  {item.icon}
-                  {item.label}
-                </button>
-              ))}
-            </div>
-          ))}
-
+          <div style={{ flex: 1, paddingTop: 8 }}>
+            {[
+              { id: null,             label: "Home",          icon: <LuHouse size={18} /> },
+              { id: "contacts",       label: "Contacts",      icon: <LuUsers size={18} /> },
+              { id: "campaignStatus", label: "Campaigns",     icon: <LuRadio size={18} /> },
+              { id: "inbox",          label: "Inbox",         icon: <LuInbox size={18} />, badge: 12 },
+              { id: "emailTemplates", label: "Templates",     icon: <LuFilePen size={18} /> },
+              { id: "emailSender",    label: "Email Senders", icon: <LuSend size={18} /> },
+              { href: "/agents/linkedin-dm-outreach", label: "LinkedIn (DM)", icon: <LuMessageCircle size={18} /> },
+              { id: "reports",        label: "Reports",       icon: <LuChartBar size={18} /> },
+            ].map(item => (
+              <button key={item.href || String(item.id)}
+                className={`dash-nav-item${page === item.id ? " is-active" : ""}`}
+                onClick={() => {
+                  setSidebarOpen(false);
+                  if (item.href) window.location.href = item.href;
+                  else setPage(item.id);
+                }}>
+                {item.icon}
+                <span style={{ flex: 1 }}>{item.label}</span>
+                {item.badge && <span className="dash-nav-badge">{item.badge}</span>}
+              </button>
+            ))}
+          </div>
 
           <div className="dash-sidebar-footer">
+            {[
+              { id: "settings", label: "Settings", icon: <LuSettings size={18} /> },
+              { id: "billing",  label: "Billing",  icon: <LuCreditCard size={18} /> },
+            ].map(item => (
+              <button key={item.id}
+                className={`dash-nav-item${page === item.id ? " is-active" : ""}`}
+                onClick={() => { setPage(item.id); setSidebarOpen(false); }}>
+                {item.icon}
+                {item.label}
+              </button>
+            ))}
             <button className="dash-user-card"
               onClick={() => { setPage("profile"); setSidebarOpen(false); }}
               style={{ width: "100%", border: "none", cursor: "pointer" }}>
@@ -5445,6 +5455,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             {page === "help"           && <HelpPage onBack={() => setPage(null)} />}
             {page === "profile"        && <ProfilePage user={user} onBack={() => setPage(null)} onLogout={onLogout} />}
             {page === "settings"       && <SettingsPage onBack={() => setPage(null)} gmailConnected={gmailConnected} connectGmail={connectGmail} user={user} />}
+            {page === "reports"        && <ReportsPage onBack={() => setPage(null)} />}
           </div>
         </div>
         </div>{/* end right panel */}
