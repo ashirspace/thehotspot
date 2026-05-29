@@ -2,9 +2,7 @@ import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  MessageSquareText, Users,
-  LayoutDashboard, House, Radio, FilePen, Settings,
-  Sparkles, Menu, X, ChevronLeft,
+  MessageSquareText, Search, Mail,
 } from "lucide-react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
@@ -31,17 +29,6 @@ const AGENT_THEME = {
   displayFont: "var(--font-display, 'Roboto', ui-sans-serif, system-ui, sans-serif)",
 };
 
-// ─── Main nav items (mirrors dashboard sidebar) ────────────────────────────────
-
-const MAIN_NAV = [
-  { label: "Home",      href: "/",                Icon: House },
-  { label: "Dashboard", href: "/dashboard",        Icon: LayoutDashboard },
-  { label: "Contacts",  href: "/contacts",         Icon: Users  },
-  { label: "Campaigns", href: "/campaign-status",  Icon: Radio },
-  { label: "Templates", href: "/email-templates",  Icon: FilePen },
-  { label: "Settings",  href: "/settings",         Icon: Settings },
-];
-
 // ─── Lazy page loader ─────────────────────────────────────────────────────────
 
 const pageCache = {};
@@ -54,6 +41,58 @@ function LazyPage({ name }) {
     <Suspense fallback={<div className="text-muted text-sm py-12 text-center">Loading agent...</div>}>
       <Page />
     </Suspense>
+  );
+}
+
+function getStoredUser() {
+  try {
+    return JSON.parse(localStorage.getItem("thehotspot_user") || "null");
+  } catch {
+    return null;
+  }
+}
+
+function DashboardTopbar({ cfg, user }) {
+  const initial = user?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U";
+
+  return (
+    <div className="dash-topbar">
+      <button
+        onClick={() => { window.location.href = "/dashboard"; }}
+        className="dash-wordmark"
+        style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+      >
+        <img className="dash-wordmark-mark" src="/logo.png" alt="" aria-hidden="true" />
+        thehotspot
+      </button>
+      <span className="dash-breadcrumb rsp-breadcrumb">
+        <span className="dash-breadcrumb-sep">/</span>
+        Intelligence
+        <span className="dash-breadcrumb-sep">/</span>
+        {cfg.label}
+      </span>
+      <div className="dash-topbar-right">
+        <label className="dash-search rsp-gmail-badge">
+          <Search size={14} style={{ flexShrink: 0 }} />
+          <input placeholder="Search campaigns, contacts..." readOnly />
+          <span className="dash-kbd">⌘K</span>
+        </label>
+        <button
+          className="dash-icon-btn"
+          onClick={() => { window.location.href = "/settings"; }}
+          title={user?.gmailToken ? "Gmail connected" : "Connect Gmail"}
+        >
+          <Mail size={17} style={{ color: user?.gmailToken ? "var(--teal)" : "var(--text-soft)" }} />
+        </button>
+        <button
+          className="dash-avatar"
+          onClick={() => { window.location.href = "/profile"; }}
+          title="Profile"
+        >
+          {initial}
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -97,113 +136,19 @@ function SplashScreen({ cfg, onDone }) {
   );
 }
 
-// ─── Sidebar ──────────────────────────────────────────────────────────────────
-
-function Sidebar({ currentAgentId, open, onClose }) {
-  const navigate = useNavigate();
-
-  const handleAgentClick = (id) => {
-    navigate(`/agents/${id}`);
-    onClose();
-  };
-
-  return (
-    <aside
-      className={open ? "al-sidebar al-sidebar--open" : "al-sidebar"}
-      style={{
-        width: 224, flexShrink: 0, display: "flex", flexDirection: "column",
-        background: "rgba(248,250,252,0.94)", borderRight: `1px solid ${AGENT_THEME.line}`,
-        height: "100vh", position: "sticky", top: 0, overflowY: "auto",
-        backdropFilter: "blur(18px)",
-      }}
-    >
-      {/* Brand */}
-      <div style={{ padding: "18px 16px 14px", borderBottom: `1px solid ${AGENT_THEME.line}` }}>
-        <div style={{ fontSize: 15, fontWeight: 800, color: AGENT_THEME.ink, fontFamily: AGENT_THEME.displayFont, letterSpacing: 0 }}>thehotspot</div>
-        <div style={{ fontSize: 10, color: AGENT_THEME.soft, marginTop: 1, letterSpacing: "0.06em" }}>outreach platform</div>
-      </div>
-
-      {/* Main nav */}
-      <div style={{ padding: "8px 8px 0" }}>
-        <p style={{ fontSize: 9, fontWeight: 700, color: AGENT_THEME.faint, letterSpacing: "0.1em", textTransform: "uppercase", padding: "8px 8px 4px" }}>Platform</p>
-        {MAIN_NAV.map(({ label, href, Icon }) => (
-          <a
-            key={href}
-            href={href}
-            style={{
-              display: "flex", alignItems: "center", gap: 9, width: "100%",
-              padding: "8px 10px", marginBottom: 1, borderRadius: 7,
-              color: AGENT_THEME.soft, fontSize: 13, fontWeight: 500,
-              textDecoration: "none", transition: "all .12s",
-              borderLeft: "2px solid transparent",
-            }}
-            onMouseEnter={e => { e.currentTarget.style.background = AGENT_THEME.tealTint; e.currentTarget.style.color = AGENT_THEME.tealDark; }}
-            onMouseLeave={e => { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = AGENT_THEME.soft; }}
-          >
-            <Icon size={14} style={{ flexShrink: 0 }} />
-            {label}
-          </a>
-        ))}
-      </div>
-
-      {/* Divider */}
-      <div style={{ borderTop: `1px solid ${AGENT_THEME.line}`, margin: "10px 0 0" }} />
-
-      {/* Agent list */}
-      <div style={{ padding: "8px 8px", flex: 1 }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 6, padding: "8px 8px 6px" }}>
-          <Sparkles size={11} style={{ color: AGENT_THEME.teal }} />
-          <p style={{ fontSize: 9, fontWeight: 700, color: AGENT_THEME.faint, letterSpacing: "0.1em", textTransform: "uppercase" }}>Intelligence</p>
-        </div>
-        {AGENTS.map(({ id, label, Icon, accent }) => {
-          const isActive = id === currentAgentId;
-          return (
-            <button
-              key={id}
-              onClick={() => handleAgentClick(id)}
-              style={{
-                display: "flex", alignItems: "center", gap: 8, width: "100%",
-                padding: "7px 10px", marginBottom: 1, borderRadius: 7,
-                background: isActive ? AGENT_THEME.tealTint : "transparent",
-                borderLeft: isActive ? `2px solid ${accent}` : "2px solid transparent",
-                color: isActive ? AGENT_THEME.ink : AGENT_THEME.soft,
-                fontWeight: isActive ? 600 : 400,
-                fontSize: 12, fontFamily: AGENT_THEME.font,
-                border: "none", cursor: "pointer", textAlign: "left",
-                transition: "all .12s",
-              }}
-              onMouseEnter={e => { if (!isActive) { e.currentTarget.style.background = AGENT_THEME.tealTint; e.currentTarget.style.color = AGENT_THEME.tealDark; } }}
-              onMouseLeave={e => { if (!isActive) { e.currentTarget.style.background = "transparent"; e.currentTarget.style.color = AGENT_THEME.soft; } }}
-            >
-              <Icon size={13} style={{ color: isActive ? accent : "inherit", flexShrink: 0 }} />
-              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
-            </button>
-          );
-        })}
-      </div>
-
-      {/* Footer */}
-      <div style={{ borderTop: `1px solid ${AGENT_THEME.line}`, padding: "10px 16px 14px" }}>
-        <span style={{ fontSize: 10, color: AGENT_THEME.faint }}>© 2026 thehotspot</span>
-      </div>
-    </aside>
-  );
-}
-
 // ─── Main export ──────────────────────────────────────────────────────────────
 
 export default function AgentsLayout() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const [splashDone, setSplashDone] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user] = useState(() => getStoredUser());
 
   const cfg = AGENT_MAP[agentId];
 
   // New splash on every agent switch
   useEffect(() => {
     setSplashDone(false);
-    setSidebarOpen(false);
   }, [agentId]);
 
   if (!cfg) {
@@ -217,50 +162,15 @@ export default function AgentsLayout() {
     );
   }
 
-  const { Icon: AgentIcon, accent } = cfg;
-
   return (
-    <div className="al-root" style={{ display: "flex", height: "100vh", background: AGENT_THEME.pageBg, color: AGENT_THEME.ink, fontFamily: AGENT_THEME.font, overflow: "hidden" }}>
+    <div className="dash-shell al-root" style={{ width: "100vw", position: "fixed", inset: 0, background: AGENT_THEME.pageBg, color: AGENT_THEME.ink, fontFamily: AGENT_THEME.font }}>
       {/* Splash */}
       {!splashDone && <SplashScreen cfg={cfg} onDone={() => setSplashDone(true)} />}
 
-      {/* Mobile overlay backdrop */}
-      {sidebarOpen && (
-        <div
-          className="al-overlay"
-          onClick={() => setSidebarOpen(false)}
-          style={{ position: "fixed", inset: 0, zIndex: 9600, background: "rgba(15,23,42,0.32)" }}
-        />
-      )}
-
-      {/* Sidebar */}
-      <Sidebar currentAgentId={agentId} open={sidebarOpen} onClose={() => setSidebarOpen(false)} />
+      <DashboardTopbar cfg={cfg} user={user} />
 
       {/* Main content */}
       <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
-        {/* Mobile top bar */}
-        <div
-          className="al-topbar"
-          style={{ display: "none", alignItems: "center", gap: 10, padding: "0 14px", height: 52, borderBottom: `1px solid ${AGENT_THEME.line}`, background: "rgba(255,255,255,0.94)", backdropFilter: "blur(14px)", flexShrink: 0, position: "sticky", top: 0, zIndex: 100 }}
-        >
-          <button
-            onClick={() => setSidebarOpen(v => !v)}
-            style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 34, height: 34, borderRadius: 8, background: AGENT_THEME.card, border: `1px solid ${AGENT_THEME.line}`, color: AGENT_THEME.soft, cursor: "pointer", flexShrink: 0 }}
-          >
-            {sidebarOpen ? <X size={16} /> : <Menu size={16} />}
-          </button>
-          <div style={{ display: "flex", alignItems: "center", gap: 8, flex: 1, minWidth: 0 }}>
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "center", width: 26, height: 26, borderRadius: 7, background: `${accent}18`, border: `1px solid ${accent}30`, flexShrink: 0 }}>
-              <AgentIcon size={13} style={{ color: accent }} />
-            </div>
-            <span style={{ fontSize: 13, fontWeight: 600, color: AGENT_THEME.ink, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cfg.label}</span>
-          </div>
-          <a href="/" style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 12, color: AGENT_THEME.soft, textDecoration: "none", flexShrink: 0 }}>
-            <ChevronLeft size={14} />
-            <span>Dashboard</span>
-          </a>
-        </div>
-
         <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px", width: "100%" }}>
           <LazyPage name={cfg.page} />
         </main>
@@ -272,35 +182,16 @@ export default function AgentsLayout() {
         @keyframes splashText { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes splashDot  { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-6px); opacity: 1; } }
 
-        /* Tablet: 768–1024px — sidebar slightly narrower, content padding reduced */
         @media (max-width: 1024px) {
-          .al-sidebar {
-            width: 200px !important;
-          }
           .al-content main {
             padding: 24px 20px 60px !important;
           }
         }
 
-        /* Mobile: 320–767px — overlay sidebar, top bar visible */
         @media (max-width: 767px) {
-          .al-sidebar {
-            position: fixed !important;
-            left: 0 !important;
-            top: 0 !important;
-            bottom: 0 !important;
-            height: 100dvh !important;
-            width: 260px !important;
-            z-index: 9700 !important;
-            transform: translateX(-100%) !important;
-            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-            box-shadow: 6px 0 26px rgba(15,23,42,0.12) !important;
-          }
-          .al-sidebar--open {
-            transform: translateX(0) !important;
-          }
-          .al-topbar {
-            display: flex !important;
+          .al-root .dash-topbar {
+            gap: 12px;
+            padding-inline: 14px;
           }
           .al-content main {
             padding: 16px 14px 80px !important;
