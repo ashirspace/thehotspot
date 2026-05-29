@@ -2,9 +2,10 @@ import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  MessageSquareText, Search, Mail, House, Users, Radio,
+  MessageSquareText, Search, Mail, LayoutDashboard, Users, Radio,
   Send, FilePen, Inbox, Settings, CreditCard, BarChart2, Menu, X,
 } from "lucide-react";
+import { useRef } from "react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
 
@@ -15,7 +16,7 @@ const AGENTS = [
 const AGENT_MAP = Object.fromEntries(AGENTS.map(a => [a.id, a]));
 
 const DASHBOARD_NAV_MAIN = [
-  { label: "Home",          href: "/",                            Icon: House },
+  { label: "Dashboard",     href: "/dashboard",                   Icon: LayoutDashboard },
   { label: "Contacts",      href: "/contacts",                    Icon: Users },
   { label: "Campaigns",     href: "/campaign-status",             Icon: Radio },
   { label: "Inbox",         href: "/inbox",                       Icon: Inbox, badge: 12 },
@@ -123,13 +124,14 @@ function DashboardTopbar({ cfg, user, navOpen, onToggleNav }) {
   );
 }
 
-function DashboardSidebar({ open, onClose }) {
+function DashboardSidebar({ open, onClose, sidebarWidth, onResizeStart }) {
   return (
     <aside
       id="linkedin-dashboard-nav"
       className={`dash-sidebar agent-dashboard-sidebar${open ? " is-open" : ""}`}
       aria-label="Dashboard navigation"
       aria-hidden={!open}
+      style={open ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}
     >
       <div style={{ flex: 1, paddingTop: 8 }}>
         {DASHBOARD_NAV_MAIN.map(({ label, href, Icon, active, badge }) => (
@@ -150,6 +152,7 @@ function DashboardSidebar({ open, onClose }) {
           </a>
         ))}
       </div>
+      <div className="dash-resize-handle" onMouseDown={onResizeStart} />
     </aside>
   );
 }
@@ -202,6 +205,28 @@ export default function AgentsLayout() {
   const [splashDone, setSplashDone] = useState(false);
   const [navOpen, setNavOpen] = useState(true);
   const [user] = useState(() => getStoredUser());
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const s = parseInt(localStorage.getItem("sidebar-width"), 10);
+    return s >= 200 && s <= 420 ? s : 268;
+  });
+  const sidebarDrag = useRef({ on: false, x0: 0, w0: 0 });
+
+  useEffect(() => {
+    const move = (e) => {
+      if (!sidebarDrag.current.on) return;
+      const w = Math.max(200, Math.min(420, sidebarDrag.current.w0 + e.clientX - sidebarDrag.current.x0));
+      setSidebarWidth(w);
+      localStorage.setItem("sidebar-width", w);
+    };
+    const up = () => {
+      if (!sidebarDrag.current.on) return;
+      sidebarDrag.current.on = false;
+      document.body.classList.remove("sidebar-resizing");
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+  }, []);
 
   const cfg = AGENT_MAP[agentId];
 
@@ -234,11 +259,20 @@ export default function AgentsLayout() {
       />
 
       <div className="dash-body">
-        {navOpen && <div className="dash-backdrop" onClick={() => setNavOpen(false)} />}
-        <DashboardSidebar open={navOpen} onClose={() => setNavOpen(false)} />
+        <DashboardSidebar
+          open={navOpen}
+          onClose={() => setNavOpen(false)}
+          sidebarWidth={sidebarWidth}
+          onResizeStart={(e) => {
+            e.preventDefault();
+            sidebarDrag.current = { on: true, x0: e.clientX, w0: sidebarWidth };
+            document.body.classList.add("sidebar-resizing");
+          }}
+        />
 
         {/* Main content */}
-        <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
+        <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column", position: "relative" }}>
+          {navOpen && <div className="dash-content-dim" onClick={() => setNavOpen(false)} />}
           <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px", width: "100%" }}>
             <LazyPage name={cfg.page} />
           </main>

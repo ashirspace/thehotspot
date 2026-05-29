@@ -5385,7 +5385,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
           style={sidebarOpen ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}>
           <div style={{ flex: 1, paddingTop: 8 }}>
             {[
-              { id: null,             label: "Home",          icon: <LuHouse size={18} /> },
+              { id: "dashboard",      label: "Dashboard",     icon: <LuLayoutDashboard size={18} /> },
               { id: "contacts",       label: "Contacts",      icon: <LuUsers size={18} /> },
               { id: "campaignStatus", label: "Campaigns",     icon: <LuRadio size={18} /> },
               { id: "inbox",          label: "Inbox",         icon: <LuInbox size={18} />, badge: 12 },
