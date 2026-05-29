@@ -119,27 +119,49 @@ function DashboardTopbar({ cfg, user, navOpen, onToggleNav }) {
   );
 }
 
-function DashboardNavBar({ open }) {
+function DashboardSidebar({ open, onClose }) {
   return (
-    <nav
+    <aside
       id="linkedin-dashboard-nav"
-      className={`agent-dashboard-nav${open ? " is-open" : ""}`}
+      className={`dash-sidebar agent-dashboard-sidebar${open ? " is-open" : ""}`}
       aria-label="Dashboard navigation"
       aria-hidden={!open}
     >
-      <div className="agent-dashboard-nav-inner">
-        {DASHBOARD_NAV.map(({ label, href, Icon, active }) => (
-          <a
-            key={href}
-            href={href}
-            className={`agent-dashboard-nav-item${active ? " is-active" : ""}`}
-          >
-            <Icon size={16} />
-            <span>{label}</span>
-          </a>
-        ))}
+      <div className="dash-sidebar-section">
+        <span className="dash-sidebar-eyebrow">Workspace</span>
       </div>
-    </nav>
+      {DASHBOARD_NAV.slice(0, 4).map(({ label, href, Icon }) => (
+        <a key={href} href={href} className="dash-nav-item agent-sidebar-link" onClick={onClose}>
+          <Icon size={18} />
+          {label}
+        </a>
+      ))}
+
+      <div className="dash-sidebar-section">
+        <span className="dash-sidebar-eyebrow">Intelligence</span>
+      </div>
+      {DASHBOARD_NAV.slice(4, 8).map(({ label, href, Icon, active }) => (
+        <a
+          key={href}
+          href={href}
+          className={`dash-nav-item agent-sidebar-link${active ? " is-active" : ""}`}
+          onClick={onClose}
+        >
+          <Icon size={18} />
+          {label}
+        </a>
+      ))}
+
+      <div className="dash-sidebar-section">
+        <span className="dash-sidebar-eyebrow">Account</span>
+      </div>
+      {DASHBOARD_NAV.slice(8).map(({ label, href, Icon }) => (
+        <a key={href} href={href} className="dash-nav-item agent-sidebar-link" onClick={onClose}>
+          <Icon size={18} />
+          {label}
+        </a>
+      ))}
+    </aside>
   );
 }
 
@@ -221,13 +243,17 @@ export default function AgentsLayout() {
         navOpen={navOpen}
         onToggleNav={() => setNavOpen(open => !open)}
       />
-      <DashboardNavBar open={navOpen} />
 
-      {/* Main content */}
-      <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
-        <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px", width: "100%" }}>
-          <LazyPage name={cfg.page} />
-        </main>
+      <div className="dash-body">
+        {navOpen && <div className="dash-backdrop" onClick={() => setNavOpen(false)} />}
+        <DashboardSidebar open={navOpen} onClose={() => setNavOpen(false)} />
+
+        {/* Main content */}
+        <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
+          <main style={{ maxWidth: 1060, margin: "0 auto", padding: "36px 28px 80px", width: "100%" }}>
+            <LazyPage name={cfg.page} />
+          </main>
+        </div>
       </div>
 
       <style>{`
@@ -236,66 +262,12 @@ export default function AgentsLayout() {
         @keyframes splashText { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes splashDot  { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-6px); opacity: 1; } }
 
-        .agent-dashboard-nav {
-          flex: 0 0 auto;
-          width: 100%;
-          max-height: 0;
-          opacity: 0;
-          background: rgba(248, 250, 252, 0.88);
-          border-bottom: 1px solid transparent;
-          backdrop-filter: blur(18px);
-          overflow-x: auto;
-          overflow-y: hidden;
-          scrollbar-width: none;
-          pointer-events: none;
-          transition: max-height 180ms ease, opacity 160ms ease, border-color 160ms ease;
+        .agent-dashboard-sidebar {
+          flex-shrink: 0;
         }
 
-        .agent-dashboard-nav.is-open {
-          max-height: 56px;
-          opacity: 1;
-          border-bottom-color: var(--border);
-          pointer-events: auto;
-        }
-
-        .agent-dashboard-nav::-webkit-scrollbar {
-          display: none;
-        }
-
-        .agent-dashboard-nav-inner {
-          display: flex;
-          align-items: center;
-          gap: 4px;
-          min-height: 48px;
-          padding: 6px 20px;
-        }
-
-        .agent-dashboard-nav-item {
-          display: inline-flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          flex: 0 0 auto;
-          min-height: 36px;
-          padding: 0 12px;
-          border-radius: var(--r);
-          color: var(--text-soft);
-          font-size: 13px;
-          font-weight: 600;
+        .agent-sidebar-link {
           text-decoration: none;
-          white-space: nowrap;
-          transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
-        }
-
-        .agent-dashboard-nav-item:hover {
-          background: rgba(255, 255, 255, 0.84);
-          color: var(--text);
-        }
-
-        .agent-dashboard-nav-item.is-active {
-          background: #ffffff;
-          color: var(--teal-dark);
-          box-shadow: var(--shadow-sm);
         }
 
         @media (max-width: 1024px) {
@@ -307,9 +279,6 @@ export default function AgentsLayout() {
         @media (max-width: 767px) {
           .al-root .dash-topbar {
             gap: 12px;
-            padding-inline: 14px;
-          }
-          .agent-dashboard-nav-inner {
             padding-inline: 14px;
           }
           .al-content main {
