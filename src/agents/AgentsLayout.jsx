@@ -3,7 +3,7 @@ import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   MessageSquareText, Search, Mail, House, LayoutDashboard, Users, Radio,
-  Send, FilePen, Inbox, Settings,
+  Send, FilePen, Inbox, Settings, Menu, X,
 } from "lucide-react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
@@ -65,11 +65,21 @@ function getStoredUser() {
   }
 }
 
-function DashboardTopbar({ cfg, user }) {
+function DashboardTopbar({ cfg, user, navOpen, onToggleNav }) {
   const initial = user?.username?.[0]?.toUpperCase() || user?.email?.[0]?.toUpperCase() || "U";
 
   return (
     <div className="dash-topbar">
+      <button
+        type="button"
+        className="dash-burger"
+        onClick={onToggleNav}
+        aria-label={navOpen ? "Close navigation" : "Open navigation"}
+        aria-expanded={navOpen}
+        aria-controls="linkedin-dashboard-nav"
+      >
+        {navOpen ? <X size={18} /> : <Menu size={18} />}
+      </button>
       <button
         onClick={() => { window.location.href = "/dashboard"; }}
         className="dash-wordmark"
@@ -109,9 +119,14 @@ function DashboardTopbar({ cfg, user }) {
   );
 }
 
-function DashboardNavBar() {
+function DashboardNavBar({ open }) {
   return (
-    <nav className="agent-dashboard-nav" aria-label="Dashboard navigation">
+    <nav
+      id="linkedin-dashboard-nav"
+      className={`agent-dashboard-nav${open ? " is-open" : ""}`}
+      aria-label="Dashboard navigation"
+      aria-hidden={!open}
+    >
       <div className="agent-dashboard-nav-inner">
         {DASHBOARD_NAV.map(({ label, href, Icon, active }) => (
           <a
@@ -174,6 +189,7 @@ export default function AgentsLayout() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const [splashDone, setSplashDone] = useState(false);
+  const [navOpen, setNavOpen] = useState(true);
   const [user] = useState(() => getStoredUser());
 
   const cfg = AGENT_MAP[agentId];
@@ -199,8 +215,13 @@ export default function AgentsLayout() {
       {/* Splash */}
       {!splashDone && <SplashScreen cfg={cfg} onDone={() => setSplashDone(true)} />}
 
-      <DashboardTopbar cfg={cfg} user={user} />
-      <DashboardNavBar />
+      <DashboardTopbar
+        cfg={cfg}
+        user={user}
+        navOpen={navOpen}
+        onToggleNav={() => setNavOpen(open => !open)}
+      />
+      <DashboardNavBar open={navOpen} />
 
       {/* Main content */}
       <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
@@ -218,12 +239,23 @@ export default function AgentsLayout() {
         .agent-dashboard-nav {
           flex: 0 0 auto;
           width: 100%;
+          max-height: 0;
+          opacity: 0;
           background: rgba(248, 250, 252, 0.88);
-          border-bottom: 1px solid var(--border);
+          border-bottom: 1px solid transparent;
           backdrop-filter: blur(18px);
           overflow-x: auto;
           overflow-y: hidden;
           scrollbar-width: none;
+          pointer-events: none;
+          transition: max-height 180ms ease, opacity 160ms ease, border-color 160ms ease;
+        }
+
+        .agent-dashboard-nav.is-open {
+          max-height: 56px;
+          opacity: 1;
+          border-bottom-color: var(--border);
+          pointer-events: auto;
         }
 
         .agent-dashboard-nav::-webkit-scrollbar {
