@@ -4937,6 +4937,28 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
   const [page, setPageRaw] = useState(() => pageFromPath());
   const [pageLoading, setPageLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 1025);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    const s = parseInt(localStorage.getItem("sidebar-width"), 10);
+    return s >= 200 && s <= 420 ? s : 268;
+  });
+  const sidebarDrag = useRef({ on: false, x0: 0, w0: 0 });
+
+  useEffect(() => {
+    const move = (e) => {
+      if (!sidebarDrag.current.on) return;
+      const w = Math.max(200, Math.min(420, sidebarDrag.current.w0 + e.clientX - sidebarDrag.current.x0));
+      setSidebarWidth(w);
+      localStorage.setItem("sidebar-width", w);
+    };
+    const up = () => {
+      if (!sidebarDrag.current.on) return;
+      sidebarDrag.current.on = false;
+      document.body.classList.remove("sidebar-resizing");
+    };
+    window.addEventListener("mousemove", move);
+    window.addEventListener("mouseup", up);
+    return () => { window.removeEventListener("mousemove", move); window.removeEventListener("mouseup", up); };
+  }, []);
 
   const setPage = (p) => {
     const path = PAGE_TO_PATH[p] ?? "/";
@@ -5358,13 +5380,9 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
       {/* ═══════ BODY: SIDEBAR + CONTENT ═══════ */}
       <div style={{ flex: 1, overflow: "hidden", display: "flex" }}>
 
-        {/* SIDEBAR BACKDROP */}
-        {sidebarOpen && window.innerWidth <= 1024 && (
-          <div className="dash-backdrop" onClick={() => setSidebarOpen(false)} />
-        )}
-
         {/* LEFT SIDEBAR — persistent on desktop, drawer below 1024px */}
-        <aside className={`dash-sidebar${sidebarOpen ? " is-open" : ""}`}>
+        <aside className={`dash-sidebar${sidebarOpen ? " is-open" : ""}`}
+          style={sidebarOpen ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}>
           <div style={{ flex: 1, paddingTop: 8 }}>
             {[
               { id: null,             label: "Home",          icon: <LuHouse size={18} /> },
@@ -5418,10 +5436,18 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
             </button>
             <div className="dash-version">v2.3 beta</div>
           </div>
+          <div className="dash-resize-handle"
+            onMouseDown={(e) => {
+              e.preventDefault();
+              sidebarDrag.current = { on: true, x0: e.clientX, w0: sidebarWidth };
+              document.body.classList.add("sidebar-resizing");
+            }}
+          />
         </aside>
 
         {/* RIGHT PANEL */}
-        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <div style={{ flex: 1, overflow: "hidden", display: "flex", flexDirection: "column", position: "relative" }}>
+          {sidebarOpen && <div className="dash-content-dim" onClick={() => setSidebarOpen(false)} />}
 
         {/* PAGE TRANSITION LOADER */}
         {pageLoading && (

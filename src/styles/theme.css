@@ -2464,8 +2464,18 @@
   background: rgba(15, 23, 42, 0.28);
 }
 
+.dash-content-dim {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background: rgba(15, 23, 42, 0.18);
+  cursor: pointer;
+  animation: fadeIn 180ms ease;
+}
+
 /* === DASHBOARD · SIDEBAR ================================ */
 .dash-sidebar {
+  position: relative;
   flex: 0 0 268px;
   width: 268px;
   background: rgba(248, 250, 252, 0.82);
@@ -2550,6 +2560,44 @@
 
 .dash-nav-item svg {
   flex: 0 0 18px;
+}
+
+.dash-resize-handle {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 5px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 10;
+}
+.dash-resize-handle::after {
+  content: "";
+  position: absolute;
+  inset: 0 1px 0 auto;
+  width: 2px;
+  background: transparent;
+  border-radius: 1px;
+  transition: background 150ms ease;
+}
+.dash-resize-handle:hover::after {
+  background: var(--teal);
+  opacity: 0.45;
+}
+.sidebar-resizing .dash-resize-handle::after {
+  background: var(--teal);
+  opacity: 0.6;
+}
+.sidebar-resizing .dash-sidebar {
+  transition: none !important;
+}
+.sidebar-resizing,
+.sidebar-resizing * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+@media (max-width: 1024px) {
+  .dash-resize-handle { display: none; }
 }
 
 .dash-nav-badge {
