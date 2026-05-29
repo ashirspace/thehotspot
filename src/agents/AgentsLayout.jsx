@@ -2,7 +2,8 @@ import "./agents.css";
 import { lazy, Suspense, useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
-  MessageSquareText, Search, Mail,
+  MessageSquareText, Search, Mail, House, LayoutDashboard, Users, Radio,
+  Send, FilePen, Inbox, Settings,
 } from "lucide-react";
 
 // ─── Agent registry ───────────────────────────────────────────────────────────
@@ -12,6 +13,18 @@ const AGENTS = [
 ];
 
 const AGENT_MAP = Object.fromEntries(AGENTS.map(a => [a.id, a]));
+
+const DASHBOARD_NAV = [
+  { label: "Home", href: "/", Icon: House },
+  { label: "Dashboard", href: "/dashboard", Icon: LayoutDashboard },
+  { label: "Contacts", href: "/contacts", Icon: Users },
+  { label: "Campaigns", href: "/campaign-status", Icon: Radio },
+  { label: "LinkedIn DM", href: "/agents/linkedin-dm-outreach", Icon: MessageSquareText, active: true },
+  { label: "Email Sender", href: "/email-sender", Icon: Send },
+  { label: "Templates", href: "/email-templates", Icon: FilePen },
+  { label: "Inbox", href: "/inbox", Icon: Inbox },
+  { label: "Settings", href: "/settings", Icon: Settings },
+];
 
 const AGENT_THEME = {
   ink: "#0f172a",
@@ -96,6 +109,25 @@ function DashboardTopbar({ cfg, user }) {
   );
 }
 
+function DashboardNavBar() {
+  return (
+    <nav className="agent-dashboard-nav" aria-label="Dashboard navigation">
+      <div className="agent-dashboard-nav-inner">
+        {DASHBOARD_NAV.map(({ label, href, Icon, active }) => (
+          <a
+            key={href}
+            href={href}
+            className={`agent-dashboard-nav-item${active ? " is-active" : ""}`}
+          >
+            <Icon size={16} />
+            <span>{label}</span>
+          </a>
+        ))}
+      </div>
+    </nav>
+  );
+}
+
 // ─── Splash screen ────────────────────────────────────────────────────────────
 
 function SplashScreen({ cfg, onDone }) {
@@ -168,6 +200,7 @@ export default function AgentsLayout() {
       {!splashDone && <SplashScreen cfg={cfg} onDone={() => setSplashDone(true)} />}
 
       <DashboardTopbar cfg={cfg} user={user} />
+      <DashboardNavBar />
 
       {/* Main content */}
       <div className="al-content" style={{ flex: 1, overflowY: "auto", opacity: splashDone ? 1 : 0, transition: "opacity 0.3s ease", display: "flex", flexDirection: "column" }}>
@@ -182,6 +215,57 @@ export default function AgentsLayout() {
         @keyframes splashText { from { transform: translateY(8px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
         @keyframes splashDot  { 0%,100% { transform: translateY(0); opacity: 0.3; } 50% { transform: translateY(-6px); opacity: 1; } }
 
+        .agent-dashboard-nav {
+          flex: 0 0 auto;
+          width: 100%;
+          background: rgba(248, 250, 252, 0.88);
+          border-bottom: 1px solid var(--border);
+          backdrop-filter: blur(18px);
+          overflow-x: auto;
+          overflow-y: hidden;
+          scrollbar-width: none;
+        }
+
+        .agent-dashboard-nav::-webkit-scrollbar {
+          display: none;
+        }
+
+        .agent-dashboard-nav-inner {
+          display: flex;
+          align-items: center;
+          gap: 4px;
+          min-height: 48px;
+          padding: 6px 20px;
+        }
+
+        .agent-dashboard-nav-item {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          flex: 0 0 auto;
+          min-height: 36px;
+          padding: 0 12px;
+          border-radius: var(--r);
+          color: var(--text-soft);
+          font-size: 13px;
+          font-weight: 600;
+          text-decoration: none;
+          white-space: nowrap;
+          transition: background-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+        }
+
+        .agent-dashboard-nav-item:hover {
+          background: rgba(255, 255, 255, 0.84);
+          color: var(--text);
+        }
+
+        .agent-dashboard-nav-item.is-active {
+          background: #ffffff;
+          color: var(--teal-dark);
+          box-shadow: var(--shadow-sm);
+        }
+
         @media (max-width: 1024px) {
           .al-content main {
             padding: 24px 20px 60px !important;
@@ -191,6 +275,9 @@ export default function AgentsLayout() {
         @media (max-width: 767px) {
           .al-root .dash-topbar {
             gap: 12px;
+            padding-inline: 14px;
+          }
+          .agent-dashboard-nav-inner {
             padding-inline: 14px;
           }
           .al-content main {
