@@ -7,10 +7,10 @@
   <link rel="icon" type="image/png" href="/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'DM Sans', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
+    body { font-family: 'Roboto', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
     nav { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff0d; background: #09090dcc; backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
     .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
     .nav-logo { width: 28px; height: 28px; object-fit: contain; }
@@ -84,11 +84,11 @@
 <body>
   <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
     <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'DM Sans',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
+    <div style="color:#fff;font-family:'Roboto',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
   </div>
   <script>
     setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
+    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:Roboto,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
   </script>
 
   <div class="glow1"></div><div class="glow2"></div>

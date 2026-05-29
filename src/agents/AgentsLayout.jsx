@@ -27,8 +27,8 @@ const AGENT_THEME = {
   tealTint: "#f0fdfa",
   tealLight: "#ccfbf1",
   pageBg: "radial-gradient(ellipse 84% 40% at 8% 2%, rgba(204,251,241,0.58) 0%, transparent 56%), radial-gradient(ellipse 60% 32% at 92% 10%, rgba(224,242,254,0.62) 0%, transparent 58%), #ffffff",
-  font: "var(--font-sans, 'Inter', ui-sans-serif, system-ui, sans-serif)",
-  displayFont: "var(--font-display, 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif)",
+  font: "var(--font-sans, 'Roboto', ui-sans-serif, system-ui, sans-serif)",
+  displayFont: "var(--font-display, 'Roboto', ui-sans-serif, system-ui, sans-serif)",
 };
 
 // ─── Main nav items (mirrors dashboard sidebar) ────────────────────────────────

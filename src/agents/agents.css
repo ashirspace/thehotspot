@@ -10,7 +10,8 @@
   --color-sky: #0d9488;
   --color-muted: #64748b;
   --color-foreground: #0f172a;
-  --font-sans: var(--font-sans, "Inter", ui-sans-serif, system-ui, -apple-system, sans-serif);
+  --font-sans: "Roboto", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: "Roboto Mono", ui-monospace, monospace;
 }
 
 .agent-page-shell {

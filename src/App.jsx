@@ -147,7 +147,7 @@ function useExternalLinkTransition() {
       e.preventDefault();
       const o = document.createElement('div');
       o.style.cssText = 'position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';
-      o.innerHTML = '<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:DM Sans,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';
+      o.innerHTML = '<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:Roboto,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';
       document.body.appendChild(o);
       requestAnimationFrame(() => { o.style.opacity = '1'; });
       setTimeout(() => { window.open(h, a.getAttribute('target') || '_self'); }, 400);
@@ -358,7 +358,7 @@ function LoginPage({ onLogin }) {
     setLoading(false);
   };
 
-  const lightInp = { width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc", color: "#0f172a", fontSize: 14, outline: "none", fontFamily: "'Plus Jakarta Sans', sans-serif", boxSizing: "border-box" };
+  const lightInp = { width: "100%", padding: "11px 14px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.12)", background: "#f8fafc", color: "#0f172a", fontSize: 14, outline: "none", fontFamily: "'Roboto', sans-serif", boxSizing: "border-box" };
   const lightLbl = { fontSize: 12, color: "#64748b", fontWeight: 600, display: "block", marginBottom: 6, letterSpacing: 0.3 };
 
   const GBtn = () => (
@@ -366,7 +366,7 @@ function LoginPage({ onLogin }) {
       width: "100%", padding: "12px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.1)",
       background: "#fff", color: "#0f172a", fontSize: 14, fontWeight: 500,
       cursor: googleLoading ? "default" : "pointer", display: "flex", alignItems: "center", justifyContent: "center",
-      gap: 10, fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "background .15s", opacity: googleLoading ? 0.6 : 1,
+      gap: 10, fontFamily: "'Roboto', sans-serif", transition: "background .15s", opacity: googleLoading ? 0.6 : 1,
     }}
       onMouseEnter={e => { if (!googleLoading) e.currentTarget.style.background = "#f1f5f9"; }}
       onMouseLeave={e => { e.currentTarget.style.background = "#fff"; }}
@@ -397,19 +397,19 @@ function LoginPage({ onLogin }) {
 
   const loginPanelRight = (
     <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", borderRadius: "0 20px 20px 0", padding: "44px 32px", display: "flex", flexDirection: "column", justifyContent: "center", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 10 }}>thehotspot</div>
-      <div style={{ fontSize: 19, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.35, marginBottom: 28 }}>Cold outreach<br />that gets replies.</div>
+      <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Roboto', sans-serif", marginBottom: 10 }}>thehotspot</div>
+      <div style={{ fontSize: 19, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", lineHeight: 1.35, marginBottom: 28 }}>Cold outreach<br />that gets replies.</div>
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         {MODAL_FEATURES.map((f, i) => (
           <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 12 }}>
             <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(16,185,129,0.13)", display: "flex", alignItems: "center", justifyContent: "center", color: "#10b981", flexShrink: 0 }}>{f.icon}</div>
-            <span style={{ fontSize: 13, color: "#334155", lineHeight: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", paddingTop: 6 }}>{f.text}</span>
+            <span style={{ fontSize: 13, color: "#334155", lineHeight: 1.5, fontFamily: "'Roboto', sans-serif", paddingTop: 6 }}>{f.text}</span>
           </div>
         ))}
       </div>
       <div style={{ marginTop: 28, padding: "14px 16px", background: "rgba(255,255,255,0.75)", borderRadius: 10, border: "1px solid rgba(16,185,129,0.15)" }}>
-        <div style={{ fontSize: 12, color: "#475569", fontStyle: "italic", lineHeight: 1.55, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>"First campaign was live in under five minutes. The replies proved it wasn't templated."</div>
-        <div style={{ fontSize: 11, color: "#10b981", fontWeight: 600, marginTop: 8, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>— Verified user</div>
+        <div style={{ fontSize: 12, color: "#475569", fontStyle: "italic", lineHeight: 1.55, fontFamily: "'Roboto', sans-serif" }}>"First campaign was live in under five minutes. The replies proved it wasn't templated."</div>
+        <div style={{ fontSize: 11, color: "#10b981", fontWeight: 600, marginTop: 8, fontFamily: "'Roboto', sans-serif" }}>— Verified user</div>
       </div>
     </div>
   );
@@ -436,22 +436,22 @@ function LoginPage({ onLogin }) {
                     <div style={{ width: 52, height: 52, borderRadius: "50%", background: "rgba(16,185,129,0.1)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "#10b981" }}>
                       <LuCheck size={24} />
                     </div>
-                    <div style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 8 }}>Check your inbox</div>
-                    <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.5, marginBottom: 24 }}>
+                    <div style={{ fontSize: 18, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", marginBottom: 8 }}>Check your inbox</div>
+                    <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Roboto', sans-serif", lineHeight: 1.5, marginBottom: 24 }}>
                       If an account exists for <strong>{forgotEmail}</strong>, a reset link is on its way.
                     </div>
-                    <button onClick={() => { setAuthMode("login"); setForgotSent(false); setForgotEmail(""); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                    <button onClick={() => { setAuthMode("login"); setForgotSent(false); setForgotEmail(""); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Roboto', sans-serif", padding: 0 }}>
                       Back to sign in
                     </button>
                   </div>
                 ) : (
                   <>
-                    <button onClick={() => { setAuthMode("login"); setError(""); setForgotEmail(""); }} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 13, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 6, alignSelf: "flex-start" }}>
+                    <button onClick={() => { setAuthMode("login"); setError(""); setForgotEmail(""); }} style={{ background: "none", border: "none", color: "#94a3b8", fontSize: 13, cursor: "pointer", fontFamily: "'Roboto', sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 6, alignSelf: "flex-start" }}>
                       ← Back
                     </button>
                     <div style={{ marginBottom: 26 }}>
-                      <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>Reset your password</div>
-                      <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>Enter the email on your account and we'll send a reset link.</div>
+                      <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", marginBottom: 5 }}>Reset your password</div>
+                      <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Roboto', sans-serif" }}>Enter the email on your account and we'll send a reset link.</div>
                     </div>
                     <form onSubmit={handleForgotPassword}>
                       <div style={{ marginBottom: 20 }}>
@@ -465,7 +465,7 @@ function LoginPage({ onLogin }) {
                         background: forgotEmail ? "#10b981" : "#e2e8f0",
                         color: forgotEmail ? "#fff" : "#94a3b8",
                         fontSize: 14, fontWeight: 600, cursor: forgotEmail ? "pointer" : "default",
-                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        fontFamily: "'Roboto', sans-serif",
                         display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
                       }}>
                         {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : "Send reset link"}
@@ -480,8 +480,8 @@ function LoginPage({ onLogin }) {
             {authMode === "login" && (
               <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center" }}>
                 <div style={{ marginBottom: 26 }}>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 5 }}>{t("login_title", "Welcome back")}</div>
-                  <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", marginBottom: 5 }}>{t("login_title", "Welcome back")}</div>
+                  <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Roboto', sans-serif" }}>{t("login_subtitle", "Sign in to your outreach dashboard")}</div>
                 </div>
                 <GBtn />
                 <OR />
@@ -494,7 +494,7 @@ function LoginPage({ onLogin }) {
                   <div style={{ marginBottom: 6 }}>
                     <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", marginBottom: 6 }}>
                       <label style={lightLbl}>{t("password_label", "Password")}</label>
-                      <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                      <button type="button" onClick={() => { setAuthMode("forgot"); setError(""); }} style={{ background: "none", border: "none", color: "#10b981", fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto', sans-serif", padding: 0 }}>
                         Forgot password?
                       </button>
                     </div>
@@ -513,16 +513,16 @@ function LoginPage({ onLogin }) {
                     background: (username && password) ? "#10b981" : "#e2e8f0",
                     color: (username && password) ? "#fff" : "#94a3b8",
                     fontSize: 14, fontWeight: 600, cursor: (username && password) ? "pointer" : "default",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Roboto', sans-serif",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
                     marginTop: 20,
                   }}>
                     {loading ? <>{[0,1,2].map(d => <div key={d} style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff", animation: `pulse 1.2s ease-in-out ${d*.2}s infinite` }} />)}</> : t("signin_btn", "Sign In")}
                   </button>
                 </form>
-                <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <div style={{ marginTop: 20, textAlign: "center", fontSize: 13, color: "#64748b", fontFamily: "'Roboto', sans-serif" }}>
                   No account?{" "}
-                  <button onClick={() => { setAuthMode("signup"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                  <button onClick={() => { setAuthMode("signup"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Roboto', sans-serif", padding: 0 }}>
                     Get started free
                   </button>
                 </div>
@@ -580,7 +580,7 @@ function LoginPage({ onLogin }) {
               <div style={{ position: "absolute", top: "45%", left: "60%", width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.05) 0%, transparent 70%)", pointerEvents: "none" }} />
               {/* Top bar */}
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 0, width: "100%" }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>thehotspot</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Roboto', sans-serif" }}>thehotspot</div>
                 <button onClick={() => { setShowLogin(false); goBack(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "#cbd5e1", padding: 4, lineHeight: 1 }}>
                   <LuX size={18} />
                 </button>
@@ -588,13 +588,13 @@ function LoginPage({ onLogin }) {
 
               {/* Slide content — key forces remount & animation replay on step change */}
               <div key={signupStep} style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", animation: `${slideDir === "right" ? "slideInFromRight" : "slideInFromLeft"} .32s cubic-bezier(.4,0,.2,1)`, width: "100%", maxWidth: 480, paddingTop: 20 }}>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 12, letterSpacing: 0.5 }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "#94a3b8", fontFamily: "'Roboto', sans-serif", marginBottom: 12, letterSpacing: 0.5 }}>
                   Step {signupStep + 1} of {STEPS.length}
                 </div>
-                <div style={{ fontSize: 32, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.2, marginBottom: 8 }}>
+                <div style={{ fontSize: 32, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", lineHeight: 1.2, marginBottom: 8 }}>
                   {STEPS[signupStep].q}
                 </div>
-                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 36, lineHeight: 1.5 }}>
+                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Roboto', sans-serif", marginBottom: 36, lineHeight: 1.5 }}>
                   {STEPS[signupStep].hint}
                 </div>
 
@@ -664,7 +664,7 @@ function LoginPage({ onLogin }) {
                         onFocus={e => e.target.style.borderColor = borderColor}
                         onBlur={e => e.target.style.borderColor = borderColor} />
                       {username.length > 0 && (
-                        <div style={{ marginTop: 8, fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", color: usernameStatus === "available" ? "#10b981" : usernameStatus === "taken" ? "#ef4444" : "#94a3b8" }}>
+                        <div style={{ marginTop: 8, fontSize: 13, fontFamily: "'Roboto', sans-serif", color: usernameStatus === "available" ? "#10b981" : usernameStatus === "taken" ? "#ef4444" : "#94a3b8" }}>
                           {usernameStatus === "checking" && "Checking availability…"}
                           {usernameStatus === "available" && "Username is available"}
                           {usernameStatus === "taken" && "Username is already taken"}
@@ -693,12 +693,12 @@ function LoginPage({ onLogin }) {
                     onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "rgba(0,0,0,0.12)"} />
                 )}
 
-                {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "11px 14px", borderRadius: 10, fontSize: 13, marginTop: 16, fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{error}</div>}
+                {error && <div style={{ background: "#fef2f2", border: "1px solid #fecaca", color: "#ef4444", padding: "11px 14px", borderRadius: 10, fontSize: 13, marginTop: 16, fontFamily: "'Roboto', sans-serif" }}>{error}</div>}
 
                 {/* Nav buttons */}
                 <div style={{ display: "flex", gap: 12, marginTop: 32 }}>
                   {signupStep > 0 && (
-                    <button onClick={retreat} style={{ padding: "13px 24px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.1)", background: "#fff", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "border-color .15s" }}
+                    <button onClick={retreat} style={{ padding: "13px 24px", borderRadius: 10, border: "1.5px solid rgba(0,0,0,0.1)", background: "#fff", color: "#64748b", fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto', sans-serif", transition: "border-color .15s" }}
                       onMouseEnter={e => e.currentTarget.style.borderColor = "#10b981"} onMouseLeave={e => e.currentTarget.style.borderColor = "rgba(0,0,0,0.1)"}>
                       Back
                     </button>
@@ -708,7 +708,7 @@ function LoginPage({ onLogin }) {
                     background: (canNext || isLast) ? "#10b981" : "#e2e8f0",
                     color: (canNext || isLast) ? "#fff" : "#94a3b8",
                     fontSize: 14, fontWeight: 600, cursor: "pointer",
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    fontFamily: "'Roboto', sans-serif",
                     display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "background .15s",
                   }}>
                     {loading
@@ -718,9 +718,9 @@ function LoginPage({ onLogin }) {
                   </button>
                 </div>
 
-                <div style={{ marginTop: 24, fontSize: 13, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+                <div style={{ marginTop: 24, fontSize: 13, color: "#64748b", fontFamily: "'Roboto', sans-serif" }}>
                   Already have an account?{" "}
-                  <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Plus Jakarta Sans', sans-serif", padding: 0 }}>
+                  <button onClick={() => { setAuthMode("login"); setError(""); resetForm(); }} style={{ background: "none", border: "none", color: "#10b981", fontWeight: 600, cursor: "pointer", fontSize: 13, fontFamily: "'Roboto', sans-serif", padding: 0 }}>
                     Sign in
                   </button>
                 </div>
@@ -730,9 +730,9 @@ function LoginPage({ onLogin }) {
             {/* Right — branding + progress */}
             {!isMobile && <div style={{ background: "linear-gradient(160deg, #f0fdf9 0%, #e0f2fe 100%)", display: "flex", flexDirection: "column", justifyContent: "space-between", padding: "40px 36px 48px", borderLeft: "1px solid rgba(16,185,129,0.12)" }}>
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Plus Jakarta Sans', sans-serif", marginBottom: 32 }}>thehotspot</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.3, marginBottom: 12 }}>Set up your account.</div>
-                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Plus Jakarta Sans', sans-serif", lineHeight: 1.6 }}>Takes about 2 minutes. No credit card needed.</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", textTransform: "uppercase", letterSpacing: 1.5, fontFamily: "'Roboto', sans-serif", marginBottom: 32 }}>thehotspot</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: "#0f172a", fontFamily: "'Roboto', sans-serif", lineHeight: 1.3, marginBottom: 12 }}>Set up your account.</div>
+                <div style={{ fontSize: 14, color: "#64748b", fontFamily: "'Roboto', sans-serif", lineHeight: 1.6 }}>Takes about 2 minutes. No credit card needed.</div>
               </div>
 
               {/* Progress dots */}
@@ -742,17 +742,17 @@ function LoginPage({ onLogin }) {
                     <div style={{ width: 28, height: 28, borderRadius: "50%", background: i < signupStep ? "#10b981" : i === signupStep ? "#0f172a" : "rgba(0,0,0,0.06)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "background .3s" }}>
                       {i < signupStep
                         ? <LuCheck size={13} color="#fff" />
-                        : <span style={{ fontSize: 11, fontWeight: 700, color: i === signupStep ? "#fff" : "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>{i + 1}</span>
+                        : <span style={{ fontSize: 11, fontWeight: 700, color: i === signupStep ? "#fff" : "#94a3b8", fontFamily: "'Roboto', sans-serif" }}>{i + 1}</span>
                       }
                     </div>
-                    <span style={{ fontSize: 13, color: i === signupStep ? "#0f172a" : i < signupStep ? "#10b981" : "#94a3b8", fontWeight: i === signupStep ? 600 : 400, fontFamily: "'Plus Jakarta Sans', sans-serif", transition: "color .3s" }}>
+                    <span style={{ fontSize: 13, color: i === signupStep ? "#0f172a" : i < signupStep ? "#10b981" : "#94a3b8", fontWeight: i === signupStep ? 600 : 400, fontFamily: "'Roboto', sans-serif", transition: "color .3s" }}>
                       {s.q.replace(/\?$/, "")}
                     </span>
                   </div>
                 ))}
               </div>
 
-              <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'Plus Jakarta Sans', sans-serif" }}>
+              <div style={{ fontSize: 12, color: "#94a3b8", fontFamily: "'Roboto', sans-serif" }}>
                 Trusted by 500+ teams
               </div>
             </div>}
@@ -832,7 +832,7 @@ function StatCard({ icon, label, value, accent, locked, onConnect, onClick }) {
         <span style={{ color: "var(--text-soft)", display: "flex", marginBottom: 14 }}>{icon}</span>
         {!locked && <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={hover ? accent : "var(--text-muted)"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transition: "all .2s" }}><polyline points="9 18 15 12 9 6" /></svg>}
       </div>
-      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
+      <div style={{ fontSize: 28, fontWeight: 700, color: "var(--text)", fontFamily: "'Roboto Mono',monospace", letterSpacing: -1 }}>{locked ? "0" : value}</div>
       <div style={{ fontSize: 12, color: "#64748B", marginTop: 4, fontWeight: 500, letterSpacing: .5, textTransform: "uppercase" }}>{label}</div>
     </div>
   );
@@ -892,7 +892,7 @@ function EmailPreviewModal({ email: e, onClose }) {
         <div style={{ padding: "14px 24px 24px", overflowY: "auto", flex: 1 }}>
           <div style={{ fontSize: 11, fontWeight: 600, color: "#94A3B8", textTransform: "uppercase", letterSpacing: .5, marginBottom: 10 }}>Message</div>
           {e.body ? (
-            <div style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "var(--bg-alt)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)", fontFamily: "'DM Sans',sans-serif" }}>
+            <div style={{ fontSize: 14, color: "var(--text)", lineHeight: 1.75, whiteSpace: "pre-wrap", background: "var(--bg-alt)", borderRadius: 12, padding: "16px 18px", border: "1px solid var(--border)", fontFamily: "'Roboto',sans-serif" }}>
               {e.body}
             </div>
           ) : (
@@ -1003,7 +1003,7 @@ function TotalContactsPage({ onBack, user }) {
     if (contact?.airtableId) manualContactDelete(contact.airtableId);
   };
 
-  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--text)", outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "9px 12px", fontSize: 13, color: "var(--text)", outline: "none", width: "100%", fontFamily: "'Roboto',sans-serif", boxSizing: "border-box" };
   const lbl = { fontSize: 11, fontWeight: 600, color: "#64748B", marginBottom: 5, display: "block", textTransform: "uppercase", letterSpacing: .5 };
   const focusStyle = (e) => { e.target.style.borderColor = "#6366f1"; e.target.style.boxShadow = "0 0 0 3px #6366f115"; };
   const blurStyle  = (e) => { e.target.style.borderColor = "var(--border)"; e.target.style.boxShadow = "none"; };
@@ -1030,14 +1030,14 @@ function TotalContactsPage({ onBack, user }) {
           return (
             <button key={cat} onClick={() => setFilterCat(filterCat === cat ? "All" : cat)} style={{
               background: "var(--bg)", border: filterCat === cat ? `2px solid ${c.dot}` : "1px solid var(--border)",
-              borderRadius: 12, padding: "12px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+              borderRadius: 12, padding: "12px 16px", cursor: "pointer", textAlign: "left", fontFamily: "'Roboto',sans-serif", transition: "all .15s",
             }}>
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <span style={{ width: 8, height: 8, borderRadius: "50%", background: c.dot, display: "inline-block" }} />
                   <span style={{ fontSize: 13, fontWeight: 600, color: c.text || "var(--text)" }}>{cat}</span>
                 </div>
-                <span style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace" }}>{count}</span>
+                <span style={{ fontSize: 16, fontWeight: 700, color: "var(--text)", fontFamily: "'Roboto Mono',monospace" }}>{count}</span>
               </div>
               <div style={{ width: "100%", height: 5, background: "var(--border)", borderRadius: 3, overflow: "hidden" }}>
                 <div style={{ width: `${(count / maxCount) * 100}%`, height: "100%", background: c.dot, borderRadius: 3, transition: "width .6s ease" }} />
@@ -1088,8 +1088,8 @@ function TotalContactsPage({ onBack, user }) {
                 {c.country && <span style={{ fontSize: 12, color: "#94A3B8", flexShrink: 0 }}>{c.country}</span>}
                 {/* Actions */}
                 <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                  <button onClick={() => openEdit(c)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Edit</button>
-                  <button onClick={() => deleteContact(c.id)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #fee2e2", background: "#fef2f2", color: "#ef4444", fontSize: 12, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>✕</button>
+                  <button onClick={() => openEdit(c)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 12, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>Edit</button>
+                  <button onClick={() => deleteContact(c.id)} style={{ padding: "5px 10px", borderRadius: 7, border: "1px solid #fee2e2", background: "#fef2f2", color: "#ef4444", fontSize: 12, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>✕</button>
                 </div>
               </div>
             );
@@ -1141,7 +1141,7 @@ function TotalContactsPage({ onBack, user }) {
                     const c = CAT[cat] || {};
                     return (
                       <button key={cat} onClick={() => setForm(f => ({ ...f, category: cat }))} style={{
-                        padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .15s",
+                        padding: "6px 14px", borderRadius: 20, fontSize: 12, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto',sans-serif", transition: "all .15s",
                         border: form.category === cat ? `2px solid ${c.dot || "#6366f1"}` : "1px solid var(--border)",
                         background: form.category === cat ? (c.bg || "#EEF2FF") : "var(--bg-alt)",
                         color: form.category === cat ? (c.text || "#4F46E5") : "#64748B",
@@ -1161,11 +1161,11 @@ function TotalContactsPage({ onBack, user }) {
               <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
                 <button onClick={submitForm} style={{
                   flex: 1, padding: "12px", borderRadius: 10, border: "none", background: "linear-gradient(135deg,#6366f1,#4f46e5)", color: "#fff",
-                  fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: "0 4px 12px #6366f140",
+                  fontSize: 14, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto',sans-serif", boxShadow: "0 4px 12px #6366f140",
                 }}>
                   {editId ? "Save Changes" : "Add Contact"}
                 </button>
-                <button onClick={() => setShowModal(false)} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+                <button onClick={() => setShowModal(false)} style={{ padding: "12px 18px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "#64748B", fontSize: 14, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>
                   Cancel
                 </button>
               </div>
@@ -1219,7 +1219,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
 
   const tabBtn = (id) => ({
     padding: "7px 18px", borderRadius: 8, border: "none", cursor: "pointer",
-    fontFamily: "'DM Sans',sans-serif", fontSize: 13, fontWeight: 600, transition: "all .15s",
+    fontFamily: "'Roboto',sans-serif", fontSize: 13, fontWeight: 600, transition: "all .15s",
     background: tab === id ? "#6366f1" : "transparent", color: tab === id ? "#fff" : "#64748B",
   });
 
@@ -1364,7 +1364,7 @@ function EmailsSentPage({ onBack, sentCount, gmailConnected, user }) {
               <div key={h.id} style={{ background: "var(--bg)", border: `1px solid ${isOpen ? c.dot + "30" : "var(--border)"}`, borderRadius: 14, overflow: "hidden", transition: "border-color .15s" }}>
                 <button onClick={() => setExpandedId(isOpen ? null : h.id)} style={{
                   width: "100%", padding: "14px 16px", display: "flex", alignItems: "center", gap: 12,
-                  background: "none", border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", textAlign: "left",
+                  background: "none", border: "none", cursor: "pointer", fontFamily: "'Roboto',sans-serif", textAlign: "left",
                 }}>
                   <div style={{ width: 38, height: 38, borderRadius: 10, background: `${c.dot}15`, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: c.dot }}>
                     <LuMail size={16} />
@@ -1722,7 +1722,7 @@ class AppErrorBoundary extends React.Component {
   render() {
     if (this.state.error) {
       return (
-        <div style={{ fontFamily: "'DM Sans',sans-serif", background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
+        <div style={{ fontFamily: "'Roboto',sans-serif", background: "var(--bg)", minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}>
           <div style={{ background: "var(--bg)", borderRadius: 16, padding: 32, maxWidth: 500, width: "100%", boxShadow: "0 4px 24px rgba(15,23,42,0.08)", border: "1px solid var(--border)" }}>
             <LuTriangleAlert size={32} style={{ marginBottom: 12, color: "#F59E0B" }} />
             <div style={{ fontSize: 18, fontWeight: 700, color: "var(--text)", marginBottom: 8 }}>Something went wrong</div>
@@ -1822,8 +1822,8 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
     }
   };
 
-  const inp = { width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'DM Sans',sans-serif", outline: "none", boxSizing: "border-box" };
-  const lbl = { display: "block", color: "#94A3B8", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "'DM Sans',sans-serif" };
+  const inp = { width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border-strong)", borderRadius: 10, padding: "11px 14px", color: "#fff", fontSize: 14, fontFamily: "'Roboto',sans-serif", outline: "none", boxSizing: "border-box" };
+  const lbl = { display: "block", color: "#94A3B8", fontSize: 12, fontWeight: 600, marginBottom: 6, fontFamily: "'Roboto',sans-serif" };
   const req  = <span style={{ color: "#10b981", marginLeft: 3 }}>*</span>;
 
   const fields = [
@@ -1849,7 +1849,7 @@ function OnboardingModal({ user, onComplete, onDismiss }) {
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <img src="/logo.png" alt="logo" style={{ width: 52, height: 52, objectFit: "contain", marginBottom: 14 }} />
           <div style={{ color: "var(--text)", fontSize: 20, fontWeight: 700, fontFamily: "var(--font-display)", marginBottom: 6 }}>Welcome to thehotspot</div>
-          <div style={{ color: "#64748B", fontSize: 13, fontFamily: "'DM Sans',sans-serif", lineHeight: 1.55 }}>Fill in your details so every outreach email you send is signed with the right sender info.</div>
+          <div style={{ color: "#64748B", fontSize: 13, fontFamily: "'Roboto',sans-serif", lineHeight: 1.55 }}>Fill in your details so every outreach email you send is signed with the right sender info.</div>
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "14px 12px", marginBottom: 24 }}>
@@ -2669,8 +2669,8 @@ function PixelPet() {
               style={{ width: 24, height: 24, imageRendering: 'pixelated', flexShrink: 0 }}
               ref={el => { if (el) { const ctx = el.getContext('2d'); ctx.clearRect(0,0,CW,CH); ppDraw(ctx, PP_HEAD, 0, false, CW); } }}
             />
-            <span style={{ flex: 1, fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 13, color: '#f1f5f9' }}>Spot</span>
-            <span style={{ fontSize: 11, color: '#10b981', background: '#10b98118', borderRadius: 20, padding: '2px 8px', fontFamily: "'DM Sans',sans-serif" }}>online</span>
+            <span style={{ flex: 1, fontFamily: "'Roboto',sans-serif", fontWeight: 600, fontSize: 13, color: '#f1f5f9' }}>Spot</span>
+            <span style={{ fontSize: 11, color: '#10b981', background: '#10b98118', borderRadius: 20, padding: '2px 8px', fontFamily: "'Roboto',sans-serif" }}>online</span>
             <button onClick={(e) => { e.stopPropagation(); openRef.current = false; setOpen(false); }} style={{ background: 'none', border: 'none', color: '#64748b', cursor: 'pointer', padding: 2, display: 'flex', alignItems: 'center' }}>
               <LuX size={14} />
             </button>
@@ -2685,7 +2685,7 @@ function PixelPet() {
                   borderRadius: m.role === 'user' ? '12px 12px 2px 12px' : '12px 12px 12px 2px',
                   background: m.role === 'user' ? 'var(--teal)' : 'var(--bg-alt)',
                   color: m.role === 'user' ? '#fff' : '#cbd5e1',
-                  fontSize: 12.5, lineHeight: 1.5, fontFamily: "'DM Sans',sans-serif",
+                  fontSize: 12.5, lineHeight: 1.5, fontFamily: "'Roboto',sans-serif",
                 }}>
                   {m.content}
                 </div>
@@ -2693,7 +2693,7 @@ function PixelPet() {
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: 'var(--bg-alt)', color: 'var(--text-soft)', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif" }}>...</div>
+                <div style={{ padding: '7px 14px', borderRadius: '12px 12px 12px 2px', background: 'var(--bg-alt)', color: 'var(--text-soft)', fontSize: 12.5, fontFamily: "'Roboto',sans-serif" }}>...</div>
               </div>
             )}
             <div ref={messagesEndRef} />
@@ -2706,7 +2706,7 @@ function PixelPet() {
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } }}
               placeholder="Ask Spot anything..."
-              style={{ flex: 1, background: 'var(--bg-alt)', border: '1px solid var(--border)', borderRadius: 10, padding: '7px 11px', color: '#f1f5f9', fontSize: 12.5, fontFamily: "'DM Sans',sans-serif", outline: 'none' }}
+              style={{ flex: 1, background: 'var(--bg-alt)', border: '1px solid var(--border)', borderRadius: 10, padding: '7px 11px', color: '#f1f5f9', fontSize: 12.5, fontFamily: "'Roboto',sans-serif", outline: 'none' }}
             />
             <button onClick={sendMessage} disabled={!input.trim() || loading} style={{ background: '#10b981', border: 'none', borderRadius: 10, padding: '7px 10px', cursor: 'pointer', display: 'flex', alignItems: 'center', opacity: (!input.trim() || loading) ? 0.4 : 1 }}>
               <LuSend size={13} color="#fff" />
@@ -2814,7 +2814,7 @@ function CreateDatabasePage({ onBack, showToast }) {
       {/* Top Bar */}
       <div style={{ background: T.card, borderBottom: `1px solid ${T.bd}`, padding: "12px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 10 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <button onClick={onBack} style={{ background: "none", border: "none", color: T.tx2, cursor: "pointer", padding: "4px 8px", borderRadius: 6, fontSize: 13, fontFamily: "'DM Sans',sans-serif", display: "flex", alignItems: "center", gap: 4 }}
+          <button onClick={onBack} style={{ background: "none", border: "none", color: T.tx2, cursor: "pointer", padding: "4px 8px", borderRadius: 6, fontSize: 13, fontFamily: "'Roboto',sans-serif", display: "flex", alignItems: "center", gap: 4 }}
             onMouseEnter={e => e.currentTarget.style.background = T.hv} onMouseLeave={e => e.currentTarget.style.background = "none"}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><polyline points="15 18 9 12 15 6" /></svg> Back
           </button>
@@ -2824,7 +2824,7 @@ function CreateDatabasePage({ onBack, showToast }) {
         </div>
         <button onClick={() => setShowNewDb(true)} style={{
           padding: "7px 16px", borderRadius: 8, border: "none", background: T.ac, color: "#fff",
-          fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", boxShadow: T.sh,
+          fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto',sans-serif", boxShadow: T.sh,
         }}>+ New Database</button>
       </div>
 
@@ -2835,11 +2835,11 @@ function CreateDatabasePage({ onBack, showToast }) {
             <div style={{ fontSize: 15, fontWeight: 600, color: T.tx, marginBottom: 12 }}>Create New Database</div>
             <input value={newDbName} onChange={e => setNewDbName(e.target.value)} placeholder="Database name..." autoFocus
               onKeyDown={e => { if (e.key === "Enter") createDb(); if (e.key === "Escape") setShowNewDb(false); }}
-              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${T.bd}`, fontSize: 14, outline: "none", fontFamily: "'DM Sans',sans-serif", color: T.tx, boxSizing: "border-box", marginBottom: 12 }}
+              style={{ width: "100%", padding: "9px 12px", borderRadius: 8, border: `1px solid ${T.bd}`, fontSize: 14, outline: "none", fontFamily: "'Roboto',sans-serif", color: T.tx, boxSizing: "border-box", marginBottom: 12 }}
               onFocus={e => e.target.style.borderColor = T.ac} onBlur={e => e.target.style.borderColor = T.bd} />
             <div style={{ display: "flex", gap: 8, justifyContent: "flex-end" }}>
-              <button onClick={() => { setShowNewDb(false); setNewDbName(""); }} style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${T.bd}`, background: T.card, color: T.tx2, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Cancel</button>
-              <button onClick={createDb} style={{ padding: "7px 20px", borderRadius: 8, border: "none", background: T.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Create</button>
+              <button onClick={() => { setShowNewDb(false); setNewDbName(""); }} style={{ padding: "7px 16px", borderRadius: 8, border: `1px solid ${T.bd}`, background: T.card, color: T.tx2, fontSize: 13, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>Cancel</button>
+              <button onClick={createDb} style={{ padding: "7px 20px", borderRadius: 8, border: "none", background: T.ac, color: "#fff", fontSize: 13, fontWeight: 600, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>Create</button>
             </div>
           </div>
         )}
@@ -2938,7 +2938,7 @@ function SpreadsheetEditor({ db, databases, saveDbs, onBack, showToast, T }) {
   const cellBd = `1px solid ${T.bdL}`;
 
   return (
-    <div style={{ background: T.bg, position: "fixed", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", fontFamily: "'DM Sans',sans-serif" }}>
+    <div style={{ background: T.bg, position: "fixed", inset: 0, zIndex: 50, display: "flex", flexDirection: "column", fontFamily: "'Roboto',sans-serif" }}>
       {/* Toolbar */}
       <div style={{ background: T.card, borderBottom: `1px solid ${T.bd}`, padding: "8px 16px", display: "flex", alignItems: "center", gap: 10, flexShrink: 0 }}>
         <button onClick={onBack} style={{ background: "none", border: "none", color: T.tx2, cursor: "pointer", padding: "4px 8px", borderRadius: 6, display: "flex", alignItems: "center", gap: 4, fontSize: 13, fontFamily: "inherit" }}
@@ -3262,7 +3262,7 @@ function ContactsPage({ onBack, showToast, user }) {
           <div className="rsp-sheet-row" style={{ display: "flex", gap: 10 }}>
             <input type="text" value={sheetUrl} onChange={e => setSheetUrl(e.target.value)}
               placeholder="https://docs.google.com/spreadsheets/d/..."
-              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }}
+              style={{ flex: 1, padding: "11px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'Roboto',sans-serif", boxSizing: "border-box" }}
               onFocus={e => e.target.style.borderColor = "#10b981"} onBlur={e => e.target.style.borderColor = "var(--border)"} />
             <button onClick={connectSheet} disabled={loading || !sheetUrl} style={{
               padding: "11px 24px", borderRadius: 10, border: "none", cursor: (loading || !sheetUrl) ? "default" : "pointer",
@@ -3307,10 +3307,10 @@ function ContactsPage({ onBack, showToast, user }) {
           </div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "#64748B", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+          <button onClick={connectSheet} disabled={loading} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg)", color: "#64748B", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>
             {loading ? "Syncing..." : "↻ Sync"}
           </button>
-          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #EF444433", background: "#FEF2F2", color: "#EF4444", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Disconnect</button>
+          <button onClick={disconnectSheet} style={{ padding: "8px 16px", borderRadius: 8, border: "1px solid #EF444433", background: "#FEF2F2", color: "#EF4444", fontSize: 12, fontWeight: 500, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>Disconnect</button>
         </div>
       </div>
       <div className="rsp-contact-stats" style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 10, marginBottom: 20 }}>
@@ -3323,8 +3323,8 @@ function ContactsPage({ onBack, showToast, user }) {
       </div>
       <div style={{ display: "flex", gap: 10, marginBottom: 16 }}>
         <input type="text" value={search} onChange={e => setSearch(e.target.value)} placeholder="Search companies..."
-          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" }} />
-        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'DM Sans',sans-serif" }}>
+          style={{ flex: 1, padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'Roboto',sans-serif", boxSizing: "border-box" }} />
+        <select value={filterCat} onChange={e => setFilterCat(e.target.value)} style={{ padding: "10px 14px", borderRadius: 10, border: "1px solid var(--border)", background: "var(--bg-alt)", color: "var(--text)", fontSize: 13, outline: "none", fontFamily: "'Roboto',sans-serif" }}>
           {categories.map(c => <option key={c} value={c}>{c}</option>)}
         </select>
       </div>
@@ -3343,7 +3343,7 @@ function ContactsPage({ onBack, showToast, user }) {
                   <td style={{ padding: "10px 14px", fontSize: 11, color: "#94A3B8" }}>{i + 1}</td>
                   <td style={{ padding: "10px 14px", fontSize: 13, fontWeight: 600, color: "var(--text)" }}>{c.company_name}</td>
                   <td style={{ padding: "10px 14px" }}>{c.website ? <a href={c.website.startsWith("http") ? c.website : "https://" + c.website} target="_blank" rel="noreferrer" style={{ fontSize: 12, color: "#0ea5e9", textDecoration: "none" }}>↗ Visit</a> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
-                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'JetBrains Mono',monospace", color: c.email ? "#64748B" : "#EF444488" }}>{c.email || "⚠ Missing"}</td>
+                  <td style={{ padding: "10px 14px", fontSize: 12, fontFamily: "'Roboto Mono',monospace", color: c.email ? "#64748B" : "#EF444488" }}>{c.email || "⚠ Missing"}</td>
                   <td style={{ padding: "10px 14px" }}>{c.category ? <span style={{ display: "inline-flex", alignItems: "center", gap: 5, background: CAT[c.category]?.bg || "#EFF1F8", color: CAT[c.category]?.text || "#64748B", padding: "3px 10px", borderRadius: 16, fontSize: 11, fontWeight: 600 }}><span style={{ width: 5, height: 5, borderRadius: "50%", background: CAT[c.category]?.dot || "#94A3B8" }} />{c.category}</span> : <span style={{ fontSize: 11, color: "#94A3B8" }}>—</span>}</td>
                   <td style={{ padding: "10px 14px", fontSize: 12, color: "#64748B" }}>{c.country || "—"}</td>
                 </tr>
@@ -3590,22 +3590,22 @@ function ProfilePage({ user, onBack, onLogout }) {
           <div style={{ fontSize: 11, color: "#64748B", textTransform: "uppercase", letterSpacing: .5, fontWeight: 600, marginBottom: 8 }}>{c("pp_section2_label", "Platform Stats")}</div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Total Contacts</span>
-            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'Roboto Mono',monospace", fontWeight: 600 }}>{user?.contactsCount || 0}</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid var(--border)" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Emails Sent</span>
-            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0</span>
+            <span style={{ fontSize: 13, color: "var(--text)", fontFamily: "'Roboto Mono',monospace", fontWeight: 600 }}>0</span>
           </div>
           <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0" }}>
             <span style={{ fontSize: 13, color: "#64748B" }}>Success Rate</span>
-            <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'JetBrains Mono',monospace", fontWeight: 600 }}>0%</span>
+            <span style={{ fontSize: 13, color: "#10b981", fontFamily: "'Roboto Mono',monospace", fontWeight: 600 }}>0%</span>
           </div>
         </div>
 
         <button onClick={onLogout} style={{
           width: "100%", padding: "14px", borderRadius: 12, border: "1px solid #EF444433",
           background: "#FEF2F2", color: "#EF4444", fontSize: 14, fontWeight: 600,
-          cursor: "pointer", fontFamily: "'DM Sans',sans-serif", transition: "all .2s",
+          cursor: "pointer", fontFamily: "'Roboto',sans-serif", transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 8,
         }}
           onMouseEnter={e => { e.currentTarget.style.background = "#FEE2E2"; e.currentTarget.style.borderColor = "#EF4444"; }}
@@ -4093,7 +4093,7 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
                   <div style={{ fontSize: 11, color: "#94A3B8" }}>{d.contact.email}</div>
                 </div>
                 <button onClick={() => updateDraft(d.id, "approved", !d.approved)} style={{
-                  padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 600, fontSize: 12,
+                  padding: "6px 14px", borderRadius: 20, border: "none", cursor: "pointer", fontFamily: "'Roboto',sans-serif", fontWeight: 600, fontSize: 12,
                   background: d.approved ? "#ECFDF5" : "var(--bg-hover)", color: d.approved ? "#059669" : "#64748B",
                 }}>
                   {d.approved ? "✓ Approved" : "Approve"}
@@ -4101,11 +4101,11 @@ function EmailSenderPage({ onBack, gmailToken, connectGmail, showToast, user }) 
               </div>
               <div style={{ marginBottom: 8 }}>
                 <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Subject</div>
-                <input value={d.subject} onChange={e => updateDraft(d.id, "subject", e.target.value)} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none" }} />
+                <input value={d.subject} onChange={e => updateDraft(d.id, "subject", e.target.value)} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'Roboto',sans-serif", outline: "none" }} />
               </div>
               <div>
                 <div style={{ fontSize: 11, color: "#94A3B8", marginBottom: 4, textTransform: "uppercase", letterSpacing: .5, fontWeight: 600 }}>Body</div>
-                <textarea value={d.body} onChange={e => updateDraft(d.id, "body", e.target.value)} rows={5} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'DM Sans',sans-serif", outline: "none", resize: "vertical" }} />
+                <textarea value={d.body} onChange={e => updateDraft(d.id, "body", e.target.value)} rows={5} style={{ width: "100%", background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 8, padding: "8px 12px", fontSize: 13, color: "var(--text)", fontFamily: "'Roboto',sans-serif", outline: "none", resize: "vertical" }} />
               </div>
             </div>
           ))}
@@ -4221,7 +4221,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   const [sending, setSending] = useState(false);
 
   const T = { bg: "var(--bg)", card: "var(--bg)", bd: "var(--border)", tx: "var(--text)", tx2: "#64748B", tx3: "#94A3B8", ac: "#4F46E5", acBg: "#6366f120" };
-  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: T.tx, outline: "none", width: "100%", fontFamily: "'DM Sans',sans-serif", boxSizing: "border-box" };
+  const inp = { background: "var(--bg-alt)", border: "1px solid var(--border)", borderRadius: 10, padding: "10px 14px", fontSize: 14, color: T.tx, outline: "none", width: "100%", fontFamily: "'Roboto',sans-serif", boxSizing: "border-box" };
   const lbl = { fontSize: 12, fontWeight: 600, color: T.tx2, marginBottom: 6, display: "block" };
 
   const generate = async () => {
@@ -4298,7 +4298,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         {TEMPLATES.map(t => (
           <button key={t.id} onClick={() => { setTemplate(t); setForm(f => ({ ...f, angle: pickAngle(t.id) })); setStep("fill"); }} style={{
             background: "var(--bg)", border: "1px solid var(--border)", borderRadius: 16, padding: "22px 20px",
-            cursor: "pointer", textAlign: "left", fontFamily: "'DM Sans',sans-serif",
+            cursor: "pointer", textAlign: "left", fontFamily: "'Roboto',sans-serif",
             boxShadow: "0 1px 4px rgba(15,23,42,0.05)", transition: "all .15s",
           }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = t.color; e.currentTarget.style.boxShadow = `0 6px 24px ${t.color}22`; e.currentTarget.style.transform = "translateY(-2px)"; }}
@@ -4319,7 +4319,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   /* ── STEP 2: FILL VARIABLES ── */
   if (step === "fill") return (
     <div style={{ maxWidth: 600 }}>
-      <button onClick={() => setStep("pick")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+      <button onClick={() => setStep("pick")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'Roboto',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
         ← Back to templates
       </button>
       {/* Template badge */}
@@ -4382,7 +4382,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
                 } catch { /* silent */ }
                 setRegeneratingAngle(false);
               }}
-              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-alt)", color: regeneratingAngle ? "#94A3B8" : "#6366f1", fontSize: 12, fontWeight: 600, cursor: regeneratingAngle ? "default" : "pointer", fontFamily: "'DM Sans',sans-serif", flexShrink: 0, transition: "all .15s" }}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "4px 10px", borderRadius: 8, border: "1px solid var(--border)", background: "var(--bg-alt)", color: regeneratingAngle ? "#94A3B8" : "#6366f1", fontSize: 12, fontWeight: 600, cursor: regeneratingAngle ? "default" : "pointer", fontFamily: "'Roboto',sans-serif", flexShrink: 0, transition: "all .15s" }}
               onMouseEnter={e => { if (!regeneratingAngle) { e.currentTarget.style.background = "#6366f120"; e.currentTarget.style.borderColor = "#6366f1"; } }}
               onMouseLeave={e => { e.currentTarget.style.background = "var(--bg-alt)"; e.currentTarget.style.borderColor = "var(--border)"; }}
             >
@@ -4403,7 +4403,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
               flex: 1, padding: "10px 8px", borderRadius: 10, border: form.maxChars === val ? `2px solid ${template.color}` : "1px solid var(--border)",
               background: form.maxChars === val ? `${template.color}10` : "var(--bg-alt)",
               color: form.maxChars === val ? template.color : T.tx2,
-              fontSize: 13, fontWeight: form.maxChars === val ? 600 : 400, cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
+              fontSize: 13, fontWeight: form.maxChars === val ? 600 : 400, cursor: "pointer", fontFamily: "'Roboto',sans-serif",
               transition: "all .15s",
             }}>
               {label}
@@ -4415,7 +4415,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         <button onClick={generate} disabled={generating || !form.recipientCompany.trim()} style={{
           marginTop: 8, padding: "13px 20px", borderRadius: 12, border: "none", cursor: form.recipientCompany.trim() ? "pointer" : "default",
           background: form.recipientCompany.trim() ? `linear-gradient(135deg, ${template.color}, ${template.color}cc)` : "var(--bg-hover)",
-          color: form.recipientCompany.trim() ? "#fff" : "#94A3B8", fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+          color: form.recipientCompany.trim() ? "#fff" : "#94A3B8", fontSize: 14, fontWeight: 600, fontFamily: "'Roboto',sans-serif",
           boxShadow: form.recipientCompany.trim() ? `0 4px 14px ${template.color}40` : "none", transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
@@ -4430,7 +4430,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
   /* ── STEP 3: PREVIEW & SEND ── */
   return (
     <div style={{ maxWidth: 680 }}>
-      <button onClick={() => setStep("fill")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
+      <button onClick={() => setStep("fill")} style={{ background: "none", border: "none", color: T.ac, fontSize: 13, cursor: "pointer", fontFamily: "'Roboto',sans-serif", marginBottom: 20, padding: 0, display: "flex", alignItems: "center", gap: 4 }}>
         ← Back to edit
       </button>
 
@@ -4439,7 +4439,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
           <div style={{ fontSize: 18, fontWeight: 700, color: T.tx }}>Your Email</div>
           <div style={{ fontSize: 13, color: T.tx2 }}>Edit below if needed, then send.</div>
         </div>
-        <button onClick={generate} disabled={generating} style={{ padding: "8px 16px", borderRadius: 10, border: `1px solid ${template.color}`, background: "none", color: template.color, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>
+        <button onClick={generate} disabled={generating} style={{ padding: "8px 16px", borderRadius: 10, border: `1px solid ${template.color}`, background: "none", color: template.color, fontSize: 13, fontWeight: 500, cursor: "pointer", fontFamily: "'Roboto',sans-serif" }}>
           {generating ? "Regenerating..." : "↻ Regenerate"}
         </button>
       </div>
@@ -4487,7 +4487,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         <button onClick={sendEmail} disabled={sending} style={{
           flex: 1, padding: "13px 20px", borderRadius: 12, border: "none", cursor: "pointer",
           background: `linear-gradient(135deg, ${template.color}, ${template.color}cc)`,
-          color: "#fff", fontSize: 14, fontWeight: 600, fontFamily: "'DM Sans',sans-serif",
+          color: "#fff", fontSize: 14, fontWeight: 600, fontFamily: "'Roboto',sans-serif",
           boxShadow: `0 4px 14px ${template.color}40`, transition: "all .2s",
           display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
         }}>
@@ -4495,7 +4495,7 @@ function EmailTemplatesPage({ onBack, gmailToken, connectGmail, showToast, user 
         </button>
         <button onClick={() => { navigator.clipboard.writeText(`Subject: ${email.subject}\n\n${email.body}`); showToast("Copied to clipboard"); }} style={{
           padding: "13px 18px", borderRadius: 12, border: "1px solid var(--border)", background: "var(--bg-alt)",
-          color: T.tx2, fontSize: 14, cursor: "pointer", fontFamily: "'DM Sans',sans-serif", fontWeight: 500,
+          color: T.tx2, fontSize: 14, cursor: "pointer", fontFamily: "'Roboto',sans-serif", fontWeight: 500,
         }}>
           Copy
         </button>

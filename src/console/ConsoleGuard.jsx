@@ -33,7 +33,7 @@ function ConsoleLogin({ onSuccess }) {
   const inp = {
     width: "100%", boxSizing: "border-box", padding: "13px 16px",
     border: "1.5px solid rgba(0,0,0,0.12)", borderRadius: 10,
-    fontSize: 15, background: "#f8fafc", fontFamily: "'Plus Jakarta Sans', sans-serif",
+    fontSize: 15, background: "#f8fafc", fontFamily: "'Roboto', sans-serif",
     outline: "none", color: "#0f172a",
   };
 
@@ -56,7 +56,7 @@ function ConsoleLogin({ onSuccess }) {
   };
 
   return (
-    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg, #f8fffe 0%, #f0fdf9 50%, #f0f9ff 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Plus Jakarta Sans', sans-serif", position: "relative", overflow: "hidden" }}>
+    <div style={{ minHeight: "100vh", background: "linear-gradient(145deg, #f8fffe 0%, #f0fdf9 50%, #f0f9ff 100%)", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Roboto', sans-serif", position: "relative", overflow: "hidden" }}>
       {/* Decorative blobs */}
       <div style={{ position: "absolute", top: -100, left: -100, width: 400, height: 400, borderRadius: "50%", background: "radial-gradient(circle, rgba(16,185,129,0.08) 0%, transparent 70%)", pointerEvents: "none" }} />
       <div style={{ position: "absolute", bottom: -80, right: -60, width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle, rgba(14,165,233,0.07) 0%, transparent 70%)", pointerEvents: "none" }} />

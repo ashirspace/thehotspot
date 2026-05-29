@@ -67,9 +67,9 @@
   --red: #ef4444;
 
   /* Typography */
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-display: 'Plus Jakarta Sans', 'Inter', sans-serif;
-  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: 'Roboto', system-ui, -apple-system, sans-serif;
+  --font-display: 'Roboto', sans-serif;
+  --font-mono: 'Roboto Mono', ui-monospace, monospace;
 
   /* Shadows — subtle only */
   --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04);
@@ -1824,9 +1824,9 @@
   --red:           #ef4444;
 
   /* Typography */
-  --font-sans:     'Inter', system-ui, -apple-system, sans-serif;
-  --font-display:  'Plus Jakarta Sans', 'Inter', sans-serif;
-  --font-mono:     'JetBrains Mono', ui-monospace, monospace;
+  --font-sans:     'Roboto', system-ui, -apple-system, sans-serif;
+  --font-display:  'Roboto', sans-serif;
+  --font-mono:     'Roboto Mono', ui-monospace, monospace;
 
   /* Shadows — subtle, used only on lift */
   --shadow-sm:     0 1px 2px rgba(15, 23, 42, 0.04);
