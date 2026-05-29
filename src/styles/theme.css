@@ -2466,8 +2466,8 @@
 
 /* === DASHBOARD · SIDEBAR ================================ */
 .dash-sidebar {
-  flex: 0 0 240px;
-  width: 240px;
+  flex: 0 0 268px;
+  width: 268px;
   background: rgba(248, 250, 252, 0.82);
   backdrop-filter: blur(18px);
   border-right: 1px solid var(--border);
