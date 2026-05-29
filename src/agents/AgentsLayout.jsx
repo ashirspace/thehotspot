@@ -131,7 +131,7 @@ function DashboardSidebar({ open, onClose, sidebarWidth, onResizeStart }) {
       className={`dash-sidebar agent-dashboard-sidebar${open ? " is-open" : ""}`}
       aria-label="Dashboard navigation"
       aria-hidden={!open}
-      style={open ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}
+      style={open && window.innerWidth > 1024 ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}
     >
       <div style={{ flex: 1, paddingTop: 8 }}>
         {DASHBOARD_NAV_MAIN.map(({ label, href, Icon, active, badge }) => (
@@ -203,7 +203,7 @@ export default function AgentsLayout() {
   const { agentId } = useParams();
   const navigate = useNavigate();
   const [splashDone, setSplashDone] = useState(false);
-  const [navOpen, setNavOpen] = useState(true);
+  const [navOpen, setNavOpen] = useState(() => window.innerWidth >= 1025);
   const [user] = useState(() => getStoredUser());
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const s = parseInt(localStorage.getItem("sidebar-width"), 10);

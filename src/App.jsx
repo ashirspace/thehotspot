@@ -5382,7 +5382,7 @@ function Dashboard({ user, onLogout, onUserUpdate }) {
 
         {/* LEFT SIDEBAR — persistent on desktop, drawer below 1024px */}
         <aside className={`dash-sidebar${sidebarOpen ? " is-open" : ""}`}
-          style={sidebarOpen ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}>
+          style={sidebarOpen && window.innerWidth > 1024 ? { width: sidebarWidth, flex: `0 0 ${sidebarWidth}px` } : {}}>
           <div style={{ flex: 1, paddingTop: 8 }}>
             {[
               { id: "dashboard",      label: "Dashboard",     icon: <LuLayoutDashboard size={18} /> },
