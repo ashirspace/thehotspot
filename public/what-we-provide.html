@@ -3,116 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>What We Provide — thehotspot</title>
+  <title>What We Provide - thehotspot</title>
+  <meta name="description" content="Tools and services that support better outbound workflows." />
   <link rel="icon" type="image/png" href="/logo.png" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static-page-theme.css" />
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', sans-serif; background: #09090d; color: #F1F5F9; min-height: 100vh; }
-
-    nav { padding: 16px 40px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #ffffff0d; background: #09090dcc; backdrop-filter: blur(12px); position: sticky; top: 0; z-index: 10; }
-    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
-    .nav-logo { width: 28px; height: 28px; object-fit: contain; }
-    .nav-name { font-size: 16px; font-weight: 700; color: #F1F5F9; letter-spacing: -0.3px; }
-    .nav-back { padding: 8px 20px; border-radius: 20px; border: 1px solid #ffffff15; background: transparent; color: #94A3B8; font-size: 13px; font-weight: 600; text-decoration: none; transition: all .2s; margin-right: 8px; }
-    .nav-back:hover { border-color: #10b98140; color: #10b981; }
-    .nav-cta { padding: 8px 20px; border-radius: 20px; background: linear-gradient(135deg,#10b981,#0ea5e9); color: #fff; font-size: 13px; font-weight: 600; text-decoration: none; transition: opacity .2s; }
-    .nav-cta:hover { opacity: .85; }
-
-    .hero { max-width: 860px; margin: 0 auto; padding: 88px 40px 72px; text-align: center; }
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: #10b98112; border: 1px solid #10b98130; border-radius: 20px; padding: 5px 16px; margin-bottom: 24px; }
-    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; box-shadow: 0 0 6px #10b981; }
-    .badge-text { font-size: 11px; color: #10b981; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
-    .hero h1 { font-size: clamp(34px,5.5vw,62px); font-weight: 900; letter-spacing: -2.5px; line-height: 1.06; margin-bottom: 20px; }
-    .hero p { font-size: 17px; color: #94A3B8; line-height: 1.8; max-width: 620px; margin: 0 auto 0; }
-
-    .container { max-width: 1280px; margin: 0 auto; padding: 0 40px 100px; }
-
-    .section-header { text-align: center; margin-bottom: 52px; }
-    .section-label { font-size: 11px; font-weight: 700; color: #10b981; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 12px; }
-    .section-title { font-size: clamp(22px,2.8vw,34px); font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-    .section-sub { font-size: 14px; color: #64748B; line-height: 1.75; max-width: 560px; margin: 0 auto; }
-
-    /* Feature deep-dive cards */
-    .features-deep { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; margin-bottom: 100px; }
-    .feat-card { background: #111116; border: 1px solid #ffffff0d; border-radius: 20px; padding: 32px 28px; transition: border-color .2s, transform .2s; }
-    .feat-card:hover { transform: translateY(-3px); }
-    .feat-icon { width: 52px; height: 52px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
-    .feat-title { font-size: 16px; font-weight: 800; color: #F1F5F9; margin-bottom: 10px; letter-spacing: -0.3px; }
-    .feat-desc { font-size: 13px; color: #64748B; line-height: 1.75; margin-bottom: 18px; }
-    .feat-points { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-    .feat-points li { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #94A3B8; line-height: 1.6; }
-    .feat-points li::before { content: ''; width: 5px; height: 5px; border-radius: 50%; flex-shrink: 0; margin-top: 6px; }
-
-    /* How they connect */
-    .flow { background: #111116; border: 1px solid #ffffff0d; border-radius: 22px; padding: 52px 48px; margin-bottom: 100px; }
-    .flow-steps { display: grid; grid-template-columns: repeat(6,1fr); gap: 0; position: relative; }
-    .flow-step { text-align: center; position: relative; padding: 0 8px; }
-    .flow-step::after { content: ''; position: absolute; top: 22px; right: -50%; width: 100%; height: 1px; background: linear-gradient(90deg,#10b98140,#0ea5e940); }
-    .flow-step:last-child::after { display: none; }
-    .flow-num { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg,#10b981,#0ea5e9); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: #fff; margin: 0 auto 14px; }
-    .flow-name { font-size: 12px; font-weight: 700; color: #F1F5F9; margin-bottom: 4px; }
-    .flow-sub { font-size: 11px; color: #64748B; }
-
-    /* Comparison table */
-    .compare { background: #111116; border: 1px solid #ffffff0d; border-radius: 22px; overflow: hidden; margin-bottom: 100px; }
-    .compare-head { display: grid; grid-template-columns: 2fr 1fr 1fr; background: #0d0d12; padding: 18px 32px; border-bottom: 1px solid #ffffff0d; }
-    .compare-head div { font-size: 12px; font-weight: 700; color: #64748B; text-transform: uppercase; letter-spacing: 0.8px; }
-    .compare-head div:last-child { color: #10b981; }
-    .compare-row { display: grid; grid-template-columns: 2fr 1fr 1fr; padding: 18px 32px; border-bottom: 1px solid #ffffff06; align-items: center; }
-    .compare-row:last-child { border-bottom: none; }
-    .compare-row:hover { background: #16161e; }
-    .compare-feat { font-size: 13px; color: #CBD5E1; font-weight: 500; }
-    .compare-no { font-size: 13px; color: #334155; }
-    .compare-yes { font-size: 13px; color: #10b981; font-weight: 600; }
-
-    .cta-box { background: linear-gradient(135deg,#0d1f14,#0d1827); border: 1px solid #10b98120; border-radius: 22px; padding: 56px 48px; text-align: center; }
-    .cta-box h3 { font-size: clamp(22px,2.5vw,30px); font-weight: 800; margin-bottom: 12px; letter-spacing: -0.8px; }
-    .cta-box p { font-size: 14px; color: #64748B; margin-bottom: 32px; }
-    .cta-btn { display: inline-block; padding: 14px 40px; border-radius: 24px; background: linear-gradient(135deg,#10b981,#0ea5e9); color: #fff; font-size: 15px; font-weight: 700; text-decoration: none; box-shadow: 0 4px 24px rgba(16,185,129,0.3); transition: all .2s; }
-    .cta-btn:hover { transform: translateY(-2px); }
-
-    footer { border-top: 1px solid #ffffff0d; padding: 24px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-    .footer-copy { font-size: 12px; color: #94A3B8; }
-    .footer-links { display: flex; gap: 20px; }
-    .footer-links a { font-size: 12px; color: #64748B; text-decoration: none; transition: color .15s; }
-    .footer-links a:hover { color: #10b981; }
-
-    .glow1 { position: fixed; width: 700px; height: 700px; border-radius: 50%; background: radial-gradient(circle,#10b98110,transparent 70%); top: -300px; left: -300px; pointer-events: none; }
-    .glow2 { position: fixed; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle,#0ea5e90c,transparent 70%); bottom: -200px; right: -200px; pointer-events: none; }
-
-    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
-    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
-
-    @media(max-width:900px){
-      nav{padding:14px 20px;} .hero{padding:56px 20px 48px;} .container{padding:0 20px 60px;}
-      .features-deep{grid-template-columns:1fr 1fr;} .flow-steps{grid-template-columns:repeat(3,1fr);gap:24px;}
-      .flow-step::after{display:none;} .compare-head,.compare-row{grid-template-columns:2fr 1fr 1fr; padding:14px 20px;}
-      .cta-box{padding:36px 24px;} footer{padding:20px;}
-    }
-    @media(max-width:600px){ .features-deep{grid-template-columns:1fr;} }
-  </style>
 </head>
 <body>
-  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
-    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'Roboto',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
-  </div>
-  <script>
-    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-    document.addEventListener('click',function(e){var a=e.target.closest('a[href]');if(!a)return;var h=a.getAttribute('href');if(!h||h.startsWith('#')||h.startsWith('/')||h.startsWith('mailto:'))return;e.preventDefault();var o=document.createElement('div');o.style.cssText='position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;opacity:0;transition:opacity .3s ease';o.innerHTML='<img src="/logo.png" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/><div style="color:#fff;font-family:Roboto,sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;opacity:.85">thehotspot</div>';document.body.appendChild(o);requestAnimationFrame(function(){o.style.opacity='1'});setTimeout(function(){window.open(h,a.getAttribute('target')||'_self')},400);setTimeout(function(){o.style.opacity='0';setTimeout(function(){o.remove()},300)},700);});
-  </script>
-
-  <div class="glow1"></div><div class="glow2"></div>
+  <div class="sp-shell">
     <nav class="sp-nav" aria-label="Main navigation">
       <div class="sp-nav-inner">
-        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
-          <span class="sp-wordmark-dot" aria-hidden="true"></span>
-          thehotspot
-        </a>
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home"><span class="sp-wordmark-dot" aria-hidden="true"></span>thehotspot</a>
         <div class="sp-nav-links" aria-label="Site links">
           <a class="sp-nav-link" href="/features.html">Features</a>
           <a class="sp-nav-link" href="/pricing.html">Pricing</a>
@@ -125,184 +28,36 @@
         </div>
       </div>
     </nav>
-
-  <div class="hero">
-    <div class="badge"><span class="badge-dot"></span><span class="badge-text">Platform</span></div>
-    <h1>Everything you need to<br/><span style="background:linear-gradient(135deg,#10b981,#0ea5e9);-webkit-background-clip:text;-webkit-text-fill-color:transparent">scale outreach</span></h1>
-    <p>Six modules that work together as one system — from finding leads to closing deals, fully automated, running while you sleep.</p>
+    <header class="site-hero">
+      <div class="sp-container site-hero-grid">
+        <div>
+          <p class="site-kicker">What we provide</p>
+          <h1 class="site-title">Tools and services to help you start more <em>conversations.</em></h1>
+          <p class="site-subtitle">Everything you need to find leads, write better emails, organize campaigns, and close more deals with a calmer operating system.</p>
+        </div>
+        <aside class="site-panel"><h2 class="site-panel-title">Service model</h2><div class="site-meta-stack"><div class="site-meta-row"><span class="site-meta-key">First</span><span class="site-meta-value">Map the target audience and offer.</span></div><div class="site-meta-row"><span class="site-meta-key">Then</span><span class="site-meta-value">Prepare lists, messages, and review steps.</span></div><div class="site-meta-row"><span class="site-meta-key">Finally</span><span class="site-meta-value">Track response signals and iterate.</span></div></div></aside>
+      </div>
+    </header>
+    <main class="sp-container site-main">
+<section class="site-section"><div class="site-service-list"><article class="site-service-row"><div><h2 class="site-service-title">Lead Discovery & Enrichment</h2><p class="site-copy">Find ideal prospects and enrich them with useful company, role, and intent signals.</p><div class="site-service-meta"><span class="site-chip site-chip--teal">Prospects</span><span class="site-chip">Filters</span><span class="site-chip">Context</span></div></div><div class="site-ui-preview"><div class="site-ui-head"><span>Workspace preview</span><span>3 rows</span></div><div class="site-ui-body"><table class="site-table"><tbody><tr><td>Maya Rao</td><td>Head of Growth</td><td><span class="site-status">Apollo</span></td></tr><tr><td>Dev Kapoor</td><td>Growth Lead</td><td><span class="site-status">Linear</span></td></tr><tr><td>Sara Lin</td><td>Marketing Dir.</td><td><span class="site-status">Vanta</span></td></tr></tbody></table></div></div></article><article class="site-service-row"><div><h2 class="site-service-title">AI Personalization</h2><p class="site-copy">Write sharper outbound messages that reference context instead of generic pain points.</p><div class="site-service-meta"><span class="site-chip site-chip--teal">Drafts</span><span class="site-chip">Variables</span><span class="site-chip">Review</span></div></div><div class="site-ui-preview"><div class="site-ui-head"><span>Workspace preview</span><span>2 rows</span></div><div class="site-ui-body"><table class="site-table"><tbody><tr><td>Acme Corp</td><td>Series A hiring</td><td><span class="site-status">Generated</span></td></tr><tr><td>Razorpay</td><td>New campaign</td><td><span class="site-status">Ready</span></td></tr></tbody></table></div></div></article><article class="site-service-row"><div><h2 class="site-service-title">Email Automation & Sequences</h2><p class="site-copy">Coordinate multi-step outreach across initial messages and follow-ups.</p><div class="site-service-meta"><span class="site-chip site-chip--teal">Sequences</span><span class="site-chip">Follow-ups</span><span class="site-chip">Pauses</span></div></div><div class="site-ui-preview"><div class="site-ui-head"><span>Workspace preview</span><span>3 rows</span></div><div class="site-ui-body"><table class="site-table"><tbody><tr><td>Day 1</td><td>Initial email</td><td><span class="site-status">Sent</span></td></tr><tr><td>Day 3</td><td>Follow-up</td><td><span class="site-status">Opened</span></td></tr><tr><td>Day 6</td><td>Final follow-up</td><td><span class="site-status">Replied</span></td></tr></tbody></table></div></div></article><article class="site-service-row"><div><h2 class="site-service-title">Deliverability & Reporting</h2><p class="site-copy">Read campaign performance clearly enough to improve targeting, copy, and timing.</p><div class="site-service-meta"><span class="site-chip site-chip--teal">Inbox placement</span><span class="site-chip">Reply rate</span><span class="site-chip">Reporting</span></div></div><div class="site-ui-preview"><div class="site-ui-head"><span>Campaign performance</span><span>Live</span></div><div class="site-ui-body"><div class="site-bars"><span style="height:52%"></span><span style="height:60%"></span><span style="height:72%"></span><span style="height:64%"></span><span style="height:86%"></span><span style="height:91%"></span></div></div></div></article></div></section>
+    </main>
+    <footer class="sp-footer">
+      <div class="sp-container">
+        <div class="sp-footer-top">
+          <div class="sp-footer-title">Choose the support your outreach needs.</div>
+          <a class="sp-btn sp-btn-primary" href="/">Open the dashboard</a>
+        </div>
+        <div class="sp-footer-bottom">
+          <div>&copy; 2026 thehotspot. All rights reserved.</div>
+          <div class="sp-footer-links">
+            <a href="/features.html">Features</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/privacy.html">Privacy</a>
+            <a href="/contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-
-  <div class="container">
-
-    <!-- Deep-dive feature cards -->
-    <div style="margin-bottom:100px;">
-      <div class="section-header">
-        <div class="section-label">What We Provide</div>
-        <div class="section-title">Every tool in one place</div>
-        <div class="section-sub">No duct tape. No third-party chaos. One platform, six modules, infinite scale.</div>
-      </div>
-      <div class="features-deep">
-
-        <div class="feat-card" style="border-color:#10b98120;" onmouseenter="this.style.borderColor='#10b98150'" onmouseleave="this.style.borderColor='#10b98120'">
-          <div class="feat-icon" style="background:#10b98115;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <div class="feat-title">Lead Generation</div>
-          <div class="feat-desc">The Lead Agent scours the web in real time — finding brands, agencies, and companies that match your exact criteria and dropping them straight into your pipeline.</div>
-          <ul class="feat-points" style="--dot:#10b981">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#10b981;flex-shrink:0;margin-top:7px;display:block;"></span>Searches by industry, region, and company size</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#10b981;flex-shrink:0;margin-top:7px;display:block;"></span>Automatically deduplicates against existing contacts</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#10b981;flex-shrink:0;margin-top:7px;display:block;"></span>Runs continuously — new leads every session</li>
-          </ul>
-        </div>
-
-        <div class="feat-card" style="border-color:#0ea5e920;" onmouseenter="this.style.borderColor='#0ea5e950'" onmouseleave="this.style.borderColor='#0ea5e920'">
-          <div class="feat-icon" style="background:#0ea5e915;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#0ea5e9" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
-          </div>
-          <div class="feat-title">Cold Email Campaigns</div>
-          <div class="feat-desc">Every contact gets a completely unique email — written by the AI Email Writer Agent, referencing their company, niche, and category. Never a blast, never a template.</div>
-          <ul class="feat-points">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#0ea5e9;flex-shrink:0;margin-top:7px;display:block;"></span>Unique subject line and body per contact</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#0ea5e9;flex-shrink:0;margin-top:7px;display:block;"></span>Personalised with company name and category context</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#0ea5e9;flex-shrink:0;margin-top:7px;display:block;"></span>Warm-up pacing to protect Gmail deliverability</li>
-          </ul>
-        </div>
-
-        <div class="feat-card" style="border-color:#6366f120;" onmouseenter="this.style.borderColor='#6366f150'" onmouseleave="this.style.borderColor='#6366f120'">
-          <div class="feat-icon" style="background:#6366f115;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#6366f1" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <div class="feat-title">Follow-up Sequences</div>
-          <div class="feat-desc">The Follow-up Agent monitors every thread. If a prospect hasn't replied in 3 days, it sends a nudge. Again at day 7. Stops the second they respond — zero over-sending.</div>
-          <ul class="feat-points">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#6366f1;flex-shrink:0;margin-top:7px;display:block;"></span>3-step drip: Day 0, Day 3, Day 7</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#6366f1;flex-shrink:0;margin-top:7px;display:block;"></span>Reply detection stops the sequence instantly</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#6366f1;flex-shrink:0;margin-top:7px;display:block;"></span>Fully automated, no manual scheduling</li>
-          </ul>
-        </div>
-
-        <div class="feat-card" style="border-color:#f59e0b20;" onmouseenter="this.style.borderColor='#f59e0b50'" onmouseleave="this.style.borderColor='#f59e0b20'">
-          <div class="feat-icon" style="background:#f59e0b15;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
-          </div>
-          <div class="feat-title">Campaign Analytics</div>
-          <div class="feat-desc">Every email has an invisible open-tracking pixel and click-tracking on all links. The Analytics Agent surfaces what's working — by campaign, category, and subject line.</div>
-          <ul class="feat-points">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#f59e0b;flex-shrink:0;margin-top:7px;display:block;"></span>Real-time open and click tracking on every send</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#f59e0b;flex-shrink:0;margin-top:7px;display:block;"></span>Campaign history with sent / failed breakdown</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#f59e0b;flex-shrink:0;margin-top:7px;display:block;"></span>Reply rate and engagement trends over time</li>
-          </ul>
-        </div>
-
-        <div class="feat-card" style="border-color:#ec489920;" onmouseenter="this.style.borderColor='#ec489950'" onmouseleave="this.style.borderColor='#ec489920'">
-          <div class="feat-icon" style="background:#ec489915;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ec4899" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg>
-          </div>
-          <div class="feat-title">Contact Database</div>
-          <div class="feat-desc">A structured contact manager built for outreach. Import, organise, and manage leads across five categories: Network, CPS, CPL, CPA, and Mobile — with full status tracking.</div>
-          <ul class="feat-points">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#ec4899;flex-shrink:0;margin-top:7px;display:block;"></span>Five built-in categories with colour coding</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#ec4899;flex-shrink:0;margin-top:7px;display:block;"></span>Import from CSV or add manually</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#ec4899;flex-shrink:0;margin-top:7px;display:block;"></span>Status tracking: Pending, Sent, Replied, Closed</li>
-          </ul>
-        </div>
-
-        <div class="feat-card" style="border-color:#14b8a620;" onmouseenter="this.style.borderColor='#14b8a650'" onmouseleave="this.style.borderColor='#14b8a620'">
-          <div class="feat-icon" style="background:#14b8a615;">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#14b8a6" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          </div>
-          <div class="feat-title">Gmail Integration</div>
-          <div class="feat-desc">Emails go out from your real Gmail inbox — not a third-party domain. That means real sender trust, better deliverability, and replies that land directly in your inbox.</div>
-          <ul class="feat-points">
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#14b8a6;flex-shrink:0;margin-top:7px;display:block;"></span>OAuth sign-in — no password required</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#14b8a6;flex-shrink:0;margin-top:7px;display:block;"></span>Sends via Gmail API — your domain, your reputation</li>
-            <li><span style="width:5px;height:5px;border-radius:50%;background:#14b8a6;flex-shrink:0;margin-top:7px;display:block;"></span>Daily warm-up limits protect your account health</li>
-          </ul>
-        </div>
-
-      </div>
-    </div>
-
-    <!-- How the modules connect -->
-    <div style="margin-bottom:100px;">
-      <div class="section-header">
-        <div class="section-label">How It Works</div>
-        <div class="section-title">Six steps, zero manual work</div>
-        <div class="section-sub">Every module feeds the next. Once set up, the entire pipeline runs itself.</div>
-      </div>
-      <div class="flow">
-        <div class="flow-steps">
-          <div class="flow-step">
-            <div class="flow-num">1</div>
-            <div class="flow-name">Find Leads</div>
-            <div class="flow-sub">Lead Agent scours the web</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">2</div>
-            <div class="flow-name">Store Contact</div>
-            <div class="flow-sub">Added to Contact DB</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">3</div>
-            <div class="flow-name">Write Email</div>
-            <div class="flow-sub">AI generates unique copy</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">4</div>
-            <div class="flow-name">Send via Gmail</div>
-            <div class="flow-sub">From your real inbox</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">5</div>
-            <div class="flow-name">Follow Up</div>
-            <div class="flow-sub">Drip at Day 3 & Day 7</div>
-          </div>
-          <div class="flow-step">
-            <div class="flow-num">6</div>
-            <div class="flow-name">Track Results</div>
-            <div class="flow-sub">Opens, clicks, replies</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Comparison -->
-    <div style="margin-bottom:100px;">
-      <div class="section-header">
-        <div class="section-label">Why thehotspot</div>
-        <div class="section-title">vs. doing it manually</div>
-        <div class="section-sub">Every hour you spend on manual outreach is an hour your competition spends closing.</div>
-      </div>
-      <div class="compare">
-        <div class="compare-head">
-          <div>Feature</div>
-          <div style="text-align:center;">Manual</div>
-          <div style="text-align:center;">thehotspot</div>
-        </div>
-        <div class="compare-row"><div class="compare-feat">Lead discovery</div><div class="compare-no" style="text-align:center;">Hours per session</div><div class="compare-yes" style="text-align:center;">Automated, real-time</div></div>
-        <div class="compare-row"><div class="compare-feat">Personalised emails at scale</div><div class="compare-no" style="text-align:center;">Not possible</div><div class="compare-yes" style="text-align:center;">Every contact, always</div></div>
-        <div class="compare-row"><div class="compare-feat">Follow-up sequences</div><div class="compare-no" style="text-align:center;">Manual reminders</div><div class="compare-yes" style="text-align:center;">Day 0, 3, 7 — auto</div></div>
-        <div class="compare-row"><div class="compare-feat">Open & click tracking</div><div class="compare-no" style="text-align:center;">None</div><div class="compare-yes" style="text-align:center;">Every email</div></div>
-        <div class="compare-row"><div class="compare-feat">Gmail deliverability</div><div class="compare-no" style="text-align:center;">Varies</div><div class="compare-yes" style="text-align:center;">Warm-up protected</div></div>
-        <div class="compare-row"><div class="compare-feat">Time to first email sent</div><div class="compare-no" style="text-align:center;">Days of prep</div><div class="compare-yes" style="text-align:center;">Under 5 minutes</div></div>
-      </div>
-    </div>
-
-    <div class="cta-box">
-      <h3>Ready to put all six modules to work?</h3>
-      <p>Sign up free and start your first automated campaign in under 5 minutes.</p>
-      <a href="/contact.html" class="cta-btn">Get Started Free →</a>
-    </div>
-
-  </div>
-
-  <footer>
-    <span class="footer-copy">© 2026 thehotspot. All rights reserved.</span>
-    <div class="footer-links">
-      <a href="/privacy.html">Privacy Policy</a>
-      <a href="/terms.html">Terms of Service</a>
-    </div>
-  </footer>
 </body>
 </html>

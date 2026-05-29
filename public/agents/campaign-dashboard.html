@@ -1,65 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Campaign Dashboard Agent — thehotspot</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campaign Dashboard Agent - thehotspot</title>
+  <meta name="description" content="Campaign Dashboard agent for thehotspot." />
+  <link rel="icon" type="image/png" href="/logo.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800;900&family=Roboto+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="/static-page-theme.css" />
-  <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}body{font-family:'Roboto',-apple-system,sans-serif;background:#09090d;color:#F1F5F9;line-height:1.6}a{color:inherit}
-.nav{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid #ffffff0d;background:#09090dcc;backdrop-filter:blur(12px);position:sticky;top:0;z-index:10}
-.logo{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,#10b981,#0ea5e9);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;color:#fff}
-.nav-cta{padding:8px 22px;border-radius:20px;background:linear-gradient(135deg,#10b981,#0ea5e9);color:#fff;border:none;font-size:13px;font-weight:600;text-decoration:none}
-.btn-primary{padding:13px 32px;border-radius:24px;background:linear-gradient(135deg,#6366f1,#818cf8);color:#fff;border:none;font-size:15px;font-weight:700;text-decoration:none;box-shadow:0 0 32px #6366f140}
-.btn-ghost{padding:13px 28px;border-radius:24px;background:transparent;color:#94A3B8;border:1px solid #ffffff15;font-size:15px;font-weight:500;text-decoration:none}
-.hero{max-width:800px;margin:0 auto;padding:80px 40px 60px;text-align:center}
-.badge{display:inline-flex;align-items:center;gap:6px;background:#6366f112;border:1px solid #6366f130;border-radius:20px;padding:5px 16px;margin-bottom:24px}
-.badge-dot{width:6px;height:6px;border-radius:50%;background:#6366f1;box-shadow:0 0 6px #6366f1}
-.badge-text{font-size:11px;color:#6366f1;font-weight:700;letter-spacing:1px;text-transform:uppercase}
-h1{font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-2px;line-height:1.08;margin-bottom:20px}
-.gradient-text{background:linear-gradient(135deg,#6366f1,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.subtitle{font-size:17px;color:#94A3B8;max-width:560px;margin:0 auto 40px}
-.cta-row{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
-.section{max-width:1100px;margin:0 auto 80px;padding:0 40px}
-.section-label{font-size:11px;font-weight:700;color:#6366f1;letter-spacing:1.5px;text-transform:uppercase;margin-bottom:12px}
-.section-title{font-size:clamp(22px,3vw,34px);font-weight:800;letter-spacing:-1px;margin-bottom:12px}
-.section-sub{font-size:14px;color:#64748B}
-.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin-top:40px}
-.card{background:#111116;border:1px solid #ffffff0d;border-radius:18px;padding:28px 24px;transition:border-color .2s}
-.card:hover{border-color:#6366f140}
-.card-icon{width:48px;height:48px;border-radius:14px;background:#6366f115;display:flex;align-items:center;justify-content:center;margin-bottom:16px;color:#6366f1}
-.card-title{font-size:15px;font-weight:700;margin-bottom:8px}
-.card-desc{font-size:13px;color:#64748B;line-height:1.7}
-.steps{display:flex;flex-direction:column;gap:20px;margin-top:40px}
-.step{display:flex;gap:20px;align-items:flex-start}
-.step-num{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#818cf8);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:#fff;flex-shrink:0}
-.step-body{flex:1}
-.step-title{font-size:15px;font-weight:700;margin-bottom:4px}
-.step-desc{font-size:13px;color:#64748B;line-height:1.65}
-.cta-banner{background:linear-gradient(135deg,#6366f115,#818cf810);border:1px solid #6366f130;border-radius:20px;padding:48px 40px;text-align:center;max-width:1100px;margin:0 auto 80px}
-.cta-banner h2{font-size:28px;font-weight:800;letter-spacing:-1px;margin-bottom:12px}
-.cta-banner p{font-size:14px;color:#64748B;margin-bottom:28px}
-.footer{border-top:1px solid #ffffff0d;padding:32px 40px;text-align:center;font-size:12px;color:#475569}
-</style>
 </head>
 <body>
-  <!-- Loading screen -->
-  <div id="splash" style="position:fixed;inset:0;z-index:9999;background:#09090d;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;transition:opacity 0.5s ease">
-    <img src="/logo.png" alt="thehotspot" style="width:72px;height:72px;object-fit:contain;animation:splashFloat 1.4s ease-in-out infinite alternate"/>
-    <div style="color:#fff;font-family:'Roboto',sans-serif;font-size:22px;font-weight:700;letter-spacing:0.04em;animation:splashFadeIn 0.6s ease forwards">thehotspot</div>
-  </div>
-  <style>
-    @keyframes splashFloat{from{transform:translateY(0) scale(1);opacity:.8}to{transform:translateY(-8px) scale(1.06);opacity:1}}
-    @keyframes splashFadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:.85;transform:translateY(0)}}
-  </style>
-  <script>
-    setTimeout(function(){var s=document.getElementById('splash');if(s){s.style.opacity='0';setTimeout(function(){s.remove()},500)}},900);
-  </script>
+  <div class="sp-shell">
     <nav class="sp-nav" aria-label="Main navigation">
       <div class="sp-nav-inner">
-        <a href="/" class="sp-wordmark" aria-label="thehotspot home">
-          <span class="sp-wordmark-dot" aria-hidden="true"></span>
-          thehotspot
-        </a>
+        <a href="/" class="sp-wordmark" aria-label="thehotspot home"><span class="sp-wordmark-dot" aria-hidden="true"></span>thehotspot</a>
         <div class="sp-nav-links" aria-label="Site links">
           <a class="sp-nav-link" href="/features.html">Features</a>
           <a class="sp-nav-link" href="/pricing.html">Pricing</a>
@@ -72,50 +28,36 @@ h1{font-size:clamp(32px,5vw,52px);font-weight:900;letter-spacing:-2px;line-heigh
         </div>
       </div>
     </nav>
-
-<div class="hero">
-  <div class="badge"><span class="badge-dot"></span><span class="badge-text">Agent 10 of 12</span></div>
-  <h1>See every open, click,<br><span class="gradient-text">and delivery in one view</span></h1>
-  <p class="subtitle">The Campaign Dashboard pulls all your email campaign data into live charts — opens, clicks, delivery rates, and individual campaign breakdowns.</p>
-  <div class="cta-row">
-    <a href="/agents/campaign-dashboard" class="btn-primary">Open Dashboard →</a>
-    <a href="/" class="btn-ghost">Sign In</a>
+    <header class="site-hero">
+      <div class="sp-container site-hero-grid">
+        <div>
+          <p class="site-kicker">Agent</p>
+          <h1 class="site-title">Campaign Dashboard for focused <em>outreach.</em></h1>
+          <p class="site-subtitle">Review campaign health, delivery status, and replies.</p>
+        </div>
+        <aside class="site-panel"><h2 class="site-panel-title">Agent status</h2><div class="site-meta-stack"><div class="site-meta-row"><span class="site-meta-key">Mode</span><span class="site-meta-value">Review-first workflow.</span></div><div class="site-meta-row"><span class="site-meta-key">Output</span><span class="site-meta-value">Structured drafts and insights.</span></div><div class="site-meta-row"><span class="site-meta-key">Control</span><span class="site-meta-value">Human approval before action.</span></div></div></aside>
+      </div>
+    </header>
+    <main class="sp-container site-main">
+<section class="site-section"><div class="site-feature-grid"><article class="site-feature"><span class="site-number">01</span><h3>Input</h3><p>Give the agent a focused brief, audience, category, and any context that should shape the output.</p></article><article class="site-feature"><span class="site-number">02</span><h3>Review</h3><p>Outputs are shaped for human review so teams can approve, edit, skip, or route the next step.</p></article><article class="site-feature site-feature--wide"><div><span class="site-number">03</span><h3>Operational output</h3><p>The result is designed to fit into thehotspot workflow, not sit as a disconnected AI chat transcript.</p></div><div class="site-ui-preview"><div class="site-ui-head"><span>Workspace preview</span><span>3 rows</span></div><div class="site-ui-body"><table class="site-table"><tbody><tr><td>Brief</td><td>Received</td><td><span class="site-status">Ready</span></td></tr><tr><td>Draft</td><td>Generated</td><td><span class="site-status">Review</span></td></tr><tr><td>Next step</td><td>Approved</td><td><span class="site-status">Queued</span></td></tr></tbody></table></div></div></article></div></section>
+    </main>
+    <footer class="sp-footer">
+      <div class="sp-container">
+        <div class="sp-footer-top">
+          <div class="sp-footer-title">Use agents where they improve judgement.</div>
+          <a class="sp-btn sp-btn-primary" href="/">Open the dashboard</a>
+        </div>
+        <div class="sp-footer-bottom">
+          <div>&copy; 2026 thehotspot. All rights reserved.</div>
+          <div class="sp-footer-links">
+            <a href="/features.html">Features</a>
+            <a href="/blog.html">Blog</a>
+            <a href="/privacy.html">Privacy</a>
+            <a href="/contact.html">Contact</a>
+          </div>
+        </div>
+      </div>
+    </footer>
   </div>
-</div>
-
-<div class="section">
-  <div style="text-align:center;margin-bottom:48px">
-    <div class="section-label">What it does</div>
-    <div class="section-title">Your outreach analytics, visualized</div>
-    <div class="section-sub">No more digging through logs. Every campaign you've sent is tracked and displayed in clean, scannable charts.</div>
-  </div>
-  <div class="cards">
-    <div class="card"><div class="card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div><div class="card-title">Timeline Charts</div><div class="card-desc">Line charts showing opens and clicks over the last 14 days — see trends, identify spikes, and know which campaigns landed.</div></div>
-    <div class="card"><div class="card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></div><div class="card-title">Delivery Stats</div><div class="card-desc">Total sent, opens, clicks, and failed delivers — displayed as stat cards with percentage breakdowns at a glance.</div></div>
-    <div class="card"><div class="card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg></div><div class="card-title">Campaign History</div><div class="card-desc">A full table of every campaign ever sent: name, status, sent count, failed count, and date — sorted newest first.</div></div>
-    <div class="card"><div class="card-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div><div class="card-title">Status Badges</div><div class="card-desc">Campaigns are tagged as Completed, Running, or Pending — color coded so you can see the health of your pipeline instantly.</div></div></div>
-</div>
-
-<div class="section">
-  <div style="text-align:center;margin-bottom:48px">
-    <div class="section-label">How it works</div>
-    <div class="section-title">Simple as 1-2-3</div>
-  </div>
-  <div class="steps">
-    <div class="step"><div class="step-num">1</div><div class="step-body"><div class="step-title">Open Campaign Dashboard</div><div class="step-desc">No inputs needed — the dashboard automatically loads your data from thehotspot's database when you open the agent.</div></div></div>
-    <div class="step"><div class="step-num">2</div><div class="step-body"><div class="step-title">Read the charts</div><div class="step-desc">The timeline chart shows 14-day open and click trends. Stat cards show your overall numbers at the top.</div></div></div>
-    <div class="step"><div class="step-num">3</div><div class="step-body"><div class="step-title">Scroll to campaign history</div><div class="step-desc">Below the charts, a full table shows every campaign with its delivery status, sent count, and date.</div></div></div></div>
-</div>
-
-<div class="cta-banner">
-  <h2>Data-driven outreach starts here</h2>
-  <p>Know what's working before you send your next campaign.</p>
-  <a href="/agents/campaign-dashboard" class="btn-primary">Open Dashboard →</a>
-</div>
-
-<footer class="footer">
-  <div style="margin-bottom:8px"><a href="/agents" style="color:#475569;text-decoration:none;margin:0 12px">All Agents</a><a href="/" style="color:#475569;text-decoration:none;margin:0 12px">Dashboard</a></div>
-  © 2026 thehotspot
-</footer>
 </body>
 </html>
