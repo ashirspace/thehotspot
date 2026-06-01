@@ -1,23 +1,8 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/:path*",
-      "destination": "/api/:path*"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
   "crons": [
     {
-      "path": "/api/crons/daily",
-      "schedule": "0 9 * * *"
+      "path": "/api/jobs/process",
+      "schedule": "*/10 * * * *"
     }
-  ],
-  "functions": {
-    "api/crons/daily.js": {
-      "maxDuration": 60
-    }
-  }
+  ]
 }
