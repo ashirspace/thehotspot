@@ -1,41 +1,70 @@
 # CLAUDE.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to Claude Code when working in this repository.
 
 ## Commands
 
 ```bash
-npm run dev       # Start dev server (http://localhost:5173)
-npm run build     # Production build
-npm run lint      # Run ESLint
-npm run preview   # Preview production build
+npm run dev              # Start Next.js dev server at http://localhost:5173
+npm run build            # Generate Prisma client and build production app
+npm run lint             # Run ESLint
+npm run preview          # Start production server at http://localhost:5173
+npm run prisma:generate  # Generate Prisma client
+npm run prisma:migrate   # Create/apply local migrations
+npm run prisma:deploy    # Apply migrations in deployed environments
+npm run prisma:studio    # Inspect data locally
 ```
 
 ## Architecture
 
-This is a single-page React 19 + Vite app called **thehotspot** — an outreach dashboard. Almost all application code lives in one file: `src/App.jsx`.
+This repository now builds as a Next.js App Router application for **thehotspot**, a LinkedIn DM outreach management platform.
 
-### Key External Integrations
+Primary application code is TypeScript under:
 
-- **Airtable** — used as the user database (login, signup, contact storage). Credentials come from env vars: `VITE_AIRTABLE_API_KEY`, `VITE_AIRTABLE_BASE_ID`, `VITE_AIRTABLE_TABLE_NAME` (defaults to `"Users"`).
-- **Google OAuth / Gmail API** — Google Sign-In and Gmail read/send scopes. Client ID is hardcoded in `App.jsx` at the top (`GMAIL_CLIENT_ID`). On login, fetches real Google Contacts count and sent email count via Gmail API.
-- **n8n** — webhook URL (`N8N_WEBHOOK_URL`) for workflow automation (send emails, pause/resume). Currently a placeholder string.
+- `src/app`
+- `src/components/dashboard`
+- `src/components/ui`
+- `src/lib`
+- `prisma`
 
-### Code Organization in App.jsx
+Legacy Vite/React files remain in the repository for historical context, but `next.config.ts` limits route extensions to `ts` and `tsx`, so the active app build ignores old `.jsx` pages.
 
-- **CONFIG block** — Airtable and Gmail constants at top of file
-- **`I` object** — all icons as inline SVG React components (no icon library)
-- **`S` object** — all shared styles as plain JS objects (no CSS modules or Tailwind)
-- **`CAT` object** — category color themes for Network, CPS, CPL, CPA, Mobile
-- **`LoginPage`** — handles password login, signup, and Google OAuth flow
-- **`getSmartResponse()`** — keyword-based chatbot logic (no LLM API needed)
-- **`StatCard`, `Badge`** — reusable UI components
-- **Main `App` component** — dashboard layout with sidebar nav, stats, contacts table, and chat panel
+## Integrations
 
-### Auth Flow
+- **Neon PostgreSQL**: primary data store via `DATABASE_URL`
+- **Prisma**: ORM and migrations
+- **NextAuth**: session management and LinkedIn OAuth
+- **LinkedIn OAuth**: entry point for users
+- **Codex/OpenAI**: DM generation in `src/lib/codex.ts`
+- **Resend**: email route in `src/app/api/email/send`
+- **Upstash Redis**: campaign/job queue helper
+- **Vercel Cron**: invokes `/api/jobs/process`
+- **Cloudflare**: cache purge helper for deployment infrastructure
 
-Users are stored in Airtable. Session is persisted in `localStorage` under the key `"thehotspot_user"`. Google login fetches real contacts/sent counts from Google APIs and saves the access token to the user object.
+## Main Product Features
 
-### Styling Convention
+- LinkedIn OAuth connection screen before dashboard access
+- Analytics timeline with Past Hour, Past Day, and Past Week filters
+- DM tabs for Drafts, Approved, Sent, and Skipped
+- Search, sort, edit, approve, skip, and move message statuses
+- Campaign setup with targeting and live recipient count
+- Campaign context and reference material storage
+- CSV/Excel bulk import with validation
+- Approval editor for generated DM copy
+- Responsive desktop, tablet, and mobile layouts
 
-All styles are inline JS objects. Color palette is dark (`#09090d` background, `#111116` cards, `#10b981` green accent, `#0ea5e9` blue accent). Do not introduce external CSS frameworks.
+## Styling Convention
+
+New UI uses Tailwind CSS utility classes and local shadcn-style primitives only. Do not add CSS modules, styled-components, or another component framework.
+
+Keep the design restrained:
+
+- slate and white surfaces
+- LinkedIn blue accents
+- compact spacing
+- small radius cards and controls
+- clear focus, loading, empty, and error states
+
+## Service Client Rule
+
+Database, Redis, Resend, Cloudflare, and model clients must be initialized lazily inside helper functions. Avoid module-scope SDK initialization that can fail during `next build`.

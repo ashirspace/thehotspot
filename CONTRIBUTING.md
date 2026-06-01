@@ -1,59 +1,99 @@
 # Contributing to thehotspot
 
-Thanks for helping build thehotspot. This guide keeps the codebase
-consistent.
+Thanks for helping build thehotspot. This guide keeps the codebase consistent.
 
-## Branch naming
+## Branch Naming
 
-```
-feat/short-description     new feature
-fix/short-description      bug fix
-chore/short-description    tooling, deps, docs
-redesign/short-description landing or UI redesign work
-```
+Use short, descriptive branch names:
 
-## Commit messages
-
-Follow [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat(hero): add product mockup to hero section
-fix(navbar): correct scroll shadow on Safari
-chore(deps): bump vite to 8.0.1
-docs(readme): update folder structure
+```text
+feat/short-description      new feature
+fix/short-description       bug fix
+chore/short-description     tooling, dependency, or docs work
+redesign/short-description  product UI redesign work
 ```
 
-Keep the subject under 70 characters. Use the body for the *why*.
+Codex-created branches should use the `codex/` prefix unless a task asks for a different prefix.
 
-## Pull request template
+## Commit Messages
 
+Prefer Conventional Commits:
+
+```text
+feat(dashboard): add approval queue
+fix(auth): handle missing linkedin profile email
+chore(deps): update next config
+docs(readme): document prisma deploy flow
 ```
+
+Keep the subject under 70 characters. Use the body for the why when the change is not obvious.
+
+## Pull Request Checklist
+
+```text
 ## Summary
-<1–3 bullet points>
+- <1-3 bullets>
 
 ## Test plan
-- [ ] npm run dev — zero console errors
-- [ ] npm run build — succeeds
-- [ ] Checked at 375px / 768px / 1440px
+- [ ] npm run lint
+- [ ] npm run build
+- [ ] npx prisma validate
+- [ ] Checked responsive layout at mobile, tablet, and desktop widths
 ```
 
-## Style rules
+## Local Setup
 
-- **Landing page styling lives in `src/styles/theme.css`** — no Tailwind
-  classes on landing components, no inline style objects for layout.
-- No glows, gradient blobs, or glassmorphism.
-- Border radius on CTAs and cards stays at 10px or below — no pill
-  buttons.
-- No emoji icons (the only exception is 🇮🇳 in the footer).
-- Animations are CSS or `requestAnimationFrame` only — no GSAP, no
-  Framer Motion.
-- Respect `prefers-reduced-motion`.
+```bash
+npm install
+cp .env.example .env.local
+npm run prisma:generate
+npm run dev
+```
 
-## Before opening a PR
+The app runs at http://localhost:5173.
+
+## Code Style
+
+- Use TypeScript for active app code.
+- Keep new routes in `src/app`.
+- Keep reusable UI primitives in `src/components/ui`.
+- Keep product-specific UI in `src/components/dashboard`.
+- Keep service integrations in `src/lib`.
+- Use Tailwind CSS utility classes only for styling.
+- Prefer small, focused components over large one-off blocks when adding new behavior.
+- Keep service clients lazy to avoid build-time environment failures.
+- Do not commit secrets. Use `.env.local` locally and Vercel environment variables in deployment.
+
+## UI Standards
+
+- Mobile, tablet, and desktop must all be usable.
+- Use restrained slate/white surfaces and LinkedIn blue accents.
+- Include loading, empty, error, active, and disabled states where relevant.
+- Avoid decorative gradients, glassmorphism, oversized radii, and template-like visual filler.
+- Use accessible labels for icon-only controls.
+
+## Database Changes
+
+After editing `prisma/schema.prisma`, generate and test migrations:
+
+```bash
+npm run prisma:generate
+npm run prisma:migrate
+npx prisma validate
+```
+
+Production deploys should use:
+
+```bash
+npm run prisma:deploy
+```
+
+## Before Opening a PR
 
 ```bash
 npm run lint
 npm run build
+npx prisma validate
 ```
 
-Both must pass.
+All three should pass before review.
