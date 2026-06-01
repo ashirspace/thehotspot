@@ -29,19 +29,19 @@ export default function SignInModal({ onClose }: Props) {
       email,
       password,
       redirect: false,
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
     setLoading(false);
     if (result?.error) {
       setError("Invalid email or password.");
     } else {
-      window.location.href = result?.url || "/";
+      window.location.href = result?.url || "/dashboard";
     }
   }
 
   function handleGoogle() {
     setGLoading(true);
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl: "/dashboard" });
   }
 
   const inputClass =

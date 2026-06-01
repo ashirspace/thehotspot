@@ -48,20 +48,20 @@ export default function SignUpPage() {
       email,
       password,
       redirect: false,
-      callbackUrl: "/",
+      callbackUrl: "/dashboard",
     });
 
     setLoading(false);
     if (result?.error) {
       setError("Account created but sign-in failed. Try signing in manually.");
     } else {
-      window.location.href = "/";
+      window.location.href = "/dashboard";
     }
   }
 
   function handleGoogle() {
     setGLoading(true);
-    signIn("google", { callbackUrl: "/" });
+    signIn("google", { callbackUrl: "/dashboard" });
   }
 
   const inputClass =
