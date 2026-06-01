@@ -9,7 +9,7 @@ import CTA from "../components/CTA";
 import Footer from "../components/Footer";
 import { useEffect } from "react";
 
-export default function Home({ onSignIn, onGetStarted }) {
+export default function Home({ onSignIn, onGetStarted, isLoggedIn }) {
   useEffect(() => {
     const scrollToHash = () => {
       const id = window.location.hash.replace("#", "");
@@ -32,7 +32,7 @@ export default function Home({ onSignIn, onGetStarted }) {
   return (
     <div className="lp-page">
       <AnnouncementBar />
-      <Navbar onSignIn={onSignIn} onGetStarted={onGetStarted} />
+      <Navbar onSignIn={onSignIn} onGetStarted={onGetStarted} isLoggedIn={isLoggedIn} />
       <div className="lp-scroll">
         <Hero onGetStarted={onGetStarted} onSignIn={onSignIn} />
         <LogoMarquee />

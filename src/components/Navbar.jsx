@@ -1,12 +1,11 @@
 import { useState, useEffect } from "react";
 
-const LINKS = [
+const BASE_LINKS = [
   { label: "About", href: "/#about" },
   { label: "Product", href: "/#product-overview" },
   { label: "Services", href: "/#what-we-provide" },
   { label: "Pricing", href: "/#pricing" },
   { label: "Resources", href: "/#resources" },
-  { label: "LinkedIn DM", href: "/dashboard" },
 ];
 
 function Wordmark() {
@@ -18,9 +17,12 @@ function Wordmark() {
   );
 }
 
-export default function Navbar({ onSignIn, onGetStarted }) {
+export default function Navbar({ onSignIn, onGetStarted, isLoggedIn }) {
   const [scrolled, setScrolled] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const LINKS = isLoggedIn
+    ? [...BASE_LINKS, { label: "LinkedIn DM", href: "/dashboard" }]
+    : BASE_LINKS;
 
   useEffect(() => {
     const scroller = document.querySelector(".lp-page");
