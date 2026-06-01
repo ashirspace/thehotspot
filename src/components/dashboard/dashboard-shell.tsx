@@ -921,28 +921,32 @@ export function ConnectionScreen() {
       <div className="mx-auto flex min-h-[calc(100vh-3rem)] max-w-6xl items-center">
         <div className="grid w-full gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
           <section className="space-y-6">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-slate-950 text-white">
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#0A66C2] text-white">
               <BadgeCheck className="h-6 w-6" />
             </div>
             <div className="space-y-3">
               <h1 className="max-w-xl text-3xl font-semibold tracking-tight text-slate-950 sm:text-5xl">
-                Connect LinkedIn before managing outreach.
+                Connect LinkedIn to start sending DMs.
               </h1>
               <p className="max-w-lg text-base leading-7 text-slate-600">
-                Authenticate with LinkedIn to access your secure workspace for campaigns, imported profile data, draft approvals, and engagement analytics.
+                Authorise with LinkedIn to access your secure DM workspace — campaign drafts, recipient profiles, approval queues, and engagement analytics.
               </p>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row">
-              <Button size="lg" onClick={() => signIn("linkedin")}>
-                <BadgeCheck className="h-4 w-4" />
+              <Button
+                size="lg"
+                className="gap-2 bg-[#0A66C2] hover:bg-[#004182]"
+                onClick={() => signIn("linkedin", { callbackUrl: "/dashboard" })}
+              >
+                <svg width="18" height="18" viewBox="0 0 34 34" fill="none" aria-hidden="true" className="shrink-0">
+                  <rect width="34" height="34" rx="4" fill="white"/>
+                  <path d="M8 13h4v13H8V13zm2-6a2 2 0 110 4 2 2 0 010-4zm6 6h4v1.8c.6-1 1.9-2 4-2 4.2 0 5 2.8 5 6.4V26h-4v-6.4c0-1.5-.03-3.4-2.1-3.4-2.1 0-2.4 1.6-2.4 3.3V26h-4V13z" fill="#0A66C2"/>
+                </svg>
                 Continue with LinkedIn
-              </Button>
-              <Button variant="outline" size="lg" onClick={() => signIn("linkedin")}>
-                Use company SSO
               </Button>
             </div>
             <p className="text-xs text-slate-500">
-              Sessions are persisted with NextAuth. LinkedIn tokens are stored server-side through Prisma and Neon.
+              LinkedIn is used exclusively for DM outreach. General site sign-in uses Google or email.
             </p>
           </section>
 

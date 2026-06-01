@@ -1,24 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import Home from "../pages/Home";
 import SignInModal from "./SignInModal";
 
-type ModalMode = "signin" | "signup" | null;
-
 export default function LandingPage({ isLoggedIn }: { isLoggedIn: boolean }) {
-  const [modalMode, setModalMode] = useState<ModalMode>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const searchParams = useSearchParams();
+  const router = useRouter();
+
+  // ?signin=1 from the signup page "Already have an account?" link
+  useEffect(() => {
+    if (searchParams?.get("signin") === "1") {
+      setModalOpen(true);
+      router.replace("/");
+    }
+  }, [searchParams, router]);
 
   return (
     <>
       <Home
-        onSignIn={() => setModalMode("signin")}
-        onGetStarted={() => setModalMode("signup")}
+        onSignIn={() => setModalOpen(true)}
+        onGetStarted={() => router.push("/signup")}
         isLoggedIn={isLoggedIn}
       />
-      {modalMode && (
-        <SignInModal mode={modalMode} onClose={() => setModalMode(null)} />
-      )}
+      {modalOpen && <SignInModal onClose={() => setModalOpen(false)} />}
     </>
   );
 }
