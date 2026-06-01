@@ -1,15 +1,7 @@
-import { getServerSession } from "next-auth";
-import { ConnectionScreen, DashboardShell } from "@/components/dashboard/dashboard-shell";
-import { getAuthOptions } from "@/lib/auth";
+import LandingPage from "@/components/LandingPage";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
-  const session = await getServerSession(getAuthOptions());
-
-  if (!session?.user) {
-    return <ConnectionScreen />;
-  }
-
-  return <DashboardShell user={session.user} />;
+export default function HomePage() {
+  return <LandingPage />;
 }

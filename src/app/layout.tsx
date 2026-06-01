@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LinkedIn DM Outreach | thehotspot",
-  description: "Manage LinkedIn DM campaigns, approvals, imports, and analytics.",
+  title: "thehotspot — AI-powered cold outreach automation",
+  description: "Automated email campaigns powered by AI personalization. Find leads, write emails, send at scale.",
 };
 
 export default function RootLayout({

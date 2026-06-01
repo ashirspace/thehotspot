@@ -6,6 +6,7 @@ const LINKS = [
   { label: "Services", href: "/#what-we-provide" },
   { label: "Pricing", href: "/#pricing" },
   { label: "Resources", href: "/#resources" },
+  { label: "LinkedIn DM", href: "/dashboard" },
 ];
 
 function Wordmark() {
