@@ -78,7 +78,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const token = getSessionToken();
     const workspaceId = getStoredWorkspaceId();
     if (!token) {
-      setLoading(false);
       return;
     }
 

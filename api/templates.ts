@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, handle, json, methodNotAllowed, readJson, requireWorkspace } from "./_shared";
+import { db, handle, json, methodNotAllowed, readJson, requireWorkspace } from "./_shared.js";
 
 const createSchema = z.object({
   name: z.string().trim().min(1).max(120),

@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { z } from "zod";
-import { db, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared";
+import { db, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared.js";
 
 const addSchema = z.object({
   email: z.string().email(),

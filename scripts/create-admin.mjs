@@ -10,6 +10,8 @@
  *   password: admin1234
  */
 
+/* global Buffer, console, process */
+
 import { neon } from "@neondatabase/serverless";
 import { randomBytes, scrypt as scryptCb } from "node:crypto";
 import { promisify } from "node:util";

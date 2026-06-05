@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, handle, json, methodNotAllowed, readJson, requireRole, requireWorkspace } from "./_shared";
+import { db, handle, json, methodNotAllowed, readJson, requireRole, requireWorkspace } from "./_shared.js";
 
 const patchSchema = z.object({
   name: z.string().trim().min(1).max(80).optional(),

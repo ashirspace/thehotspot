@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, handle, json, normalizeEmail, readJson } from "./_shared";
+import { db, handle, json, normalizeEmail, readJson } from "./_shared.js";
 
 const schema = z.object({
   messageId: z.string().uuid(),

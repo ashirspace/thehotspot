@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, handle, json, methodNotAllowed, readJson, requireWorkspace } from "./_shared";
+import { db, handle, json, methodNotAllowed, readJson, requireWorkspace } from "./_shared.js";
 
 const stepSchema = z.object({
   id: z.string(),

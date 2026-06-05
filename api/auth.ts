@@ -5,7 +5,7 @@ import {
   hashOtp, hashPassword, hashSessionToken, json, methodNotAllowed,
   normalizeEmail, publicBaseUrl, readJson, requireUser, sendTransactionalEmail,
   verifyPassword, verifyTurnstile, workspaceForUser,
-} from "./_shared";
+} from "./_shared.js";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -259,7 +259,7 @@ export default handle(async function handler(request: Request) {
     const googleId = String(idPayload.sub ?? "");
     const googleEmail = String(idPayload.email ?? "");
     const googleName = String(idPayload.name ?? "");
-    if (!Boolean(idPayload.email_verified) || !googleEmail)
+    if (!idPayload.email_verified || !googleEmail)
       return Response.redirect(`${base}/login?error=google_unverified`, 302);
     const email = normalizeEmail(googleEmail);
     const [user] = await db()`

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { db, getPagination, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared";
+import { db, getPagination, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared.js";
 
 const leadSchema = z.object({
   name: z.string().trim().min(1).max(160),

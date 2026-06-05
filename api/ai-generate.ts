@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { handle, json, readJson, requireWorkspace } from "./_shared";
+import { handle, json, readJson, requireWorkspace } from "./_shared.js";
 
 const schema = z.object({
   lead: z.object({

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { checkSuppression, db, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared";
+import { checkSuppression, db, handle, json, methodNotAllowed, normalizeEmail, readJson, requireWorkspace } from "./_shared.js";
 
 const sendOneOffSchema = z.object({
   sendingIdentityId: z.string().uuid(),
