@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { GitBranch, Plus, Timer } from "lucide-react";
 import { Badge, Button, Card, Field, Input, Textarea } from "../../components/ui";
-import { sequenceSteps as initialSteps, templates } from "../../data/demo";
+import { useSequenceSteps, useTemplates } from "../../lib/data-hooks";
 import type { SequenceStep } from "../../types";
 
 export function SequenceBuilderPage() {
+  const initialSteps = useSequenceSteps();
+  const { data: templates = [] } = useTemplates();
   const [steps, setSteps] = useState<SequenceStep[]>(initialSteps);
 
   function addWait() {

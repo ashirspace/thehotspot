@@ -1,8 +1,12 @@
 import { AlertTriangle, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Badge, Button, Card } from "../../components/ui";
-import { sendingIdentities } from "../../data/demo";
+import { useIdentities, useVerifyIdentityDns } from "../../lib/data-hooks";
 
 export function DeliverabilityPage() {
+  const identitiesQuery = useIdentities();
+  const verifyDns = useVerifyIdentityDns();
+  const sendingIdentities = identitiesQuery.data || [];
+
   return (
     <div className="grid gap-6">
       <div>
@@ -13,7 +17,13 @@ export function DeliverabilityPage() {
         <Card>
           <h2 className="font-sans text-[1.1rem] font-medium not-italic tracking-normal">Sending identities</h2>
           <div className="mt-5 space-y-4">
-            {sendingIdentities.map((identity) => (
+            {identitiesQuery.isLoading ? (
+              <div className="text-sm text-[var(--text-secondary)]">Loading sending identities...</div>
+            ) : identitiesQuery.isError ? (
+              <div className="text-sm text-red-700">Could not load sending identities.</div>
+            ) : sendingIdentities.length === 0 ? (
+              <div className="text-sm text-[var(--text-secondary)]">No sending identities connected yet.</div>
+            ) : sendingIdentities.map((identity) => (
               <div key={identity.id} className="rounded border border-[var(--surface-border)] p-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
@@ -31,6 +41,14 @@ export function DeliverabilityPage() {
                   <div className="warmup-gradient h-2 rounded-full" style={{ width: `${Math.min(100, (identity.sentToday / Math.max(1, identity.dailyLimit)) * 100)}%` }} />
                 </div>
                 <div className="mt-2 font-mono text-[0.7rem] text-[var(--text-tertiary)]">{identity.sentToday}/{identity.dailyLimit} sent today · warmup {identity.warmupStage}</div>
+                <Button
+                  variant="secondary"
+                  className="mt-4"
+                  disabled={verifyDns.isPending}
+                  onClick={() => verifyDns.mutate(identity.id)}
+                >
+                  {verifyDns.isPending ? "Checking DNS..." : "Verify DNS"}
+                </Button>
               </div>
             ))}
           </div>

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { json, readJson, requireWorkspace } from "./_shared";
+import { handle, json, readJson, requireWorkspace } from "./_shared";
 
 const schema = z.object({
   lead: z.object({
@@ -17,7 +17,7 @@ const schema = z.object({
   toneGuide: z.string().default("Concise, specific, no hype, no invented facts."),
 });
 
-export default async function handler(request: Request) {
+export default handle(async function handler(request: Request) {
   if (request.method !== "POST") return json({ error: "Method not allowed" }, { status: 405 });
   const membership = await requireWorkspace(request);
   if ("error" in membership) return membership.error;
@@ -61,4 +61,4 @@ export default async function handler(request: Request) {
   }
 
   return json({ reviewRequired: false, generation: parsed.data });
-}
+});

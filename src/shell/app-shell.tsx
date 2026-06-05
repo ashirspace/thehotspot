@@ -15,7 +15,10 @@ import { Badge, HubLogo, SidebarLink } from "../components/ui";
 import { useAuth } from "../state/use-auth";
 
 export function AppShell() {
-  const { user, workspace } = useAuth();
+  const { loading, user, workspace } = useAuth();
+  if (loading) {
+    return <div className="grid min-h-screen place-items-center bg-[var(--surface-base)] text-sm text-[var(--text-secondary)]">Loading workspace...</div>;
+  }
   if (!user) return <Navigate to="/login" replace />;
 
   return (

@@ -4,11 +4,14 @@ export type LeadStatus = "new" | "contacted" | "replied" | "booked" | "closed" |
 export type ValidationStatus = "unknown" | "valid" | "invalid" | "risky";
 export type MessageStatus =
   | "queued"
+  | "scheduled"
+  | "sending"
   | "sent"
   | "delivered"
   | "bounced"
   | "replied"
-  | "skipped";
+  | "skipped"
+  | "failed";
 export type Channel = "email" | "linkedin" | "x" | "instagram" | "facebook";
 
 export type Workspace = {

@@ -1,12 +1,13 @@
-import { useState } from "react";
 import { Badge, Card } from "../../components/ui";
-import { leads as initialLeads } from "../../data/demo";
+import { useLeads, useUpdateLead } from "../../lib/data-hooks";
 import type { LeadStatus } from "../../types";
 
 const stages: LeadStatus[] = ["new", "contacted", "replied", "booked", "closed", "lost"];
 
 export function CrmPage() {
-  const [items, setItems] = useState(initialLeads);
+  const leadsQuery = useLeads();
+  const updateLead = useUpdateLead();
+  const items = leadsQuery.data || [];
 
   return (
     <div className="grid gap-6">
@@ -14,7 +15,9 @@ export function CrmPage() {
         <h1 className="font-heading italic text-[clamp(2.3rem,4vw,4rem)] font-normal leading-[1] tracking-[-0.02em]">CRM Lite</h1>
         <p className="mt-2 text-slate-600">Lead pipeline from new contact to booked or closed outcome.</p>
       </div>
-      <div className="grid gap-4 xl:grid-cols-6">
+      {leadsQuery.isLoading ? <div className="text-sm text-slate-500">Loading pipeline...</div> : null}
+      {leadsQuery.isError ? <div className="text-sm text-red-700">Could not load pipeline.</div> : null}
+      <div className="grid gap-4 overflow-x-auto xl:grid-cols-6">
         {stages.map((stage) => (
           <Card key={stage} className="min-h-72">
             <div className="mb-4 flex items-center justify-between">
@@ -27,13 +30,10 @@ export function CrmPage() {
                   key={lead.id}
                   type="button"
                   onClick={() =>
-                    setItems((current) =>
-                      current.map((item) =>
-                        item.id === lead.id
-                          ? { ...item, status: stages[Math.min(stages.indexOf(item.status) + 1, stages.length - 1)] }
-                          : item,
-                      ),
-                    )
+                    updateLead.mutate({
+                      id: lead.id,
+                      status: stages[Math.min(stages.indexOf(lead.status) + 1, stages.length - 1)],
+                    })
                   }
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 p-3 text-left hover:border-[var(--orange)]"
                 >

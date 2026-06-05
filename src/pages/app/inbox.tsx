@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { Badge, Button, Card, Textarea } from "../../components/ui";
-import { inboxThreads } from "../../data/demo";
+import { useInboxThreads } from "../../lib/data-hooks";
 
 export function InboxPage() {
-  const [activeId, setActiveId] = useState(inboxThreads[0].id);
+  const inboxQuery = useInboxThreads();
+  const inboxThreads = inboxQuery.data ?? [];
+  const [selectedId, setSelectedId] = useState("");
+  const activeId = selectedId || inboxThreads[0]?.id || "";
   const active = inboxThreads.find((thread) => thread.id === activeId) || inboxThreads[0];
 
   return (
@@ -15,11 +18,17 @@ export function InboxPage() {
       <section className="grid gap-6 xl:grid-cols-[360px_1fr]">
         <Card className="p-3">
           <div className="space-y-2">
-            {inboxThreads.map((thread) => (
+            {inboxQuery.isLoading ? (
+              <div className="p-3 text-sm text-slate-500">Loading replies...</div>
+            ) : inboxQuery.isError ? (
+              <div className="p-3 text-sm text-red-700">Could not load replies.</div>
+            ) : inboxThreads.length === 0 ? (
+              <div className="p-3 text-sm text-slate-500">No replies yet.</div>
+            ) : inboxThreads.map((thread) => (
               <button
                 key={thread.id}
                 type="button"
-                onClick={() => setActiveId(thread.id)}
+                onClick={() => setSelectedId(thread.id)}
                 className={`w-full rounded-xl border p-3 text-left transition ${activeId === thread.id ? "border-[var(--orange)] bg-[rgba(254,110,0,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
               >
                 <div className="flex items-center justify-between gap-2">
@@ -33,23 +42,23 @@ export function InboxPage() {
           </div>
         </Card>
         <Card>
-          <div className="flex flex-wrap items-start justify-between gap-3">
+          {active ? <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
               <h2 className="text-xl font-semibold">{active.leadName}</h2>
               <p className="text-sm text-slate-500">{active.company} · {active.channel}</p>
             </div>
             <Badge tone={active.intent === "interested" ? "green" : active.intent === "pricing" ? "orange" : "slate"}>{active.intent}</Badge>
-          </div>
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+          </div> : null}
+          {active ? <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
             {active.preview}
-          </div>
-          <div className="mt-6 grid gap-3">
+          </div> : null}
+          {active ? <div className="mt-6 grid gap-3">
             <Textarea placeholder="Write a reply..." defaultValue="Thanks for the context. I can send a concise overview and a deliverability checklist. Would a 15-minute walkthrough next week be useful?" />
             <div className="flex justify-end gap-2">
               <Button variant="secondary">Insert template</Button>
               <Button>Send reply</Button>
             </div>
-          </div>
+          </div> : <div className="text-sm text-slate-500">Select a reply thread to respond.</div>}
         </Card>
       </section>
     </div>

@@ -1,9 +1,11 @@
 import { Cable, KeyRound, LogOut, Webhook } from "lucide-react";
 import { Badge, Button, Card, Field, Input } from "../../components/ui";
+import { useSaveWorkspaceSettings } from "../../lib/data-hooks";
 import { useAuth } from "../../state/use-auth";
 
 export function SettingsPage() {
   const { signOut, workspace } = useAuth();
+  const saveWorkspace = useSaveWorkspaceSettings();
   const integrations = [
     { label: "Supabase Auth + RLS", status: "configured", Icon: KeyRound },
     { label: "OpenAI JSON mode", status: "env required", Icon: KeyRound },
@@ -21,12 +23,24 @@ export function SettingsPage() {
       <section className="grid gap-6 xl:grid-cols-2">
         <Card>
           <h2 className="font-semibold">Workspace</h2>
-          <div className="mt-5 grid gap-4">
-            <Field label="Workspace name"><Input defaultValue={workspace.name} /></Field>
-            <Field label="Plan"><Input defaultValue={workspace.plan} /></Field>
-            <Field label="Physical mailing address"><Input placeholder="Required before email campaigns launch" /></Field>
-            <Button>Save workspace settings</Button>
-          </div>
+          <form
+            className="mt-5 grid gap-4"
+            onSubmit={(event) => {
+              event.preventDefault();
+              const form = new FormData(event.currentTarget);
+              saveWorkspace.mutate({
+                name: String(form.get("name") || workspace.name),
+                physicalAddress: String(form.get("physicalAddress") || ""),
+                webhookUrl: String(form.get("webhookUrl") || "") || null,
+              });
+            }}
+          >
+            <Field label="Workspace name"><Input name="name" defaultValue={workspace.name} /></Field>
+            <Field label="Plan"><Input defaultValue={workspace.plan} disabled /></Field>
+            <Field label="Physical mailing address"><Input name="physicalAddress" placeholder="Required before email campaigns launch" /></Field>
+            <Field label="Webhook URL"><Input name="webhookUrl" placeholder="https://hooks.zapier.com/..." /></Field>
+            <Button disabled={saveWorkspace.isPending}>{saveWorkspace.isPending ? "Saving..." : "Save workspace settings"}</Button>
+          </form>
         </Card>
         <Card>
           <h2 className="font-semibold">Integrations</h2>
@@ -41,7 +55,7 @@ export function SettingsPage() {
               </div>
             ))}
           </div>
-          <Button variant="secondary" className="mt-5 w-full" onClick={signOut}>
+          <Button variant="secondary" className="mt-5 w-full" onClick={() => void signOut()}>
             <LogOut className="h-4 w-4" />
             Sign out
           </Button>

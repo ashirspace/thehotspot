@@ -1,18 +1,14 @@
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { FileSpreadsheet, Upload } from "lucide-react";
 import { Badge, Button, Card, Field, Input } from "../../components/ui";
-import { leads as seedLeads } from "../../data/demo";
-import type { Lead } from "../../types";
+import { useImportLeads, useLeads } from "../../lib/data-hooks";
 
 export function LeadsPage() {
-  const [leads, setLeads] = useState<Lead[]>(seedLeads);
   const [query, setQuery] = useState("");
   const [importMessage, setImportMessage] = useState("No import running.");
-
-  const filtered = useMemo(
-    () => leads.filter((lead) => [lead.name, lead.company, lead.email, lead.role].join(" ").toLowerCase().includes(query.toLowerCase())),
-    [leads, query],
-  );
+  const leadsQuery = useLeads(query);
+  const importMutation = useImportLeads();
+  const filtered = leadsQuery.data || [];
 
   return (
     <div className="grid gap-6">
@@ -30,8 +26,15 @@ export function LeadsPage() {
             className="mt-5 grid gap-4"
             onSubmit={(event) => {
               event.preventDefault();
-              setImportMessage("Mapped 4 columns, removed 2 duplicates, flagged 1 risky address.");
-              setLeads(seedLeads);
+              const form = new FormData(event.currentTarget);
+              const emailOrUrl = String(form.get("sourceValue") || "");
+              const fallbackRows = emailOrUrl.includes("@")
+                ? [{ email: emailOrUrl, name: emailOrUrl.split("@")[0], company: "", role: "" }]
+                : [];
+              importMutation.mutate(fallbackRows, {
+                onSuccess: (result) => setImportMessage(`Inserted ${result.inserted} lead(s), skipped ${result.skipped}.`),
+                onError: (error) => setImportMessage(error instanceof Error ? error.message : "Import failed."),
+              });
             }}
           >
             <Field label="Source">
@@ -41,12 +44,12 @@ export function LeadsPage() {
               </select>
             </Field>
             <Field label="File or sheet URL">
-              <Input placeholder="Upload CSV or paste Google Sheet URL" />
+              <Input name="sourceValue" placeholder="Paste one email now; CSV/Sheets parser is available through /api/leads/import" />
             </Field>
             <div className="rounded-xl bg-slate-50 p-3 text-sm text-slate-600">
               Required mapping: name or first_name, email, company. Optional: role, LinkedIn URL, enrichment notes.
             </div>
-            <Button type="submit">Validate import</Button>
+            <Button type="submit" disabled={importMutation.isPending}>{importMutation.isPending ? "Validating..." : "Validate import"}</Button>
           </form>
           <p className="mt-4 rounded-xl bg-[rgba(254,110,0,0.08)] p-3 text-sm text-[var(--orange-dim)]">{importMessage}</p>
         </Card>
@@ -59,7 +62,13 @@ export function LeadsPage() {
             <Input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search leads..." />
           </div>
           <div className="overflow-hidden rounded-xl border border-slate-200">
-            {filtered.map((lead) => (
+            {leadsQuery.isLoading ? (
+              <div className="p-4 text-sm text-slate-500">Loading leads...</div>
+            ) : leadsQuery.isError ? (
+              <div className="p-4 text-sm text-red-700">Could not load leads.</div>
+            ) : filtered.length === 0 ? (
+              <div className="p-4 text-sm text-slate-500">No leads found.</div>
+            ) : filtered.map((lead) => (
               <div key={lead.id} className="grid gap-3 border-b border-slate-100 p-4 text-sm last:border-b-0 md:grid-cols-[1fr_1fr_130px_120px] md:items-center">
                 <div>
                   <div className="font-semibold">{lead.name}</div>

@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
 import { Badge, Button, Card } from "../../components/ui";
-import { campaigns } from "../../data/demo";
+import { useCampaigns } from "../../lib/data-hooks";
 import { percent } from "../../lib/utils";
 
 export function CampaignsPage() {
+  const campaignsQuery = useCampaigns();
+  const campaigns = campaignsQuery.data || [];
+
   return (
     <div className="grid gap-6">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
@@ -15,7 +18,13 @@ export function CampaignsPage() {
       </div>
       <Card className="p-0">
         <div className="overflow-hidden">
-          {campaigns.map((campaign) => (
+          {campaignsQuery.isLoading ? (
+            <div className="p-5 text-sm text-slate-500">Loading campaigns...</div>
+          ) : campaignsQuery.isError ? (
+            <div className="p-5 text-sm text-red-700">Could not load campaigns.</div>
+          ) : campaigns.length === 0 ? (
+            <div className="p-5 text-sm text-slate-500">No campaigns yet.</div>
+          ) : campaigns.map((campaign) => (
             <div key={campaign.id} className="grid gap-3 border-b border-slate-100 p-5 last:border-b-0 lg:grid-cols-[1.4fr_100px_repeat(4,1fr)_120px] lg:items-center">
               <div>
                 <div className="font-semibold">{campaign.name}</div>
