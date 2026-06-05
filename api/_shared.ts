@@ -70,8 +70,90 @@ export async function readJson<T>(request: Request, schema: z.ZodType<T>) {
   return schema.parse(body);
 }
 
-export function handle(handler: (request: Request) => Promise<Response>) {
-  return async (request: Request) => {
+type NodeHeaderValue = string | string[] | undefined;
+type NodeRequest = {
+  method?: string;
+  url?: string;
+  headers?: Record<string, NodeHeaderValue>;
+  body?: unknown;
+  [Symbol.asyncIterator]?: () => AsyncIterator<Uint8Array | string>;
+};
+
+type NodeResponse = {
+  statusCode?: number;
+  setHeader: (name: string, value: string | string[]) => void;
+  end: (body?: string) => void;
+};
+
+type ApiHandler = {
+  (request: Request): Promise<Response>;
+  (request: NodeRequest, response: NodeResponse): Promise<void>;
+};
+
+function isFetchRequest(value: unknown): value is Request {
+  return typeof Request !== "undefined" && value instanceof Request;
+}
+
+function getHeader(headers: Record<string, NodeHeaderValue> | undefined, name: string) {
+  const value = headers?.[name] ?? headers?.[name.toLowerCase()];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function normalizeHeaders(headers: Record<string, NodeHeaderValue> | undefined) {
+  const normalized = new Headers();
+  for (const [name, value] of Object.entries(headers ?? {})) {
+    if (Array.isArray(value)) {
+      for (const item of value) normalized.append(name, item);
+    } else if (value !== undefined) {
+      normalized.set(name, value);
+    }
+  }
+  return normalized;
+}
+
+async function readNodeBody(request: NodeRequest, method: string) {
+  if (method === "GET" || method === "HEAD") return undefined;
+  if (request.body !== undefined) {
+    if (typeof request.body === "string" || request.body instanceof URLSearchParams) {
+      return request.body;
+    }
+    if (request.body instanceof Uint8Array) return new TextDecoder().decode(request.body);
+    return JSON.stringify(request.body);
+  }
+
+  if (typeof request[Symbol.asyncIterator] !== "function") return undefined;
+  const chunks: Uint8Array[] = [];
+  for await (const chunk of request as AsyncIterable<Uint8Array | string>) {
+    chunks.push(typeof chunk === "string" ? new TextEncoder().encode(chunk) : chunk);
+  }
+  if (chunks.length === 0) return undefined;
+  return Buffer.concat(chunks).toString("utf8");
+}
+
+async function toFetchRequest(request: NodeRequest) {
+  const headers = normalizeHeaders(request.headers);
+  const protocol = getHeader(request.headers, "x-forwarded-proto") || "https";
+  const host = getHeader(request.headers, "x-forwarded-host") || getHeader(request.headers, "host") || process.env.VERCEL_URL || "localhost";
+  const rawUrl = request.url || "/";
+  const url = rawUrl.startsWith("http://") || rawUrl.startsWith("https://")
+    ? rawUrl
+    : `${protocol}://${host}${rawUrl.startsWith("/") ? "" : "/"}${rawUrl}`;
+  const method = request.method || "GET";
+  const body = await readNodeBody(request, method);
+
+  return new Request(url, { method, headers, body });
+}
+
+async function sendNodeResponse(response: Response, nodeResponse: NodeResponse) {
+  nodeResponse.statusCode = response.status;
+  response.headers.forEach((value, name) => {
+    nodeResponse.setHeader(name, value);
+  });
+  nodeResponse.end(await response.text());
+}
+
+export function handle(handler: (request: Request) => Promise<Response>): ApiHandler {
+  const run = async (request: Request) => {
     try {
       return await handler(request);
     } catch (error) {
@@ -82,6 +164,16 @@ export function handle(handler: (request: Request) => Promise<Response>) {
       return json({ error: message }, { status: 500 });
     }
   };
+
+  return (async (request: Request | NodeRequest, response?: NodeResponse) => {
+    const fetchRequest = isFetchRequest(request) ? request : await toFetchRequest(request);
+    const fetchResponse = await run(fetchRequest);
+    if (response) {
+      await sendNodeResponse(fetchResponse, response);
+      return;
+    }
+    return fetchResponse;
+  }) as ApiHandler;
 }
 
 export function normalizeEmail(email: string) {
