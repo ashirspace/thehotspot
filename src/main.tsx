@@ -16,6 +16,7 @@ import { SequenceBuilderPage } from "./pages/app/sequence-builder";
 import { SettingsPage } from "./pages/app/settings";
 import { TemplatesPage } from "./pages/app/templates";
 import { LoginPage } from "./pages/auth/login";
+import { OtpPage } from "./pages/auth/otp-page";
 import { SignupPage } from "./pages/auth/signup";
 import { AboutPage } from "./pages/marketing/about";
 import { BlogPage } from "./pages/marketing/blog";
@@ -50,6 +51,7 @@ const router = createBrowserRouter([
     children: [
       { path: "/login", element: <LoginPage /> },
       { path: "/signup", element: <SignupPage /> },
+      { path: "/otp", element: <OtpPage /> },
     ],
   },
   {

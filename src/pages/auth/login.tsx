@@ -5,8 +5,6 @@ import { Button, Field, Input } from "../../components/ui";
 import { Turnstile } from "../../components/Turnstile";
 import { useAuth } from "../../state/use-auth";
 
-type OtpStep = "idle" | "sending" | "sent" | "verifying";
-
 const GOOGLE_ERRORS: Record<string, string> = {
   google_denied: "Google sign-in was cancelled.",
   google_unverified: "Google account email is not verified.",
@@ -17,15 +15,12 @@ const GOOGLE_ERRORS: Record<string, string> = {
 export function LoginPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, error, signIn, sendOtp, verifyOtp } = useAuth();
+  const { user, error, signIn } = useAuth();
 
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-
-  const [otpStep, setOtpStep] = useState<OtpStep>("idle");
-  const [otpEmail, setOtpEmail] = useState("");
-  const [otpCode, setOtpCode] = useState("");
 
   const turnstileRequired = Boolean(import.meta.env.VITE_TURNSTILE_SITE_KEY);
   const turnstileReady = !turnstileRequired || Boolean(turnstileToken);
@@ -37,12 +32,12 @@ export function LoginPage() {
     if (user) navigate("/app", { replace: true });
   }, [user, navigate]);
 
-  const handlePasswordSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSignIn = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = new FormData(event.currentTarget);
     setIsSubmitting(true);
     try {
-      await signIn(String(form.get("email")), String(form.get("password")), turnstileToken ?? undefined);
+      await signIn(email, String(form.get("password")), turnstileToken ?? undefined);
       navigate("/app");
     } catch {
       // error set in auth context
@@ -51,37 +46,8 @@ export function LoginPage() {
     }
   };
 
-  const handleSendOtp = async () => {
-    if (!otpEmail) return;
-    setOtpStep("sending");
-    try {
-      await sendOtp(otpEmail, turnstileToken ?? undefined);
-      setOtpStep("sent");
-    } catch {
-      setOtpStep("idle");
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otpCode.length < 6) return;
-    setOtpStep("verifying");
-    try {
-      await verifyOtp(otpEmail, otpCode);
-      navigate("/app");
-    } catch {
-      setOtpStep("sent");
-    }
-  };
-
-  const handleResendOtp = async () => {
-    setOtpCode("");
-    setOtpStep("sending");
-    try {
-      await sendOtp(otpEmail, turnstileToken ?? undefined);
-      setOtpStep("sent");
-    } catch {
-      setOtpStep("idle");
-    }
+  const handleOtpNav = () => {
+    navigate("/otp", { state: { email } });
   };
 
   const handleTurnstileVerify = useCallback((token: string) => {
@@ -95,9 +61,17 @@ export function LoginPage() {
           <h1 className="font-heading text-3xl font-normal italic text-[var(--text-primary)]">Sign in</h1>
           <p className="mt-1 text-sm text-[var(--text-secondary)]">Welcome back to your workspace.</p>
 
-          <form className="mt-6 grid gap-4" onSubmit={handlePasswordSignIn}>
+          <form className="mt-6 grid gap-4" onSubmit={handleSignIn}>
             <Field label="Email">
-              <Input name="email" type="email" required placeholder="you@company.com" autoComplete="email" />
+              <Input
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                autoComplete="email"
+              />
             </Field>
             <Field label="Password">
               <div className="relative">
@@ -139,62 +113,15 @@ export function LoginPage() {
           </div>
 
           <div className="grid gap-3">
-            {otpStep === "idle" || otpStep === "sending" ? (
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  value={otpEmail}
-                  onChange={(e) => setOtpEmail(e.target.value)}
-                  placeholder="Email for one-time code"
-                  className="flex-1"
-                  aria-label="Email for OTP"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleSendOtp}
-                  disabled={otpStep === "sending" || !otpEmail || !turnstileReady}
-                  className="shrink-0"
-                >
-                  <Mail size={15} />
-                  {otpStep === "sending" ? "Sending…" : "Send OTP"}
-                </Button>
-              </div>
-            ) : (
-              <div className="grid gap-2">
-                <p className="text-xs text-[var(--text-secondary)]">
-                  Code sent to <span className="font-medium text-[var(--text-primary)]">{otpEmail}</span>
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    placeholder="000000"
-                    className="flex-1 font-mono tracking-widest"
-                    aria-label="One-time code"
-                    autoFocus
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={otpStep === "verifying" || otpCode.length < 6}
-                    className="shrink-0"
-                  >
-                    {otpStep === "verifying" ? "Verifying…" : "Verify"}
-                  </Button>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  className="text-left text-xs text-[var(--text-secondary)] underline underline-offset-2 hover:text-[var(--text-primary)]"
-                >
-                  Resend code
-                </button>
-              </div>
-            )}
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={handleOtpNav}
+            >
+              <Mail size={16} />
+              Email for OTP
+            </Button>
 
             <Button
               type="button"

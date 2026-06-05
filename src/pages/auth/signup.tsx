@@ -5,22 +5,17 @@ import { Button, Field, Input } from "../../components/ui";
 import { Turnstile } from "../../components/Turnstile";
 import { useAuth } from "../../state/use-auth";
 
-type OtpStep = "idle" | "sending" | "sent" | "verifying";
-
 export function SignupPage() {
   const navigate = useNavigate();
-  const { user, error, signUp, sendOtp, verifyOtp } = useAuth();
+  const { user, error, signUp } = useAuth();
 
+  const [email, setEmail] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const turnstileRequired = Boolean(import.meta.env.VITE_TURNSTILE_SITE_KEY);
   const turnstileReady = !turnstileRequired || Boolean(turnstileToken);
-
-  const [otpStep, setOtpStep] = useState<OtpStep>("idle");
-  const [otpEmail, setOtpEmail] = useState("");
-  const [otpCode, setOtpCode] = useState("");
 
   useEffect(() => {
     if (user) navigate("/app", { replace: true });
@@ -33,7 +28,7 @@ export function SignupPage() {
     try {
       await signUp({
         fullName: String(form.get("fullName")),
-        email: String(form.get("email")),
+        email,
         password: String(form.get("password")),
         turnstileToken: turnstileToken ?? undefined,
       });
@@ -45,37 +40,8 @@ export function SignupPage() {
     }
   };
 
-  const handleSendOtp = async () => {
-    if (!otpEmail) return;
-    setOtpStep("sending");
-    try {
-      await sendOtp(otpEmail, turnstileToken ?? undefined);
-      setOtpStep("sent");
-    } catch {
-      setOtpStep("idle");
-    }
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otpCode.length < 6) return;
-    setOtpStep("verifying");
-    try {
-      await verifyOtp(otpEmail, otpCode);
-      navigate("/app");
-    } catch {
-      setOtpStep("sent");
-    }
-  };
-
-  const handleResendOtp = async () => {
-    setOtpCode("");
-    setOtpStep("sending");
-    try {
-      await sendOtp(otpEmail, turnstileToken ?? undefined);
-      setOtpStep("sent");
-    } catch {
-      setOtpStep("idle");
-    }
+  const handleOtpNav = () => {
+    navigate("/otp", { state: { email } });
   };
 
   const handleTurnstileVerify = useCallback((token: string) => {
@@ -94,7 +60,15 @@ export function SignupPage() {
               <Input name="fullName" required placeholder="Your name" autoComplete="name" />
             </Field>
             <Field label="Email">
-              <Input name="email" type="email" required placeholder="you@company.com" autoComplete="email" />
+              <Input
+                name="email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@company.com"
+                autoComplete="email"
+              />
             </Field>
             <Field label="Password" hint="Minimum 8 characters">
               <div className="relative">
@@ -123,7 +97,7 @@ export function SignupPage() {
               className="h-12 w-full"
               disabled={isSubmitting || !turnstileReady}
             >
-              {isSubmitting ? "Creating account…" : "Create account"}
+              {isSubmitting ? "Creating account…" : "Sign up"}
             </Button>
           </form>
 
@@ -137,62 +111,15 @@ export function SignupPage() {
           </div>
 
           <div className="grid gap-3">
-            {otpStep === "idle" || otpStep === "sending" ? (
-              <div className="flex gap-2">
-                <Input
-                  type="email"
-                  value={otpEmail}
-                  onChange={(e) => setOtpEmail(e.target.value)}
-                  placeholder="Email for one-time code"
-                  className="flex-1"
-                  aria-label="Email for OTP"
-                />
-                <Button
-                  type="button"
-                  variant="secondary"
-                  onClick={handleSendOtp}
-                  disabled={otpStep === "sending" || !otpEmail || !turnstileReady}
-                  className="shrink-0"
-                >
-                  <Mail size={15} />
-                  {otpStep === "sending" ? "Sending…" : "Send OTP"}
-                </Button>
-              </div>
-            ) : (
-              <div className="grid gap-2">
-                <p className="text-xs text-[var(--text-secondary)]">
-                  Code sent to <span className="font-medium text-[var(--text-primary)]">{otpEmail}</span>
-                </p>
-                <div className="flex gap-2">
-                  <Input
-                    type="text"
-                    inputMode="numeric"
-                    maxLength={6}
-                    value={otpCode}
-                    onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
-                    placeholder="000000"
-                    className="flex-1 font-mono tracking-widest"
-                    aria-label="One-time code"
-                    autoFocus
-                  />
-                  <Button
-                    type="button"
-                    onClick={handleVerifyOtp}
-                    disabled={otpStep === "verifying" || otpCode.length < 6}
-                    className="shrink-0"
-                  >
-                    {otpStep === "verifying" ? "Verifying…" : "Verify"}
-                  </Button>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleResendOtp}
-                  className="text-left text-xs text-[var(--text-secondary)] underline underline-offset-2 hover:text-[var(--text-primary)]"
-                >
-                  Resend code
-                </button>
-              </div>
-            )}
+            <Button
+              type="button"
+              variant="secondary"
+              className="w-full"
+              onClick={handleOtpNav}
+            >
+              <Mail size={16} />
+              Email for OTP
+            </Button>
 
             <Button
               type="button"
