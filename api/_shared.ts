@@ -237,6 +237,17 @@ export function requireRole(context: AuthedWorkspace, roles: WorkspaceRole[]) {
   return null;
 }
 
+export function requireAdmin(context: AuthedUser) {
+  const adminEmails = (process.env.ADMIN_EMAILS ?? "")
+    .split(",")
+    .map((e) => e.trim().toLowerCase())
+    .filter(Boolean);
+  if (adminEmails.length === 0 || !adminEmails.includes(context.user.email.toLowerCase())) {
+    return json({ error: "Admin access required." }, { status: 403 });
+  }
+  return null;
+}
+
 export async function checkSuppression(workspaceId: string, email: string) {
   const [row] = await db()`
     select reason
