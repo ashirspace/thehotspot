@@ -3,13 +3,13 @@ import { HubLogo } from "../components/ui";
 
 export function AuthLayout() {
   return (
-    <div className="dark-auth min-h-screen overflow-hidden">
-      <div className="relative mx-auto flex min-h-screen max-w-6xl flex-col px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-[var(--surface-base)]">
+      <div className="relative mx-auto flex min-h-screen max-w-md flex-col px-4 sm:px-6">
         <header className="flex h-20 items-center justify-between">
           <Link to="/">
-            <HubLogo dark />
+            <HubLogo />
           </Link>
-          <Link to="/" className="text-sm font-medium text-[var(--dark-text)]/70 hover:text-[var(--dark-text)]">
+          <Link to="/" className="text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Back to site
           </Link>
         </header>
