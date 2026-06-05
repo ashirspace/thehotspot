@@ -10,6 +10,7 @@ const GOOGLE_ERRORS: Record<string, string> = {
   google_unverified: "Google account email is not verified.",
   google_token_exchange: "Google sign-in failed. Please try again.",
   invalid_state: "Sign-in state was invalid. Please try again.",
+  google_not_configured: "Google sign-in is not configured for this environment.",
 };
 
 export function LoginPage() {
@@ -127,7 +128,7 @@ export function LoginPage() {
               type="button"
               variant="secondary"
               className="w-full"
-              onClick={() => { window.location.href = "/api/auth?action=google"; }}
+              onClick={() => { window.location.href = "/api/auth/google"; }}
             >
               <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true">
                 <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4" />

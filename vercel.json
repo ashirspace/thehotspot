@@ -1,0 +1,13 @@
+{
+  "devCommand": "vite --host 0.0.0.0 --port $PORT",
+  "rewrites": [
+    {
+      "source": "/api/auth/google",
+      "destination": "/api/auth?action=google"
+    },
+    {
+      "source": "/api/auth/google-callback",
+      "destination": "/api/auth?action=google-callback"
+    }
+  ]
+}

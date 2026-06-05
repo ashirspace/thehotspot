@@ -44,8 +44,13 @@ let client: NeonQueryFunction<false, false> | null = null;
 
 export function db() {
   if (!client) {
-    const connectionString = process.env.DATABASE_URL;
-    if (!connectionString) throw new Error("DATABASE_URL is not configured");
+    const connectionString =
+      process.env.DATABASE_URL ||
+      process.env.POSTGRES_URL ||
+      process.env.POSTGRES_PRISMA_URL ||
+      process.env.POSTGRES_URL_NON_POOLING ||
+      process.env.DATABASE_URL_UNPOOLED;
+    if (!connectionString) throw new Error("DATABASE_URL or POSTGRES_URL is not configured");
     client = neon(connectionString);
   }
   return client;
@@ -132,7 +137,7 @@ async function readNodeBody(request: NodeRequest, method: string) {
 
 async function toFetchRequest(request: NodeRequest) {
   const headers = normalizeHeaders(request.headers);
-  const protocol = getHeader(request.headers, "x-forwarded-proto") || "https";
+  const protocol = getHeader(request.headers, "x-forwarded-proto") || "http";
   const host = getHeader(request.headers, "x-forwarded-host") || getHeader(request.headers, "host") || process.env.VERCEL_URL || "localhost";
   const rawUrl = request.url || "/";
   const url = rawUrl.startsWith("http://") || rawUrl.startsWith("https://")

@@ -72,7 +72,12 @@ const bootstrapSchema = z.object({
 
 export default handle(async function handler(request: Request) {
   const url = new URL(request.url);
-  const action = url.searchParams.get("action");
+  const actionFromPath = url.pathname.endsWith("/google")
+    ? "google"
+    : url.pathname.endsWith("/google-callback")
+      ? "google-callback"
+      : null;
+  const action = actionFromPath ?? url.searchParams.get("action");
   const base = publicBaseUrl(request);
 
   // POST /api/auth?action=login
@@ -221,12 +226,15 @@ export default handle(async function handler(request: Request) {
     });
   }
 
-  // GET /api/auth?action=google  — redirect to Google consent screen
-  // NOTE: update authorized redirect URIs in Google Cloud Console to:
-  //   https://your-domain.com/api/auth?action=google-callback
+  // GET /api/auth/google or /api/auth?action=google — redirect to Google consent screen.
+  // Authorized redirect URI in Google Cloud Console:
+  //   https://your-domain.com/api/auth/google-callback
   if (action === "google") {
     if (request.method !== "GET") return methodNotAllowed();
-    const redirectUri = `${base}/api/auth?action=google-callback`;
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
+      return Response.redirect(`${base}/login?error=google_not_configured`, 302);
+    }
+    const redirectUri = `${base}/api/auth/google-callback`;
     const state = buildState();
     const params = new URLSearchParams({
       client_id: process.env.GOOGLE_CLIENT_ID ?? "",
@@ -246,8 +254,10 @@ export default handle(async function handler(request: Request) {
     const state = url.searchParams.get("state");
     const error = url.searchParams.get("error");
     if (error || !code || !state) return Response.redirect(`${base}/login?error=google_denied`, 302);
+    if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET)
+      return Response.redirect(`${base}/login?error=google_not_configured`, 302);
     if (!verifyState(state)) return Response.redirect(`${base}/login?error=invalid_state`, 302);
-    const redirectUri = `${base}/api/auth?action=google-callback`;
+    const redirectUri = `${base}/api/auth/google-callback`;
     const tokenRes = await fetch("https://oauth2.googleapis.com/token", {
       method: "POST",
       headers: { "content-type": "application/x-www-form-urlencoded" },
@@ -277,5 +287,5 @@ export default handle(async function handler(request: Request) {
     return Response.redirect(`${base}/login?${redirectParams}`, 302);
   }
 
-  return json({ error: "Unknown auth action. Use ?action=login|signup|logout|session|otp-send|otp-verify|bootstrap|google|google-callback" }, { status: 400 });
+  return json({ error: "Unknown auth action. Use ?action=login|signup|logout|session|otp-send|otp-verify|bootstrap|google|google-callback or /api/auth/google." }, { status: 400 });
 });
