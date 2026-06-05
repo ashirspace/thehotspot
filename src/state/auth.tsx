@@ -82,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    apiFetch<AuthPayload>("/api/auth/session", { token, workspaceId: workspaceId || undefined })
+    apiFetch<AuthPayload>("/api/auth?action=session", { token, workspaceId: workspaceId || undefined })
       .then((payload) => {
         if (mounted) applyAuthPayload(payload);
       })
@@ -112,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn: async (email, password, turnstileToken) => {
         setError(null);
         try {
-          const payload = await postAuth("/api/auth/login", { email, password, turnstileToken });
+          const payload = await postAuth("/api/auth?action=login", { email, password, turnstileToken });
           applyAuthPayload(payload);
         } catch (authError) {
           const message = authError instanceof Error ? authError.message : "Authentication failed";
@@ -123,7 +123,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signUp: async ({ fullName, email, password, turnstileToken }) => {
         setError(null);
         try {
-          const payload = await postAuth("/api/auth/signup", { fullName, email, password, turnstileToken });
+          const payload = await postAuth("/api/auth?action=signup", { fullName, email, password, turnstileToken });
           applyAuthPayload(payload);
         } catch (authError) {
           const message = authError instanceof Error ? authError.message : "Authentication failed";
@@ -133,7 +133,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       sendOtp: async (email, turnstileToken) => {
         setError(null);
-        const res = await fetch("/api/auth/otp-send", {
+        const res = await fetch("/api/auth?action=otp-send", {
           method: "POST",
           headers: { "content-type": "application/json" },
           body: JSON.stringify({ email: email.trim().toLowerCase(), turnstileToken }),
@@ -148,7 +148,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       verifyOtp: async (email, otp) => {
         setError(null);
         try {
-          const payload = await postAuth("/api/auth/otp-verify", { email: email.trim().toLowerCase(), otp });
+          const payload = await postAuth("/api/auth?action=otp-verify", { email: email.trim().toLowerCase(), otp });
           applyAuthPayload(payload);
         } catch (authError) {
           const message = authError instanceof Error ? authError.message : "OTP verification failed";
@@ -158,7 +158,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       },
       signOut: async () => {
         const token = getSessionToken();
-        if (token) await postAuth("/api/auth/logout", undefined, token).catch(() => undefined);
+        if (token) await postAuth("/api/auth?action=logout", undefined, token).catch(() => undefined);
         setSessionToken(null);
         setStoredWorkspaceId(null);
         setUser(null);

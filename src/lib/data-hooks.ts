@@ -142,7 +142,7 @@ export function useImportLeads() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (rows: Array<Record<string, unknown>>) => {
-      return apiFetch<{ inserted: number; skipped: number }>("/api/leads/import", { workspaceId: workspace.id, body: { rows } });
+      return apiFetch<{ inserted: number; skipped: number }>("/api/leads?action=import", { workspaceId: workspace.id, body: { rows } });
     },
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["leads", workspace.id] }),
   });
@@ -153,7 +153,7 @@ export function useUpdateLead() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, status }: { id: string; status: Lead["status"] }) => {
-      return apiFetch(`/api/leads/${id}`, { method: "PATCH", workspaceId: workspace.id, body: { status } });
+      return apiFetch(`/api/leads?id=${id}`, { method: "PATCH", workspaceId: workspace.id, body: { status } });
     },
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["leads", workspace.id] }),
   });
@@ -199,7 +199,7 @@ export function useVerifyIdentityDns() {
   const { workspace } = useAuth();
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: async (identityId: string) => apiFetch(`/api/identities/${identityId}/verify-dns`, { workspaceId: workspace.id, method: "POST" }),
+    mutationFn: async (identityId: string) => apiFetch(`/api/identities?id=${identityId}&action=verify-dns`, { workspaceId: workspace.id, method: "POST" }),
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["identities", workspace.id] }),
   });
 }
@@ -209,7 +209,7 @@ export function useSaveWorkspaceSettings() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: async (body: { name?: string; physicalAddress?: string | null; webhookUrl?: string | null; calendarUrl?: string | null }) => {
-      return apiFetch("/api/workspaces/current", { method: "PATCH", workspaceId: workspace.id, body });
+      return apiFetch("/api/workspaces", { method: "PATCH", workspaceId: workspace.id, body });
     },
     onSuccess: () => void queryClient.invalidateQueries({ queryKey: ["workspace", workspace.id] }),
   });
