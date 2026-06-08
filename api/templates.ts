@@ -53,7 +53,7 @@ export default handle(async function handler(request: Request) {
     const input = await readJson(request, createSchema);
     const [template] = await db()`
       insert into templates (workspace_id, name, channel, subject, body, variables)
-      values (${context.workspaceId}, ${input.name}, ${input.channel}, ${input.subject || null}, ${input.body}, ${JSON.stringify(input.variables)}::jsonb)
+      values (${context.workspaceId}, ${input.name}, ${input.channel}::outreach_channel, ${input.subject || null}, ${input.body}, ${JSON.stringify(input.variables)}::jsonb)
       returning *
     `;
     return json({ template }, { status: 201 });

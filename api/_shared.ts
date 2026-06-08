@@ -438,12 +438,12 @@ export async function ensureDefaultWorkspace(userId: string, email: string, full
   const [created] = await db()`
     with workspace_insert as (
       insert into workspaces (name, owner_id, plan)
-      values (${name}, ${userId}, 'starter')
+      values (${name}, ${userId}, 'starter'::workspace_plan)
       returning id, name, plan, physical_address, owner_id
     ),
     member_insert as (
       insert into members (workspace_id, user_id, role)
-      select id, ${userId}, 'owner'
+      select id, ${userId}, 'owner'::workspace_role
       from workspace_insert
       returning workspace_id, role
     ),
@@ -455,17 +455,17 @@ export async function ensureDefaultWorkspace(userId: string, email: string, full
     ),
     template_insert as (
       insert into templates (workspace_id, name, channel, subject, body, variables)
-      select id, 'Founder intro', 'email', 'Quick idea for {{company}}',
+      select id, 'Founder intro', 'email'::outreach_channel, 'Quick idea for {{company}}',
         'Hi {{first_name}}, saw {{ai: summarize the strongest company signal in one sentence}}. We help teams turn that context into safe outbound sequences that stop the moment someone replies.',
         '["first_name","company","ai"]'::jsonb
       from workspace_insert
       union all
-      select id, 'Low-pressure follow-up', 'email', 'Worth a quick look?',
+      select id, 'Low-pressure follow-up', 'email'::outreach_channel, 'Worth a quick look?',
         'Hi {{first_name}}, wanted to follow up. If outbound quality or sender health is on your radar, I can send a short teardown for {{company}}.',
         '["first_name","company"]'::jsonb
       from workspace_insert
       union all
-      select id, 'Assisted LinkedIn DM', 'linkedin', null,
+      select id, 'Assisted LinkedIn DM', 'linkedin'::outreach_channel, null,
         'Hi {{first_name}}, quick note after seeing your work at {{company}}. I had an idea for improving outbound reply quality without adding more reps. Open to me sending it over?',
         '["first_name","company"]'::jsonb
       from workspace_insert

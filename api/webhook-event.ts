@@ -36,7 +36,7 @@ export default handle(async function handler(request: Request) {
         ${message.workspace_id},
         ${input.messageId},
         ${message.lead_id || null},
-        ${input.type},
+        ${input.type}::event_type,
         ${JSON.stringify(input.payload)}::jsonb
       )
     `,
@@ -47,17 +47,17 @@ export default handle(async function handler(request: Request) {
     statements.push(
       db()`
         update messages
-        set status = ${nextStatus}
+        set status = ${nextStatus}::message_status
         where id = ${input.messageId}
       `,
       db()`
         update leads
-        set status = ${input.type === "reply" ? "replied" : "lost"}
+        set status = ${input.type === "reply" ? "replied" : "lost"}::lead_status
         where id = ${message.lead_id}
       `,
       db()`
         update messages
-        set status = 'skipped'
+        set status = 'skipped'::message_status
         where lead_id = ${message.lead_id}
           and status in ('queued', 'scheduled')
       `,
@@ -71,7 +71,7 @@ export default handle(async function handler(request: Request) {
         values (
           ${message.workspace_id},
           ${normalizeEmail(String(message.lead_email))},
-          ${input.type === "bounce" ? "bounced" : input.type === "complaint" ? "complained" : "unsubscribed"},
+          ${input.type === "bounce" ? "bounced" : input.type === "complaint" ? "complained" : "unsubscribed"}::suppression_reason,
           'webhook'
         )
         on conflict (workspace_id, email)

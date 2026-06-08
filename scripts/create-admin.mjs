@@ -118,12 +118,12 @@ if (existingWs.length > 0) {
   const wsName = `${name.split(" ")[0]}'s workspace`;
   const [ws] = await sql`
     insert into workspaces (name, owner_id, plan)
-    values (${wsName}, ${user.id}, 'starter')
+    values (${wsName}, ${user.id}, 'starter'::workspace_plan)
     returning id, name
   `;
   await sql`
     insert into members (workspace_id, user_id, role)
-    values (${ws.id}, ${user.id}, 'owner')
+    values (${ws.id}, ${user.id}, 'owner'::workspace_role)
   `;
   await sql`
     insert into workspace_settings (workspace_id)

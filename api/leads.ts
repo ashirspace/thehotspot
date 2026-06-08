@@ -168,7 +168,7 @@ export default handle(async function handler(request: Request) {
       values (
         ${context.workspaceId}, ${input.name}, ${input.name.split(/\s+/)[0] || input.name},
         ${email}, ${input.company}, ${input.role}, ${input.linkedinUrl || null},
-        ${JSON.stringify(input.enrichment)}::jsonb, 'valid'
+        ${JSON.stringify(input.enrichment)}::jsonb, 'valid'::validation_status
       )
       returning *
     `;

@@ -33,7 +33,7 @@ export default handle(async function handler(request: Request) {
     if (Number(identity.sent_today || 0) >= Number(identity.daily_limit || 0)) return json({ error: "Daily limit reached" }, { status: 429 });
     const [message] = await db()`
       insert into messages (workspace_id, campaign_id, lead_id, sending_identity_id, step_index, channel, subject, body, scheduled_at, status, idempotency_key)
-      values (${membership.workspaceId}, null, null, ${input.sendingIdentityId}, 0, 'email', ${input.subject}, ${input.body}, now(), 'scheduled', ${`one-off:${membership.workspaceId}:${input.to}:${Date.now()}`})
+      values (${membership.workspaceId}, null, null, ${input.sendingIdentityId}, 0, 'email'::outreach_channel, ${input.subject}, ${input.body}, now(), 'scheduled'::message_status, ${`one-off:${membership.workspaceId}:${input.to}:${Date.now()}`})
       returning id
     `;
     return json({ queued: true, messageId: message.id, provider: identity.provider });
@@ -82,15 +82,15 @@ export default handle(async function handler(request: Request) {
 
     if (blockReason) {
       await db().transaction([
-        db()`update messages set status = 'skipped', error = ${blockReason} where id = ${message.id}`,
-        db()`update messages set status = 'skipped', error = ${blockReason} where lead_id = ${message.lead_id} and status in ('queued', 'scheduled')`,
+      db()`update messages set status = 'skipped'::message_status, error = ${blockReason} where id = ${message.id}`,
+      db()`update messages set status = 'skipped'::message_status, error = ${blockReason} where lead_id = ${message.lead_id} and status in ('queued', 'scheduled')`,
       ]);
       processed.push({ id: String(message.id), action: "skipped", reason: blockReason });
       continue;
     }
 
     await db().transaction([
-      db()`update messages set status = 'sent', sent_at = now(), error = null where id = ${message.id}`,
+      db()`update messages set status = 'sent'::message_status, sent_at = now(), error = null where id = ${message.id}`,
       db()`update sending_identities set sent_today = sent_today + 1, last_reset_date = current_date where id = ${message.identity_id}`,
     ]);
     processed.push({ id: String(message.id), action: "sent" });

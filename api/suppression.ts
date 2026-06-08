@@ -34,7 +34,7 @@ export default handle(async function handler(request: Request) {
     if (!verified) return json({ error: "Invalid unsubscribe token" }, { status: 400 });
     await db()`
       insert into suppression_list (workspace_id, email, reason, source)
-      values (${verified.workspaceId}, ${normalizeEmail(verified.email)}, 'unsubscribed', 'unsubscribe_link')
+      values (${verified.workspaceId}, ${normalizeEmail(verified.email)}, 'unsubscribed'::suppression_reason, 'unsubscribe_link')
       on conflict (workspace_id, email) do update set reason = excluded.reason, source = excluded.source, created_at = now()
     `;
     return new Response("You have been unsubscribed. No further outreach will be sent to this address.", {
@@ -59,7 +59,7 @@ export default handle(async function handler(request: Request) {
     const input = await readJson(request, addSchema);
     const [suppression] = await db()`
       insert into suppression_list (workspace_id, email, reason, source)
-      values (${context.workspaceId}, ${normalizeEmail(input.email)}, ${input.reason}, 'manual')
+      values (${context.workspaceId}, ${normalizeEmail(input.email)}, ${input.reason}::suppression_reason, 'manual')
       on conflict (workspace_id, email) do update set reason = excluded.reason, source = excluded.source, created_at = now()
       returning *
     `;

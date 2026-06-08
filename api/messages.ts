@@ -25,10 +25,10 @@ export default handle(async function handler(request: Request) {
     if (!message) return json({ error: "Message not found" }, { status: 404 });
     await db().transaction([
       db()`insert into events (workspace_id, message_id, lead_id, type, payload)
-           values (${context.workspaceId}, ${id}, ${message.lead_id || null}, 'reply', ${JSON.stringify({ body: input.body, manual: true })}::jsonb)`,
-      db()`update leads set status = ${input.markLeadStatus} where id = ${message.lead_id} and workspace_id = ${context.workspaceId}`,
-      db()`update messages set status = 'replied' where id = ${id} and workspace_id = ${context.workspaceId}`,
-      db()`update messages set status = 'skipped' where lead_id = ${message.lead_id} and workspace_id = ${context.workspaceId} and status in ('queued', 'scheduled')`,
+           values (${context.workspaceId}, ${id}, ${message.lead_id || null}, 'reply'::event_type, ${JSON.stringify({ body: input.body, manual: true })}::jsonb)`,
+      db()`update leads set status = ${input.markLeadStatus}::lead_status where id = ${message.lead_id} and workspace_id = ${context.workspaceId}`,
+      db()`update messages set status = 'replied'::message_status where id = ${id} and workspace_id = ${context.workspaceId}`,
+      db()`update messages set status = 'skipped'::message_status where lead_id = ${message.lead_id} and workspace_id = ${context.workspaceId} and status in ('queued', 'scheduled')`,
     ]);
     return json({ ok: true });
   }

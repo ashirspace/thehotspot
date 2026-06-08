@@ -68,7 +68,7 @@ export default handle(async function handler(request: Request) {
     const input = await readJson(request, createSchema);
     const [identity] = await db()`
       insert into sending_identities (workspace_id, from_name, from_email, provider, provider_account_ref, tracking_domain, daily_limit)
-      values (${context.workspaceId}, ${input.fromName}, ${input.fromEmail.toLowerCase()}, ${input.provider}, ${input.providerAccountRef || null}, ${input.trackingDomain || null}, ${input.dailyLimit || 20})
+      values (${context.workspaceId}, ${input.fromName}, ${input.fromEmail.toLowerCase()}, ${input.provider}::sender_provider, ${input.providerAccountRef || null}, ${input.trackingDomain || null}, ${input.dailyLimit || 20})
       returning *
     `;
     return json({ identity }, { status: 201 });
