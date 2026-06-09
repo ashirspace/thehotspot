@@ -51,7 +51,7 @@ export function LeadsPage() {
             </div>
             <Button type="submit" disabled={importMutation.isPending}>{importMutation.isPending ? "Validating..." : "Validate import"}</Button>
           </form>
-          <p className="mt-4 rounded-xl bg-[rgba(254,110,0,0.08)] p-3 text-sm text-[var(--orange-dim)]">{importMessage}</p>
+          <p className="mt-4 rounded-xl bg-[rgba(13,148,136,0.08)] p-3 text-sm text-[var(--orange-dim)]">{importMessage}</p>
         </Card>
         <Card>
           <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

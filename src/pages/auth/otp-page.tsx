@@ -140,7 +140,7 @@ export function OtpPage() {
     <main className="flex flex-1 items-center justify-center py-12">
       <div className="w-full">
         <div className="precision-card p-8">
-          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-orange-50 text-[var(--orange)]">
+          <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-[var(--teal-pale)]/60 text-[var(--orange)]">
             <Mail size={22} />
           </div>
 
@@ -198,7 +198,7 @@ export function OtpPage() {
                     onKeyDown={(e) => handleDigitKeyDown(i, e)}
                     onFocus={(e) => e.target.select()}
                     disabled={isVerifying}
-                    className="h-12 w-full rounded border border-[var(--surface-border)] bg-[var(--surface-base)] text-center font-mono text-lg font-semibold text-[var(--text-primary)] outline-none transition focus:border-[var(--orange)] focus:ring-2 focus:ring-orange-500/15 disabled:opacity-50"
+                    className="h-12 w-full rounded border border-[var(--surface-border)] bg-[var(--surface-base)] text-center font-mono text-lg font-semibold text-[var(--text-primary)] outline-none transition focus:border-[var(--orange)] focus:ring-2 focus:ring-teal-500/15 disabled:opacity-50"
                     aria-label={`Digit ${i + 1}`}
                   />
                 ))}

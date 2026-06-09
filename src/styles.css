@@ -6,18 +6,22 @@
 
 :root {
   color-scheme: light;
-  --surface-base: #f8fafc;
+  --surface-base: #f7faf9;
   --surface-card: #ffffff;
-  --surface-raised: #f1f5f9;
-  --surface-border: #e2e8f0;
-  --surface-border-strong: #cbd5e1;
+  --surface-raised: #eef7f5;
+  --surface-border: #dbe7e4;
+  --surface-border-strong: #b8ccc8;
   --text-primary: #0f172a;
   --text-secondary: #475569;
   --text-tertiary: #94a3b8;
-  --orange: #fe6e00;
-  --orange-hover: #c53c00;
-  --orange-dim: #9f2d00;
+  --orange: #0d9488;
+  --orange-hover: #0f766e;
+  --orange-dim: #115e59;
+  --teal-deep: #0f766e;
   --teal: #0d9488;
+  --teal-bright: #14b8a6;
+  --teal-pale: #ccfbf1;
+  --teal-ink: #134e4a;
   --green: #22c55e;
   --red: #ef4444;
   --amber: #f59e0b;
@@ -50,7 +54,7 @@ body {
   margin: 0;
   min-height: 100vh;
   background:
-    linear-gradient(rgba(248, 250, 252, 0.97), rgba(248, 250, 252, 0.97)),
+    linear-gradient(rgba(247, 250, 249, 0.98), rgba(247, 250, 249, 0.98)),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180' viewBox='0 0 180 180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.18'/%3E%3C/svg%3E");
   color: var(--text-primary);
 }
@@ -169,14 +173,30 @@ h2.font-heading {
 
 .precision-card {
   border: 1px solid var(--surface-border);
-  border-radius: 10px;
+  border-radius: 8px;
   background: var(--surface-card);
   box-shadow: none;
 }
 
+.growth-panel {
+  border: 1px solid var(--surface-border);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--surface-card) 94%, var(--teal-pale));
+  box-shadow: 0 18px 48px rgba(15, 118, 110, 0.08);
+}
+
+.hero-grid {
+  background:
+    linear-gradient(90deg, rgba(20, 184, 166, 0.08) 1px, transparent 1px),
+    linear-gradient(180deg, rgba(20, 184, 166, 0.08) 1px, transparent 1px),
+    radial-gradient(ellipse at 82% 18%, rgba(20, 184, 166, 0.18), transparent 36%),
+    var(--surface-base);
+  background-size: 72px 72px, 72px 72px, auto, auto;
+}
+
 .alert-card {
-  border-left: 2px solid var(--orange);
-  background: color-mix(in srgb, var(--orange) 6%, var(--surface-base));
+  border-left: 2px solid var(--teal);
+  background: color-mix(in srgb, var(--teal) 7%, var(--surface-base));
 }
 
 .campaign-row {
@@ -204,7 +224,7 @@ h2.font-heading {
   bottom: -6px;
   left: 0;
   height: 2px;
-  background: var(--orange);
+  background: var(--teal);
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 0.15s ease;
@@ -303,13 +323,13 @@ h2.font-heading {
 
 .faq-row[open] summary::after {
   transform: rotate(45deg);
-  color: var(--orange);
+  color: var(--teal);
 }
 
 .dark-auth {
   background:
-    radial-gradient(ellipse at 20% 60%, rgba(124, 58, 13, 0.4) 0%, transparent 60%),
-    radial-gradient(ellipse at 72% 20%, rgba(124, 58, 13, 0.18) 0%, transparent 50%),
+    radial-gradient(ellipse at 20% 60%, rgba(15, 118, 110, 0.35) 0%, transparent 60%),
+    radial-gradient(ellipse at 72% 20%, rgba(20, 184, 166, 0.18) 0%, transparent 50%),
     var(--dark-base);
   color: var(--dark-text);
 }
@@ -317,6 +337,26 @@ h2.font-heading {
 .dark-auth h1,
 .dark-auth h2 {
   color: var(--dark-text);
+}
+
+.service-row {
+  transition: background 0.18s ease, padding-left 0.18s ease;
+}
+
+.service-row:hover {
+  background: rgba(204, 251, 241, 0.24);
+  padding-left: 1rem;
+}
+
+.footer-dark {
+  background:
+    radial-gradient(circle, rgba(20, 184, 166, 0.16) 1px, transparent 1.5px),
+    linear-gradient(180deg, #101827 0%, #0b1322 46%, #0b1221 100%);
+  background-size: 22px 22px, auto;
+}
+
+.footer-dark .precision-label {
+  color: rgba(255, 255, 255, 0.38);
 }
 
 .dark-auth label > span {
@@ -341,14 +381,14 @@ h2.font-heading {
 }
 
 .dark-auth input:focus {
-  border-bottom-color: var(--orange);
+  border-bottom-color: var(--teal);
   box-shadow: none;
   outline: none;
 }
 
 .warmup-gradient {
-  background: linear-gradient(90deg, var(--orange), #ff8b1a);
-  box-shadow: 0 0 18px rgba(254, 110, 0, 0.22);
+  background: linear-gradient(90deg, var(--teal-deep), var(--teal-bright));
+  box-shadow: 0 0 18px rgba(13, 148, 136, 0.22);
 }
 
 button:focus-visible,
@@ -356,7 +396,7 @@ a:focus-visible,
 input:focus-visible,
 select:focus-visible,
 textarea:focus-visible {
-  outline: 2px solid var(--orange);
+  outline: 2px solid var(--teal);
   outline-offset: 2px;
 }
 

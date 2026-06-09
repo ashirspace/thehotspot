@@ -30,7 +30,7 @@ export function TemplatesPage() {
               key={template.id}
               type="button"
               onClick={() => setSelectedId(template.id)}
-              className={`mb-2 w-full rounded-xl border p-3 text-left last:mb-0 ${activeId === template.id ? "border-[var(--orange)] bg-[rgba(254,110,0,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
+              className={`mb-2 w-full rounded-xl border p-3 text-left last:mb-0 ${activeId === template.id ? "border-[var(--orange)] bg-[rgba(13,148,136,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
             >
               <div className="font-semibold">{template.name}</div>
               <div className="mt-1 text-xs text-slate-500">{template.channel}</div>

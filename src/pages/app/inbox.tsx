@@ -29,7 +29,7 @@ export function InboxPage() {
                 key={thread.id}
                 type="button"
                 onClick={() => setSelectedId(thread.id)}
-                className={`w-full rounded-xl border p-3 text-left transition ${activeId === thread.id ? "border-[var(--orange)] bg-[rgba(254,110,0,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
+                className={`w-full rounded-xl border p-3 text-left transition ${activeId === thread.id ? "border-[var(--orange)] bg-[rgba(13,148,136,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
               >
                 <div className="flex items-center justify-between gap-2">
                   <span className="font-semibold">{thread.leadName}</span>
