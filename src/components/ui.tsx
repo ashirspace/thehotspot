@@ -104,8 +104,8 @@ export function SidebarLink({ to, icon, label }: { to: string; icon: React.React
 
 export function HubLogo({ dark = false }: { dark?: boolean }) {
   return (
-    <span className={cn("flex items-center gap-2 font-sans text-lg font-semibold tracking-[-0.01em]", dark ? "text-[var(--dark-text)]" : "text-[var(--text-primary)]")}>
-      <img src="/brand/thehotspot-logo.png" alt="" className="h-9 w-[30px] object-contain" />
+    <span className={cn("flex min-w-0 items-center gap-2 font-sans text-base font-semibold tracking-[-0.01em] sm:text-lg", dark ? "text-[var(--dark-text)]" : "text-[var(--text-primary)]")}>
+      <img src="/brand/thehotspot-logo.png" alt="" className="h-8 w-[27px] shrink-0 object-contain sm:h-9 sm:w-[30px]" />
       thehotspot.in
     </span>
   );

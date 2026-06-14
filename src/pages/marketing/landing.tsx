@@ -32,16 +32,16 @@ export function LandingPage() {
   return (
     <>
       <section className="hero-grid relative overflow-hidden border-b border-[var(--surface-border)]">
-        <div className="mx-auto grid max-w-7xl gap-12 px-4 pb-14 pt-20 sm:px-6 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8 lg:pb-16 lg:pt-28">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-12 pt-14 sm:px-6 sm:pt-20 lg:grid-cols-[minmax(0,1fr)_500px] lg:px-8 lg:pb-16 lg:pt-28">
           <div className="max-w-3xl">
-            <p className="precision-label flex items-center gap-3 text-[var(--teal-deep)]">
-              <span className="h-px w-8 bg-[var(--teal)]" />
+            <p className="precision-label flex items-center gap-2 text-[0.65rem] text-[var(--teal-deep)] sm:gap-3 sm:text-[0.72rem]">
+              <span className="h-px w-5 shrink-0 bg-[var(--teal)] sm:w-8" />
               Outreach automation · built for 2026
             </p>
-            <h1 className="mt-6 max-w-4xl font-heading text-[clamp(3.5rem,7vw,6.8rem)] leading-[0.92] tracking-[-0.03em] text-[var(--text-primary)]">
+            <h1 className="mt-6 max-w-4xl font-sans text-[clamp(2.55rem,13vw,5.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-[var(--text-primary)] sm:leading-[0.98]">
               Cold outreach that actually gets replies.
             </h1>
-            <p className="mt-7 max-w-2xl text-base leading-8 text-[var(--text-secondary)]">
+            <p className="mt-6 max-w-2xl text-[0.95rem] leading-7 text-[var(--text-secondary)] sm:mt-7 sm:text-base sm:leading-8">
               Import leads, generate personalized email copy, launch multi-step sequences, stop on replies or bounces,
               and manage every campaign from one workspace-secured dashboard.
             </p>
@@ -51,9 +51,9 @@ export function LandingPage() {
                 Watch 2-min demo <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </div>
-            <div className="mt-8 grid max-w-xl grid-cols-3 border-y border-[var(--surface-border)] text-sm text-[var(--text-secondary)]">
+            <div className="mt-8 grid max-w-xl grid-cols-1 border-y border-[var(--surface-border)] text-sm text-[var(--text-secondary)] min-[420px]:grid-cols-3">
               {["No credit card", "14-day trial", "Setup in 3 min"].map((item) => (
-                <span key={item} className="border-r border-[var(--surface-border)] py-4 last:border-r-0">{item}</span>
+                <span key={item} className="border-b border-[var(--surface-border)] py-3 last:border-b-0 min-[420px]:border-b-0 min-[420px]:border-r min-[420px]:py-4 min-[420px]:last:border-r-0">{item}</span>
               ))}
             </div>
           </div>
@@ -70,13 +70,13 @@ export function LandingPage() {
                   Live
                 </div>
               </div>
-              <div className="grid grid-cols-3 border-b border-[var(--surface-border)]">
+              <div className="grid border-b border-[var(--surface-border)] min-[420px]:grid-cols-3">
                 {[
                   ["Campaigns", "12"],
                   ["Sent", "847"],
                   ["Reply rate", "38%"],
                 ].map(([label, value]) => (
-                  <div key={label} className="border-r border-[var(--surface-border)] bg-[var(--surface-card)] p-5 last:border-r-0">
+                  <div key={label} className="border-b border-[var(--surface-border)] bg-[var(--surface-card)] p-4 last:border-b-0 min-[420px]:border-b-0 min-[420px]:border-r min-[420px]:p-5 min-[420px]:last:border-r-0">
                     <div className="precision-label">{label}</div>
                     <div className="mt-3 text-[2.1rem] font-semibold tracking-[-0.04em]">{value}</div>
                   </div>
@@ -90,7 +90,7 @@ export function LandingPage() {
                 ].map(([initial, name, copy]) => (
                   <div key={name} className="flex gap-3 rounded-md border border-[var(--surface-border)] bg-white p-3 shadow-[0_1px_0_rgba(15,23,42,0.03)]">
                     <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-md bg-[var(--teal)] text-sm font-semibold text-white">{initial}</span>
-                    <div>
+                    <div className="min-w-0">
                       <div className="text-sm font-semibold">{name}</div>
                       <p className="mt-1 text-sm leading-5 text-[var(--text-secondary)]">{copy}</p>
                     </div>
@@ -115,7 +115,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="about" className="mx-auto grid max-w-7xl gap-12 px-4 py-20 sm:px-6 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
+      <section id="about" className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 sm:py-20 lg:grid-cols-[0.9fr_1.1fr] lg:px-8">
         <div>
           <p className="precision-label text-[var(--teal-deep)]">About</p>
           <h2 className="mt-5 max-w-xl font-heading text-[clamp(2rem,4vw,3.6rem)] leading-[1]">
@@ -147,7 +147,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="product-overview" className="border-y border-[var(--surface-border)] bg-[var(--surface-raised)] px-4 py-20 sm:px-6 lg:px-8">
+      <section id="product-overview" className="border-y border-[var(--surface-border)] bg-[var(--surface-raised)] px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[0.75fr_1.25fr]">
           <div>
             <p className="precision-label text-[var(--teal-deep)]">Product overview</p>
@@ -165,7 +165,7 @@ export function LandingPage() {
                 <h3 className="text-[1.05rem] font-semibold text-[var(--text-primary)]">AI personalization demo</h3>
               </div>
               <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--text-secondary)]">Draft subject/body pairs from real campaign context, then block weak generations before they reach the queue.</p>
-              <div className="mt-6 grid gap-3 rounded-md border border-[var(--surface-border)] bg-white p-4 font-mono text-[0.72rem] text-[var(--text-secondary)]">
+              <div className="mt-6 grid gap-3 overflow-hidden rounded-md border border-[var(--surface-border)] bg-white p-4 font-mono text-[0.7rem] text-[var(--text-secondary)] sm:text-[0.72rem]">
                 <span>{">"} ICP: B2B SaaS founders, 11-50 employees</span>
                 <span>{">"} Reference: hiring outbound SDRs this quarter</span>
                 <span className="text-[var(--teal-deep)]">{">"} output: approved draft · confidence 94%</span>
@@ -205,7 +205,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="what-we-provide" className="mx-auto max-w-6xl px-4 py-20 sm:px-6 lg:px-8">
+      <section id="what-we-provide" className="mx-auto max-w-6xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <p className="precision-label text-[var(--teal-deep)]">What we provide</p>
         <div className="mt-8 border-b border-[var(--surface-border)]">
           {services.map(([title, copy, visual], index) => (
@@ -221,7 +221,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section id="resources" className="mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+      <section id="resources" className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20 lg:px-8">
         <div className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
           <div className="growth-panel grid gap-6 p-6 sm:grid-cols-[1fr_220px]">
             <div>
@@ -246,7 +246,7 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-5xl px-4 pb-20 sm:px-6 lg:px-8">
+      <section className="mx-auto max-w-5xl px-4 pb-14 sm:px-6 sm:pb-20 lg:px-8">
         <h2 className="font-heading text-[clamp(1.8rem,3vw,2.6rem)] leading-[1.1]">Questions operators ask before launch.</h2>
         <div className="mt-8 border-t border-[var(--surface-border)]">
           {faqs.map(([question, answer]) => (
@@ -260,8 +260,8 @@ export function LandingPage() {
 
       <footer className="footer-dark px-4 text-white sm:px-6 lg:px-8">
         <div className="mx-auto max-w-7xl">
-          <div className="mx-auto max-w-3xl py-20 text-center lg:py-24">
-            <h2 className="font-sans text-[clamp(3rem,7vw,5.8rem)] font-bold leading-[0.98] tracking-[-0.02em] text-white">
+          <div className="mx-auto max-w-3xl py-14 text-center sm:py-20 lg:py-24">
+            <h2 className="font-sans text-[clamp(2.35rem,12vw,5.8rem)] font-bold leading-[1.02] tracking-[-0.02em] text-white sm:leading-[0.98]">
               Stop sending emails into the void.
             </h2>
             <p className="mx-auto mt-7 max-w-2xl text-lg leading-8 text-white/58">
@@ -273,8 +273,8 @@ export function LandingPage() {
             <p className="mt-7 text-sm text-white/28">No credit card · Cancel anytime · 14-day trial</p>
           </div>
 
-          <div className="grid gap-10 border-b border-white/10 pb-14 pt-20 lg:grid-cols-[1fr_auto] lg:items-start">
-            <h2 className="max-w-xl font-sans text-[clamp(2.5rem,5vw,4.4rem)] font-bold leading-[1.02] tracking-[-0.02em] text-white">
+          <div className="grid gap-8 border-b border-white/10 pb-12 pt-14 sm:gap-10 sm:pb-14 sm:pt-20 lg:grid-cols-[1fr_auto] lg:items-start">
+            <h2 className="max-w-xl font-sans text-[clamp(2.25rem,11vw,4.4rem)] font-bold leading-[1.04] tracking-[-0.02em] text-white sm:leading-[1.02]">
               Ready to grow connections?
             </h2>
             <Link to="/signup" className="inline-flex items-center gap-2 pt-3 text-lg font-medium text-white/70 transition hover:text-white">
@@ -282,7 +282,7 @@ export function LandingPage() {
             </Link>
           </div>
 
-          <div className="grid gap-12 py-12 lg:grid-cols-[1.25fr_2fr]">
+          <div className="grid gap-10 py-10 sm:gap-12 sm:py-12 lg:grid-cols-[1.25fr_2fr]">
             <div>
               <Link to="/" className="inline-flex items-center gap-2 text-2xl font-bold tracking-[-0.02em] text-white">
                 <img src="/brand/thehotspot-logo.png" alt="" className="h-9 w-[30px] object-contain" />
@@ -292,7 +292,7 @@ export function LandingPage() {
                 AI-powered cold outreach automation for modern sales teams.
               </p>
             </div>
-            <div className="grid gap-10 sm:grid-cols-3">
+            <div className="grid gap-8 min-[520px]:grid-cols-3 sm:gap-10">
               {[
                 ["Product", "Features", "Pricing", "Changelog", "Roadmap"],
                 ["Company", "About", "Blog", "Careers", "Contact"],
@@ -308,7 +308,7 @@ export function LandingPage() {
             </div>
           </div>
 
-          <div className="grid gap-4 border-t border-white/10 py-8 text-sm text-white/34 md:grid-cols-2 md:items-center">
+          <div className="grid gap-5 border-t border-white/10 py-8 text-sm text-white/34 md:grid-cols-2 md:items-center">
             <span>© 2026 thehotspot · All rights reserved</span>
             <div className="flex gap-6 md:justify-end">
               <span>X</span>
