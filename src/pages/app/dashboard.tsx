@@ -1,106 +1,175 @@
-import { AlertTriangle, ArrowRight, CheckCircle2, MailCheck } from "lucide-react";
+import type { ReactNode } from "react";
+import { ArrowRight, CalendarClock, Loader2, MailCheck, Megaphone, UsersRound } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Badge, Card } from "../../components/ui";
-import { useDashboardData } from "../../lib/data-hooks";
-import { percent } from "../../lib/utils";
+import { Card } from "../../components/ui";
+import { useDashboardOverview } from "../../lib/data-hooks";
 
 export function DashboardPage() {
-  const { campaigns, identities, inboxThreads, isError, isLoading } = useDashboardData();
-  const totalSent = campaigns.reduce((sum, campaign) => sum + campaign.sent, 0);
-  const totalReplies = campaigns.reduce((sum, campaign) => sum + campaign.replied, 0);
-  const blockedSenders = identities.filter((sender) => !sender.dnsVerified).length;
+  const dashboardQuery = useDashboardOverview();
+  const summary = dashboardQuery.data?.summary ?? {
+    totalCampaigns: 0,
+    leadsGenerated: 0,
+    followUpsLeftToday: 0,
+  };
+  const recentReplies = dashboardQuery.data?.recentReplies ?? [];
 
   return (
     <div className="grid gap-6">
-      <div>
-        <h1 className="font-heading italic text-[clamp(2.5rem,4vw,4.5rem)] font-normal leading-[0.95] tracking-[-0.03em]">Campaign dashboard</h1>
-        <p className="mt-2 text-[var(--text-secondary)]">Live workspace health, funnel metrics, replies, and launch readiness.</p>
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+        <div>
+          <h1 className="font-heading italic text-[clamp(2.5rem,4vw,4.5rem)] font-normal leading-[0.95] tracking-[-0.03em]">Campaign dashboard</h1>
+          <p className="mt-2 max-w-2xl text-[var(--text-secondary)]">
+            Live campaign, lead, follow-up, and reply activity for this workspace.
+          </p>
+        </div>
+        <div className="flex items-center gap-2 rounded-md border border-[var(--surface-border)] bg-[var(--surface-card)] px-3 py-2 text-sm text-[var(--text-secondary)]">
+          {dashboardQuery.isFetching ? <Loader2 className="h-4 w-4 animate-spin text-[var(--teal)]" /> : <span className="h-2 w-2 rounded-full bg-[var(--teal)]" />}
+          {dashboardQuery.isFetching ? "Refreshing live data" : "Live data"}
+        </div>
       </div>
-      <section className="grid border-y border-[var(--surface-border)] md:grid-cols-4">
-        <Metric label="Sent" value={totalSent.toLocaleString()} helper="Across active campaigns" />
-        <Metric label="Reply rate" value={percent(totalReplies, totalSent)} helper={`${totalReplies} replies`} />
-        <Metric label="Booked" value="34" helper="Demo-ready opportunities" />
-        <Metric label="Blocked senders" value={String(blockedSenders)} helper="DNS verification required" warning={blockedSenders > 0} />
+
+      {dashboardQuery.isError ? (
+        <StateLine label="Could not load dashboard metrics from the backend. Try refreshing or check your workspace access." tone="error" />
+      ) : null}
+
+      <section className="grid gap-4 md:grid-cols-3">
+        <MetricCard
+          label="Total Campaigns"
+          value={summary.totalCampaigns}
+          helper="Campaigns created in this workspace"
+          to="/app/campaigns"
+          icon={<Megaphone className="h-5 w-5" />}
+        />
+        <MetricCard
+          label="Leads Generated"
+          value={summary.leadsGenerated}
+          helper="Workspace leads available for outreach"
+          to="/app/leads"
+          icon={<UsersRound className="h-5 w-5" />}
+        />
+        <MetricCard
+          label="Follow-ups Left Today"
+          value={summary.followUpsLeftToday}
+          helper="Queued or scheduled follow-ups due by tonight"
+          to="/app/sequences"
+          icon={<CalendarClock className="h-5 w-5" />}
+          highlight={summary.followUpsLeftToday > 0}
+        />
       </section>
-      {isLoading ? <StateLine label="Loading live workspace data..." /> : null}
-      {isError ? <StateLine label="Could not load Neon data. Showing empty workspace state." tone="error" /> : null}
-      <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+
+      <section className="grid gap-6 xl:grid-cols-[1fr_340px]">
         <Card className="p-0">
-          <div className="mb-5 flex items-center justify-between">
+          <div className="flex flex-col gap-3 border-b border-[var(--surface-border)] p-5 sm:flex-row sm:items-center sm:justify-between">
             <div>
-              <h2 className="px-5 pt-5 font-sans text-[1.1rem] font-medium not-italic tracking-normal">Campaign funnel</h2>
-              <p className="px-5 text-sm text-[var(--text-secondary)]">Sent to booked conversion by campaign.</p>
-            </div>
-            <Link className="px-5 pt-5 text-sm font-medium text-[var(--orange-dim)]" to="/app/campaigns">Manage <ArrowRight className="inline h-4 w-4" /></Link>
-          </div>
-          <div className="overflow-x-auto">
-            <div className="grid min-w-[820px] grid-cols-[minmax(190px,1.3fr)_90px_repeat(5,minmax(72px,1fr))] gap-3 border-y border-[var(--surface-border)] bg-[var(--surface-raised)] px-5 py-2 font-mono text-[0.68rem] uppercase tracking-[0.08em] text-[var(--text-tertiary)]">
-              <span>Campaign</span>
-              <span>Status</span>
-              <span>Sent</span>
-              <span>Delivered</span>
-              <span>Opened</span>
-              <span>Replied</span>
-              <span>Booked</span>
-            </div>
-            {campaigns.length === 0 ? (
-              <div className="px-5 py-8 text-sm text-[var(--text-secondary)]">No campaigns yet. Create a campaign to populate the funnel.</div>
-            ) : campaigns.map((campaign) => (
-              <div key={campaign.id} className="campaign-row grid min-w-[820px] grid-cols-[minmax(190px,1.3fr)_90px_repeat(5,minmax(72px,1fr))] gap-3 border-b border-[var(--surface-border)] px-5 py-4 text-sm last:border-b-0">
-                <div className="font-medium">{campaign.name}</div>
-                <Badge tone={campaign.status === "active" ? "teal" : "orange"}>{campaign.status}</Badge>
-                <span>{campaign.sent}</span>
-                <span>{campaign.delivered}</span>
-                <span>{campaign.opened}</span>
-                <span>{campaign.replied}</span>
-                <span>{campaign.booked}</span>
+              <div className="flex items-center gap-2 font-semibold">
+                <MailCheck className="h-5 w-5 text-[var(--teal)]" />
+                Recent Replies
               </div>
-            ))}
+              <p className="mt-1 text-sm text-[var(--text-secondary)]">The five newest replied email messages from your inbox.</p>
+            </div>
+            <Link to="/app/inbox" className="inline-flex items-center gap-1 text-sm font-medium text-[var(--teal-deep)]">
+              Open inbox <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
-        </Card>
-        <div className="grid gap-6">
-          <Card>
-            <h2 className="font-sans text-[1.1rem] font-medium not-italic tracking-normal">Onboarding</h2>
-            <div className="mt-4 space-y-3">
-              {[
-                ["Connect mailbox", true],
-                ["Verify SPF/DKIM/DMARC", false],
-                ["Import leads", true],
-                ["Build sequence", true],
-                ["Launch safely", false],
-              ].map(([label, done]) => (
-                <div key={String(label)} className="flex items-center gap-3 text-sm text-[var(--text-secondary)]">
-                  {done ? <CheckCircle2 className="h-4 w-4 text-[var(--green)]" /> : <AlertTriangle className="h-4 w-4 text-[var(--amber)]" />}
-                  {label}
-                </div>
+
+          {dashboardQuery.isLoading ? (
+            <div className="grid gap-3 p-5">
+              {Array.from({ length: 3 }).map((_, index) => (
+                <div key={index} className="h-20 animate-pulse rounded-md bg-[var(--surface-raised)]" />
               ))}
             </div>
-          </Card>
-          <Card>
-            <div className="flex items-center gap-2 font-medium">
-              <MailCheck className="h-5 w-5 text-[var(--orange)]" />
-              Reply inbox
+          ) : recentReplies.length === 0 ? (
+            <div className="p-8 text-sm text-[var(--text-secondary)]">
+              No recent replies yet. New replied emails will appear here as soon as they land in the workspace.
             </div>
-            <div className="mt-4 space-y-3">
-              {inboxThreads.length === 0 ? (
-                <p className="text-sm text-[var(--text-secondary)]">No replies yet.</p>
-              ) : inboxThreads.slice(0, 2).map((thread) => (
-                <Link key={thread.id} to="/app/inbox" className="grid grid-cols-[28px_1fr_auto] gap-3 rounded border border-[var(--surface-border)] p-3 hover:bg-[var(--surface-raised)]">
-                  <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[var(--orange)] text-xs font-medium text-[var(--dark-text)]">
-                    {thread.leadName.slice(0, 1)}
+          ) : (
+            <div className="divide-y divide-[var(--surface-border)]">
+              {recentReplies.map((reply) => (
+                <Link
+                  key={reply.id}
+                  to={`/app/inbox?thread=${reply.id}`}
+                  className="grid gap-3 p-5 transition hover:bg-[var(--surface-raised)] sm:grid-cols-[44px_minmax(0,1fr)_auto] sm:items-start"
+                >
+                  <span className="flex h-11 w-11 items-center justify-center rounded-md bg-[var(--teal)] text-sm font-semibold text-white">
+                    {reply.senderName.slice(0, 1).toUpperCase()}
                   </span>
                   <span className="min-w-0">
-                    <span className="block text-sm font-medium">{thread.leadName}</span>
-                    <span className="mt-1 block line-clamp-2 text-xs text-[var(--text-secondary)]">{thread.preview}</span>
+                    <span className="flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
+                      <span className="font-semibold text-[var(--text-primary)]">{reply.senderName}</span>
+                      {reply.senderEmail ? <span className="truncate text-xs text-[var(--text-tertiary)]">{reply.senderEmail}</span> : null}
+                    </span>
+                    <span className="mt-1 block truncate text-sm font-medium text-[var(--text-primary)]">{reply.subject}</span>
+                    <span className="mt-1 block line-clamp-2 text-sm leading-6 text-[var(--text-secondary)]">{reply.preview || reply.campaignName}</span>
                   </span>
-                  <span className="font-mono text-[0.7rem] text-[var(--text-tertiary)]">{thread.lastActivity}</span>
+                  <span className="font-mono text-[0.7rem] text-[var(--text-tertiary)] sm:text-right">{formatRelativeTime(reply.timestamp)}</span>
                 </Link>
               ))}
             </div>
-          </Card>
-        </div>
+          )}
+        </Card>
+
+        <Card>
+          <div className="precision-label">Today</div>
+          <h2 className="mt-3 font-sans text-xl font-semibold not-italic tracking-normal">What needs attention</h2>
+          <div className="mt-5 grid gap-3">
+            <ActionItem
+              label="Follow-ups pending"
+              value={summary.followUpsLeftToday}
+              copy={summary.followUpsLeftToday > 0 ? "Review queued steps before the next scheduler run." : "No pending follow-ups due today."}
+              to="/app/sequences"
+            />
+            <ActionItem
+              label="Replies to review"
+              value={recentReplies.length}
+              copy={recentReplies.length > 0 ? "Open recent conversations and move qualified leads forward." : "Your reply queue is clear."}
+              to="/app/inbox"
+            />
+          </div>
+        </Card>
       </section>
     </div>
+  );
+}
+
+function MetricCard({
+  label,
+  value,
+  helper,
+  to,
+  icon,
+  highlight = false,
+}: {
+  label: string;
+  value: number;
+  helper: string;
+  to: string;
+  icon: ReactNode;
+  highlight?: boolean;
+}) {
+  return (
+    <Link to={to} className="group block">
+      <Card className={`h-full p-5 transition group-hover:border-[var(--teal)] group-hover:shadow-[0_18px_42px_rgba(15,118,110,0.08)] ${highlight ? "bg-[var(--teal-pale)]/35" : ""}`}>
+        <div className="flex items-start justify-between gap-4">
+          <span className="flex h-10 w-10 items-center justify-center rounded-md bg-[var(--teal-pale)] text-[var(--teal-deep)]">{icon}</span>
+          <ArrowRight className="h-4 w-4 text-[var(--text-tertiary)] transition group-hover:translate-x-1 group-hover:text-[var(--teal-deep)]" />
+        </div>
+        <div className="mt-5 precision-label">{label}</div>
+        <div className="mt-2 text-[2.75rem] font-semibold leading-none tracking-[-0.05em]">{value.toLocaleString()}</div>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-secondary)]">{helper}</p>
+      </Card>
+    </Link>
+  );
+}
+
+function ActionItem({ label, value, copy, to }: { label: string; value: number; copy: string; to: string }) {
+  return (
+    <Link to={to} className="rounded-md border border-[var(--surface-border)] bg-[var(--surface-base)] p-4 transition hover:border-[var(--teal)] hover:bg-[var(--teal-pale)]/35">
+      <div className="flex items-center justify-between gap-4">
+        <span className="text-sm font-semibold">{label}</span>
+        <span className="font-mono text-sm text-[var(--teal-deep)]">{value}</span>
+      </div>
+      <p className="mt-2 text-sm leading-6 text-[var(--text-secondary)]">{copy}</p>
+    </Link>
   );
 }
 
@@ -112,12 +181,16 @@ function StateLine({ label, tone = "default" }: { label: string; tone?: "default
   );
 }
 
-function Metric({ label, value, helper, warning }: { label: string; value: string; helper: string; warning?: boolean }) {
-  return (
-    <div className="border-b border-[var(--surface-border)] p-4 md:border-b-0 md:border-r md:last:border-r-0">
-      <div className="precision-label">{label}</div>
-      <div className={warning ? "mt-2 text-[2.5rem] font-light leading-none text-[var(--orange-dim)]" : "mt-2 text-[2.5rem] font-light leading-none"}>{value}</div>
-      <div className="mt-2 font-mono text-[0.7rem] text-[var(--text-tertiary)]">{helper}</div>
-    </div>
-  );
+function formatRelativeTime(timestamp: string) {
+  const then = new Date(timestamp).getTime();
+  if (!Number.isFinite(then)) return "recently";
+  const diffMs = Date.now() - then;
+  const minutes = Math.max(0, Math.round(diffMs / 60_000));
+  if (minutes < 1) return "now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.round(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric" }).format(new Date(timestamp));
 }

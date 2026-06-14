@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type { Campaign, InboxThread, Lead, SendingIdentity, SequenceStep, Template } from "../types";
+import type { Campaign, DashboardOverview, InboxThread, Lead, SendingIdentity, SequenceStep, Template } from "../types";
 import { useAuth } from "../state/use-auth";
 import { apiFetch } from "./api";
 
@@ -224,6 +224,18 @@ export function useInboxThreads() {
       return data.messages.map(mapMessage);
     },
     enabled: Boolean(workspace.id),
+  });
+}
+
+export function useDashboardOverview() {
+  const { workspace } = useAuth();
+  return useQuery({
+    queryKey: ["dashboard-overview", workspace.id],
+    queryFn: async () => {
+      return apiFetch<DashboardOverview>("/api/dashboard", { workspaceId: workspace.id });
+    },
+    enabled: Boolean(workspace.id),
+    refetchInterval: 60_000,
   });
 }
 

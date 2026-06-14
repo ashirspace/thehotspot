@@ -82,3 +82,24 @@ export type InboxThread = {
   preview: string;
   lastActivity: string;
 };
+
+export type DashboardReply = {
+  id: string;
+  senderName: string;
+  senderEmail: string | null;
+  subject: string;
+  preview: string;
+  campaignName: string;
+  timestamp: string;
+};
+
+export type DashboardSummary = {
+  totalCampaigns: number;
+  leadsGenerated: number;
+  followUpsLeftToday: number;
+};
+
+export type DashboardOverview = {
+  summary: DashboardSummary;
+  recentReplies: DashboardReply[];
+};

@@ -1,12 +1,15 @@
 import { useState } from "react";
 import { Badge, Button, Card, Textarea } from "../../components/ui";
 import { useInboxThreads } from "../../lib/data-hooks";
+import { useSearchParams } from "react-router-dom";
 
 export function InboxPage() {
   const inboxQuery = useInboxThreads();
   const inboxThreads = inboxQuery.data ?? [];
+  const [searchParams, setSearchParams] = useSearchParams();
   const [selectedId, setSelectedId] = useState("");
-  const activeId = selectedId || inboxThreads[0]?.id || "";
+  const requestedThreadId = searchParams.get("thread") || "";
+  const activeId = selectedId || requestedThreadId || inboxThreads[0]?.id || "";
   const active = inboxThreads.find((thread) => thread.id === activeId) || inboxThreads[0];
 
   return (
@@ -28,7 +31,10 @@ export function InboxPage() {
               <button
                 key={thread.id}
                 type="button"
-                onClick={() => setSelectedId(thread.id)}
+                onClick={() => {
+                  setSelectedId(thread.id);
+                  setSearchParams({ thread: thread.id });
+                }}
                 className={`w-full rounded-xl border p-3 text-left transition ${activeId === thread.id ? "border-[var(--orange)] bg-[rgba(13,148,136,0.08)]" : "border-slate-200 hover:bg-slate-50"}`}
               >
                 <div className="flex items-center justify-between gap-2">

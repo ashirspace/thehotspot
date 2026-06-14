@@ -28,6 +28,36 @@ const insightRows = [
   ["Approval gate", "On", "Low-confidence AI drafts wait"],
 ];
 
+const footerLinkGroups = [
+  {
+    heading: "Product",
+    links: [
+      ["Features", "/#product-overview"],
+      ["Pricing", "/pricing"],
+      ["Changelog", "/blog"],
+      ["Roadmap", "/#what-we-provide"],
+    ],
+  },
+  {
+    heading: "Company",
+    links: [
+      ["About", "/about"],
+      ["Blog", "/blog"],
+      ["Careers", "/about"],
+      ["Contact", "/#resources"],
+    ],
+  },
+  {
+    heading: "Legal",
+    links: [
+      ["Privacy", "/privacy"],
+      ["Terms", "/terms"],
+      ["Security", "/privacy"],
+      ["GDPR", "/privacy"],
+    ],
+  },
+];
+
 export function LandingPage() {
   return (
     <>
@@ -293,15 +323,15 @@ export function LandingPage() {
               </p>
             </div>
             <div className="grid gap-8 min-[520px]:grid-cols-3 sm:gap-10">
-              {[
-                ["Product", "Features", "Pricing", "Changelog", "Roadmap"],
-                ["Company", "About", "Blog", "Careers", "Contact"],
-                ["Legal", "Privacy", "Terms", "Security", "GDPR"],
-              ].map(([heading, ...links]) => (
+              {footerLinkGroups.map(({ heading, links }) => (
                 <div key={heading}>
                   <div className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-white/38">{heading}</div>
                   <div className="mt-6 grid gap-4 text-base text-white/52">
-                    {links.map((item) => <span key={item}>{item}</span>)}
+                    {links.map(([label, to]) => (
+                      <Link key={label} to={to} className="transition hover:text-white">
+                        {label}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               ))}
