@@ -1,0 +1,9 @@
+import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
+import { StatusBadge } from "@/components/status-badge";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import type { Contact } from "@/lib/types";
+
+export function LeadsTable({ contacts, compact = false }: { contacts: Contact[]; compact?: boolean }) {
+  return <Table><TableHeader><TableRow><TableHead>Lead</TableHead><TableHead className="hidden sm:table-cell">Company</TableHead><TableHead>Status</TableHead>{!compact && <TableHead className="hidden lg:table-cell">Added</TableHead>}<TableHead className="hidden w-12 sm:table-cell"><span className="sr-only">Open</span></TableHead></TableRow></TableHeader><TableBody>{contacts.map((contact) => <TableRow key={contact.id}><TableCell><div><Link href={`/app/leads/${contact.id}`} className="font-medium hover:text-primary">{contact.first_name} {contact.last_name}</Link><p className="mt-0.5 max-w-36 truncate text-xs text-muted-foreground sm:max-w-none">{contact.email}</p></div></TableCell><TableCell className="hidden sm:table-cell"><p className="font-medium">{contact.company}</p><p className="mt-0.5 text-xs text-muted-foreground">{contact.job_title}</p></TableCell><TableCell><StatusBadge status={contact.status} /></TableCell>{!compact && <TableCell className="hidden text-muted-foreground lg:table-cell">{new Date(contact.created_at).toLocaleDateString("en", { month: "short", day: "numeric" })}</TableCell>}<TableCell className="hidden sm:table-cell"><Link href={`/app/leads/${contact.id}`} className="grid size-8 place-items-center rounded-lg text-muted-foreground hover:bg-secondary hover:text-foreground" aria-label={`Open ${contact.first_name}`}><ArrowUpRight className="size-4" /></Link></TableCell></TableRow>)}</TableBody></Table>;
+}

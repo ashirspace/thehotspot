@@ -1,0 +1,42 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@theme inline {
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+}
+
+:root {
+  --background: #f7f6f2;
+  --foreground: #172135;
+  --card: #fffefa;
+  --card-foreground: #172135;
+  --primary: #f04f3e;
+  --primary-foreground: #ffffff;
+  --secondary: #edece7;
+  --secondary-foreground: #172135;
+  --muted: #f0efea;
+  --muted-foreground: #697080;
+  --border: #deddd7;
+  --input: #deddd7;
+  --ring: #f04f3e;
+}
+
+* { border-color: var(--border); }
+html { background: var(--background); }
+body { min-height: 100vh; background: var(--background); color: var(--foreground); font-family: var(--font-geist-sans), sans-serif; }
+button, a, input, textarea, select { outline-color: var(--ring); }
+::selection { background: #ffd4cf; color: #172135; }
